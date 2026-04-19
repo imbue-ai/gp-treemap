@@ -62,7 +62,7 @@ const STYLE = `
   transform-origin: 0 0; transition: transform var(--gp-zoom-ms, 350ms) ease; }
 .overlay { position:absolute; inset:0; pointer-events:none; }
 .overlay .sel, .overlay .loc { position:absolute; box-sizing:border-box; pointer-events:none; }
-.overlay .sel { border:2px solid var(--gp-selected); mix-blend-mode: difference; }
+.overlay .sel { border:2px solid var(--gp-selected); mix-blend-mode: difference; box-sizing:border-box; }
 .overlay .loc { border:2px solid var(--gp-located); box-shadow: 0 0 0 1px #fff8; }
 .overlay .lbl { position:absolute; color:#111; font-size:11px; font-weight:500; line-height:1; padding:1px 3px;
   text-shadow: 0 0 2px #ffffffcc, 0 0 2px #ffffffcc; white-space:nowrap; pointer-events:none;
@@ -748,10 +748,15 @@ function escapeHtml(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&':'&amp
 function overlayBox(cls, leaf, dpr) {
   const el = document.createElement('div');
   el.className = cls;
+  const cssW = leaf.w / dpr, cssH = leaf.h / dpr;
   el.style.left = leaf.x / dpr + 'px';
   el.style.top = leaf.y / dpr + 'px';
-  el.style.width = leaf.w / dpr + 'px';
-  el.style.height = leaf.h / dpr + 'px';
+  el.style.width = cssW + 'px';
+  el.style.height = cssH + 'px';
+  if (cls === 'sel') {
+    const t = Math.max(2, Math.round(Math.max(cssW, cssH) * 0.01));
+    el.style.borderWidth = t + 'px';
+  }
   return el;
 }
 function parseBgColor(css) {
