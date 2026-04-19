@@ -1280,9 +1280,11 @@ class GpTreemap extends HTMLElement {
     const inSubtree = new Set();
     const leafCap = new Set(); // ids that are rendered as leaves (at cap or true leaves)
     const pad = Math.max(0, (p.groupPadding || 0) * dpr);
+    const nodeRects = new Map(); // rect for every node in the subtree — used for selection highlight
 
     const layoutSubtree = (nodeId, rect) => {
       inSubtree.add(nodeId);
+      nodeRects.set(nodeId, rect);
       const node = nodes.get(nodeId);
       const atCap = node.depth >= cap;
       if (atCap || node.childIds.length === 0) {
@@ -1313,6 +1315,7 @@ class GpTreemap extends HTMLElement {
       }
     };
     layoutSubtree(rootId, { x: 0, y: 0, w, h });
+    this._nodeRects = nodeRects;
 
     const palette = this._resolvedPalette();
     const subtree = Array.from(inSubtree).map((id) => nodes.get(id));
@@ -1688,22 +1691,9 @@ class GpTreemap extends HTMLElement {
   }
 
   _selectionBounds(nodeId) {
-    if (this._leafById.has(nodeId)) return this._leafById.get(nodeId);
-    // Node is a directory — compute bounding box of all its rendered descendant leaves.
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    const stack = [nodeId];
-    while (stack.length) {
-      const id = stack.pop();
-      if (this._leafById.has(id)) {
-        const l = this._leafById.get(id);
-        if (l.x < minX) minX = l.x; if (l.y < minY) minY = l.y;
-        if (l.x + l.w > maxX) maxX = l.x + l.w; if (l.y + l.h > maxY) maxY = l.y + l.h;
-      } else {
-        const n = this._tree && this._tree.nodes.get(id);
-        if (n) for (const c of n.childIds) stack.push(c);
-      }
-    }
-    return minX === Infinity ? null : { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
+    // The rect for any node is captured during the layout pass — a parent's rect is
+    // exactly the union of its children's rects because the tiling is perfect.
+    return (this._nodeRects && this._nodeRects.get(nodeId)) || null;
   }
 
   _treeMaxDepth() {
