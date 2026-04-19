@@ -1,0 +1,18 @@
+{
+  "name": "gp-treemap",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GrandPerspective-style <gp-treemap> Web Component",
+  "type": "module",
+  "scripts": {
+    "serve": "node tools/server.js",
+    "build": "node tools/build.js",
+    "scan": "node tools/scan.js",
+    "test": "playwright test",
+    "test:install": "playwright install chromium",
+    "test:update": "playwright test --update-snapshots"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0"
+  }
+}

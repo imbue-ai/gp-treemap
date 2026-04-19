@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>gp-treemap · filesystem</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, sans-serif; background:#fafafa; color:#111; }
+  header { padding: 10px 14px; border-bottom: 1px solid #0002; display: flex; gap: 12px; align-items: center; }
+  header h1 { margin: 0; font-size: 16px; font-weight: 600; }
+  header a { margin-left: auto; color: #0645ad; text-decoration: none; font-size: 13px; }
+  gp-treemap { display:flex; height: calc(100vh - 47px); }
+  .controls { display: flex; gap: 12px; align-items: center; font-size: 13px; color:#444; }
+</style>
+</head>
+<body>
+<header>
+  <h1>filesystem — categorical by file kind</h1>
+  <div class="controls">
+    <label>intensity <input id="intensity" type="range" min="0" max="1" step="0.01" value="0.5"></label>
+    <label><input id="labels" type="checkbox"> show labels</label>
+  </div>
+  <a href="index.html">← all samples</a>
+</header>
+<gp-treemap id="tm"
+  color-mode="categorical"
+  palette="gp-default"
+  gradient-intensity="0.5"
+  value-format="b"
+  min-cell-area="40"></gp-treemap>
+
+<script src="../dist/gp-treemap.bundle.js"></script>
+<script src="data/filesystem.js"></script>
+<script>
+(function () {
+  var d = window.__data.flattenFilesystem();
+  var tm = document.getElementById('tm');
+  tm.labels = d.labels; tm.parents = d.parents; tm.values = d.values;
+  tm.ids = d.ids; tm.color = d.color;
+  tm.colorMap = {
+    pdf:  'hsl(354,70%,53%)', doc:  'hsl(211,70%,52%)', xls: 'hsl(138,55%,45%)',
+    ppt:  'hsl(26,85%,55%)',  jpg:  'hsl(300,55%,55%)', heic:'hsl(320,55%,60%)',
+    png:  'hsl(260,60%,60%)', raw:  'hsl(200,70%,55%)', mp3: 'hsl(170,55%,45%)',
+    flac: 'hsl(180,65%,40%)', js:   'hsl(48,85%,55%)',  ts:  'hsl(210,75%,50%)',
+    css:  'hsl(188,70%,48%)', lib:  'hsl(264,55%,58%)', mov: 'hsl(348,70%,50%)',
+    zip:  'hsl(20,60%,48%)',  app:  'hsl(138,50%,44%)', sys: 'hsl(264,45%,50%)',
+  };
+  document.getElementById('intensity').addEventListener('input', function (e) { tm.gradientIntensity = Number(e.target.value); });
+  document.getElementById('labels').addEventListener('change', function (e) { tm.showLabels = e.target.checked; });
+})();
+</script>
+</body>
+</html>

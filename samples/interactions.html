@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>gp-treemap · interactions</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, sans-serif; background:#fafafa; color:#111; }
+  .wrap { display: grid; grid-template-columns: 1fr 300px; height: 100vh; }
+  header { padding: 10px 14px; border-bottom: 1px solid #0002; grid-column: 1 / -1; display:flex; gap:12px; align-items:center; }
+  header h1 { margin:0; font-size:16px; font-weight:600; }
+  header a { margin-left:auto; color:#0645ad; text-decoration:none; font-size:13px; }
+  header code { background:#eee; padding:1px 4px; border-radius:3px; }
+  .log { border-left: 1px solid #0002; padding: 8px 10px; overflow: auto; font-size: 12px; background: #fff; }
+  .log div { padding: 2px 0; border-bottom: 1px dotted #0002; font-family: ui-monospace, SF Mono, monospace; }
+  .log .gp-hover { color:#555; }
+  .log .gp-click { color:#088; }
+  .log .gp-dblclick { color:#b70; }
+  .log .gp-select { color:#06a; }
+  .log .gp-zoom-change { color:#a04; font-weight:600; }
+  gp-treemap { display:flex; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>interactions — hover, click, dblclick-to-zoom, keyboard</h1>
+    <span style="color:#666; font-size:13px;">(click a cell, then arrow keys / <code>+ 0 -</code>)</span>
+    <a href="index.html">← all samples</a>
+  </header>
+  <gp-treemap id="tm"
+    color-mode="categorical"
+    palette="gp-default"
+    gradient-intensity="0.5"
+    value-format="b"
+    show-labels="true"
+    min-cell-area="100"></gp-treemap>
+  <div id="log" class="log"></div>
+</div>
+
+<script src="../dist/gp-treemap.bundle.js"></script>
+<script src="data/filesystem.js"></script>
+<script>
+(function () {
+  var d = window.__data.flattenFilesystem();
+  var tm = document.getElementById('tm');
+  tm.labels = d.labels; tm.parents = d.parents; tm.values = d.values;
+  tm.ids = d.ids; tm.color = d.color;
+  var log = document.getElementById('log');
+  function write(e) {
+    var div = document.createElement('div');
+    div.className = e.type;
+    var dt = e.detail || {};
+    div.textContent = e.type + '  ' + (dt.label || dt.nodeId || '(reset)') + (dt.value != null ? ' · ' + dt.value : '');
+    log.prepend(div);
+    while (log.childElementCount > 200) log.removeChild(log.lastChild);
+  }
+  ['gp-hover','gp-click','gp-dblclick','gp-select','gp-zoom-change'].forEach(function (t) { tm.addEventListener(t, write); });
+})();
+</script>
+</body>
+</html>

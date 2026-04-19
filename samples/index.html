@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>gp-treemap · samples</title>
+<style>
+  body { font: 15px system-ui, sans-serif; max-width: 720px; margin: 40px auto; color:#222; }
+  h1 { margin-top: 0; }
+  li { margin: 6px 0; }
+  code { background: #eee; padding: 1px 4px; border-radius: 3px; }
+  .note { padding: 10px 12px; background: #fff9e6; border: 1px solid #f0d469; border-radius: 4px; color: #5a4a00; }
+</style>
+</head>
+<body>
+<h1>&lt;gp-treemap&gt; samples</h1>
+<p>Drop-in Custom Element that paints a "raised tile" treemap onto a single Canvas, pixel-by-pixel. Open any sample below.</p>
+<p class="note">Each sample loads <code>../dist/gp-treemap.bundle.js</code> via a plain <code>&lt;script src&gt;</code> tag, so it runs under <code>file://</code> or any static server — no modules, no CORS, no bundler.</p>
+<ul>
+  <li><a href="filesystem.html">Filesystem</a> — categorical colors by file kind, bytes formatter, default palette.</li>
+  <li><a href="budget.html">Budget</a> — quantitative colors by variance-vs-plan, diverging palette.</li>
+  <li><a href="depth.html">Deep hierarchy</a> — ~960 leaves, colored by tree depth.</li>
+  <li><a href="interactions.html">Interactions</a> — hover/click/dblclick/zoom demo with event log.</li>
+  <li><a href="gradients.html">Gradient intensities</a> — 0 / 0.5 / 1 side-by-side.</li>
+  <li><a href="min-cell.html">minCellArea threshold</a> — shows small-cell pruning.</li>
+  <li><a href="located.html">Located nodes</a> — highlight ring demo.</li>
+</ul>
+<p>Source of truth: <code>src/*.js</code> (ES modules). Rebuild the bundle with <code>node tools/build.js</code>. Tests in <code>tests/</code> generate PNGs into <code>tests/screenshots/</code>.</p>
+</body>
+</html>

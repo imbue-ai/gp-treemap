@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>gp-treemap · budget</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, sans-serif; background:#fafafa; color:#111; }
+  header { padding: 10px 14px; border-bottom: 1px solid #0002; display: flex; gap: 12px; align-items: center; }
+  header h1 { margin: 0; font-size: 16px; font-weight: 600; }
+  header a { margin-left: auto; color: #0645ad; text-decoration: none; font-size: 13px; }
+  gp-treemap { display:flex; height: calc(100vh - 47px); }
+</style>
+</head>
+<body>
+<header>
+  <h1>budget — quantitative, diverging (under vs. over plan)</h1>
+  <a href="index.html">← all samples</a>
+</header>
+<gp-treemap id="tm"
+  color-mode="quantitative"
+  color-scale="diverging"
+  palette="heatmap"
+  gradient-intensity="0.6"
+  value-format=".2s"
+  show-labels="true"></gp-treemap>
+
+<script src="../dist/gp-treemap.bundle.js"></script>
+<script src="data/budget.js"></script>
+<script>
+(function () {
+  var d = window.__data.flattenBudget();
+  var tm = document.getElementById('tm');
+  tm.labels = d.labels; tm.parents = d.parents; tm.values = d.values;
+  tm.ids = d.ids; tm.color = d.color;
+  tm.colorDomain = [-8, 0, 12];
+})();
+</script>
+</body>
+</html>
