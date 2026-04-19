@@ -18,7 +18,7 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const BUNDLE_PATH = path.join(ROOT, 'dist', 'gp-treemap.bundle.js');
 
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   if (args.length < 1 || args[0] === '-h' || args[0] === '--help') {
     console.error('Usage: node tools/scan.js <dir> [output.html]');
@@ -56,7 +56,10 @@ function main() {
   console.log('  scan took    ' + elapsed + ' ms');
   console.log('');
   console.log('wrote ' + out + '  (' + humanBytes(fs.statSync(out).size) + ')');
-  console.log('open it with:  open "' + out + '"');
+
+  const { execSync } = await import('node:child_process');
+  const openCmd = process.platform === 'win32' ? 'start ""' : process.platform === 'darwin' ? 'open' : 'xdg-open';
+  try { execSync(openCmd + ' ' + JSON.stringify(out)); } catch { console.log('open it with:  open "' + out + '"'); }
 }
 
 /**

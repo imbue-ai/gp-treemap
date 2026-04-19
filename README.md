@@ -11,6 +11,21 @@ pixel's shade is chosen by comparing its normalized in-cell coordinates
 256-entry brightness-ramp LUT for the cell's base color. LUTs are built by
 linear-RGB interpolation between the base color and black/white targets.
 
+## Quick start
+
+No install required — run directly from GitHub:
+
+```sh
+npx github:imbue-ai/raised-treemap ~/Downloads
+```
+
+Scans `~/Downloads`, writes a self-contained HTML file, and opens it in your
+default browser. Pass a second argument to choose the output path:
+
+```sh
+npx github:imbue-ai/raised-treemap ~/Pictures /tmp/pictures.html
+```
+
 ## Viewing the samples
 
 ```sh

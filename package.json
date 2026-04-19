@@ -1,7 +1,8 @@
 {
-  "name": "gp-treemap",
+  "name": "raised-treemap",
   "version": "0.1.0",
   "private": true,
+  "bin": { "raised-treemap": "./tools/scan.js" },
   "description": "GrandPerspective-style <gp-treemap> Web Component",
   "type": "module",
   "scripts": {
