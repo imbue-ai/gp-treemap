@@ -263,7 +263,6 @@ export class GpTreemap extends HTMLElement {
     const inSubtree = new Set();
     const leafCap = new Set(); // ids that are rendered as leaves (at cap or true leaves)
     const pad = Math.max(0, (p.groupPadding || 0) * dpr);
-    const minArea = Math.max(1, p.minCellArea * dpr * dpr);
 
     const layoutSubtree = (nodeId, rect) => {
       inSubtree.add(nodeId);
@@ -278,7 +277,7 @@ export class GpTreemap extends HTMLElement {
       const balRoot = balanceChildren(kids.map((k) => ({ id: k.id, size: Math.max(0, k.value) })));
       const childRects = new Map();
       if (balRoot) {
-        layoutTree(balRoot, rect, (id, r) => childRects.set(id, r), minArea);
+        layoutTree(balRoot, rect, (id, r) => childRects.set(id, r));
       }
       for (const kid of kids) {
         const r = childRects.get(kid.id);

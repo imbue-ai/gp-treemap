@@ -26,6 +26,27 @@ test('layout: rects sum to parent area', async ({ page }) => {
   expect(Math.abs(result.total - 800 * 400)).toBeLessThan(1);
 });
 
+test('layout: covers the whole parent rect with no background holes', async ({ page }) => {
+  await setup(page);
+  const result = await page.evaluate(() => {
+    const { balanceChildren, layoutTree } = window.__mods;
+    // One dominant sibling and a small sibling whose rect is well above
+    // sub-pixel but well below any plausible min-area threshold (400 px²
+    // inside a 40,000-px² parent). GrandPerspective-style layout only
+    // culls sub-pixel rects, so this small cell must still be drawn and
+    // the parent rect must be fully covered with no black gaps.
+    const items = [{ id: 'big', size: 99 }, { id: 'small', size: 1 }];
+    const root = balanceChildren(items);
+    const rect = { x: 0, y: 0, w: 200, h: 200 };
+    const got = [];
+    layoutTree(root, rect, (id, r) => got.push({ id, r }));
+    const covered = got.reduce((s, x) => s + x.r.w * x.r.h, 0);
+    return { parentArea: rect.w * rect.h, covered, leaves: got.length };
+  });
+  expect(result.leaves).toBe(2);
+  expect(Math.abs(result.covered - result.parentArea)).toBeLessThan(1);
+});
+
 test('balancer: equal-size items produce a perfectly balanced tree', async ({ page }) => {
   await setup(page);
   const depth = await page.evaluate(() => {
