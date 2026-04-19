@@ -1,4 +1,4 @@
-# `<gp-treemap>` — treemap Web Component with raised-tile shading
+# raised-treemap — treemap Web Component with raised-tile shading
 
 A standards-compliant Custom Element that renders interactive treemaps with a
 "raised tile" pixel-shading look — bright upper-left corner, dark lower-right,
@@ -105,7 +105,7 @@ samples/                one HTML per behavior (load via <script src>)
   data/                   small datasets the samples attach to window.__data
 
 dist/                   build output
-  gp-treemap.bundle.js    single-file IIFE; defines <gp-treemap>
+  gp-treemap.bundle.js    single-file IIFE; defines the custom element
 
 tests/                  Playwright suite (Chromium)
   visual.spec.js          screenshots → tests/screenshots/*.png
