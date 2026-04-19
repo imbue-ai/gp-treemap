@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>gp-treemap · interactions</title>
+<title>raised-treemap · interactions</title>
 <style>
   html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, sans-serif; background:#fafafa; color:#111; }
   .wrap { display: grid; grid-template-columns: 1fr 300px; height: 100vh; }
@@ -17,7 +17,7 @@
   .log .gp-dblclick { color:#b70; }
   .log .gp-select { color:#06a; }
   .log .gp-zoom-change { color:#a04; font-weight:600; }
-  gp-treemap { display:flex; }
+  raised-treemap { display:flex; }
 </style>
 </head>
 <body>
@@ -27,17 +27,17 @@
     <span style="color:#666; font-size:13px;">(click a cell, then arrow keys / <code>+ 0 -</code>)</span>
     <a href="index.html">← all samples</a>
   </header>
-  <gp-treemap id="tm"
+  <raised-treemap id="tm"
     color-mode="categorical"
     palette="gp-default"
     gradient-intensity="0.5"
     value-format="b"
     show-labels="true"
-    min-cell-area="100"></gp-treemap>
+    min-cell-area="100"></raised-treemap>
   <div id="log" class="log"></div>
 </div>
 
-<script src="../dist/gp-treemap.bundle.js"></script>
+<script src="../dist/raised-treemap.bundle.js"></script>
 <script src="data/filesystem.js"></script>
 <script>
 (function () {

@@ -13,7 +13,7 @@ test('samples/filesystem.html renders over file://', async ({ page }) => {
   page.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
   await page.goto(FS_SAMPLE);
   await page.waitForTimeout(400);
-  const cells = await page.locator('gp-treemap').evaluate((el) => el._leaves ? el._leaves.length : 0);
+  const cells = await page.locator('raised-treemap').evaluate((el) => el._leaves ? el._leaves.length : 0);
   expect(errs, 'no page errors under file://').toEqual([]);
   expect(cells, 'cells should render under file://').toBeGreaterThan(10);
 });

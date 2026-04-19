@@ -1,4 +1,4 @@
-// <gp-treemap> — a standards-compliant Custom Element rendering an
+// <raised-treemap> — a standards-compliant Custom Element rendering an
 // interactive treemap with a "raised tile" look: bright upper-left, dark
 // lower-right, with a crisp diagonal seam between the two halves of every
 // cell.
@@ -72,7 +72,7 @@ const STYLE = `
 .tooltip b { display:block; font-size:11px; font-weight:600; margin-bottom:1px; }
 `;
 
-export class GpTreemap extends HTMLElement {
+export class RaisedTreemap extends HTMLElement {
   static get observedAttributes() {
     return [
       'color-mode','color-scale','palette','gradient-intensity','visible-root-id',
@@ -513,7 +513,7 @@ export class GpTreemap extends HTMLElement {
   _showErrorToolbar(msg) {
     this._toolbar.innerHTML = '';
     const s = document.createElement('span');
-    s.textContent = 'gp-treemap: ' + msg;
+    s.textContent = 'raised-treemap: ' + msg;
     s.style.color = '#b00';
     this._toolbar.appendChild(s);
     this._clearCanvas();
@@ -769,11 +769,11 @@ function parseBgColor(css) {
 }
 
 for (const p of Object.keys(DEFAULT_PROPS)) {
-  Object.defineProperty(GpTreemap.prototype, p, {
+  Object.defineProperty(RaisedTreemap.prototype, p, {
     configurable: true,
     get() { return this._props[p]; },
     set(v) { this._props[p] = v; this._queueRender(); },
   });
 }
 
-if (!customElements.get('gp-treemap')) customElements.define('gp-treemap', GpTreemap);
+if (!customElements.get('raised-treemap')) customElements.define('raised-treemap', RaisedTreemap);

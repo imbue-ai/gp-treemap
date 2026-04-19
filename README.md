@@ -29,12 +29,12 @@ npx github:imbue-ai/raised-treemap ~/Pictures /tmp/pictures.html
 ## Viewing the samples
 
 ```sh
-node tools/build.js     # (re)generate dist/gp-treemap.bundle.js
+node tools/build.js     # (re)generate dist/raised-treemap.bundle.js
 open samples/index.html # or just double-click it in Finder
 ```
 
 Each sample is a plain HTML file loading the bundle with a sibling
-`<script src="../dist/gp-treemap.bundle.js">` tag — no ES modules, no CORS,
+`<script src="../dist/raised-treemap.bundle.js">` tag — no ES modules, no CORS,
 no server required. `file://` works.
 
 If you prefer to serve over HTTP:
@@ -51,7 +51,7 @@ HTML file that renders its size treemap — the bundle and dataset are inlined
 so the output works under `file://`.
 
 ```sh
-# Produce /tmp/gp-treemap-<name>-<ts>.html for ~/Downloads:
+# Produce /tmp/raised-treemap-<name>-<ts>.html for ~/Downloads:
 node tools/scan.js ~/Downloads
 
 # Or pick your own output path:
@@ -71,8 +71,7 @@ scanned /Users/you/Pictures
   total size   38.6 GB  (41,434,812,100 B)
   scan took    612 ms
 
-wrote /tmp/gp-treemap-Pictures-1776569124346.html  (5.1 MB)
-open it with:  open "/tmp/gp-treemap-Pictures-1776569124346.html"
+wrote /tmp/raised-treemap-Pictures-1776569124346.html  (5.1 MB)
 ```
 
 Symlinks are not followed and unreadable entries are counted and skipped.
@@ -81,7 +80,7 @@ Symlinks are not followed and unreadable entries are counted and skipped.
 
 ```
 src/                    component source (ES modules)
-  gp-treemap.js           custom element: canvas render + hit-testing + toolbar
+  raised-treemap.js           custom element: canvas render + hit-testing + toolbar
   painter.js              per-pixel raised-tile painter (clean-room)
   lut.js                  brightness-ramp LUT (clean-room)
   layout.js               BSP slice-and-dice
@@ -105,7 +104,7 @@ samples/                one HTML per behavior (load via <script src>)
   data/                   small datasets the samples attach to window.__data
 
 dist/                   build output
-  gp-treemap.bundle.js    single-file IIFE; defines the custom element
+  raised-treemap.bundle.js    single-file IIFE; defines the custom element
 
 tests/                  Playwright suite (Chromium)
   visual.spec.js          screenshots → tests/screenshots/*.png
@@ -115,7 +114,7 @@ tests/                  Playwright suite (Chromium)
   screenshots/            committed PNGs — browse offline
 
 tools/
-  build.js                concatenates src/ → dist/gp-treemap.bundle.js
+  build.js                concatenates src/ → dist/raised-treemap.bundle.js
   server.js               tiny static server (used by Playwright & local dev)
 ```
 

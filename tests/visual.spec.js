@@ -25,9 +25,9 @@ test.describe('visual snapshots', () => {
   test('filesystem · categorical', async ({ page }) => {
     await page.goto('/samples/filesystem.html');
     await waitForRender(page);
-    await expect(page.locator('gp-treemap')).toBeVisible();
+    await expect(page.locator('raised-treemap')).toBeVisible();
     await snap(page, '01-filesystem-categorical');
-    const cellCount = await page.locator('gp-treemap').evaluate((el) => el._leaves.length);
+    const cellCount = await page.locator('raised-treemap').evaluate((el) => el._leaves.length);
     expect(cellCount).toBeGreaterThan(10);
   });
 
@@ -53,7 +53,7 @@ test.describe('visual snapshots', () => {
     await page.goto('/samples/depth.html');
     await waitForRender(page);
     await snap(page, '04-depth-hierarchy');
-    const cellCount = await page.locator('gp-treemap').evaluate((el) => el._leaves.length);
+    const cellCount = await page.locator('raised-treemap').evaluate((el) => el._leaves.length);
     expect(cellCount).toBeGreaterThan(100);
   });
 
@@ -73,7 +73,7 @@ test.describe('visual snapshots', () => {
     await page.goto('/samples/located.html');
     await waitForRender(page);
     await snap(page, '07-located-node');
-    const hasLocated = await page.locator('gp-treemap').evaluate((el) =>
+    const hasLocated = await page.locator('raised-treemap').evaluate((el) =>
       !!el.shadowRoot.querySelector('.overlay .loc'));
     expect(hasLocated).toBe(true);
   });
@@ -82,7 +82,7 @@ test.describe('visual snapshots', () => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);
     // click a cell
-    const box = await page.locator('gp-treemap').boundingBox();
+    const box = await page.locator('raised-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await waitForRender(page);
     await snap(page, '08-interactions-after-click');
@@ -94,11 +94,11 @@ test.describe('visual snapshots', () => {
   test('interactions · double click zooms in (breadcrumb updates)', async ({ page }) => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);
-    const box = await page.locator('gp-treemap').boundingBox();
+    const box = await page.locator('raised-treemap').boundingBox();
     await page.mouse.dblclick(box.x + box.width * 0.7, box.y + box.height * 0.3);
     await waitForRender(page);
     await snap(page, '09-interactions-after-zoom');
-    const crumbCount = await page.locator('gp-treemap').evaluate((el) =>
+    const crumbCount = await page.locator('raised-treemap').evaluate((el) =>
       el.shadowRoot.querySelectorAll('.crumbs a').length);
     expect(crumbCount).toBeGreaterThanOrEqual(1);
   });
@@ -106,13 +106,13 @@ test.describe('visual snapshots', () => {
   test('hover shows tooltip', async ({ page }) => {
     await page.goto('/samples/filesystem.html');
     await waitForRender(page);
-    const box = await page.locator('gp-treemap').boundingBox();
+    const box = await page.locator('raised-treemap').boundingBox();
     await page.mouse.move(box.x + box.width * 0.2, box.y + box.height * 0.2);
     await page.waitForTimeout(80);
     await page.mouse.move(box.x + box.width * 0.2 + 1, box.y + box.height * 0.2 + 1);
     await waitForRender(page);
     await snap(page, '10-hover-tooltip');
-    const hasTip = await page.locator('gp-treemap').evaluate((el) => {
+    const hasTip = await page.locator('raised-treemap').evaluate((el) => {
       const t = el.shadowRoot.querySelector('.tooltip');
       return t && !t.hidden;
     });

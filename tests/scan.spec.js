@@ -13,7 +13,7 @@ const ROOT = path.resolve(__dirname, '..');
 
 test('scan.js produces a self-contained HTML that renders', async ({ page }) => {
   const target = path.join(ROOT, 'GrandPerspective-3_6_4');
-  const out = path.join(os.tmpdir(), 'gp-treemap-scan-' + Date.now() + '.html');
+  const out = path.join(os.tmpdir(), 'raised-treemap-scan-' + Date.now() + '.html');
   const res = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'scan.js'), target, out], {
     encoding: 'utf8',
   });
@@ -29,7 +29,7 @@ test('scan.js produces a self-contained HTML that renders', async ({ page }) => 
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
   expect(errs, 'no errors').toEqual([]);
-  const cells = await page.locator('gp-treemap').evaluate((el) => el._leaves.length);
+  const cells = await page.locator('raised-treemap').evaluate((el) => el._leaves.length);
   expect(cells).toBeGreaterThan(100);
 
   await page.screenshot({

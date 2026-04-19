@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>gp-treemap · deep hierarchy</title>
+<title>raised-treemap · deep hierarchy</title>
 <style>
   html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, sans-serif; background:#fafafa; color:#111; }
   header { padding: 10px 14px; border-bottom: 1px solid #0002; display: flex; gap: 12px; align-items: center; }
   header h1 { margin: 0; font-size: 16px; font-weight: 600; }
   header a { margin-left: auto; color: #0645ad; text-decoration: none; font-size: 13px; }
-  gp-treemap { display:flex; height: calc(100vh - 47px); }
+  raised-treemap { display:flex; height: calc(100vh - 47px); }
 </style>
 </head>
 <body>
@@ -16,13 +16,13 @@
   <h1>deep hierarchy — colored by depth (5 levels, ~960 leaves)</h1>
   <a href="index.html">← all samples</a>
 </header>
-<gp-treemap id="tm"
+<raised-treemap id="tm"
   color-mode="categorical"
   palette="rainbow"
   gradient-intensity="0.6"
-  min-cell-area="12"></gp-treemap>
+  min-cell-area="12"></raised-treemap>
 
-<script src="../dist/gp-treemap.bundle.js"></script>
+<script src="../dist/raised-treemap.bundle.js"></script>
 <script src="data/deephier.js"></script>
 <script>
 (function () {

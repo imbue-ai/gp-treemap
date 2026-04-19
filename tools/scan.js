@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Scan a directory recursively and emit a self-contained HTML file that
-// renders its size treemap with <gp-treemap>. The output has the bundle and
+// renders its size treemap with <raised-treemap>. The output has the bundle and
 // the dataset inlined, so you can open it from anywhere with no server.
 //
 // Usage:  node tools/scan.js <dir> [output.html]
@@ -16,7 +16,7 @@ import url from 'node:url';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const BUNDLE_PATH = path.join(ROOT, 'dist', 'gp-treemap.bundle.js');
+const BUNDLE_PATH = path.join(ROOT, 'dist', 'raised-treemap.bundle.js');
 
 async function main() {
   const args = process.argv.slice(2);
@@ -27,7 +27,7 @@ async function main() {
   const target = path.resolve(args[0]);
   const out = args[1]
     ? path.resolve(args[1])
-    : path.join(os.tmpdir(), 'gp-treemap-' + path.basename(target).replace(/[^a-zA-Z0-9._-]/g, '_') + '-' + Date.now() + '.html');
+    : path.join(os.tmpdir(), 'raised-treemap-' + path.basename(target).replace(/[^a-zA-Z0-9._-]/g, '_') + '-' + Date.now() + '.html');
 
   let rootStat;
   try { rootStat = fs.lstatSync(target); }
@@ -201,7 +201,7 @@ function buildHtml(target, scan) {
   header h1 { margin:0; font-size:14px; font-weight:600; font-family: ui-monospace, SF Mono, Menlo, monospace; color:#222; }
   header .stat { color:#555; font-size:13px; font-variant-numeric: tabular-nums; }
   header .stat b { color:#000; font-weight:600; }
-  gp-treemap { display:flex; height: calc(100vh - 42px); }
+  raised-treemap { display:flex; height: calc(100vh - 42px); }
 </style>
 </head>
 <body>
@@ -213,12 +213,12 @@ function buildHtml(target, scan) {
   ${stats.unreadable ? `<span class="stat">(${stats.unreadable.toLocaleString()} unreadable)</span>` : ''}
   <span class="stat" style="margin-left:auto; color:#888;">scanned ${escapeHtml(stats.when)}</span>
 </header>
-<gp-treemap id="tm"
+<raised-treemap id="tm"
   color-mode="categorical"
   palette="gp-default"
   gradient-intensity="0.6"
   value-format="b"
-  min-cell-area="30"></gp-treemap>
+  min-cell-area="30"></raised-treemap>
 
 <script>
 ${bundle}
