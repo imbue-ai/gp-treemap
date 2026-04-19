@@ -1096,7 +1096,7 @@ const STYLE = `
   transform-origin: 0 0; transition: transform var(--gp-zoom-ms, 350ms) ease; }
 .overlay { position:absolute; inset:0; pointer-events:none; }
 .overlay .sel, .overlay .loc { position:absolute; box-sizing:border-box; pointer-events:none; }
-.overlay .sel { border:2px solid var(--gp-selected); mix-blend-mode: difference; box-sizing:border-box; }
+.overlay .sel { border:2px solid var(--gp-selected); box-sizing:border-box; }
 .overlay .loc { border:2px solid var(--gp-located); box-shadow: 0 0 0 1px #fff8; }
 .overlay .lbl { position:absolute; color:#111; font-size:11px; font-weight:500; line-height:1; padding:1px 3px;
   text-shadow: 0 0 2px #ffffffcc, 0 0 2px #ffffffcc; white-space:nowrap; pointer-events:none;
