@@ -1134,6 +1134,8 @@ class GpTreemap extends HTMLElement {
     this._wheelAcc = 0;
     this._selectionLocked = false;
     this._hoverRaf = 0;
+    this._leafSelectedId = null;  // original clicked leaf; used by focus-down navigation
+    this._focusValEl = null;
 
     this._onResize = this._onResize.bind(this);
     this._onStageMouse = this._onStageMouse.bind(this);
@@ -1378,7 +1380,15 @@ class GpTreemap extends HTMLElement {
     }
     if (this._selectedId && this._leafById.has(this._selectedId)) {
       this._overlay.appendChild(overlayBox('sel', this._leafById.get(this._selectedId), dpr));
+    } else if (this._selectedId) {
+      // Selected node is not a rendered leaf (e.g. a directory at display cap).
+      // Find its closest rendered ancestor and highlight that instead.
+      const anc = this.findRenderedAncestor(this._selectedId);
+      if (anc && this._leafById.has(anc.id)) {
+        this._overlay.appendChild(overlayBox('sel', this._leafById.get(anc.id), dpr));
+      }
     }
+    this._updateFocusUI();
     if (p.showLabels) {
       for (const l of this._leaves) {
         if (l.w < 48 * dpr || l.h < 16 * dpr) continue;
@@ -1413,6 +1423,7 @@ class GpTreemap extends HTMLElement {
       breadcrumb: cfg.breadcrumb !== false,
       info: cfg.info !== false,
       depth: cfg.depth !== false,
+      focus: cfg.focus !== false,
       legend: cfg.legend !== false,
     };
 
@@ -1471,21 +1482,39 @@ class GpTreemap extends HTMLElement {
       const d = document.createElement('div'); d.className = 'depth';
       d.append(document.createTextNode('depth '));
       const m = document.createElement('button'); m.textContent = '−';
+      const maxD = this._treeMaxDepth();
       const val = document.createElement('span');
       val.textContent = this._props.displayDepth === Infinity ? '∞' : String(this._props.displayDepth);
       val.style.padding = '0 6px';
       const pl = document.createElement('button'); pl.textContent = '+';
       m.addEventListener('click', () => {
-        const cur = this._props.displayDepth === Infinity ? 10 : this._props.displayDepth;
+        const max = this._treeMaxDepth();
+        const cur = this._props.displayDepth === Infinity ? max : this._props.displayDepth;
         this._props.displayDepth = Math.max(1, cur - 1); this._queueRender();
       });
       pl.addEventListener('click', () => {
-        const cur = this._props.displayDepth === Infinity ? 10 : this._props.displayDepth;
-        this._props.displayDepth = cur + 1; this._queueRender();
+        const max = this._treeMaxDepth();
+        const cur = this._props.displayDepth === Infinity ? max : this._props.displayDepth;
+        const next = cur + 1;
+        this._props.displayDepth = next > max ? Infinity : next; this._queueRender();
       });
       d.appendChild(m); d.appendChild(val); d.appendChild(pl);
       this._toolbar.appendChild(d);
       this._toolbar.appendChild(sep());
+    }
+    if (want.focus) {
+      const f = document.createElement('div'); f.className = 'depth';
+      f.append(document.createTextNode('focus '));
+      const fm = document.createElement('button'); fm.textContent = '−'; fm.title = 'Select parent (broader view)';
+      fm.addEventListener('click', () => this._selAncestorUp());
+      const fval = document.createElement('span'); fval.style.padding = '0 6px';
+      const fpl = document.createElement('button'); fpl.textContent = '+'; fpl.title = 'Select child (narrower view)';
+      fpl.addEventListener('click', () => this._selAncestorDown());
+      f.appendChild(fm); f.appendChild(fval); f.appendChild(fpl);
+      this._toolbar.appendChild(f);
+      this._toolbar.appendChild(sep());
+      this._focusValEl = fval;
+      this._updateFocusUI();
     }
     if (want.legend) {
       const lg = document.createElement('div'); lg.className = 'legend';
@@ -1513,7 +1542,7 @@ class GpTreemap extends HTMLElement {
     if (!id || !this._tree) { this._infoEl.innerHTML = '<span>(hover a cell)</span>'; return; }
     const n = this._tree.nodes.get(id);
     if (!n) return;
-    this._infoEl.innerHTML = `<b>${escapeHtml(n.label)}</b> · ${escapeHtml(this._formatValue(n.value))} · depth ${n.depth}`;
+    this._infoEl.innerHTML = `<b>${escapeHtml(this._buildPath(id))}</b> · ${escapeHtml(this._formatValue(n.value))}`;
   }
   _formatValue(v) {
     if (typeof this._props.valueFormatter === 'function') return this._props.valueFormatter(v);
@@ -1558,6 +1587,7 @@ class GpTreemap extends HTMLElement {
     const id = this._hitTest(e);
     if (!id) return;
     this._selectedId = id;
+    this._leafSelectedId = id;
     this._selectionLocked = true;
     this._stage.focus();
     this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth);
@@ -1599,7 +1629,7 @@ class GpTreemap extends HTMLElement {
     } else if (e.key === 'Enter') {
       if (n.childIds.length) next = n.childIds[0];
     } else if (e.key === 'Escape') {
-      if (parent) next = parent.id;
+      this._selAncestorUp(); return;
     } else { return; }
     if (next) {
       this._selectedId = next;
@@ -1612,7 +1642,7 @@ class GpTreemap extends HTMLElement {
     const n = this._tree.nodes.get(id);
     if (!n) return;
     this._tooltip.hidden = false;
-    this._tooltip.innerHTML = `<b>${escapeHtml(n.label)}</b>${escapeHtml(this._formatValue(n.value))}${n.isOther ? ' (collapsed)' : ''}`;
+    this._tooltip.innerHTML = `<b>${escapeHtml(this._buildPath(id))}</b><br>${escapeHtml(this._formatValue(n.value))}${n.isOther ? ' (collapsed)' : ''}`;
     const x = e.clientX + 12, y = e.clientY + 12;
     this._tooltip.style.left = x + 'px';
     this._tooltip.style.top = y + 'px';
@@ -1649,6 +1679,62 @@ class GpTreemap extends HTMLElement {
       ...extra,
     };
     this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
+  }
+
+  // ----- path / focus helpers -----
+  _buildPath(nodeId) {
+    if (!this._tree) return '';
+    const chain = [];
+    let cur = this._tree.nodes.get(nodeId);
+    while (cur) {
+      chain.unshift(cur.label);
+      cur = cur.parentId ? this._tree.nodes.get(cur.parentId) : null;
+    }
+    return chain.join('/');
+  }
+
+  _treeMaxDepth() {
+    if (!this._tree) return 10;
+    let max = 0;
+    for (const n of this._tree.nodes.values()) if (n.depth > max) max = n.depth;
+    return max;
+  }
+
+  _selAncestorUp() {
+    if (!this._selectedId || !this._tree) return;
+    const n = this._tree.nodes.get(this._selectedId);
+    if (!n || !n.parentId) return;
+    this._selectedId = n.parentId;
+    const dpr = this._canvas.width / this._stage.clientWidth;
+    this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, dpr);
+    this._updateToolbarInfo();
+    this._dispatch('gp-select', this._selectedId);
+  }
+
+  _selAncestorDown() {
+    if (!this._selectedId || !this._leafSelectedId || !this._tree) return;
+    if (this._selectedId === this._leafSelectedId) return;
+    // Walk up from _leafSelectedId to find the direct child of _selectedId on that path.
+    let cur = this._tree.nodes.get(this._leafSelectedId);
+    let found = null;
+    while (cur) {
+      if (!cur.parentId) break;
+      if (cur.parentId === this._selectedId) { found = cur; break; }
+      cur = this._tree.nodes.get(cur.parentId);
+    }
+    if (!found) return;
+    this._selectedId = found.id;
+    const dpr = this._canvas.width / this._stage.clientWidth;
+    this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, dpr);
+    this._updateToolbarInfo();
+    this._dispatch('gp-select', this._selectedId);
+  }
+
+  _updateFocusUI() {
+    if (!this._focusValEl) return;
+    if (!this._selectedId || !this._tree) { this._focusValEl.textContent = '∞'; return; }
+    const n = this._tree.nodes.get(this._selectedId);
+    this._focusValEl.textContent = n ? String(n.depth) : '∞';
   }
 
   _onResize() {
