@@ -363,15 +363,9 @@ export class GpTreemap extends HTMLElement {
         this._overlay.appendChild(overlayBox('loc', l, dpr));
       }
     }
-    if (this._selectedId && this._leafById.has(this._selectedId)) {
-      this._overlay.appendChild(overlayBox('sel', this._leafById.get(this._selectedId), dpr));
-    } else if (this._selectedId) {
-      // Selected node is not a rendered leaf (e.g. a directory at display cap).
-      // Find its closest rendered ancestor and highlight that instead.
-      const anc = this.findRenderedAncestor(this._selectedId);
-      if (anc && this._leafById.has(anc.id)) {
-        this._overlay.appendChild(overlayBox('sel', this._leafById.get(anc.id), dpr));
-      }
+    if (this._selectedId) {
+      const bounds = this._selectionBounds(this._selectedId);
+      if (bounds) this._overlay.appendChild(overlayBox('sel', bounds, dpr));
     }
     this._updateFocusUI();
     if (p.showLabels) {
@@ -672,10 +666,29 @@ export class GpTreemap extends HTMLElement {
     const chain = [];
     let cur = this._tree.nodes.get(nodeId);
     while (cur) {
-      chain.unshift(cur.label);
+      if (cur.parentId !== null) chain.unshift(cur.label); // skip root (shown in header)
       cur = cur.parentId ? this._tree.nodes.get(cur.parentId) : null;
     }
     return chain.join('/');
+  }
+
+  _selectionBounds(nodeId) {
+    if (this._leafById.has(nodeId)) return this._leafById.get(nodeId);
+    // Node is a directory — compute bounding box of all its rendered descendant leaves.
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    const stack = [nodeId];
+    while (stack.length) {
+      const id = stack.pop();
+      if (this._leafById.has(id)) {
+        const l = this._leafById.get(id);
+        if (l.x < minX) minX = l.x; if (l.y < minY) minY = l.y;
+        if (l.x + l.w > maxX) maxX = l.x + l.w; if (l.y + l.h > maxY) maxY = l.y + l.h;
+      } else {
+        const n = this._tree && this._tree.nodes.get(id);
+        if (n) for (const c of n.childIds) stack.push(c);
+      }
+    }
+    return minX === Infinity ? null : { x: minX, y: minY, w: maxX - minX, h: maxY - minY };
   }
 
   _treeMaxDepth() {
