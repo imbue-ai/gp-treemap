@@ -24,7 +24,7 @@ import { paintAll } from './painter.js';
 import { applyFormat } from './format.js';
 
 const DEFAULT_PROPS = {
-  labels: null, parents: null, values: null, color: null, ids: null,
+  labels: null, parents: null, parentIndices: null, values: null, color: null, ids: null,
   root: null, getChildren: null, getValue: null, getLabel: null,
   getColor: null, getId: null,
   aggregateFn: null, colorAggregateFn: null,
@@ -215,9 +215,9 @@ export class GpTreemap extends HTMLElement {
         minRelArea,
       });
     }
-    if (p.labels && p.parents && p.values) {
+    if (p.labels && (p.parents || p.parentIndices) && p.values) {
       return buildFromTabular(
-        { labels: p.labels, parents: p.parents, values: p.values, color: p.color, ids: p.ids },
+        { labels: p.labels, parents: p.parents, parentIndices: p.parentIndices, values: p.values, color: p.color, ids: p.ids },
         {
           aggregateFn: p.aggregateFn || undefined,
           colorAggregateFn: p.colorAggregateFn || undefined,

@@ -12,21 +12,52 @@
 //   layout pass; this step just preserves the spec's "synthetic `other`" rule.
 
 export function buildFromTabular(data, opts = {}) {
-  const { labels, parents, values } = data;
+  const { labels, parents, values, parentIndices } = data;
   const color = data.color;
   const ids = data.ids;
-  if (!(Array.isArray(labels) && Array.isArray(parents) && Array.isArray(values))) {
-    throw new Error('buildFromTabular: labels/parents/values required');
+  const n = labels.length;
+  if (!Array.isArray(labels) || !Array.isArray(values)) {
+    throw new Error('buildFromTabular: labels/values required');
   }
+
+  // Fast path: parentIndices is an array of integer row references where
+  // parentIndices[i] is the row index of node i's parent (-1 for roots).
+  // The scan tool guarantees parents appear before their children in the array,
+  // so IDs can be synthesized in a single forward pass — no lookups needed.
+  if (Array.isArray(parentIndices)) {
+    if (parentIndices.length !== n) throw new Error('buildFromTabular: parentIndices length mismatch');
+    const idOfRow = new Array(n);
+    for (let i = 0; i < n; i++) {
+      const pi = parentIndices[i];
+      idOfRow[i] = (pi == null || pi < 0) ? labels[i] : idOfRow[pi] + '\x00' + labels[i];
+    }
+    const nodes = new Map();
+    for (let i = 0; i < n; i++) {
+      nodes.set(idOfRow[i], {
+        id: idOfRow[i], label: labels[i], value: Number(values[i]) || 0,
+        colorValue: color ? color[i] : values[i],
+        depth: 0, parentId: null, childIds: [],
+        isOther: false, isLocated: false, rect: null, colorIndex: 0, _hasExplicitValue: true,
+      });
+    }
+    for (let i = 0; i < n; i++) {
+      const pi = parentIndices[i];
+      if (pi == null || pi < 0) continue;
+      const node = nodes.get(idOfRow[i]);
+      const parentId = idOfRow[pi];
+      node.parentId = parentId;
+      nodes.get(parentId).childIds.push(idOfRow[i]);
+    }
+    return finalize(nodes, opts);
+  }
+
+  // Legacy path: parents as string IDs or labels.
+  if (!(Array.isArray(parents))) throw new Error('buildFromTabular: parents or parentIndices required');
   if (labels.length !== parents.length || labels.length !== values.length) {
     throw new Error('buildFromTabular: arrays must be same length');
   }
-  const n = labels.length;
+
   const idOfRow = new Array(n);
-  // First pass: assign labels to their row id (either user-provided or auto).
-  // Auto ids use a dynamic resolution: we need the parent's id, which might be
-  // a row-local label or a full ancestor path. So we first build a label→row
-  // map per parent and walk the tree top-down.
   const byLabelForParent = new Map(); // parent_id → Map<label, rowIndex>
   for (let i = 0; i < n; i++) {
     const key = parents[i] || '';
@@ -34,7 +65,9 @@ export function buildFromTabular(data, opts = {}) {
     byLabelForParent.get(key).set(labels[i], i);
   }
 
-  // Row ids: if user provided, use directly; otherwise resolve ancestor chain.
+  // Build id→row index once for O(1) parent lookups.
+  const idToRow = ids ? new Map(ids.map((id, i) => [id, i])) : null;
+
   function resolveId(i, seen = new Set()) {
     if (idOfRow[i] !== undefined) return idOfRow[i];
     if (seen.has(i)) throw new Error('buildFromTabular: parent cycle at row ' + i);
@@ -42,59 +75,44 @@ export function buildFromTabular(data, opts = {}) {
     if (ids && ids[i]) { idOfRow[i] = ids[i]; return ids[i]; }
     const parentKey = parents[i] || '';
     if (!parentKey) { idOfRow[i] = labels[i]; return idOfRow[i]; }
-    // The parent key might be (a) an exact user-provided id, or (b) a label
-    // appearing in some parent's label map. We prefer (a) if the user passed `ids`.
     if (ids) {
-      // parent key is expected to match an id value
-      const parentRow = ids.indexOf(parentKey);
-      if (parentRow < 0) throw new Error('buildFromTabular: unknown parent id ' + parentKey);
+      const parentRow = idToRow.get(parentKey);
+      if (parentRow == null) throw new Error('buildFromTabular: unknown parent id ' + parentKey);
       const pid = resolveId(parentRow, seen);
       idOfRow[i] = pid + '\x00' + labels[i];
       return idOfRow[i];
     } else {
-      // parent key is expected to be a label unique among root rows, or a full ancestor path.
       if (byLabelForParent.get('').has(parentKey)) {
         const parentRow = byLabelForParent.get('').get(parentKey);
         const pid = resolveId(parentRow, seen);
         idOfRow[i] = pid + '\x00' + labels[i];
         return idOfRow[i];
       }
-      // Could be a deeper ancestor chain: just append.
       idOfRow[i] = parentKey + '\x00' + labels[i];
       return idOfRow[i];
     }
   }
   for (let i = 0; i < n; i++) resolveId(i);
 
-  // Build node map.
   const nodes = new Map();
   for (let i = 0; i < n; i++) {
     const id = idOfRow[i];
     nodes.set(id, {
-      id,
-      label: labels[i],
-      value: Number(values[i]) || 0,
+      id, label: labels[i], value: Number(values[i]) || 0,
       colorValue: color ? color[i] : values[i],
-      depth: 0,
-      parentId: null,
-      childIds: [],
-      isOther: false,
-      isLocated: false,
-      rect: null,
-      colorIndex: 0,
-      _hasExplicitValue: true,
+      depth: 0, parentId: null, childIds: [],
+      isOther: false, isLocated: false, rect: null, colorIndex: 0, _hasExplicitValue: true,
     });
   }
 
-  // Wire parent/child.
   for (let i = 0; i < n; i++) {
     const id = idOfRow[i];
     const pkey = parents[i] || '';
     if (!pkey) continue;
     let parentId;
     if (ids) {
-      const parentRow = ids.indexOf(pkey);
-      if (parentRow < 0) throw new Error('buildFromTabular: unknown parent id ' + pkey);
+      const parentRow = idToRow.get(pkey);
+      if (parentRow == null) throw new Error('buildFromTabular: unknown parent id ' + pkey);
       parentId = idOfRow[parentRow];
     } else if (byLabelForParent.get('').has(pkey)) {
       parentId = idOfRow[byLabelForParent.get('').get(pkey)];

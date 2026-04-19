@@ -64,45 +64,51 @@ function main() {
  * labels/parents/values/ids/color are the flat tabular arrays the component takes.
  */
 function walk(rootPath) {
-  const labels = [], parents = [], values = [], ids = [], color = [];
+  const labels = [], parentIndices = [], values = [], color = [];
   let bytes = 0, files = 0, dirs = 0, unreadable = 0;
 
-  // Root.
-  const rootId = rootPath;
-  const rootLabel = path.basename(rootPath) || rootPath;
-  labels.push(rootLabel); parents.push(''); values.push(0); ids.push(rootId); color.push('dir');
+  // rowByPath maps a directory's full path to its row index so children can
+  // reference their parent as an integer instead of a repeated path string.
+  const rowByPath = new Map();
+
+  // Root (parentIndex = -1).
+  rowByPath.set(rootPath, 0);
+  labels.push(path.basename(rootPath) || rootPath); parentIndices.push(-1); values.push(0); color.push('dir');
   dirs++;
 
   // Iterative DFS to avoid blowing the stack on deep trees.
+  // Parents are always pushed to labels before their children, so
+  // parentIndices[i] < i is guaranteed — enabling the O(n) fast path in builder.
   const stack = [rootPath];
   while (stack.length) {
     const dir = stack.pop();
+    const dirRow = rowByPath.get(dir);
     let entries;
     try { entries = fs.readdirSync(dir, { withFileTypes: true }); }
     catch (e) { unreadable++; continue; }
     for (const ent of entries) {
       const full = path.join(dir, ent.name);
-      // Don't follow symlinks: lstat-based classification.
       if (ent.isSymbolicLink()) { unreadable++; continue; }
       if (ent.isDirectory()) {
-        labels.push(ent.name); parents.push(dir); values.push(0); ids.push(full); color.push('dir');
+        const row = labels.length;
+        labels.push(ent.name); parentIndices.push(dirRow); values.push(0); color.push('dir');
         dirs++;
+        rowByPath.set(full, row);
         stack.push(full);
       } else if (ent.isFile()) {
         let size = 0;
         try { size = fs.statSync(full).size; }
         catch (e) { unreadable++; continue; }
-        labels.push(ent.name); parents.push(dir); values.push(size); ids.push(full);
+        labels.push(ent.name); parentIndices.push(dirRow); values.push(size);
         color.push(extKind(ent.name));
         bytes += size;
         files++;
       } else {
-        // sockets, fifos, block/char devices — count as unreadable for now
         unreadable++;
       }
     }
   }
-  return { labels, parents, values, ids, color, bytes, files, dirs, unreadable };
+  return { labels, parentIndices, values, color, bytes, files, dirs, unreadable };
 }
 
 // Map a filename to a color-key. Curated buckets for common kinds; everything
@@ -174,9 +180,8 @@ function buildHtml(target, scan) {
   // filesystem paths; we keep them as-is so the tooltip shows the real path.
   const dataJson = JSON.stringify({
     labels: scan.labels,
-    parents: scan.parents,
+    parentIndices: scan.parentIndices,
     values: scan.values,
-    ids: scan.ids,
     color: scan.color,
   });
   const colorMapJson = JSON.stringify(colorMap);
@@ -219,8 +224,8 @@ ${bundle}
 (function () {
   var d = ${dataJson};
   var tm = document.getElementById('tm');
-  tm.labels = d.labels; tm.parents = d.parents; tm.values = d.values;
-  tm.ids = d.ids; tm.color = d.color;
+  tm.labels = d.labels; tm.parentIndices = d.parentIndices; tm.values = d.values;
+  tm.color = d.color;
   tm.colorMap = ${colorMapJson};
   tm.valueFormatter = function (v) {
     var units = ['B','KB','MB','GB','TB','PB']; var i = 0, n = v || 0;
