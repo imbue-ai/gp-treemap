@@ -100,7 +100,7 @@ test.describe('visual snapshots', () => {
     await snap(page, '09-interactions-after-zoom');
     const crumbCount = await page.locator('gp-treemap').evaluate((el) =>
       el.shadowRoot.querySelectorAll('.crumbs a').length);
-    expect(crumbCount).toBeGreaterThanOrEqual(2);
+    expect(crumbCount).toBeGreaterThanOrEqual(1);
   });
 
   test('hover shows tooltip', async ({ page }) => {

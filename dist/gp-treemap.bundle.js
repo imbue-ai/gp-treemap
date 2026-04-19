@@ -1435,38 +1435,38 @@ class GpTreemap extends HTMLElement {
       this._toolbar.appendChild(sep());
     }
     if (want.breadcrumb && this._tree) {
-      const crumbs = document.createElement('div');
-      crumbs.className = 'crumbs';
       const active = this._activeVisibleRootId();
       const rootId = this._tree.roots[0];
       const chain = [];
       let cur = active ? this._tree.nodes.get(active) : this._tree.nodes.get(rootId);
       while (cur) { chain.unshift(cur); cur = cur.parentId ? this._tree.nodes.get(cur.parentId) : null; }
-      const atRoot = chain.length === 1;
-      chain.forEach((n, i) => {
-        if (i > 0) {
-          const s = document.createElement('span'); s.className = 'sep-arrow'; s.textContent = '›';
-          crumbs.appendChild(s);
-        }
-        const isLast = i === chain.length - 1;
-        // The current (last) crumb is shown as plain text; ancestors are
-        // clickable links. When the chain has only one item (we're at root),
-        // nothing is linky since clicking would be a no-op.
-        if (isLast || atRoot) {
-          const span = document.createElement('span');
-          span.textContent = n.label;
-          span.style.fontWeight = '600';
-          span.style.color = '#222';
-          crumbs.appendChild(span);
-        } else {
-          const a = document.createElement('a');
-          a.textContent = n.label; a.dataset.id = n.id;
-          a.addEventListener('click', (e) => { e.preventDefault(); this._setVisibleRoot(n.parentId === null ? null : n.id); });
-          crumbs.appendChild(a);
-        }
-      });
-      this._toolbar.appendChild(crumbs);
-      this._toolbar.appendChild(sep());
+      // Drop the root node — its label is already in the page header.
+      const crumbChain = chain.filter(n => n.parentId !== null);
+      if (crumbChain.length > 0) {
+        const crumbs = document.createElement('div');
+        crumbs.className = 'crumbs';
+        crumbChain.forEach((n, i) => {
+          if (i > 0) {
+            const s = document.createElement('span'); s.className = 'sep-arrow'; s.textContent = '›';
+            crumbs.appendChild(s);
+          }
+          const isLast = i === crumbChain.length - 1;
+          if (isLast) {
+            const span = document.createElement('span');
+            span.textContent = n.label;
+            span.style.fontWeight = '600';
+            span.style.color = '#222';
+            crumbs.appendChild(span);
+          } else {
+            const a = document.createElement('a');
+            a.textContent = n.label; a.dataset.id = n.id;
+            a.addEventListener('click', (e) => { e.preventDefault(); this._setVisibleRoot(n.id); });
+            crumbs.appendChild(a);
+          }
+        });
+        this._toolbar.appendChild(crumbs);
+        this._toolbar.appendChild(sep());
+      }
     }
     if (want.info) {
       const info = document.createElement('div'); info.className = 'info';
