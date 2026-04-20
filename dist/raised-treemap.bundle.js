@@ -1108,15 +1108,14 @@ const STYLE = `
 .toolbar button:hover { background:#eef; }
 .toolbar button:disabled { opacity:0.35; cursor:default; }
 .toolbar button:disabled:hover { background:#fff; }
-.toolbar .info { flex:1; min-width:120px; font-variant-numeric: tabular-nums; color:#333; }
-.toolbar .info b { color:#000; }
+.info-line { padding:2px 8px; border-bottom:1px solid #0001; background:#fafafa; font-variant-numeric: tabular-nums;
+  color:#333; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-height:20px; }
+.info-line b { color:#000; }
 .toolbar .crumbs { display:flex; align-items:center; gap:2px; flex-wrap:wrap; }
 .toolbar .crumbs a { cursor:pointer; color:#0645ad; text-decoration:none; }
 .toolbar .crumbs a:hover { text-decoration:underline; }
 .toolbar .crumbs span.sep-arrow { color:#999; padding:0 2px; }
 .toolbar .depth { display:flex; gap:2px; align-items:center; }
-.toolbar .legend { display:flex; gap:6px; align-items:center; flex-wrap:wrap; max-width:320px; }
-.toolbar .legend i { width:12px; height:12px; border-radius:2px; display:inline-block; box-shadow:inset 0 0 0 1px #0002; }
 .stage { position:relative; flex:1; overflow:hidden; background:#0b0b0b; cursor: default; outline: none; }
 .stage canvas { position:absolute; inset:0; width:100%; height:100%; display:block; image-rendering: pixelated;
   transform-origin: 0 0; transition: transform var(--gp-zoom-ms, 350ms) ease; }
@@ -1150,6 +1149,11 @@ class RaisedTreemap extends HTMLElement {
     this._toolbar = document.createElement('div');
     this._toolbar.className = 'toolbar';
     root.appendChild(this._toolbar);
+
+    this._infoLine = document.createElement('div');
+    this._infoLine.className = 'info-line';
+    this._infoLine.innerHTML = '<span>(hover a cell)</span>';
+    root.appendChild(this._infoLine);
 
     this._stage = document.createElement('div');
     this._stage.className = 'stage';
@@ -1564,7 +1568,7 @@ class RaisedTreemap extends HTMLElement {
     const p = this._props;
     const cfg = p.toolbar === false ? false : (typeof p.toolbar === 'object' ? p.toolbar : {});
     this._toolbar.innerHTML = '';
-    if (!cfg) { this._toolbar.style.display = 'none'; return; }
+    if (!cfg) { this._toolbar.style.display = 'none'; this._infoLine.style.display = 'none'; return; }
     this._toolbar.style.display = '';
     const want = {
       zoom: cfg.zoom !== false,
@@ -1572,7 +1576,6 @@ class RaisedTreemap extends HTMLElement {
       info: cfg.info !== false,
       depth: cfg.depth !== false,
       focus: cfg.focus !== false,
-      legend: cfg.legend !== false,
     };
 
     if (want.zoom) {
@@ -1627,11 +1630,11 @@ class RaisedTreemap extends HTMLElement {
       }
     }
     if (want.info) {
-      const info = document.createElement('div'); info.className = 'info';
-      info.innerHTML = '<span>(hover a cell)</span>';
-      this._toolbar.appendChild(info);
-      this._infoEl = info;
-      this._toolbar.appendChild(sep());
+      this._infoEl = this._infoLine;
+      this._infoLine.style.display = '';
+    } else {
+      this._infoEl = null;
+      this._infoLine.style.display = 'none';
     }
     if (want.depth) {
       const d = document.createElement('div'); d.className = 'depth';
@@ -1670,16 +1673,6 @@ class RaisedTreemap extends HTMLElement {
       this._toolbar.appendChild(sep());
       this._focusValEl = fval;
       this._updateFocusUI();
-    }
-    if (want.legend) {
-      const lg = document.createElement('div'); lg.className = 'legend';
-      const palette = this._resolvedPalette();
-      const maxRows = (typeof cfg.legend === 'object' && cfg.legend.maxRows) || 8;
-      palette.slice(0, maxRows).forEach((c) => {
-        const i = document.createElement('i'); i.style.background = c;
-        lg.appendChild(i);
-      });
-      this._toolbar.appendChild(lg);
     }
   }
 
