@@ -12,11 +12,11 @@
   header code { background:#eee; padding:1px 4px; border-radius:3px; }
   .log { border-left: 1px solid #0002; padding: 8px 10px; overflow: auto; font-size: 12px; background: #fff; }
   .log div { padding: 2px 0; border-bottom: 1px dotted #0002; font-family: ui-monospace, SF Mono, monospace; }
-  .log .gp-hover { color:#555; }
-  .log .gp-click { color:#088; }
-  .log .gp-dblclick { color:#b70; }
-  .log .gp-select { color:#06a; }
-  .log .gp-zoom-change { color:#a04; font-weight:600; }
+  .log .rt-hover { color:#555; }
+  .log .rt-click { color:#088; }
+  .log .rt-dblclick { color:#b70; }
+  .log .rt-select { color:#06a; }
+  .log .rt-zoom-change { color:#a04; font-weight:600; }
   raised-treemap { display:flex; }
 </style>
 </head>
@@ -54,7 +54,32 @@
     log.prepend(div);
     while (log.childElementCount > 200) log.removeChild(log.lastChild);
   }
-  ['gp-hover','gp-click','gp-dblclick','gp-select','gp-zoom-change'].forEach(function (t) { tm.addEventListener(t, write); });
+  ['rt-hover','rt-click','rt-dblclick','rt-select','rt-zoom-change','rt-depth-change'].forEach(function (t) { tm.addEventListener(t, write); });
+})();
+</script>
+<script>
+// Sync zoom/depth state with URL hash.
+(function () {
+  var tm = document.getElementById('tm');
+  function readHash() {
+    try {
+      var p = new URLSearchParams(location.hash.slice(1));
+      var z = p.get('zoom');   if (z) tm.visibleRootId = z;
+      var d = p.get('depth');  if (d != null) tm.displayDepth = d === 'Infinity' ? Infinity : Number(d);
+    } catch (_) {}
+  }
+  function writeHash() {
+    try {
+      var p = new URLSearchParams();
+      var z = tm._internalVisibleRootId; if (z) p.set('zoom', z);
+      var d = tm.displayDepth;           if (d !== Infinity) p.set('depth', String(d));
+      var s = p.toString();
+      history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+    } catch (_) {}
+  }
+  readHash();
+  tm.addEventListener('rt-zoom-change', writeHash);
+  tm.addEventListener('rt-depth-change', writeHash);
 })();
 </script>
 </body>

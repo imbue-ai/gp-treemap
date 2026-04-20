@@ -296,6 +296,29 @@ ${bundle}
     return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' ' + units[i];
   };
 })();
+// Sync zoom/depth state with URL hash so copying the URL preserves the view.
+(function () {
+  var tm = document.getElementById('tm');
+  function readHash() {
+    try {
+      var p = new URLSearchParams(location.hash.slice(1));
+      var z = p.get('zoom');   if (z) tm.visibleRootId = z;
+      var d = p.get('depth');  if (d != null) tm.displayDepth = d === 'Infinity' ? Infinity : Number(d);
+    } catch (_) {}
+  }
+  function writeHash() {
+    try {
+      var p = new URLSearchParams();
+      var z = tm._internalVisibleRootId; if (z) p.set('zoom', z);
+      var d = tm.displayDepth;           if (d !== Infinity) p.set('depth', String(d));
+      var s = p.toString();
+      history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+    } catch (_) {}
+  }
+  readHash();
+  tm.addEventListener('rt-zoom-change', writeHash);
+  tm.addEventListener('rt-depth-change', writeHash);
+})();
 </script>
 </body>
 </html>

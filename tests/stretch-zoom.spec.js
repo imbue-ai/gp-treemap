@@ -321,11 +321,8 @@ test.describe('stretch zoom', () => {
     if (!zoomedId) { test.skip(); return; }
     expect(zoomedId).not.toBeNull();
 
-    // Now click the reset button
-    await page.locator('raised-treemap').evaluate((el) => {
-      const btn = el.shadowRoot.querySelector('.toolbar button[title="Reset zoom"]');
-      if (btn) btn.click();
-    });
+    // Reset zoom via the public API (same as clicking the root icon)
+    await page.locator('raised-treemap').evaluate((el) => el.zoomReset());
     await waitForZoomAnimation(page);
 
     // Verify we're back to the original state
@@ -365,7 +362,7 @@ test.describe('stretch zoom', () => {
     expect(after).toBeNull();
   });
 
-  test('stretch zoom fires gp-zoom-change event', async ({ page }) => {
+  test('stretch zoom fires rt-zoom-change event', async ({ page }) => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);
 
@@ -379,7 +376,7 @@ test.describe('stretch zoom', () => {
     // Listen for zoom-change events
     const events = await page.locator('raised-treemap').evaluate((el) => {
       const evts = [];
-      el.addEventListener('gp-zoom-change', (e) => evts.push(e.detail));
+      el.addEventListener('rt-zoom-change', (e) => evts.push(e.detail));
 
       if (el._selectedId) el.stretchZoomIn(el._selectedId);
       return evts;

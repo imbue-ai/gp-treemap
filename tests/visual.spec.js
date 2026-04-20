@@ -87,8 +87,8 @@ test.describe('visual snapshots', () => {
     await waitForRender(page);
     await snap(page, '08-interactions-after-click');
     const logText = await page.locator('#log').textContent();
-    expect(logText).toMatch(/gp-click/);
-    expect(logText).toMatch(/gp-select/);
+    expect(logText).toMatch(/rt-click/);
+    expect(logText).toMatch(/rt-select/);
   });
 
   test('interactions · double click zooms in (info line updates)', async ({ page }) => {

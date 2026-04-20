@@ -1100,7 +1100,7 @@ const STYLE = `
 :host { display:flex; flex-direction:column; position:relative; overflow:hidden;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; font-size:12px;
   color:#222; background:#f4f4f4;
-  --gp-selected:#ffffff; --gp-located:#ff1fa3; }
+  --rt-selected:#ffffff; --rt-located:#ff1fa3; }
 .toolbar { display:flex; gap:8px; align-items:center; padding:6px 8px; border-bottom:1px solid #0001;
   background:#fafafa; user-select:none; flex-wrap:wrap; min-height:34px; }
 .toolbar .sep { width:1px; height:20px; background:#0002; }
@@ -1121,11 +1121,11 @@ const STYLE = `
 .toolbar .depth { display:flex; gap:2px; align-items:center; }
 .stage { position:relative; flex:1; overflow:hidden; background:#0b0b0b; cursor: default; outline: none; }
 .stage canvas { position:absolute; inset:0; width:100%; height:100%; display:block; image-rendering: pixelated;
-  transform-origin: 0 0; transition: transform var(--gp-zoom-ms, 350ms) ease; }
+  transform-origin: 0 0; transition: transform var(--rt-zoom-ms, 350ms) ease; }
 .overlay { position:absolute; inset:0; pointer-events:none; transform-origin:0 0; }
 .overlay .sel, .overlay .loc { position:absolute; box-sizing:border-box; pointer-events:none; }
-.overlay .sel { border:2px solid var(--gp-selected); box-sizing:border-box; }
-.overlay .loc { border:2px solid var(--gp-located); box-shadow: 0 0 0 1px #fff8; }
+.overlay .sel { border:2px solid var(--rt-selected); box-sizing:border-box; }
+.overlay .loc { border:2px solid var(--rt-located); box-shadow: 0 0 0 1px #fff8; }
 .overlay .lbl { position:absolute; color:#111; font-size:11px; font-weight:500; line-height:1; padding:1px 3px;
   text-shadow: 0 0 2px #ffffffcc, 0 0 2px #ffffffcc; white-space:nowrap; pointer-events:none;
   transform: translate(-50%, -50%); }
@@ -1205,17 +1205,7 @@ class RaisedTreemap extends HTMLElement {
     this._stage.addEventListener('keydown', this._onKeyDown);
   }
 
-  connectedCallback() {
-    this._resizeObserver.observe(this._stage);
-    // Restore zoom from URL hash (e.g. #zoom=some/path).
-    try {
-      const h = window.location.hash.slice(1);
-      const params = new URLSearchParams(h);
-      const z = params.get('zoom');
-      if (z) this._internalVisibleRootId = z;
-    } catch (_) { /* ignore */ }
-    requestAnimationFrame(() => this._queueRender());
-  }
+  connectedCallback() { this._resizeObserver.observe(this._stage); requestAnimationFrame(() => this._queueRender()); }
   disconnectedCallback() { this._resizeObserver.disconnect(); }
 
   attributeChangedCallback(name, _old, val) {
@@ -1299,7 +1289,7 @@ class RaisedTreemap extends HTMLElement {
       this._zoomAnimating = false;
     }, this._props.zoomDuration);
 
-    this._dispatch('gp-zoom-change', id);
+    this._dispatch('rt-zoom-change', id);
     this._renderToolbar();
   }
 
@@ -1345,7 +1335,7 @@ class RaisedTreemap extends HTMLElement {
       this._zoomAnimating = false;
     }, this._props.zoomDuration);
 
-    this._dispatch('gp-zoom-change', null);
+    this._dispatch('rt-zoom-change', null);
     this._renderToolbar();
   }
 
@@ -1409,7 +1399,7 @@ class RaisedTreemap extends HTMLElement {
     if (this._canvas.height !== h) this._canvas.height = h;
     this._canvas.style.width = cssW + 'px';
     this._canvas.style.height = cssH + 'px';
-    this._canvas.style.setProperty('--gp-zoom-ms', `${p.zoomDuration}ms`);
+    this._canvas.style.setProperty('--rt-zoom-ms', `${p.zoomDuration}ms`);
 
     const activeRoot = this._activeVisibleRootId();
     const nodes = this._tree.nodes;
@@ -1583,14 +1573,9 @@ class RaisedTreemap extends HTMLElement {
     };
 
     if (want.zoom) {
-      const wrap = document.createElement('div');
-      wrap.style.display = 'flex'; wrap.style.gap = '2px';
       const b1 = document.createElement('button'); b1.textContent = 'zoom out'; b1.title = 'Zoom to parent';
       b1.addEventListener('click', () => this.zoomOut());
-      const b2 = document.createElement('button'); b2.textContent = 'reset'; b2.title = 'Reset zoom';
-      b2.addEventListener('click', () => { this._stretchZoomId = null; this._stretchZoomAspect = 0; this._internalVisibleRootId = null; this._updateUrlHash(null); this._queueRender(); this._dispatch('gp-zoom-change', null); });
-      wrap.appendChild(b1); wrap.appendChild(b2);
-      this._toolbar.appendChild(wrap);
+      this._toolbar.appendChild(b1);
       this._toolbar.appendChild(sep());
     }
     if (want.info) {
@@ -1612,12 +1597,14 @@ class RaisedTreemap extends HTMLElement {
         const max = this._treeMaxDepth();
         const cur = this._props.displayDepth === Infinity ? max : this._props.displayDepth;
         this._props.displayDepth = Math.max(1, cur - 1); this._queueRender();
+        this._fireDepthChange();
       });
       pl.addEventListener('click', () => {
         const max = this._treeMaxDepth();
         const cur = this._props.displayDepth === Infinity ? max : this._props.displayDepth;
         const next = cur + 1;
         this._props.displayDepth = next > max ? Infinity : next; this._queueRender();
+        this._fireDepthChange();
       });
       d.appendChild(m); d.appendChild(val); d.appendChild(pl);
       this._toolbar.appendChild(d);
@@ -1677,7 +1664,7 @@ class RaisedTreemap extends HTMLElement {
           const dpr = this._canvas.width / this._stage.clientWidth;
           this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, dpr);
           this._updateToolbarInfo();
-          this._dispatch('gp-select', node.id);
+          this._dispatch('rt-select', node.id);
         });
         a.addEventListener('dblclick', (e) => {
           e.preventDefault();
@@ -1720,8 +1707,8 @@ class RaisedTreemap extends HTMLElement {
       this._setHover(id);
       if (this._props.tooltip && id) this._showTooltip(e, id); else this._hideTooltip();
       if (id) {
-        this._dispatch('gp-hover', id);
-        this._dispatch('gp-mouseover', id);
+        this._dispatch('rt-hover', id);
+        this._dispatch('rt-mouseover', id);
       }
     });
   }
@@ -1737,13 +1724,13 @@ class RaisedTreemap extends HTMLElement {
     this._selectionLocked = true;
     this._stage.focus();
     this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth);
-    this._dispatch('gp-click', id);
-    this._dispatch('gp-select', id);
+    this._dispatch('rt-click', id);
+    this._dispatch('rt-select', id);
   }
   _onDblClick(e) {
     const id = this._hitTest(e);
     if (id == null) return;
-    this._dispatch('gp-dblclick', id);
+    this._dispatch('rt-dblclick', id);
     this._setVisibleRoot(id);
   }
   _onWheel(e) {
@@ -1757,7 +1744,7 @@ class RaisedTreemap extends HTMLElement {
     let next = null;
     if (dir < 0) next = n.parentId;
     else if (n.childIds && n.childIds.length) next = n.childIds[0];
-    if (next != null) { this._selectedId = next; this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth); this._dispatch('gp-select', next); }
+    if (next != null) { this._selectedId = next; this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth); this._dispatch('rt-select', next); }
   }
   _onKeyDown(e) {
     if (e.key === '+' || e.key === '=') { if (this._selectedId != null) this._setVisibleRoot(this._selectedId); return; }
@@ -1780,7 +1767,7 @@ class RaisedTreemap extends HTMLElement {
     if (next != null) {
       this._selectedId = next;
       this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth);
-      this._dispatch('gp-select', next);
+      this._dispatch('rt-select', next);
     }
   }
   _showTooltip(e, id) {
@@ -1795,29 +1782,24 @@ class RaisedTreemap extends HTMLElement {
   }
   _hideTooltip() { this._tooltip.hidden = true; }
 
+  _fireDepthChange() {
+    const d = this._props.displayDepth;
+    this.dispatchEvent(new CustomEvent('rt-depth-change', { detail: { displayDepth: d }, bubbles: true, composed: true }));
+  }
+
   _setVisibleRoot(id) {
     if (this._props.visibleRootId != null) {
-      this._dispatch('gp-zoom-change', id, { intendedRoot: true });
+      this._dispatch('rt-zoom-change', id, { intendedRoot: true });
       return;
     }
     this._internalVisibleRootId = id;
-    this._updateUrlHash(id);
-    this._dispatch('gp-zoom-change', id);
+    this._dispatch('rt-zoom-change', id);
     this._queueRender();
   }
-  _updateUrlHash(zoomId) {
-    try {
-      const url = new URL(window.location.href);
-      if (zoomId) url.hash = 'zoom=' + encodeURIComponent(zoomId);
-      else url.hash = '';
-      history.replaceState(null, '', url.toString());
-    } catch (_) { /* file:// edge cases */ }
-  }
-
   _dispatch(name, nodeId, extra = {}) {
     if (!this._tree) return;
     if (nodeId && !this._tree.nodes.has(nodeId)) {
-      if (name !== 'gp-zoom-change') return;
+      if (name !== 'rt-zoom-change') return;
     }
     const node = nodeId ? this._tree.nodes.get(nodeId) : null;
     const ancestorIds = [];
@@ -1869,7 +1851,7 @@ class RaisedTreemap extends HTMLElement {
     const dpr = this._canvas.width / this._stage.clientWidth;
     this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, dpr);
     this._updateToolbarInfo();
-    this._dispatch('gp-select', this._selectedId);
+    this._dispatch('rt-select', this._selectedId);
   }
 
 
