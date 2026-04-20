@@ -58,8 +58,6 @@ const STYLE = `
 .toolbar .crumbs a:hover { text-decoration:underline; }
 .toolbar .crumbs span.sep-arrow { color:#999; padding:0 2px; }
 .toolbar .depth { display:flex; gap:2px; align-items:center; }
-.toolbar .legend { display:flex; gap:6px; align-items:center; flex-wrap:wrap; max-width:320px; }
-.toolbar .legend i { width:12px; height:12px; border-radius:2px; display:inline-block; box-shadow:inset 0 0 0 1px #0002; }
 .stage { position:relative; flex:1; overflow:hidden; background:#0b0b0b; cursor: default; outline: none; }
 .stage canvas { position:absolute; inset:0; width:100%; height:100%; display:block; image-rendering: pixelated;
   transform-origin: 0 0; transition: transform var(--gp-zoom-ms, 350ms) ease; }
@@ -521,7 +519,6 @@ export class RaisedTreemap extends HTMLElement {
       info: cfg.info !== false,
       depth: cfg.depth !== false,
       focus: cfg.focus !== false,
-      legend: cfg.legend !== false,
     };
 
     if (want.zoom) {
