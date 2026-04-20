@@ -198,9 +198,14 @@ test('scan HTML: numeric IDs round-trip through URL hash', async ({ page }) => {
     const restored = await page.locator('raised-treemap').evaluate((el) => ({
       targetId: el._targetId,
       targetType: typeof el._targetId,
+      hasFocusBox: el.shadowRoot.querySelector('.overlay .sel') !== null,
+      infoHasLinks: el.shadowRoot.querySelectorAll('.info-line a').length > 0,
     }));
     expect(restored.targetId).toBe(targetId);
     expect(restored.targetType).toBe('number');
+    // The focus highlight box and info-line breadcrumbs must render on load.
+    expect(restored.hasFocusBox).toBe(true);
+    expect(restored.infoHasLinks).toBe(true);
   } finally {
     if (fs.existsSync(out)) fs.unlinkSync(out);
     fs.rmSync(target, { recursive: true, force: true });

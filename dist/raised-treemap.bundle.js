@@ -1130,7 +1130,7 @@ const STYLE = `
   text-shadow: 0 0 2px #ffffffcc, 0 0 2px #ffffffcc; white-space:nowrap; pointer-events:none;
   transform: translate(-50%, -50%); }
 .tooltip { position:fixed; pointer-events:none; background:#111d; color:#fff; padding:4px 8px;
-  border-radius:4px; font-size:12px; line-height:1.3; z-index:1000; max-width:260px; box-shadow:0 2px 6px #0006; }
+  border-radius:4px; font-size:12px; line-height:1.3; z-index:1000; max-width:400px; box-shadow:0 2px 6px #0006; }
 .tooltip b { display:block; font-size:11px; font-weight:600; margin-bottom:1px; }
 `;
 class RaisedTreemap extends HTMLElement {
@@ -1768,9 +1768,16 @@ class RaisedTreemap extends HTMLElement {
     if (!n) return;
     this._tooltip.hidden = false;
     this._tooltip.innerHTML = `<b>${escapeHtml(this._buildPath(id))}</b><br>${escapeHtml(this._formatValue(n.value))}${n.isOther ? ' (collapsed)' : ''}`;
-    const x = e.clientX + 12, y = e.clientY + 12;
-    this._tooltip.style.left = x + 'px';
-    this._tooltip.style.top = y + 'px';
+    const gap = 12;
+    const vw = window.innerWidth;
+    const tt = this._tooltip;
+    // Measure tooltip width: temporarily show off-screen to get actual size
+    tt.style.left = '-9999px'; tt.style.top = '-9999px';
+    const tw = tt.offsetWidth;
+    const flipX = e.clientX + gap + tw > vw;
+    const x = flipX ? e.clientX - gap - tw : e.clientX + gap;
+    tt.style.left = x + 'px';
+    tt.style.top = (e.clientY + gap) + 'px';
   }
   _hideTooltip() { this._tooltip.hidden = true; }
 

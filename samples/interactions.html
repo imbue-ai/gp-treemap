@@ -83,6 +83,7 @@
     } catch (_) {}
   }
   readHash();
+  if (location.hash.length > 1) tm._queueRender();
   tm.addEventListener('rt-zoom-change', writeHash);
   tm.addEventListener('rt-depth-change', writeHash);
   tm.addEventListener('rt-target', writeHash);

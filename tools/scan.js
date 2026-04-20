@@ -210,7 +210,7 @@ function buildHtml(target, scan) {
     bytes: scan.bytes,
     unreadable: scan.unreadable,
     humanSize: humanBytes(scan.bytes),
-    when: new Date().toISOString(),
+    when: (() => { const d = new Date(); const off = -d.getTimezoneOffset(); const sign = off >= 0 ? '+' : '-'; const hh = String(Math.floor(Math.abs(off) / 60)).padStart(2, '0'); const mm = String(Math.abs(off) % 60).padStart(2, '0'); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + 'T' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0') + sign + hh + ':' + mm; })(),
   };
 
   // Binary-encode parentIndices (Int32Array) and color (Uint16 enum index).
@@ -248,7 +248,7 @@ function buildHtml(target, scan) {
   header h1 { margin:0; font-size:14px; font-weight:600; font-family: ui-monospace, SF Mono, Menlo, monospace; color:#222; }
   header .stat { color:#555; font-size:13px; font-variant-numeric: tabular-nums; }
   header .stat b { color:#000; font-weight:600; }
-  raised-treemap { display:flex; height: calc(100vh - 42px); }
+  raised-treemap { display:flex; height: calc(100vh - 58px); margin-bottom: 16px; }
 </style>
 </head>
 <body>
@@ -322,6 +322,7 @@ ${bundle}
     } catch (_) {}
   }
   readHash();
+  if (location.hash.length > 1) tm._queueRender();
   tm.addEventListener('rt-zoom-change', writeHash);
   tm.addEventListener('rt-depth-change', writeHash);
   tm.addEventListener('rt-target', writeHash);
