@@ -50,8 +50,9 @@ const STYLE = `
 .toolbar button:hover { background:#eef; }
 .toolbar button:disabled { opacity:0.35; cursor:default; }
 .toolbar button:disabled:hover { background:#fff; }
-.toolbar .info { flex:1; min-width:120px; font-variant-numeric: tabular-nums; color:#333; }
-.toolbar .info b { color:#000; }
+.info-line { padding:2px 8px; border-bottom:1px solid #0001; background:#fafafa; font-variant-numeric: tabular-nums;
+  color:#333; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-height:20px; }
+.info-line b { color:#000; }
 .toolbar .crumbs { display:flex; align-items:center; gap:2px; flex-wrap:wrap; }
 .toolbar .crumbs a { cursor:pointer; color:#0645ad; text-decoration:none; }
 .toolbar .crumbs a:hover { text-decoration:underline; }
@@ -93,6 +94,11 @@ export class RaisedTreemap extends HTMLElement {
     this._toolbar = document.createElement('div');
     this._toolbar.className = 'toolbar';
     root.appendChild(this._toolbar);
+
+    this._infoLine = document.createElement('div');
+    this._infoLine.className = 'info-line';
+    this._infoLine.innerHTML = '<span>(hover a cell)</span>';
+    root.appendChild(this._infoLine);
 
     this._stage = document.createElement('div');
     this._stage.className = 'stage';
@@ -507,7 +513,7 @@ export class RaisedTreemap extends HTMLElement {
     const p = this._props;
     const cfg = p.toolbar === false ? false : (typeof p.toolbar === 'object' ? p.toolbar : {});
     this._toolbar.innerHTML = '';
-    if (!cfg) { this._toolbar.style.display = 'none'; return; }
+    if (!cfg) { this._toolbar.style.display = 'none'; this._infoLine.style.display = 'none'; return; }
     this._toolbar.style.display = '';
     const want = {
       zoom: cfg.zoom !== false,
@@ -570,11 +576,11 @@ export class RaisedTreemap extends HTMLElement {
       }
     }
     if (want.info) {
-      const info = document.createElement('div'); info.className = 'info';
-      info.innerHTML = '<span>(hover a cell)</span>';
-      this._toolbar.appendChild(info);
-      this._infoEl = info;
-      this._toolbar.appendChild(sep());
+      this._infoEl = this._infoLine;
+      this._infoLine.style.display = '';
+    } else {
+      this._infoEl = null;
+      this._infoLine.style.display = 'none';
     }
     if (want.depth) {
       const d = document.createElement('div'); d.className = 'depth';
@@ -613,16 +619,6 @@ export class RaisedTreemap extends HTMLElement {
       this._toolbar.appendChild(sep());
       this._focusValEl = fval;
       this._updateFocusUI();
-    }
-    if (want.legend) {
-      const lg = document.createElement('div'); lg.className = 'legend';
-      const palette = this._resolvedPalette();
-      const maxRows = (typeof cfg.legend === 'object' && cfg.legend.maxRows) || 8;
-      palette.slice(0, maxRows).forEach((c) => {
-        const i = document.createElement('i'); i.style.background = c;
-        lg.appendChild(i);
-      });
-      this._toolbar.appendChild(lg);
     }
   }
 

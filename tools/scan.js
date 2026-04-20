@@ -19,9 +19,11 @@ const ROOT = path.resolve(__dirname, '..');
 const BUNDLE_PATH = path.join(ROOT, 'dist', 'raised-treemap.bundle.js');
 
 async function main() {
-  const args = process.argv.slice(2);
+  const argv = process.argv.slice(2);
+  const noOpen = argv.includes('--no-open');
+  const args = argv.filter((a) => a !== '--no-open');
   if (args.length < 1 || args[0] === '-h' || args[0] === '--help') {
-    console.error('Usage: node tools/scan.js <dir> [output.html]');
+    console.error('Usage: node tools/scan.js [--no-open] <dir> [output.html]');
     process.exit(args[0] === '-h' || args[0] === '--help' ? 0 : 2);
   }
   const target = path.resolve(args[0]);
@@ -57,9 +59,11 @@ async function main() {
   console.log('');
   console.log('wrote ' + out + '  (' + humanBytes(fs.statSync(out).size) + ')');
 
-  const { execSync } = await import('node:child_process');
-  const openCmd = process.platform === 'win32' ? 'start ""' : process.platform === 'darwin' ? 'open' : 'xdg-open';
-  try { execSync(openCmd + ' ' + JSON.stringify(out)); } catch { console.log('open it with:  open "' + out + '"'); }
+  if (!noOpen) {
+    const { execSync } = await import('node:child_process');
+    const openCmd = process.platform === 'win32' ? 'start ""' : process.platform === 'darwin' ? 'open' : 'xdg-open';
+    try { execSync(openCmd + ' ' + JSON.stringify(out)); } catch { console.log('open it with:  open "' + out + '"'); }
+  }
 }
 
 async function walk(rootPath) {

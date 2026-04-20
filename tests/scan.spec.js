@@ -1,5 +1,5 @@
-// Exercises tools/scan.js on a real directory, loads the generated HTML
-// over file:// (the primary way a user will open it), and snapshots the
+// Exercises tools/scan.js on a synthetic directory tree, loads the generated
+// HTML over file:// (the primary way a user will open it), and snapshots the
 // result to tests/screenshots/.
 import { test, expect } from '@playwright/test';
 import { spawnSync } from 'node:child_process';
@@ -23,7 +23,7 @@ function parseScanHtml(htmlPath) {
 }
 
 function runScan(srcDir, outFile) {
-  const res = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'scan.js'), srcDir, outFile], {
+  const res = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'scan.js'), '--no-open', srcDir, outFile], {
     encoding: 'utf8', timeout: 30000,
   });
   return res;
@@ -114,12 +114,50 @@ test('scan produces correct tree structure for a known directory', () => {
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
+// Simple seeded PRNG (mulberry32) for repeatable random directory trees.
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// Build a deterministic directory tree under `root` using a seeded PRNG.
+function buildTree(root, seed) {
+  const rand = mulberry32(seed);
+  const pick = (arr) => arr[Math.floor(rand() * arr.length)];
+  const exts = ['.js', '.ts', '.py', '.json', '.css', '.html', '.md', '.txt', '.png', '.jpg'];
+  const dirs = [root];
+
+  // Create ~8 subdirectories and ~120 files.
+  for (let d = 0; d < 8; d++) {
+    const parent = pick(dirs);
+    const name = 'dir_' + d;
+    const p = path.join(parent, name);
+    fs.mkdirSync(p, { recursive: true });
+    dirs.push(p);
+  }
+  for (let f = 0; f < 120; f++) {
+    const parent = pick(dirs);
+    const ext = pick(exts);
+    const name = 'file_' + f + ext;
+    // Deterministic size: 100–10 000 bytes of repeating ASCII.
+    const size = 100 + Math.floor(rand() * 9900);
+    fs.writeFileSync(path.join(parent, name), 'x'.repeat(size));
+  }
+}
+
 test('scan.js produces a self-contained HTML that renders', async ({ page }) => {
-  const target = path.join(ROOT, 'GrandPerspective-3_6_4');
+  // Create a hermetic, repeatable temp directory tree.
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-scan-test-'));
+  buildTree(target, 42);
+
   const out = path.join(os.tmpdir(), 'raised-treemap-scan-' + Date.now() + '.html');
-  const res = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'scan.js'), target, out], {
-    encoding: 'utf8',
-  });
+  const res = spawnSync(process.execPath, [
+    path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+  ], { encoding: 'utf8' });
   expect(res.status, res.stderr).toBe(0);
   expect(fs.existsSync(out)).toBe(true);
 
@@ -136,8 +174,11 @@ test('scan.js produces a self-contained HTML that renders', async ({ page }) => 
   expect(cells).toBeGreaterThan(100);
 
   await page.screenshot({
-    path: path.join(__dirname, 'screenshots', '11-scan-grandperspective.png'),
+    path: path.join(__dirname, 'screenshots', '11-scan-synthetic.png'),
     fullPage: false,
   });
+
+  // Cleanup.
   fs.unlinkSync(out);
+  fs.rmSync(target, { recursive: true, force: true });
 });
