@@ -173,17 +173,17 @@ export class RaisedTreemap extends HTMLElement {
     let cur = this._tree.nodes.get(id);
     while (cur) {
       if (this._leafById.has(cur.id)) return cur;
-      cur = cur.parentId ? this._tree.nodes.get(cur.parentId) : null;
+      cur = cur.parentId !== null ? this._tree.nodes.get(cur.parentId) : null;
     }
     return null;
   }
-  zoomTo(id) { if (!id || (this._tree && this._tree.nodes.has(id))) this._setVisibleRoot(id); }
+  zoomTo(id) { if (id == null || (this._tree && this._tree.nodes.has(id))) this._setVisibleRoot(id); }
   zoomReset() { this._setVisibleRoot(null); }
   zoomOut() {
     const vr = this._activeVisibleRootId();
-    if (!vr || !this._tree) return;
+    if (vr == null || !this._tree) return;
     const n = this._tree.nodes.get(vr);
-    this._setVisibleRoot(n && n.parentId ? n.parentId : null);
+    this._setVisibleRoot(n && n.parentId !== null ? n.parentId : null);
   }
 
   // ----- render pipeline -----
@@ -249,8 +249,8 @@ export class RaisedTreemap extends HTMLElement {
 
     const activeRoot = this._activeVisibleRootId();
     const nodes = this._tree.nodes;
-    const rootId = activeRoot && nodes.has(activeRoot) ? activeRoot : this._tree.roots[0];
-    if (!rootId) { this._clearCanvas(); return; }
+    const rootId = activeRoot != null && nodes.has(activeRoot) ? activeRoot : this._tree.roots[0];
+    if (rootId == null) { this._clearCanvas(); return; }
     const rootNode = nodes.get(rootId);
     const baseDepth = rootNode.depth;
     const cap = baseDepth + (p.displayDepth === Infinity ? 99 : Math.max(0, p.displayDepth));
@@ -272,7 +272,7 @@ export class RaisedTreemap extends HTMLElement {
       nodeRects.set(nodeId, rect);
       const node = nodes.get(nodeId);
       const atCap = node.depth >= cap;
-      if (atCap || node.childIds.length === 0) {
+      if (atCap || !node.childIds || node.childIds.length === 0) {
         leafCap.add(nodeId);
         leavesCollect.push({ node, rect });
         return;
@@ -289,7 +289,7 @@ export class RaisedTreemap extends HTMLElement {
         // Inset this group's rect so sibling groups get a visible gutter.
         // Only apply padding to non-leaf groups (a leaf's rect is its own).
         let sub = r;
-        if (pad > 0 && kid.childIds.length > 0) {
+        if (pad > 0 && kid.childIds && kid.childIds.length > 0) {
           const px = Math.min(pad, r.w / 2 - 1);
           const py = Math.min(pad, r.h / 2 - 1);
           if (px > 0 && py > 0) {
@@ -424,7 +424,7 @@ export class RaisedTreemap extends HTMLElement {
       const rootId = this._tree.roots[0];
       const chain = [];
       let cur = active ? this._tree.nodes.get(active) : this._tree.nodes.get(rootId);
-      while (cur) { chain.unshift(cur); cur = cur.parentId ? this._tree.nodes.get(cur.parentId) : null; }
+      while (cur) { chain.unshift(cur); cur = cur.parentId !== null ? this._tree.nodes.get(cur.parentId) : null; }
       // Drop the root node — its label is already in the page header.
       const crumbChain = chain.filter(n => n.parentId !== null);
       if (crumbChain.length > 0) {
@@ -521,7 +521,7 @@ export class RaisedTreemap extends HTMLElement {
   _updateToolbarInfo() {
     if (!this._infoEl) return;
     const id = this._hoverId || this._selectedId;
-    if (!id || !this._tree) { this._infoEl.innerHTML = '<span>(hover a cell)</span>'; return; }
+    if (id == null || !this._tree) { this._infoEl.innerHTML = '<span>(hover a cell)</span>'; return; }
     const n = this._tree.nodes.get(id);
     if (!n) return;
     this._infoEl.innerHTML = `<b>${escapeHtml(this._buildPath(id))}</b> · ${escapeHtml(this._formatValue(n.value))}`;
@@ -567,7 +567,7 @@ export class RaisedTreemap extends HTMLElement {
   }
   _onClick(e) {
     const id = this._hitTest(e);
-    if (!id) return;
+    if (id == null) return;
     this._selectedId = id;
     this._leafSelectedId = id;
     this._selectionLocked = true;
@@ -578,12 +578,12 @@ export class RaisedTreemap extends HTMLElement {
   }
   _onDblClick(e) {
     const id = this._hitTest(e);
-    if (!id) return;
+    if (id == null) return;
     this._dispatch('gp-dblclick', id);
     this._setVisibleRoot(id);
   }
   _onWheel(e) {
-    if (!this._selectedId || !this._tree) return;
+    if (this._selectedId == null || !this._tree) return;
     this._wheelAcc += e.deltaY;
     if (Math.abs(this._wheelAcc) < 80) return;
     const dir = this._wheelAcc > 0 ? 1 : -1;
@@ -592,28 +592,28 @@ export class RaisedTreemap extends HTMLElement {
     if (!n) return;
     let next = null;
     if (dir < 0) next = n.parentId;
-    else if (n.childIds.length) next = n.childIds[0];
-    if (next) { this._selectedId = next; this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth); this._dispatch('gp-select', next); }
+    else if (n.childIds && n.childIds.length) next = n.childIds[0];
+    if (next != null) { this._selectedId = next; this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth); this._dispatch('gp-select', next); }
   }
   _onKeyDown(e) {
-    if (e.key === '+' || e.key === '=') { if (this._selectedId) this._setVisibleRoot(this._selectedId); return; }
+    if (e.key === '+' || e.key === '=') { if (this._selectedId != null) this._setVisibleRoot(this._selectedId); return; }
     if (e.key === '-') { this.zoomOut(); return; }
     if (e.key === '0') { this.zoomReset(); return; }
-    if (!this._selectionLocked || !this._tree || !this._selectedId) return;
+    if (!this._selectionLocked || !this._tree || this._selectedId == null) return;
     const n = this._tree.nodes.get(this._selectedId);
     if (!n) return;
-    const parent = n.parentId ? this._tree.nodes.get(n.parentId) : null;
+    const parent = n.parentId !== null ? this._tree.nodes.get(n.parentId) : null;
     let next = null;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
       if (parent) { const i = parent.childIds.indexOf(n.id); next = parent.childIds[Math.max(0, i - 1)]; }
     } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       if (parent) { const i = parent.childIds.indexOf(n.id); next = parent.childIds[Math.min(parent.childIds.length - 1, i + 1)]; }
     } else if (e.key === 'Enter') {
-      if (n.childIds.length) next = n.childIds[0];
+      if (n.childIds && n.childIds.length) next = n.childIds[0];
     } else if (e.key === 'Escape') {
       this._selAncestorUp(); return;
     } else { return; }
-    if (next) {
+    if (next != null) {
       this._selectedId = next;
       this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth);
       this._dispatch('gp-select', next);
@@ -670,7 +670,7 @@ export class RaisedTreemap extends HTMLElement {
     let cur = this._tree.nodes.get(nodeId);
     while (cur) {
       if (cur.parentId !== null) chain.unshift(cur.label); // skip root (shown in header)
-      cur = cur.parentId ? this._tree.nodes.get(cur.parentId) : null;
+      cur = cur.parentId !== null ? this._tree.nodes.get(cur.parentId) : null;
     }
     return chain.join('/');
   }
@@ -689,9 +689,9 @@ export class RaisedTreemap extends HTMLElement {
   }
 
   _selAncestorUp() {
-    if (!this._selectedId || !this._tree) return;
+    if (this._selectedId == null || !this._tree) return;
     const n = this._tree.nodes.get(this._selectedId);
-    if (!n || !n.parentId) return;
+    if (!n || n.parentId === null) return;
     this._selectedId = n.parentId;
     const dpr = this._canvas.width / this._stage.clientWidth;
     this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, dpr);
@@ -700,13 +700,13 @@ export class RaisedTreemap extends HTMLElement {
   }
 
   _selAncestorDown() {
-    if (!this._selectedId || !this._leafSelectedId || !this._tree) return;
+    if (this._selectedId == null || this._leafSelectedId == null || !this._tree) return;
     if (this._selectedId === this._leafSelectedId) return;
     // Walk up from _leafSelectedId to find the direct child of _selectedId on that path.
     let cur = this._tree.nodes.get(this._leafSelectedId);
     let found = null;
     while (cur) {
-      if (!cur.parentId) break;
+      if (cur.parentId === null) break;
       if (cur.parentId === this._selectedId) { found = cur; break; }
       cur = this._tree.nodes.get(cur.parentId);
     }
@@ -720,7 +720,7 @@ export class RaisedTreemap extends HTMLElement {
 
   _updateFocusUI() {
     if (!this._focusValEl) return;
-    if (!this._selectedId || !this._tree) { this._focusValEl.textContent = '∞'; return; }
+    if (this._selectedId == null || !this._tree) { this._focusValEl.textContent = '∞'; return; }
     const n = this._tree.nodes.get(this._selectedId);
     this._focusValEl.textContent = n ? String(n.depth) : '∞';
   }

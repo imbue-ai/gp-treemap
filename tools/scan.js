@@ -179,16 +179,29 @@ function buildHtml(target, scan) {
     when: new Date().toISOString(),
   };
 
-  // NOTE: `data` is a big array. JSON-serialize it once and inline. `ids` are
-  // filesystem paths; we keep them as-is so the tooltip shows the real path.
-  const dataJson = JSON.stringify({
-    labels: scan.labels,
-    parentIndices: scan.parentIndices,
-    values: scan.values,
-    color: scan.color,
-  });
-  const colorMapJson = JSON.stringify(colorMap);
-  const statsJson = JSON.stringify(stats);
+  // Binary-encode parentIndices (Int32Array) and color (Uint16 enum index).
+  // Avoids ~96 MB of JSON integers and ~80 MB of repeated color strings;
+  // typed-array base64 decodes far faster than JSON.parse on the same data.
+  const colorNames = [...new Set(scan.color)].sort();
+  const colorToIdx = new Map(colorNames.map((c, i) => [c, i]));
+  const colorU16 = new Uint16Array(scan.color.length);
+  for (let i = 0; i < scan.color.length; i++) colorU16[i] = colorToIdx.get(scan.color[i]);
+  const colorB64 = Buffer.from(colorU16.buffer).toString('base64');
+
+  const piI32 = Int32Array.from(scan.parentIndices);
+  const piB64 = Buffer.from(piI32.buffer).toString('base64');
+
+  // Labels and values stay as JSON (values include files > 4 GB, exceed Uint32).
+  // Embed all data in a non-executing script tag so the browser uses the fast
+  // JSON parser (not the general JS compiler) at runtime.
+  const labelsJson  = JSON.stringify(scan.labels);
+  const valuesJson  = JSON.stringify(scan.values);
+  const colorNamesJson = JSON.stringify(colorNames);
+  const colorMapJson   = JSON.stringify(colorMap);
+
+  // Escape </script so the data tag can't be prematurely closed.
+  const embeddedJson = `{"labels":${labelsJson},"values":${valuesJson},"colorNames":${colorNamesJson},"piB64":"${piB64}","colorB64":"${colorB64}"}`
+    .replace(/<\/script/gi, '<\\/script');
 
   return `<!doctype html>
 <html lang="en">
@@ -220,15 +233,28 @@ function buildHtml(target, scan) {
   value-format="b"
   min-cell-area="30"></raised-treemap>
 
+<script type="application/json" id="tmdata">
+${embeddedJson}
+</script>
 <script>
 ${bundle}
 </script>
 <script>
 (function () {
-  var d = ${dataJson};
+  function _buf(b64) {
+    var s = atob(b64), b = new Uint8Array(s.length);
+    for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i);
+    return b.buffer;
+  }
+  var raw = JSON.parse(document.getElementById('tmdata').textContent);
   var tm = document.getElementById('tm');
-  tm.labels = d.labels; tm.parentIndices = d.parentIndices; tm.values = d.values;
-  tm.color = d.color;
+  tm.labels = raw.labels;
+  tm.values = raw.values;
+  tm.parentIndices = new Int32Array(_buf(raw.piB64));
+  var cn = raw.colorNames, ci = new Uint16Array(_buf(raw.colorB64));
+  var ca = new Array(ci.length);
+  for (var i = 0; i < ci.length; i++) ca[i] = cn[ci[i]];
+  tm.color = ca;
   tm.colorMap = ${colorMapJson};
   tm.valueFormatter = function (v) {
     var units = ['B','KB','MB','GB','TB','PB']; var i = 0, n = v || 0;

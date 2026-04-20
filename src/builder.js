@@ -20,35 +20,50 @@ export function buildFromTabular(data, opts = {}) {
     throw new Error('buildFromTabular: labels/values required');
   }
 
-  // Fast path: parentIndices is an array of integer row references where
+  // Fast path: parentIndices is an integer array (or TypedArray) where
   // parentIndices[i] is the row index of node i's parent (-1 for roots).
-  // The scan tool guarantees parents appear before their children in the array,
-  // so IDs can be synthesized in a single forward pass — no lookups needed.
-  if (Array.isArray(parentIndices)) {
+  // Parents always appear before children, enabling O(n) passes with no
+  // string-ID synthesis — critical for large datasets (millions of rows).
+  if (parentIndices != null && typeof parentIndices.length === 'number') {
     if (parentIndices.length !== n) throw new Error('buildFromTabular: parentIndices length mismatch');
-    const idOfRow = new Array(n);
-    for (let i = 0; i < n; i++) {
-      const pi = parentIndices[i];
-      idOfRow[i] = (pi == null || pi < 0) ? labels[i] : idOfRow[pi] + '\x00' + labels[i];
-    }
+
     const nodes = new Map();
+    // Use integer row index as ID. childIds allocated lazily only for parents
+    // (leaves keep childIds:null), saving ~400 MB on 10M-file datasets.
     for (let i = 0; i < n; i++) {
-      nodes.set(idOfRow[i], {
-        id: idOfRow[i], label: labels[i], value: Number(values[i]) || 0,
+      nodes.set(i, {
+        id: i, label: labels[i], value: Number(values[i]) || 0,
         colorValue: color ? color[i] : values[i],
-        depth: 0, parentId: null, childIds: [],
+        depth: 0, parentId: parentIndices[i] >= 0 ? parentIndices[i] : null,
+        childIds: null,
         isOther: false, isLocated: false, rect: null, colorIndex: 0, _hasExplicitValue: true,
       });
     }
+
+    // Wire children — O(n), no hashing.
     for (let i = 0; i < n; i++) {
       const pi = parentIndices[i];
-      if (pi == null || pi < 0) continue;
-      const node = nodes.get(idOfRow[i]);
-      const parentId = idOfRow[pi];
-      node.parentId = parentId;
-      nodes.get(parentId).childIds.push(idOfRow[i]);
+      if (pi < 0) continue;
+      const parent = nodes.get(pi);
+      if (parent.childIds === null) parent.childIds = [];
+      parent.childIds.push(i);
     }
-    return finalize(nodes, opts);
+
+    // Depth: O(n) forward pass (parents guaranteed before children).
+    for (let i = 0; i < n; i++) {
+      const pi = parentIndices[i];
+      if (pi >= 0) nodes.get(i).depth = nodes.get(pi).depth + 1;
+    }
+
+    // Value aggregation: O(n) reverse pass — each child adds to its parent.
+    for (let i = n - 1; i >= 0; i--) {
+      const pi = parentIndices[i];
+      if (pi >= 0) nodes.get(pi).value += nodes.get(i).value;
+    }
+
+    const roots = [];
+    for (let i = 0; i < n; i++) if (parentIndices[i] < 0) roots.push(i);
+    return { nodes, roots };
   }
 
   // Legacy path: parents as string IDs or labels.
@@ -176,24 +191,29 @@ function finalize(nodes, opts) {
   const roots = [];
   for (const n of nodes.values()) if (n.parentId === null) roots.push(n.id);
 
-  // Topologically compute values (post-order). We do DFS.
+  // Topologically compute values (post-order) — iterative to avoid stack overflow.
   const order = [];
+  const stack = [...roots];
   const seen = new Set();
-  function dfs(id) {
-    if (seen.has(id)) return;
-    seen.add(id);
-    const n = nodes.get(id);
-    for (const c of n.childIds) dfs(c);
-    order.push(id);
+  while (stack.length) {
+    const id = stack[stack.length - 1];
+    if (!seen.has(id)) {
+      seen.add(id);
+      const children = nodes.get(id).childIds || [];
+      for (const c of children) if (!seen.has(c)) stack.push(c);
+    } else {
+      stack.pop();
+      order.push(id);
+    }
   }
-  for (const r of roots) dfs(r);
 
-  // Compute depth top-down.
-  function setDepth(id, d) {
+  // Compute depth top-down — iterative.
+  const depthStack = roots.map((r) => [r, 0]);
+  while (depthStack.length) {
+    const [id, d] = depthStack.pop();
     nodes.get(id).depth = d;
-    for (const c of nodes.get(id).childIds) setDepth(c, d + 1);
+    for (const c of nodes.get(id).childIds || []) depthStack.push([c, d + 1]);
   }
-  for (const r of roots) setDepth(r, 0);
 
   // Aggregate parent value/color from children if leaf children exist.
   for (const id of order) {
@@ -210,13 +230,17 @@ function finalize(nodes, opts) {
 
   // Collapse small siblings into synthetic `other` per parent.
   if (minRelArea > 0) {
-    // Recursively delete a subtree so we don't leave orphan descendants in
+    // Iteratively delete a subtree so we don't leave orphan descendants in
     // `nodes` when we collapse a small child.
     function deleteSubtree(nid) {
-      const nn = nodes.get(nid);
-      if (!nn) return;
-      for (const c of nn.childIds) deleteSubtree(c);
-      nodes.delete(nid);
+      const stk = [nid];
+      while (stk.length) {
+        const cur = stk.pop();
+        const nn = nodes.get(cur);
+        if (!nn) continue;
+        for (const c of nn.childIds || []) stk.push(c);
+        nodes.delete(cur);
+      }
     }
     for (const id of Array.from(nodes.keys())) {
       const n = nodes.get(id);

@@ -375,35 +375,50 @@ function buildFromTabular(data, opts = {}) {
     throw new Error('buildFromTabular: labels/values required');
   }
 
-  // Fast path: parentIndices is an array of integer row references where
+  // Fast path: parentIndices is an integer array (or TypedArray) where
   // parentIndices[i] is the row index of node i's parent (-1 for roots).
-  // The scan tool guarantees parents appear before their children in the array,
-  // so IDs can be synthesized in a single forward pass — no lookups needed.
-  if (Array.isArray(parentIndices)) {
+  // Parents always appear before children, enabling O(n) passes with no
+  // string-ID synthesis — critical for large datasets (millions of rows).
+  if (parentIndices != null && typeof parentIndices.length === 'number') {
     if (parentIndices.length !== n) throw new Error('buildFromTabular: parentIndices length mismatch');
-    const idOfRow = new Array(n);
-    for (let i = 0; i < n; i++) {
-      const pi = parentIndices[i];
-      idOfRow[i] = (pi == null || pi < 0) ? labels[i] : idOfRow[pi] + '\x00' + labels[i];
-    }
+
     const nodes = new Map();
+    // Use integer row index as ID. childIds allocated lazily only for parents
+    // (leaves keep childIds:null), saving ~400 MB on 10M-file datasets.
     for (let i = 0; i < n; i++) {
-      nodes.set(idOfRow[i], {
-        id: idOfRow[i], label: labels[i], value: Number(values[i]) || 0,
+      nodes.set(i, {
+        id: i, label: labels[i], value: Number(values[i]) || 0,
         colorValue: color ? color[i] : values[i],
-        depth: 0, parentId: null, childIds: [],
+        depth: 0, parentId: parentIndices[i] >= 0 ? parentIndices[i] : null,
+        childIds: null,
         isOther: false, isLocated: false, rect: null, colorIndex: 0, _hasExplicitValue: true,
       });
     }
+
+    // Wire children — O(n), no hashing.
     for (let i = 0; i < n; i++) {
       const pi = parentIndices[i];
-      if (pi == null || pi < 0) continue;
-      const node = nodes.get(idOfRow[i]);
-      const parentId = idOfRow[pi];
-      node.parentId = parentId;
-      nodes.get(parentId).childIds.push(idOfRow[i]);
+      if (pi < 0) continue;
+      const parent = nodes.get(pi);
+      if (parent.childIds === null) parent.childIds = [];
+      parent.childIds.push(i);
     }
-    return finalize(nodes, opts);
+
+    // Depth: O(n) forward pass (parents guaranteed before children).
+    for (let i = 0; i < n; i++) {
+      const pi = parentIndices[i];
+      if (pi >= 0) nodes.get(i).depth = nodes.get(pi).depth + 1;
+    }
+
+    // Value aggregation: O(n) reverse pass — each child adds to its parent.
+    for (let i = n - 1; i >= 0; i--) {
+      const pi = parentIndices[i];
+      if (pi >= 0) nodes.get(pi).value += nodes.get(i).value;
+    }
+
+    const roots = [];
+    for (let i = 0; i < n; i++) if (parentIndices[i] < 0) roots.push(i);
+    return { nodes, roots };
   }
 
   // Legacy path: parents as string IDs or labels.
@@ -530,24 +545,29 @@ function finalize(nodes, opts) {
   const roots = [];
   for (const n of nodes.values()) if (n.parentId === null) roots.push(n.id);
 
-  // Topologically compute values (post-order). We do DFS.
+  // Topologically compute values (post-order) — iterative to avoid stack overflow.
   const order = [];
+  const stack = [...roots];
   const seen = new Set();
-  function dfs(id) {
-    if (seen.has(id)) return;
-    seen.add(id);
-    const n = nodes.get(id);
-    for (const c of n.childIds) dfs(c);
-    order.push(id);
+  while (stack.length) {
+    const id = stack[stack.length - 1];
+    if (!seen.has(id)) {
+      seen.add(id);
+      const children = nodes.get(id).childIds || [];
+      for (const c of children) if (!seen.has(c)) stack.push(c);
+    } else {
+      stack.pop();
+      order.push(id);
+    }
   }
-  for (const r of roots) dfs(r);
 
-  // Compute depth top-down.
-  function setDepth(id, d) {
+  // Compute depth top-down — iterative.
+  const depthStack = roots.map((r) => [r, 0]);
+  while (depthStack.length) {
+    const [id, d] = depthStack.pop();
     nodes.get(id).depth = d;
-    for (const c of nodes.get(id).childIds) setDepth(c, d + 1);
+    for (const c of nodes.get(id).childIds || []) depthStack.push([c, d + 1]);
   }
-  for (const r of roots) setDepth(r, 0);
 
   // Aggregate parent value/color from children if leaf children exist.
   for (const id of order) {
@@ -564,13 +584,17 @@ function finalize(nodes, opts) {
 
   // Collapse small siblings into synthetic `other` per parent.
   if (minRelArea > 0) {
-    // Recursively delete a subtree so we don't leave orphan descendants in
+    // Iteratively delete a subtree so we don't leave orphan descendants in
     // `nodes` when we collapse a small child.
     function deleteSubtree(nid) {
-      const nn = nodes.get(nid);
-      if (!nn) return;
-      for (const c of nn.childIds) deleteSubtree(c);
-      nodes.delete(nid);
+      const stk = [nid];
+      while (stk.length) {
+        const cur = stk.pop();
+        const nn = nodes.get(cur);
+        if (!nn) continue;
+        for (const c of nn.childIds || []) stk.push(c);
+        nodes.delete(cur);
+      }
     }
     for (const id of Array.from(nodes.keys())) {
       const n = nodes.get(id);
@@ -1206,17 +1230,17 @@ class RaisedTreemap extends HTMLElement {
     let cur = this._tree.nodes.get(id);
     while (cur) {
       if (this._leafById.has(cur.id)) return cur;
-      cur = cur.parentId ? this._tree.nodes.get(cur.parentId) : null;
+      cur = cur.parentId !== null ? this._tree.nodes.get(cur.parentId) : null;
     }
     return null;
   }
-  zoomTo(id) { if (!id || (this._tree && this._tree.nodes.has(id))) this._setVisibleRoot(id); }
+  zoomTo(id) { if (id == null || (this._tree && this._tree.nodes.has(id))) this._setVisibleRoot(id); }
   zoomReset() { this._setVisibleRoot(null); }
   zoomOut() {
     const vr = this._activeVisibleRootId();
-    if (!vr || !this._tree) return;
+    if (vr == null || !this._tree) return;
     const n = this._tree.nodes.get(vr);
-    this._setVisibleRoot(n && n.parentId ? n.parentId : null);
+    this._setVisibleRoot(n && n.parentId !== null ? n.parentId : null);
   }
 
   // ----- render pipeline -----
@@ -1282,8 +1306,8 @@ class RaisedTreemap extends HTMLElement {
 
     const activeRoot = this._activeVisibleRootId();
     const nodes = this._tree.nodes;
-    const rootId = activeRoot && nodes.has(activeRoot) ? activeRoot : this._tree.roots[0];
-    if (!rootId) { this._clearCanvas(); return; }
+    const rootId = activeRoot != null && nodes.has(activeRoot) ? activeRoot : this._tree.roots[0];
+    if (rootId == null) { this._clearCanvas(); return; }
     const rootNode = nodes.get(rootId);
     const baseDepth = rootNode.depth;
     const cap = baseDepth + (p.displayDepth === Infinity ? 99 : Math.max(0, p.displayDepth));
@@ -1305,7 +1329,7 @@ class RaisedTreemap extends HTMLElement {
       nodeRects.set(nodeId, rect);
       const node = nodes.get(nodeId);
       const atCap = node.depth >= cap;
-      if (atCap || node.childIds.length === 0) {
+      if (atCap || !node.childIds || node.childIds.length === 0) {
         leafCap.add(nodeId);
         leavesCollect.push({ node, rect });
         return;
@@ -1322,7 +1346,7 @@ class RaisedTreemap extends HTMLElement {
         // Inset this group's rect so sibling groups get a visible gutter.
         // Only apply padding to non-leaf groups (a leaf's rect is its own).
         let sub = r;
-        if (pad > 0 && kid.childIds.length > 0) {
+        if (pad > 0 && kid.childIds && kid.childIds.length > 0) {
           const px = Math.min(pad, r.w / 2 - 1);
           const py = Math.min(pad, r.h / 2 - 1);
           if (px > 0 && py > 0) {
@@ -1457,7 +1481,7 @@ class RaisedTreemap extends HTMLElement {
       const rootId = this._tree.roots[0];
       const chain = [];
       let cur = active ? this._tree.nodes.get(active) : this._tree.nodes.get(rootId);
-      while (cur) { chain.unshift(cur); cur = cur.parentId ? this._tree.nodes.get(cur.parentId) : null; }
+      while (cur) { chain.unshift(cur); cur = cur.parentId !== null ? this._tree.nodes.get(cur.parentId) : null; }
       // Drop the root node — its label is already in the page header.
       const crumbChain = chain.filter(n => n.parentId !== null);
       if (crumbChain.length > 0) {
@@ -1554,7 +1578,7 @@ class RaisedTreemap extends HTMLElement {
   _updateToolbarInfo() {
     if (!this._infoEl) return;
     const id = this._hoverId || this._selectedId;
-    if (!id || !this._tree) { this._infoEl.innerHTML = '<span>(hover a cell)</span>'; return; }
+    if (id == null || !this._tree) { this._infoEl.innerHTML = '<span>(hover a cell)</span>'; return; }
     const n = this._tree.nodes.get(id);
     if (!n) return;
     this._infoEl.innerHTML = `<b>${escapeHtml(this._buildPath(id))}</b> · ${escapeHtml(this._formatValue(n.value))}`;
@@ -1600,7 +1624,7 @@ class RaisedTreemap extends HTMLElement {
   }
   _onClick(e) {
     const id = this._hitTest(e);
-    if (!id) return;
+    if (id == null) return;
     this._selectedId = id;
     this._leafSelectedId = id;
     this._selectionLocked = true;
@@ -1611,12 +1635,12 @@ class RaisedTreemap extends HTMLElement {
   }
   _onDblClick(e) {
     const id = this._hitTest(e);
-    if (!id) return;
+    if (id == null) return;
     this._dispatch('gp-dblclick', id);
     this._setVisibleRoot(id);
   }
   _onWheel(e) {
-    if (!this._selectedId || !this._tree) return;
+    if (this._selectedId == null || !this._tree) return;
     this._wheelAcc += e.deltaY;
     if (Math.abs(this._wheelAcc) < 80) return;
     const dir = this._wheelAcc > 0 ? 1 : -1;
@@ -1625,28 +1649,28 @@ class RaisedTreemap extends HTMLElement {
     if (!n) return;
     let next = null;
     if (dir < 0) next = n.parentId;
-    else if (n.childIds.length) next = n.childIds[0];
-    if (next) { this._selectedId = next; this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth); this._dispatch('gp-select', next); }
+    else if (n.childIds && n.childIds.length) next = n.childIds[0];
+    if (next != null) { this._selectedId = next; this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth); this._dispatch('gp-select', next); }
   }
   _onKeyDown(e) {
-    if (e.key === '+' || e.key === '=') { if (this._selectedId) this._setVisibleRoot(this._selectedId); return; }
+    if (e.key === '+' || e.key === '=') { if (this._selectedId != null) this._setVisibleRoot(this._selectedId); return; }
     if (e.key === '-') { this.zoomOut(); return; }
     if (e.key === '0') { this.zoomReset(); return; }
-    if (!this._selectionLocked || !this._tree || !this._selectedId) return;
+    if (!this._selectionLocked || !this._tree || this._selectedId == null) return;
     const n = this._tree.nodes.get(this._selectedId);
     if (!n) return;
-    const parent = n.parentId ? this._tree.nodes.get(n.parentId) : null;
+    const parent = n.parentId !== null ? this._tree.nodes.get(n.parentId) : null;
     let next = null;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
       if (parent) { const i = parent.childIds.indexOf(n.id); next = parent.childIds[Math.max(0, i - 1)]; }
     } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       if (parent) { const i = parent.childIds.indexOf(n.id); next = parent.childIds[Math.min(parent.childIds.length - 1, i + 1)]; }
     } else if (e.key === 'Enter') {
-      if (n.childIds.length) next = n.childIds[0];
+      if (n.childIds && n.childIds.length) next = n.childIds[0];
     } else if (e.key === 'Escape') {
       this._selAncestorUp(); return;
     } else { return; }
-    if (next) {
+    if (next != null) {
       this._selectedId = next;
       this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth);
       this._dispatch('gp-select', next);
@@ -1703,7 +1727,7 @@ class RaisedTreemap extends HTMLElement {
     let cur = this._tree.nodes.get(nodeId);
     while (cur) {
       if (cur.parentId !== null) chain.unshift(cur.label); // skip root (shown in header)
-      cur = cur.parentId ? this._tree.nodes.get(cur.parentId) : null;
+      cur = cur.parentId !== null ? this._tree.nodes.get(cur.parentId) : null;
     }
     return chain.join('/');
   }
@@ -1722,9 +1746,9 @@ class RaisedTreemap extends HTMLElement {
   }
 
   _selAncestorUp() {
-    if (!this._selectedId || !this._tree) return;
+    if (this._selectedId == null || !this._tree) return;
     const n = this._tree.nodes.get(this._selectedId);
-    if (!n || !n.parentId) return;
+    if (!n || n.parentId === null) return;
     this._selectedId = n.parentId;
     const dpr = this._canvas.width / this._stage.clientWidth;
     this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, dpr);
@@ -1733,13 +1757,13 @@ class RaisedTreemap extends HTMLElement {
   }
 
   _selAncestorDown() {
-    if (!this._selectedId || !this._leafSelectedId || !this._tree) return;
+    if (this._selectedId == null || this._leafSelectedId == null || !this._tree) return;
     if (this._selectedId === this._leafSelectedId) return;
     // Walk up from _leafSelectedId to find the direct child of _selectedId on that path.
     let cur = this._tree.nodes.get(this._leafSelectedId);
     let found = null;
     while (cur) {
-      if (!cur.parentId) break;
+      if (cur.parentId === null) break;
       if (cur.parentId === this._selectedId) { found = cur; break; }
       cur = this._tree.nodes.get(cur.parentId);
     }
@@ -1753,7 +1777,7 @@ class RaisedTreemap extends HTMLElement {
 
   _updateFocusUI() {
     if (!this._focusValEl) return;
-    if (!this._selectedId || !this._tree) { this._focusValEl.textContent = '∞'; return; }
+    if (this._selectedId == null || !this._tree) { this._focusValEl.textContent = '∞'; return; }
     const n = this._tree.nodes.get(this._selectedId);
     this._focusValEl.textContent = n ? String(n.depth) : '∞';
   }
