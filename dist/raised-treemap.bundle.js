@@ -1661,7 +1661,7 @@ class RaisedTreemap extends HTMLElement {
       });
       a.addEventListener('dblclick', (e) => {
         e.preventDefault();
-        this._setVisibleRoot(node.id);
+        this.stretchZoomIn(node.id);
       });
       this._infoEl.appendChild(a);
     });
@@ -1727,7 +1727,7 @@ class RaisedTreemap extends HTMLElement {
     const id = this._hitTest(e);
     if (id == null) return;
     this._dispatch('rt-dblclick', id);
-    this._setVisibleRoot(id);
+    this.stretchZoomIn(id);
   }
   _onWheel(e) {
     if (this._targetId == null || !this._tree) return;
