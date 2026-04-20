@@ -19,12 +19,12 @@ test.describe('URL hash state', () => {
     const box = await page.locator('raised-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await waitForRender(page);
-    const clickedId = await page.locator('raised-treemap').evaluate((el) => el._selectedId);
+    const clickedId = await page.locator('raised-treemap').evaluate((el) => el._targetId);
     expect(clickedId).not.toBeNull();
 
     // Zoom to the clicked node's parent
     await page.locator('raised-treemap').evaluate((el) => {
-      const n = el._tree.nodes.get(el._selectedId);
+      const n = el._tree.nodes.get(el._targetId);
       if (n && n.parentId !== null) el.zoomTo(n.parentId);
     });
     await waitForRender(page);
@@ -90,6 +90,60 @@ test.describe('URL hash state', () => {
     const hash = await page.evaluate(() => window.location.hash);
     // Hash should be empty (no zoom, depth is default)
     expect(hash === '' || hash === '#').toBe(true);
+  });
+
+  test('clicking a cell writes target to hash', async ({ page }) => {
+    await page.goto('/samples/interactions.html');
+    await waitForRender(page);
+
+    const box = await page.locator('raised-treemap').boundingBox();
+    await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await waitForRender(page);
+
+    const hash = await page.evaluate(() => window.location.hash);
+    expect(hash).toMatch(/target=/);
+  });
+
+  test('target and focus restored from hash', async ({ page }) => {
+    await page.goto('/samples/interactions.html#target=src&focus=src');
+    await waitForRender(page);
+
+    const state = await page.locator('raised-treemap').evaluate((el) => ({
+      targetId: el._targetId,
+      focusId: el._focusId,
+    }));
+    expect(state.targetId).toBe('src');
+    expect(state.focusId).toBe('src');
+  });
+
+  test('focus differs from target in hash round-trip', async ({ page }) => {
+    await page.goto('/samples/interactions.html');
+    await waitForRender(page);
+
+    // Click a cell to set target
+    const box = await page.locator('raised-treemap').boundingBox();
+    await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await waitForRender(page);
+
+    // Move focus up
+    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
+    await waitForRender(page);
+
+    const hash = await page.evaluate(() => window.location.hash);
+    expect(hash).toMatch(/target=/);
+    expect(hash).toMatch(/focus=/);
+
+    // Reload and verify
+    await page.goto('/samples/interactions.html' + hash);
+    await waitForRender(page);
+
+    const state = await page.locator('raised-treemap').evaluate((el) => ({
+      targetId: el._targetId,
+      focusId: el._focusId,
+    }));
+    expect(state.targetId).not.toBeNull();
+    expect(state.focusId).not.toBeNull();
+    expect(state.focusId).not.toBe(state.targetId);
   });
 
 });

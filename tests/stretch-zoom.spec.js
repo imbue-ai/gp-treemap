@@ -88,7 +88,7 @@ test.describe('stretch zoom', () => {
 
     // Now stretch-zoom into that node
     await page.locator('raised-treemap').evaluate((el, targetId) => {
-      el._selectedId = targetId;
+      el._targetId = targetId;
       el.stretchZoomIn(targetId);
     }, before.targetId);
     await waitForZoomAnimation(page);
@@ -155,7 +155,7 @@ test.describe('stretch zoom', () => {
 
     // Stretch-zoom into the node
     await page.locator('raised-treemap').evaluate((el, id) => {
-      el._selectedId = id;
+      el._targetId = id;
       el.stretchZoomIn(id);
     }, info.id);
     await waitForZoomAnimation(page);
@@ -217,7 +217,7 @@ test.describe('stretch zoom', () => {
     if (!nodeInfo) { test.skip(); return; }
 
     await page.locator('raised-treemap').evaluate((el, id) => {
-      el._selectedId = id;
+      el._targetId = id;
       el.stretchZoomIn(id);
     }, nodeInfo.id);
     await waitForZoomAnimation(page);
@@ -275,7 +275,7 @@ test.describe('stretch zoom', () => {
 
     // Stretch-zoom into the small node
     await page.locator('raised-treemap').evaluate((el, id) => {
-      el._selectedId = id;
+      el._targetId = id;
       el.stretchZoomIn(id);
     }, target.id);
     await waitForZoomAnimation(page);
@@ -306,14 +306,14 @@ test.describe('stretch zoom', () => {
     await waitForRender(page);
     await page.locator('raised-treemap').evaluate((el) => {
       // Navigate up to a parent
-      el._selAncestorUp();
-      el._selAncestorUp();
+      el._focusUp();
+      el._focusUp();
     });
     await waitForRender(page);
 
     // Stretch-zoom in
     const zoomedId = await page.locator('raised-treemap').evaluate((el) => {
-      if (el._selectedId) el.stretchZoomIn(el._selectedId);
+      { var id = el._focusId || el._targetId; if (id) el.stretchZoomIn(id); }
       return el._stretchZoomId;
     });
     await waitForZoomAnimation(page);
@@ -344,11 +344,11 @@ test.describe('stretch zoom', () => {
     const box = await page.locator('raised-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await waitForRender(page);
-    await page.locator('raised-treemap').evaluate((el) => el._selAncestorUp());
+    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
     await waitForRender(page);
 
     const didZoom = await page.locator('raised-treemap').evaluate((el) => {
-      if (el._selectedId) el.stretchZoomIn(el._selectedId);
+      { var id = el._focusId || el._targetId; if (id) el.stretchZoomIn(id); }
       return !!el._stretchZoomId;
     });
     if (!didZoom) { test.skip(); return; }
@@ -370,7 +370,7 @@ test.describe('stretch zoom', () => {
     const box = await page.locator('raised-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await waitForRender(page);
-    await page.locator('raised-treemap').evaluate((el) => el._selAncestorUp());
+    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
     await waitForRender(page);
 
     // Listen for zoom-change events
@@ -378,7 +378,7 @@ test.describe('stretch zoom', () => {
       const evts = [];
       el.addEventListener('rt-zoom-change', (e) => evts.push(e.detail));
 
-      if (el._selectedId) el.stretchZoomIn(el._selectedId);
+      { var id = el._focusId || el._targetId; if (id) el.stretchZoomIn(id); }
       return evts;
     });
 
@@ -395,11 +395,11 @@ test.describe('stretch zoom', () => {
     await page.mouse.click(box.x + box.width * 0.4, box.y + box.height * 0.4);
     await waitForRender(page);
     // Navigate up to a visible parent
-    await page.locator('raised-treemap').evaluate((el) => el._selAncestorUp());
+    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
     await waitForRender(page);
 
     await page.locator('raised-treemap').evaluate((el) => {
-      if (el._selectedId) el.stretchZoomIn(el._selectedId);
+      { var id = el._focusId || el._targetId; if (id) el.stretchZoomIn(id); }
     });
     await waitForZoomAnimation(page);
     await snap(page, '13-stretch-zoom-in');
@@ -418,11 +418,11 @@ test.describe('stretch zoom', () => {
     const box = await page.locator('raised-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.3, box.y + box.height * 0.3);
     await waitForRender(page);
-    await page.locator('raised-treemap').evaluate((el) => el._selAncestorUp());
+    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
     await waitForRender(page);
 
     const didZoom = await page.locator('raised-treemap').evaluate((el) => {
-      if (el._selectedId) el.stretchZoomIn(el._selectedId);
+      { var id = el._focusId || el._targetId; if (id) el.stretchZoomIn(id); }
       return !!el._stretchZoomId;
     });
     if (!didZoom) { test.skip(); return; }

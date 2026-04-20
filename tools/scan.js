@@ -296,7 +296,7 @@ ${bundle}
     return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' ' + units[i];
   };
 })();
-// Sync zoom/depth state with URL hash so copying the URL preserves the view.
+// Sync UI state with URL hash so copying the URL preserves the view.
 (function () {
   var tm = document.getElementById('tm');
   function readHash() {
@@ -304,6 +304,8 @@ ${bundle}
       var p = new URLSearchParams(location.hash.slice(1));
       var z = p.get('zoom');   if (z) tm.visibleRootId = z;
       var d = p.get('depth');  if (d != null) tm.displayDepth = d === 'Infinity' ? Infinity : Number(d);
+      var t = p.get('target'); if (t) { tm._targetId = t; tm._selectionLocked = true; }
+      var f = p.get('focus');  if (f) tm._focusId = f;
     } catch (_) {}
   }
   function writeHash() {
@@ -311,6 +313,8 @@ ${bundle}
       var p = new URLSearchParams();
       var z = tm._internalVisibleRootId; if (z) p.set('zoom', z);
       var d = tm.displayDepth;           if (d !== Infinity) p.set('depth', String(d));
+      var t = tm._targetId;              if (t) p.set('target', t);
+      var f = tm._focusId;               if (f && f !== t) p.set('focus', f);
       var s = p.toString();
       history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
     } catch (_) {}
@@ -318,6 +322,8 @@ ${bundle}
   readHash();
   tm.addEventListener('rt-zoom-change', writeHash);
   tm.addEventListener('rt-depth-change', writeHash);
+  tm.addEventListener('rt-target', writeHash);
+  tm.addEventListener('rt-focus', writeHash);
 })();
 </script>
 </body>
