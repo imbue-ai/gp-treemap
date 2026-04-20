@@ -74,7 +74,7 @@
   function writeHash() {
     try {
       var p = new URLSearchParams();
-      var z = tm._internalVisibleRootId; if (z) p.set('zoom', z);
+      var z = tm._activeVisibleRootId(); if (z) p.set('zoom', z);
       var d = tm.displayDepth;           if (d !== Infinity) p.set('depth', String(d));
       var t = tm._targetId;              if (t) p.set('target', t);
       var f = tm._focusId;               if (f && f !== t) p.set('focus', f);

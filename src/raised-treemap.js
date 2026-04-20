@@ -18,7 +18,7 @@ import { buildFromTabular, buildFromTree } from './builder.js';
 import { balanceChildren } from './balancer.js';
 import { layoutTree } from './layout.js';
 import { resolveColors } from './color-resolver.js';
-import { resolvePalette } from './palettes.js';
+import { resolvePalette, THEMES } from './palettes.js';
 import { buildLUTs, buildLUTForCssColor } from './lut.js';
 import { paintAll } from './painter.js';
 import { applyFormat } from './format.js';
@@ -41,38 +41,45 @@ const DEFAULT_PROPS = {
 const STYLE = `
 :host { display:flex; flex-direction:column; position:relative; overflow:hidden;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; font-size:12px;
-  color:#222; background:#f4f4f4;
+  color: var(--rt-fg, #222); background: var(--rt-bg, #f4f4f4);
   --rt-selected:#ffffff; --rt-located:#ff1fa3; }
-.toolbar { display:flex; gap:8px; align-items:center; padding:6px 8px; border-bottom:1px solid #0001;
-  background:#fafafa; user-select:none; flex-wrap:wrap; min-height:34px; }
-.toolbar .sep { width:1px; height:20px; background:#0002; }
-.toolbar button { padding:2px 8px; background:#fff; border:1px solid #0003; border-radius:4px; cursor:pointer; font:inherit; }
-.toolbar button:hover { background:#eef; }
+.toolbar { display:flex; gap:8px; align-items:center; padding:6px 8px;
+  border-bottom:1px solid var(--rt-border, #0001);
+  background: var(--rt-surface, #fafafa); user-select:none; flex-wrap:wrap; min-height:34px; }
+.toolbar .sep { width:1px; height:20px; background: var(--rt-border, #0002); }
+.toolbar button { padding:2px 8px; background: var(--rt-bg, #fff);
+  border:1px solid var(--rt-border, #0003); border-radius:4px; cursor:pointer;
+  font:inherit; color: var(--rt-fg, inherit); }
+.toolbar button:hover { background: var(--rt-surface, #eef); }
 .toolbar button:disabled { opacity:0.35; cursor:default; }
-.toolbar button:disabled:hover { background:#fff; }
-.info-line { padding:3px 8px; border-bottom:1px solid #0001; background:#fafafa; font-variant-numeric: tabular-nums;
-  color:#333; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-height:22px;
+.toolbar button:disabled:hover { background: var(--rt-bg, #fff); }
+.info-line { padding:3px 8px; border-bottom:1px solid var(--rt-border, #0001);
+  background: var(--rt-surface, #fafafa); font-variant-numeric: tabular-nums;
+  color: var(--rt-fg, #333); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-height:22px;
   display:flex; align-items:center; gap:0; }
-.info-line .root-icon { cursor:pointer; margin-right:4px; color:#999; flex-shrink:0; }
-.info-line .root-icon:hover { color:#0645ad; }
-.info-line a { cursor:pointer; color:#0645ad; text-decoration:none; }
+.info-line .root-icon { cursor:pointer; margin-right:4px; color: var(--rt-fg-muted, #999); flex-shrink:0; }
+.info-line .root-icon:hover { color: var(--rt-accent, #0645ad); }
+.info-line a { cursor:pointer; color: var(--rt-accent, #0645ad); text-decoration:none; }
 .info-line a:hover { text-decoration:underline; }
-.info-line a.focused { font-weight:700; color:#000; text-decoration:underline; text-underline-offset:2px; }
-.info-line .sep-slash { color:#999; padding:0 1px; }
-.info-line .val { color:#555; margin-left:6px; }
+.info-line a.focused { font-weight:700; color: var(--rt-fg, #000); text-decoration:underline; text-underline-offset:2px; }
+.info-line .sep-slash { color: var(--rt-fg-muted, #999); padding:0 1px; }
+.info-line .val { color: var(--rt-fg-muted, #555); margin-left:6px; }
 .toolbar .depth { display:flex; gap:2px; align-items:center; }
-.stage { position:relative; flex:1; overflow:hidden; background:#0b0b0b; cursor: default; outline: none; }
+.stage { position:relative; flex:1; overflow:hidden; background: var(--rt-stage-bg, #0b0b0b); cursor: default; outline: none; }
 .stage canvas { position:absolute; inset:0; width:100%; height:100%; display:block; image-rendering: pixelated;
   transform-origin: 0 0; transition: transform var(--rt-zoom-ms, 350ms) ease; }
 .overlay { position:absolute; inset:0; pointer-events:none; transform-origin:0 0; }
 .overlay .sel, .overlay .loc { position:absolute; box-sizing:border-box; pointer-events:none; }
 .overlay .sel { border:2px solid var(--rt-selected); box-sizing:border-box; }
 .overlay .loc { border:2px solid var(--rt-located); box-shadow: 0 0 0 1px #fff8; }
-.overlay .lbl { position:absolute; color:#111; font-size:11px; font-weight:500; line-height:1; padding:1px 3px;
-  text-shadow: 0 0 2px #ffffffcc, 0 0 2px #ffffffcc; white-space:nowrap; pointer-events:none;
-  transform: translate(-50%, -50%); }
-.tooltip { position:fixed; pointer-events:none; background:#111d; color:#fff; padding:4px 8px;
-  border-radius:4px; font-size:12px; line-height:1.3; z-index:1000; max-width:260px; box-shadow:0 2px 6px #0006; }
+.overlay .lbl { position:absolute; font-size:11px; font-weight:500; line-height:1; padding:1px 3px;
+  color: var(--rt-fg, #111);
+  text-shadow: 0 0 2px var(--rt-bg, #ffffffcc), 0 0 2px var(--rt-bg, #ffffffcc);
+  white-space:nowrap; pointer-events:none; transform: translate(-50%, -50%); }
+.tooltip { position:fixed; pointer-events:none; padding:4px 8px;
+  background: var(--rt-surface, #111d); color: var(--rt-fg, #fff);
+  border:1px solid var(--rt-border, transparent);
+  border-radius:4px; font-size:12px; line-height:1.3; z-index:1000; max-width:400px; box-shadow:0 2px 6px #0006; }
 .tooltip b { display:block; font-size:11px; font-weight:600; margin-bottom:1px; }
 `;
 
@@ -81,7 +88,7 @@ export class RaisedTreemap extends HTMLElement {
     return [
       'color-mode','color-scale','palette','gradient-intensity','visible-root-id',
       'display-depth','min-cell-area','show-labels','value-format','toolbar',
-      'zoom-duration','tooltip','background','group-padding',
+      'zoom-duration','tooltip','background','group-padding','theme',
     ];
   }
 
@@ -168,8 +175,33 @@ export class RaisedTreemap extends HTMLElement {
       case 'tooltip': this._props.tooltip = val !== 'false'; break;
       case 'background': this._props.background = val || '#111'; break;
       case 'group-padding': this._props.groupPadding = Number(val) || 0; break;
+      case 'theme': this._applyTheme(val); break;
     }
     this._queueRender();
+  }
+
+  _applyTheme(name) {
+    const host = this.shadowRoot.host;
+    const theme = name ? THEMES[name] : null;
+    if (!theme) {
+      // Clear theme vars — revert to defaults.
+      for (const v of ['--rt-bg','--rt-surface','--rt-border','--rt-fg','--rt-fg-muted','--rt-accent','--rt-stage-bg'])
+        host.style.removeProperty(v);
+      this._props.palette = this._props._userPalette || 'gp-default';
+      this._props.background = this._props._userBackground || '#111';
+      return;
+    }
+    host.style.setProperty('--rt-bg', theme.bg);
+    host.style.setProperty('--rt-surface', theme.surface);
+    host.style.setProperty('--rt-border', theme.border);
+    host.style.setProperty('--rt-fg', theme.fg);
+    host.style.setProperty('--rt-fg-muted', theme.fgMuted);
+    host.style.setProperty('--rt-accent', theme.accent);
+    host.style.setProperty('--rt-stage-bg', theme.stageBg);
+    this._props._userPalette = this._props._userPalette || this._props.palette;
+    this._props._userBackground = this._props._userBackground || this._props.background;
+    this._props.palette = name;
+    this._props.background = theme.stageBg;
   }
 
   // ----- public methods -----
@@ -711,9 +743,16 @@ export class RaisedTreemap extends HTMLElement {
     if (!n) return;
     this._tooltip.hidden = false;
     this._tooltip.innerHTML = `<b>${escapeHtml(this._buildPath(id))}</b><br>${escapeHtml(this._formatValue(n.value))}${n.isOther ? ' (collapsed)' : ''}`;
-    const x = e.clientX + 12, y = e.clientY + 12;
-    this._tooltip.style.left = x + 'px';
-    this._tooltip.style.top = y + 'px';
+    const gap = 12;
+    const vw = window.innerWidth;
+    const tt = this._tooltip;
+    // Measure tooltip width: temporarily show off-screen to get actual size
+    tt.style.left = '-9999px'; tt.style.top = '-9999px';
+    const tw = tt.offsetWidth;
+    const flipX = e.clientX + gap + tw > vw;
+    const x = flipX ? e.clientX - gap - tw : e.clientX + gap;
+    tt.style.left = x + 'px';
+    tt.style.top = (e.clientY + gap) + 'px';
   }
   _hideTooltip() { this._tooltip.hidden = true; }
 

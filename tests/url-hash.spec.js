@@ -124,6 +124,32 @@ test.describe('URL hash state', () => {
     expect(state.focusId).toBe('src');
   });
 
+  test('double-click zoom writes zoom param to hash', async ({ page }) => {
+    await page.goto('/samples/interactions.html');
+    await waitForRender(page);
+
+    // Double-click a cell to trigger stretch-zoom
+    const box = await page.locator('raised-treemap').boundingBox();
+    await page.mouse.dblclick(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    // Wait for the zoom animation (350ms default + buffer)
+    await page.waitForTimeout(500);
+    await waitForRender(page);
+
+    const hash = await page.evaluate(() => window.location.hash);
+    expect(hash).toMatch(/zoom=/);
+
+    // Verify the zoom ID was captured
+    const zoomId = await page.locator('raised-treemap').evaluate((el) => el._activeVisibleRootId());
+    expect(zoomId).not.toBeNull();
+
+    // Reload and verify zoom is restored
+    await page.goto('/samples/interactions.html' + hash);
+    await waitForRender(page);
+
+    const restored = await page.locator('raised-treemap').evaluate((el) => el._activeVisibleRootId());
+    expect(restored).toBe(zoomId);
+  });
+
   test('focus differs from target in hash round-trip', async ({ page }) => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);

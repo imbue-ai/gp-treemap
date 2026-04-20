@@ -3,8 +3,8 @@
 // renders its size treemap with <raised-treemap>. The output has the bundle and
 // the dataset inlined, so you can open it from anywhere with no server.
 //
-// Usage:  node tools/scan.js <dir> [output.html]
-//                 (or `npm run scan -- <dir> [output.html]`)
+// Usage:  node tools/scan.js [--color=extension|folder|ctime|atime] <dir> [output.html]
+//                 (or `npm run scan -- [--color=...] <dir> [output.html]`)
 //
 // Symlinks are not followed (we use lstat). Unreadable entries are counted
 // and skipped.
@@ -18,14 +18,38 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const BUNDLE_PATH = path.join(ROOT, 'dist', 'raised-treemap.bundle.js');
 
+const COLOR_MODES = ['extension', 'folder', 'ctime', 'atime'];
+
 async function main() {
   const argv = process.argv.slice(2);
   const noOpen = argv.includes('--no-open');
-  const args = argv.filter((a) => a !== '--no-open');
+  let colorBy = 'extension';
+  const args = [];
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--no-open') continue;
+    if (argv[i] === '--color' || argv[i] === '--color-by') {
+      colorBy = argv[++i];
+      if (!COLOR_MODES.includes(colorBy)) {
+        console.error('Unknown --color mode: ' + colorBy + '\nValid modes: ' + COLOR_MODES.join(', '));
+        process.exit(2);
+      }
+      continue;
+    }
+    if (argv[i].startsWith('--color=') || argv[i].startsWith('--color-by=')) {
+      colorBy = argv[i].split('=')[1];
+      if (!COLOR_MODES.includes(colorBy)) {
+        console.error('Unknown --color mode: ' + colorBy + '\nValid modes: ' + COLOR_MODES.join(', '));
+        process.exit(2);
+      }
+      continue;
+    }
+    args.push(argv[i]);
+  }
   if (args.length < 1 || args[0] === '-h' || args[0] === '--help') {
-    console.error('Usage: node tools/scan.js [--no-open] <dir> [output.html]');
+    console.error('Usage: node tools/scan.js [--no-open] [--color=extension|folder|ctime|atime] <dir> [output.html]');
     process.exit(args[0] === '-h' || args[0] === '--help' ? 0 : 2);
   }
+  const needTimestamps = colorBy === 'ctime' || colorBy === 'atime';
   const target = path.resolve(args[0]);
   const out = args[1]
     ? path.resolve(args[1])
@@ -44,9 +68,9 @@ async function main() {
   }
 
   const t0 = Date.now();
-  const scan = await walk(target);
+  const scan = await walk(target, needTimestamps, colorBy);
   const elapsed = Date.now() - t0;
-  const html = buildHtml(target, scan);
+  const html = buildHtml(target, scan, colorBy);
   fs.writeFileSync(out, html);
 
   console.log('');
@@ -66,19 +90,21 @@ async function main() {
   }
 }
 
-async function walk(rootPath) {
+async function walk(rootPath, needTimestamps, colorBy) {
   const { Worker } = await import('node:worker_threads');
-  const NWORKERS = Math.max(2, Math.min(os.cpus().length, 8));
+  const NWORKERS = Math.max(2, Math.min(os.cpus().length, 16));
   const workerPath = path.join(__dirname, 'scan-worker.js');
 
   const labels = [], parentIndices = [], values = [], color = [];
+  const timestamps = needTimestamps ? [] : null;
   let bytes = 0, files = 0, dirs = 0, unreadable = 0;
 
   labels.push(path.basename(rootPath) || rootPath);
   parentIndices.push(-1); values.push(0); color.push('dir');
+  if (timestamps) timestamps.push(0);
   dirs++;
 
-  const queue = [{ dirPath: rootPath, dirRow: 0 }];
+  const queue = [{ dirPath: rootPath, dirRow: 0, needTimestamps }];
   let pending = 0;
 
   let lastPrint = 0;
@@ -120,13 +146,15 @@ async function walk(rootPath) {
             labels.push(ent.name);
             parentIndices.push(result.dirRow);
             values.push(0); color.push('dir');
+            if (timestamps) timestamps.push(0);
             dirs++;
-            queue.push({ dirPath: path.join(result.dirPath, ent.name), dirRow: row });
+            queue.push({ dirPath: path.join(result.dirPath, ent.name), dirRow: row, needTimestamps });
           } else {
             labels.push(ent.name);
             parentIndices.push(result.dirRow);
             values.push(ent.size);
-            color.push(extKind(ent.name));
+            color.push(colorBy === 'folder' ? labels[result.dirRow] : extKind(ent.name));
+            if (timestamps) timestamps.push(ent.ts ? ent.ts[colorBy] : 0);
             bytes += ent.size;
             files++;
           }
@@ -145,7 +173,7 @@ async function walk(rootPath) {
   process.stderr.write('\r' + ' '.repeat(72) + '\r');
   for (const w of workers) w.terminate();
 
-  return { labels, parentIndices, values, color, bytes, files, dirs, unreadable };
+  return { labels, parentIndices, values, color, timestamps, bytes, files, dirs, unreadable };
 }
 
 // Map a filename to a color-key. Curated buckets for common kinds; everything
@@ -184,10 +212,12 @@ function humanBytes(v) {
   return s + ' ' + units[i];
 }
 
-function buildHtml(target, scan) {
+function buildHtml(target, scan, colorBy) {
   const bundle = fs.readFileSync(BUNDLE_PATH, 'utf8');
-  // Per-bucket color map. Hues chosen to be distinct under the raised-tile shading.
-  const colorMap = {
+  const isCategorical = colorBy === 'extension' || colorBy === 'folder';
+
+  // Per-bucket color map for extension mode.
+  const extColorMap = {
     image:   'hsl(300, 55%, 55%)',  // magenta
     video:   'hsl(348, 70%, 50%)',  // red
     audio:   'hsl(170, 55%, 45%)',  // teal
@@ -213,29 +243,76 @@ function buildHtml(target, scan) {
     when: (() => { const d = new Date(); const off = -d.getTimezoneOffset(); const sign = off >= 0 ? '+' : '-'; const hh = String(Math.floor(Math.abs(off) / 60)).padStart(2, '0'); const mm = String(Math.abs(off) % 60).padStart(2, '0'); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + 'T' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0') + sign + hh + ':' + mm; })(),
   };
 
-  // Binary-encode parentIndices (Int32Array) and color (Uint16 enum index).
-  // Avoids ~96 MB of JSON integers and ~80 MB of repeated color strings;
-  // typed-array base64 decodes far faster than JSON.parse on the same data.
-  const colorNames = [...new Set(scan.color)].sort();
-  const colorToIdx = new Map(colorNames.map((c, i) => [c, i]));
-  const colorU16 = new Uint16Array(scan.color.length);
-  for (let i = 0; i < scan.color.length; i++) colorU16[i] = colorToIdx.get(scan.color[i]);
-  const colorB64 = Buffer.from(colorU16.buffer).toString('base64');
-
+  // Binary-encode parentIndices (Int32Array).
   const piI32 = Int32Array.from(scan.parentIndices);
   const piB64 = Buffer.from(piI32.buffer).toString('base64');
 
-  // Labels and values stay as JSON (values include files > 4 GB, exceed Uint32).
-  // Embed all data in a non-executing script tag so the browser uses the fast
-  // JSON parser (not the general JS compiler) at runtime.
   const labelsJson  = JSON.stringify(scan.labels);
   const valuesJson  = JSON.stringify(scan.values);
-  const colorNamesJson = JSON.stringify(colorNames);
-  const colorMapJson   = JSON.stringify(colorMap);
+
+  let colorDataFields, colorSetupJs;
+
+  if (isCategorical) {
+    // Binary-encode color categories as Uint16 enum indices.
+    const colorNames = [...new Set(scan.color)].sort();
+    const colorToIdx = new Map(colorNames.map((c, i) => [c, i]));
+    const colorU16 = new Uint16Array(scan.color.length);
+    for (let i = 0; i < scan.color.length; i++) colorU16[i] = colorToIdx.get(scan.color[i]);
+    const colorB64 = Buffer.from(colorU16.buffer).toString('base64');
+    const colorNamesJson = JSON.stringify(colorNames);
+    const colorMapJson = colorBy === 'extension' ? JSON.stringify(extColorMap) : 'undefined';
+
+    colorDataFields = `,"colorNames":${colorNamesJson},"colorB64":"${colorB64}"`;
+    colorSetupJs = `
+  var cn = raw.colorNames, ci = new Uint16Array(_buf(raw.colorB64));
+  var ca = new Array(ci.length);
+  for (var i = 0; i < ci.length; i++) ca[i] = cn[ci[i]];
+  tm.color = ca;
+  ${colorMapJson !== 'undefined' ? 'tm.colorMap = ' + colorMapJson + ';' : ''}`;
+  } else {
+    // Quantitative: embed timestamps as Float64Array base64.
+    const tsF64 = Float64Array.from(scan.timestamps);
+    const tsB64 = Buffer.from(tsF64.buffer).toString('base64');
+
+    colorDataFields = `,"tsB64":"${tsB64}"`;
+    const timeLabel = colorBy === 'ctime' ? 'created' : 'accessed';
+    colorSetupJs = `
+  var ts = new Float64Array(_buf(raw.tsB64));
+  tm.color = Array.from(ts);
+  // Compute domain excluding zero (directories have no timestamp).
+  var tsMin = Infinity, tsMax = -Infinity;
+  for (var j = 0; j < ts.length; j++) {
+    if (ts[j] > 0) { if (ts[j] < tsMin) tsMin = ts[j]; if (ts[j] > tsMax) tsMax = ts[j]; }
+  }
+  if (tsMin !== Infinity) tm.colorDomain = [tsMin, tsMax];`;
+  }
 
   // Escape </script so the data tag can't be prematurely closed.
-  const embeddedJson = `{"labels":${labelsJson},"values":${valuesJson},"colorNames":${colorNamesJson},"piB64":"${piB64}","colorB64":"${colorB64}"}`
+  const embeddedJson = `{"labels":${labelsJson},"values":${valuesJson},"piB64":"${piB64}"${colorDataFields}}`
     .replace(/<\/script/gi, '<\\/script');
+
+  const tmColorMode = isCategorical ? 'categorical' : 'quantitative';
+  const tmPalette = isCategorical ? 'gp-default' : 'viridis';
+  const colorLabel = { extension: 'file kind', folder: 'folder', ctime: 'creation time', atime: 'access time' }[colorBy];
+
+  // Theme page-color metadata for the dropdown switcher.
+  // The treemap component has its own copy; this is just for the outer page chrome.
+  const themePageColors = {
+    nord:          { label: 'Nord',             dark: true,  bg: '#2e3440', surface: '#3b4252', border: '#4c566a', fg: '#d8dee9', fgMuted: '#81a1c1', accent: '#88c0d0' },
+    solarized:     { label: 'Solarized Dark',   dark: true,  bg: '#002b36', surface: '#073642', border: '#586e75', fg: '#839496', fgMuted: '#657b83', accent: '#268bd2' },
+    dracula:       { label: 'Dracula',           dark: true,  bg: '#282a36', surface: '#44475a', border: '#6272a4', fg: '#f8f8f2', fgMuted: '#6272a4', accent: '#bd93f9' },
+    catppuccin:    { label: 'Catppuccin Mocha',  dark: true,  bg: '#1e1e2e', surface: '#313244', border: '#45475a', fg: '#cdd6f4', fgMuted: '#a6adc8', accent: '#cba6f7' },
+    gruvbox:       { label: 'Gruvbox Dark',      dark: true,  bg: '#282828', surface: '#3c3836', border: '#504945', fg: '#ebdbb2', fgMuted: '#a89984', accent: '#fabd2f' },
+    'tokyo-night': { label: 'Tokyo Night',       dark: true,  bg: '#1a1b26', surface: '#16161e', border: '#0f0f14', fg: '#c0caf5', fgMuted: '#787c99', accent: '#7aa2f7' },
+    'rose-pine':   { label: 'Rosé Pine',         dark: true,  bg: '#191724', surface: '#1f1d2e', border: '#26233a', fg: '#e0def4', fgMuted: '#908caa', accent: '#c4a7e7' },
+    'one-dark':    { label: 'One Dark',           dark: true,  bg: '#282c34', surface: '#2c313a', border: '#3e4452', fg: '#abb2bf', fgMuted: '#828997', accent: '#61afef' },
+  };
+  const themesJson = JSON.stringify(themePageColors);
+
+  // Build theme <option> list.
+  const themeOptions = Object.entries(themePageColors)
+    .map(([k, v]) => `<option value="${k}">${escapeHtml(v.label)}</option>`)
+    .join('');
 
   return `<!doctype html>
 <html lang="en">
@@ -243,12 +320,18 @@ function buildHtml(target, scan) {
 <meta charset="utf-8">
 <title>treemap · ${escapeHtml(target)}</title>
 <style>
-  html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, -apple-system, Segoe UI, sans-serif; background:#fafafa; color:#111; }
-  header { padding: 8px 14px; border-bottom: 1px solid #0002; display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; background:#fff; }
-  header h1 { margin:0; font-size:14px; font-weight:600; font-family: ui-monospace, SF Mono, Menlo, monospace; color:#222; }
-  header .stat { color:#555; font-size:13px; font-variant-numeric: tabular-nums; }
-  header .stat b { color:#000; font-weight:600; }
+  html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+    background: var(--page-bg, #fafafa); color: var(--page-fg, #111); transition: background .15s, color .15s; }
+  header { padding: 8px 14px; border-bottom: 1px solid var(--page-border, #0002); display: flex; gap: 16px;
+    align-items: baseline; flex-wrap: wrap; background: var(--page-surface, #fff); transition: background .15s; }
+  header h1 { margin:0; font-size:14px; font-weight:600; font-family: ui-monospace, SF Mono, Menlo, monospace;
+    color: var(--page-fg, #222); }
+  header .stat { color: var(--page-fg-muted, #555); font-size:13px; font-variant-numeric: tabular-nums; }
+  header .stat b { color: var(--page-fg, #000); font-weight:600; }
   raised-treemap { display:flex; height: calc(100vh - 58px); margin-bottom: 16px; }
+  #theme-sel { font-size: 12px; padding: 2px 4px; border-radius: 4px;
+    background: var(--page-bg, #fff); color: var(--page-fg, #333);
+    border: 1px solid var(--page-border, #ccc); cursor: pointer; }
 </style>
 </head>
 <body>
@@ -258,11 +341,18 @@ function buildHtml(target, scan) {
   <span class="stat"><b>${stats.dirs.toLocaleString()}</b> directories</span>
   <span class="stat"><b>${stats.humanSize}</b> total</span>
   ${stats.unreadable ? `<span class="stat">(${stats.unreadable.toLocaleString()} unreadable)</span>` : ''}
-  <span class="stat" style="margin-left:auto; color:#888;">scanned ${escapeHtml(stats.when)}</span>
+  <span class="stat" style="color: var(--page-fg-muted, #888);">colored by <b>${colorLabel}</b></span>
+  <span class="stat" style="margin-left:auto;">
+    <select id="theme-sel">
+      <option value="">Default (light)</option>
+      ${themeOptions}
+    </select>
+  </span>
+  <span class="stat" style="color: var(--page-fg-muted, #888);">scanned ${escapeHtml(stats.when)}</span>
 </header>
 <raised-treemap id="tm"
-  color-mode="categorical"
-  palette="gp-default"
+  color-mode="${tmColorMode}"
+  palette="${tmPalette}"
   gradient-intensity="0.6"
   value-format="b"
   min-cell-area="30"></raised-treemap>
@@ -285,16 +375,35 @@ ${bundle}
   tm.labels = raw.labels;
   tm.values = raw.values;
   tm.parentIndices = new Int32Array(_buf(raw.piB64));
-  var cn = raw.colorNames, ci = new Uint16Array(_buf(raw.colorB64));
-  var ca = new Array(ci.length);
-  for (var i = 0; i < ci.length; i++) ca[i] = cn[ci[i]];
-  tm.color = ca;
-  tm.colorMap = ${colorMapJson};
-  tm.valueFormatter = function (v) {
+${colorSetupJs}
+  tm.valueFormatter = tm.valueFormatter || function (v) {
     var units = ['B','KB','MB','GB','TB','PB']; var i = 0, n = v || 0;
     while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
     return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' ' + units[i];
   };
+})();
+// Theme switcher: updates both the page chrome and the <raised-treemap> component.
+(function () {
+  var themes = ${themesJson};
+  var sel = document.getElementById('theme-sel');
+  var tm = document.getElementById('tm');
+  var root = document.documentElement;
+  function applyPageTheme(name) {
+    var t = name ? themes[name] : null;
+    if (t) {
+      root.style.setProperty('--page-bg', t.bg);
+      root.style.setProperty('--page-surface', t.surface);
+      root.style.setProperty('--page-border', t.border);
+      root.style.setProperty('--page-fg', t.fg);
+      root.style.setProperty('--page-fg-muted', t.fgMuted);
+      root.style.setProperty('--page-accent', t.accent);
+    } else {
+      ['--page-bg','--page-surface','--page-border','--page-fg','--page-fg-muted','--page-accent']
+        .forEach(function (v) { root.style.removeProperty(v); });
+    }
+    tm.setAttribute('theme', name || '');
+  }
+  sel.addEventListener('change', function () { applyPageTheme(sel.value); });
 })();
 // Sync UI state with URL hash so copying the URL preserves the view.
 (function () {
@@ -313,7 +422,7 @@ ${bundle}
   function writeHash() {
     try {
       var p = new URLSearchParams();
-      var z = tm._internalVisibleRootId; if (z) p.set('zoom', z);
+      var z = tm._activeVisibleRootId(); if (z) p.set('zoom', z);
       var d = tm.displayDepth;           if (d !== Infinity) p.set('depth', String(d));
       var t = tm._targetId;              if (t) p.set('target', t);
       var f = tm._focusId;               if (f && f !== t) p.set('focus', f);
