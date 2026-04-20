@@ -299,13 +299,15 @@ ${bundle}
 // Sync UI state with URL hash so copying the URL preserves the view.
 (function () {
   var tm = document.getElementById('tm');
+  // Node IDs in the scan tree are integers; URL params arrive as strings.
+  function coerceId(s) { return /^\d+$/.test(s) ? Number(s) : s; }
   function readHash() {
     try {
       var p = new URLSearchParams(location.hash.slice(1));
-      var z = p.get('zoom');   if (z) tm.visibleRootId = z;
+      var z = p.get('zoom');   if (z) tm._internalVisibleRootId = coerceId(z);
       var d = p.get('depth');  if (d != null) tm.displayDepth = d === 'Infinity' ? Infinity : Number(d);
-      var t = p.get('target'); if (t) { tm._targetId = t; tm._selectionLocked = true; }
-      var f = p.get('focus');  if (f) tm._focusId = f;
+      var t = p.get('target'); if (t) { tm._targetId = coerceId(t); tm._selectionLocked = true; }
+      var f = p.get('focus');  if (f) tm._focusId = coerceId(f);
     } catch (_) {}
   }
   function writeHash() {

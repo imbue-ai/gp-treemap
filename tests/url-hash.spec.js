@@ -1,7 +1,15 @@
-// Tests that zoom and depth state is persisted in the URL hash and restored
-// when the page loads with hash parameters. The hash sync logic lives in the
-// page (samples/interactions.html), not in the component itself.
+// Tests that UI state is persisted in the URL hash and restored when the page
+// loads with hash parameters. The hash sync logic lives in the page
+// (samples/interactions.html, scan.js template), not in the component itself.
 import { test, expect } from '@playwright/test';
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import url from 'node:url';
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '..');
 
 async function waitForRender(page) {
   await page.waitForLoadState('networkidle');
@@ -146,4 +154,55 @@ test.describe('URL hash state', () => {
     expect(state.focusId).not.toBe(state.targetId);
   });
 
+});
+
+// Scan-generated HTML uses numeric node IDs (integers). The hash sync script
+// must coerce string params back to numbers so they match the tree's Map keys.
+test('scan HTML: numeric IDs round-trip through URL hash', async ({ page }) => {
+  // Build a small temp directory for the scan.
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-hash-test-'));
+  fs.mkdirSync(path.join(target, 'sub'));
+  fs.writeFileSync(path.join(target, 'sub', 'a.txt'), 'hello');
+  fs.writeFileSync(path.join(target, 'sub', 'b.txt'), 'world');
+  fs.writeFileSync(path.join(target, 'c.txt'), 'test');
+
+  const out = path.join(os.tmpdir(), 'rt-hash-test-' + Date.now() + '.html');
+  try {
+    const res = spawnSync(process.execPath, [
+      path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+    ], { encoding: 'utf8' });
+    expect(res.status, res.stderr).toBe(0);
+
+    // Load the scan HTML and click a cell to set a target.
+    await page.goto('file://' + out);
+    await page.waitForTimeout(400);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+    const box = await page.locator('raised-treemap').boundingBox();
+    await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.waitForTimeout(200);
+
+    // Verify target is a number (scan uses integer IDs).
+    const targetId = await page.locator('raised-treemap').evaluate((el) => el._targetId);
+    expect(typeof targetId).toBe('number');
+
+    // Read the hash — it should contain the numeric target as a string.
+    const hash = await page.evaluate(() => window.location.hash);
+    expect(hash).toMatch(/target=\d+/);
+
+    // Reload with the same hash and verify the target is restored as a number.
+    await page.goto('file://' + out + hash);
+    await page.waitForTimeout(400);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+    const restored = await page.locator('raised-treemap').evaluate((el) => ({
+      targetId: el._targetId,
+      targetType: typeof el._targetId,
+    }));
+    expect(restored.targetId).toBe(targetId);
+    expect(restored.targetType).toBe('number');
+  } finally {
+    if (fs.existsSync(out)) fs.unlinkSync(out);
+    fs.rmSync(target, { recursive: true, force: true });
+  }
 });
