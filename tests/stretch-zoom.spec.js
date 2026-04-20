@@ -29,34 +29,6 @@ async function snap(page, name) {
 
 test.describe('stretch zoom', () => {
 
-  test('magnifying glass button exists and is disabled without selection', async ({ page }) => {
-    await page.goto('/samples/filesystem.html');
-    await waitForRender(page);
-    const btn = await page.locator('raised-treemap').evaluate((el) => {
-      const b = el.shadowRoot.querySelector('.toolbar button[title="Zoom into selected node"]');
-      return b ? { exists: true, disabled: b.disabled } : { exists: false };
-    });
-    expect(btn.exists).toBe(true);
-    expect(btn.disabled).toBe(true);
-  });
-
-  test('magnifying glass becomes enabled after clicking a cell', async ({ page }) => {
-    await page.goto('/samples/filesystem.html');
-    await waitForRender(page);
-    const box = await page.locator('raised-treemap').boundingBox();
-    // Click a cell
-    await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
-    await waitForRender(page);
-    // Navigate up to a parent so we have children to zoom into
-    await page.locator('raised-treemap').evaluate((el) => el._selAncestorUp());
-    await waitForRender(page);
-    const disabled = await page.locator('raised-treemap').evaluate((el) => {
-      const b = el.shadowRoot.querySelector('.toolbar button[title="Zoom into selected node"]');
-      return b.disabled;
-    });
-    expect(disabled).toBe(false);
-  });
-
   test('stretch zoom preserves layout structure (split directions unchanged)', async ({ page }) => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);

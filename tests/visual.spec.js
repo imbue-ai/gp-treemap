@@ -91,16 +91,20 @@ test.describe('visual snapshots', () => {
     expect(logText).toMatch(/gp-select/);
   });
 
-  test('interactions · double click zooms in (breadcrumb updates)', async ({ page }) => {
+  test('interactions · double click zooms in (info line updates)', async ({ page }) => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);
     const box = await page.locator('raised-treemap').boundingBox();
+    // Hover first so the info line populates, then double-click to zoom
+    await page.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.3);
+    await waitForRender(page);
     await page.mouse.dblclick(box.x + box.width * 0.7, box.y + box.height * 0.3);
     await waitForRender(page);
     await snap(page, '09-interactions-after-zoom');
-    const crumbCount = await page.locator('raised-treemap').evaluate((el) =>
-      el.shadowRoot.querySelectorAll('.crumbs a').length);
-    expect(crumbCount).toBeGreaterThanOrEqual(1);
+    // After zooming, the info line should contain the root icon
+    const hasRootIcon = await page.locator('raised-treemap').evaluate((el) =>
+      el.shadowRoot.querySelector('.info-line .root-icon') !== null);
+    expect(hasRootIcon).toBe(true);
   });
 
   test('hover shows tooltip', async ({ page }) => {
