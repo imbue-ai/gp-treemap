@@ -371,7 +371,7 @@ function buildFromTabular(data, opts = {}) {
   const color = data.color;
   const ids = data.ids;
   const n = labels.length;
-  if (!Array.isArray(labels) || !Array.isArray(values)) {
+  if (!Array.isArray(labels) || values == null || typeof values.length !== 'number') {
     throw new Error('buildFromTabular: labels/values required');
   }
 

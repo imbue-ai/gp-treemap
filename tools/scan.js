@@ -42,7 +42,7 @@ async function main() {
   }
 
   const t0 = Date.now();
-  const scan = walk(target);
+  const scan = await walk(target);
   const elapsed = Date.now() - t0;
   const html = buildHtml(target, scan);
   fs.writeFileSync(out, html);
@@ -62,55 +62,85 @@ async function main() {
   try { execSync(openCmd + ' ' + JSON.stringify(out)); } catch { console.log('open it with:  open "' + out + '"'); }
 }
 
-/**
- * Recursive scan. Returns { labels, parents, values, ids, color, bytes, files, dirs, unreadable }.
- * labels/parents/values/ids/color are the flat tabular arrays the component takes.
- */
-function walk(rootPath) {
+async function walk(rootPath) {
+  const { Worker } = await import('node:worker_threads');
+  const NWORKERS = Math.max(2, Math.min(os.cpus().length, 8));
+  const workerPath = path.join(__dirname, 'scan-worker.js');
+
   const labels = [], parentIndices = [], values = [], color = [];
   let bytes = 0, files = 0, dirs = 0, unreadable = 0;
 
-  // rowByPath maps a directory's full path to its row index so children can
-  // reference their parent as an integer instead of a repeated path string.
-  const rowByPath = new Map();
-
-  // Root (parentIndex = -1).
-  rowByPath.set(rootPath, 0);
-  labels.push(path.basename(rootPath) || rootPath); parentIndices.push(-1); values.push(0); color.push('dir');
+  labels.push(path.basename(rootPath) || rootPath);
+  parentIndices.push(-1); values.push(0); color.push('dir');
   dirs++;
 
-  // Iterative DFS to avoid blowing the stack on deep trees.
-  // Parents are always pushed to labels before their children, so
-  // parentIndices[i] < i is guaranteed — enabling the O(n) fast path in builder.
-  const stack = [rootPath];
-  while (stack.length) {
-    const dir = stack.pop();
-    const dirRow = rowByPath.get(dir);
-    let entries;
-    try { entries = fs.readdirSync(dir, { withFileTypes: true }); }
-    catch (e) { unreadable++; continue; }
-    for (const ent of entries) {
-      const full = path.join(dir, ent.name);
-      if (ent.isSymbolicLink()) { unreadable++; continue; }
-      if (ent.isDirectory()) {
-        const row = labels.length;
-        labels.push(ent.name); parentIndices.push(dirRow); values.push(0); color.push('dir');
-        dirs++;
-        rowByPath.set(full, row);
-        stack.push(full);
-      } else if (ent.isFile()) {
-        let size = 0;
-        try { size = fs.statSync(full).size; }
-        catch (e) { unreadable++; continue; }
-        labels.push(ent.name); parentIndices.push(dirRow); values.push(size);
-        color.push(extKind(ent.name));
-        bytes += size;
-        files++;
-      } else {
-        unreadable++;
-      }
-    }
+  const queue = [{ dirPath: rootPath, dirRow: 0 }];
+  let pending = 0;
+
+  let lastPrint = 0;
+  function printProgress() {
+    const now = Date.now();
+    if (now - lastPrint < 150) return;
+    lastPrint = now;
+    process.stderr.write(
+      '\r  ' + files.toLocaleString() + ' files   ' +
+      dirs.toLocaleString() + ' dirs   ' + humanBytes(bytes) + '          '
+    );
   }
+
+  const workers = [];
+
+  await new Promise((resolve, reject) => {
+    const idle = [];
+
+    function dispatch() {
+      while (idle.length > 0 && queue.length > 0) {
+        const wi = idle.pop();
+        const work = queue.shift();
+        pending++;
+        workers[wi].postMessage(work);
+      }
+      if (pending === 0 && queue.length === 0) resolve();
+    }
+
+    for (let i = 0; i < NWORKERS; i++) {
+      const wi = i;
+      const w = new Worker(workerPath);
+      w.on('message', (result) => {
+        pending--;
+        idle.push(wi);
+        unreadable += result.unreadable;
+        for (const ent of result.results) {
+          if (ent.isDir) {
+            const row = labels.length;
+            labels.push(ent.name);
+            parentIndices.push(result.dirRow);
+            values.push(0); color.push('dir');
+            dirs++;
+            queue.push({ dirPath: path.join(result.dirPath, ent.name), dirRow: row });
+          } else {
+            labels.push(ent.name);
+            parentIndices.push(result.dirRow);
+            values.push(ent.size);
+            color.push(extKind(ent.name));
+            bytes += ent.size;
+            files++;
+          }
+        }
+        printProgress();
+        dispatch();
+      });
+      w.on('error', reject);
+      workers.push(w);
+      idle.push(i);
+    }
+
+    dispatch();
+  });
+
+  process.stderr.write('\r' + ' '.repeat(72) + '\r');
+  for (const w of workers) w.terminate();
+
   return { labels, parentIndices, values, color, bytes, files, dirs, unreadable };
 }
 

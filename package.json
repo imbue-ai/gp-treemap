@@ -2,7 +2,9 @@
   "name": "raised-treemap",
   "version": "0.1.0",
   "private": true,
-  "bin": { "raised-treemap": "./tools/scan.js" },
+  "bin": {
+    "raised-treemap": "./tools/scan.js"
+  },
   "description": "GrandPerspective-style <raised-treemap> Web Component",
   "type": "module",
   "scripts": {
@@ -11,9 +13,11 @@
     "scan": "node tools/scan.js",
     "test": "playwright test",
     "test:install": "playwright install chromium",
-    "test:update": "playwright test --update-snapshots"
+    "test:update": "playwright test --update-snapshots",
+    "bench": "node tools/bench.js"
   },
   "devDependencies": {
-    "@playwright/test": "^1.47.0"
+    "@playwright/test": "^1.47.0",
+    "tinybench": "^6.0.0"
   }
 }
