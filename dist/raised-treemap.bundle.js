@@ -1106,6 +1106,8 @@ const STYLE = `
 .toolbar .sep { width:1px; height:20px; background:#0002; }
 .toolbar button { padding:2px 8px; background:#fff; border:1px solid #0003; border-radius:4px; cursor:pointer; font:inherit; }
 .toolbar button:hover { background:#eef; }
+.toolbar button:disabled { opacity:0.35; cursor:default; }
+.toolbar button:disabled:hover { background:#fff; }
 .toolbar .info { flex:1; min-width:120px; font-variant-numeric: tabular-nums; color:#333; }
 .toolbar .info b { color:#000; }
 .toolbar .crumbs { display:flex; align-items:center; gap:2px; flex-wrap:wrap; }
@@ -1118,7 +1120,7 @@ const STYLE = `
 .stage { position:relative; flex:1; overflow:hidden; background:#0b0b0b; cursor: default; outline: none; }
 .stage canvas { position:absolute; inset:0; width:100%; height:100%; display:block; image-rendering: pixelated;
   transform-origin: 0 0; transition: transform var(--gp-zoom-ms, 350ms) ease; }
-.overlay { position:absolute; inset:0; pointer-events:none; }
+.overlay { position:absolute; inset:0; pointer-events:none; transform-origin:0 0; }
 .overlay .sel, .overlay .loc { position:absolute; box-sizing:border-box; pointer-events:none; }
 .overlay .sel { border:2px solid var(--gp-selected); box-sizing:border-box; }
 .overlay .loc { border:2px solid var(--gp-located); box-shadow: 0 0 0 1px #fff8; }
@@ -1178,6 +1180,10 @@ class RaisedTreemap extends HTMLElement {
     this._hoverRaf = 0;
     this._leafSelectedId = null;  // original clicked leaf; used by focus-down navigation
     this._focusValEl = null;
+    this._zoomInBtn = null;       // reference to the magnifying-glass button
+    this._stretchZoomId = null;   // node zoomed into with preserved aspect
+    this._stretchZoomAspect = 0;  // original w/h ratio of zoomed node's rect
+    this._zoomAnimating = false;  // true during zoom animation
 
     this._onResize = this._onResize.bind(this);
     this._onStageMouse = this._onStageMouse.bind(this);
@@ -1235,12 +1241,98 @@ class RaisedTreemap extends HTMLElement {
     return null;
   }
   zoomTo(id) { if (id == null || (this._tree && this._tree.nodes.has(id))) this._setVisibleRoot(id); }
-  zoomReset() { this._setVisibleRoot(null); }
+  zoomReset() { if (this._stretchZoomId) { this.stretchZoomReset(); return; } this._setVisibleRoot(null); }
   zoomOut() {
+    if (this._stretchZoomId) { this.stretchZoomReset(); return; }
     const vr = this._activeVisibleRootId();
     if (vr == null || !this._tree) return;
     const n = this._tree.nodes.get(vr);
     this._setVisibleRoot(n && n.parentId !== null ? n.parentId : null);
+  }
+
+  stretchZoomIn(id) {
+    if (!id || !this._tree || !this._nodeRects || this._zoomAnimating) return;
+    const nodeRect = this._nodeRects.get(id);
+    if (!nodeRect || nodeRect.w <= 0 || nodeRect.h <= 0) return;
+
+    this._stretchZoomId = id;
+    this._stretchZoomAspect = nodeRect.w / nodeRect.h;
+    this._zoomAnimating = true;
+
+    // Animate: CSS-transform the current canvas to expand the node rect to fill the stage
+    const dpr = this._canvas.width / this._stage.clientWidth;
+    const stageW = this._stage.clientWidth;
+    const stageH = this._stage.clientHeight;
+    const sx = stageW / (nodeRect.w / dpr);
+    const sy = stageH / (nodeRect.h / dpr);
+    const tx = -(nodeRect.x / dpr) * sx;
+    const ty = -(nodeRect.y / dpr) * sy;
+    this._canvas.style.transform = `matrix(${sx}, 0, 0, ${sy}, ${tx}, ${ty})`;
+    // Also scale the overlay to match
+    this._overlay.style.transform = `matrix(${sx}, 0, 0, ${sy}, ${tx}, ${ty})`;
+    this._overlay.style.transformOrigin = '0 0';
+
+    setTimeout(() => {
+      this._canvas.style.transition = 'none';
+      this._overlay.style.transition = 'none';
+      this._rebuildAndRender();  // renders zoomed content at full resolution
+      this._canvas.style.transform = '';
+      this._overlay.style.transform = '';
+      this._overlay.style.transformOrigin = '';
+      this._canvas.offsetHeight; // force reflow
+      this._canvas.style.transition = '';
+      this._overlay.style.transition = '';
+      this._zoomAnimating = false;
+    }, this._props.zoomDuration);
+
+    this._dispatch('gp-zoom-change', id);
+    this._renderToolbar();
+  }
+
+  stretchZoomReset() {
+    if (!this._stretchZoomId || this._zoomAnimating) return;
+    const oldId = this._stretchZoomId;
+    this._stretchZoomId = null;
+    this._stretchZoomAspect = 0;
+    this._zoomAnimating = true;
+
+    // Re-render the unzoomed layout (synchronous)
+    this._canvas.style.transition = 'none';
+    this._overlay.style.transition = 'none';
+    this._rebuildAndRender();
+
+    // Find where the previously-zoomed node sits in the new layout
+    const nodeRect = this._nodeRects && this._nodeRects.get(oldId);
+    if (nodeRect && nodeRect.w > 0 && nodeRect.h > 0) {
+      const dpr = this._canvas.width / this._stage.clientWidth;
+      const stageW = this._stage.clientWidth;
+      const stageH = this._stage.clientHeight;
+      const sx = stageW / (nodeRect.w / dpr);
+      const sy = stageH / (nodeRect.h / dpr);
+      const tx = -(nodeRect.x / dpr) * sx;
+      const ty = -(nodeRect.y / dpr) * sy;
+      // Start zoomed-in, animate to identity
+      this._canvas.style.transform = `matrix(${sx}, 0, 0, ${sy}, ${tx}, ${ty})`;
+      this._overlay.style.transform = `matrix(${sx}, 0, 0, ${sy}, ${tx}, ${ty})`;
+      this._overlay.style.transformOrigin = '0 0';
+      this._canvas.offsetHeight; // force reflow
+      this._canvas.style.transition = '';
+      this._overlay.style.transition = `transform ${this._props.zoomDuration}ms ease`;
+      this._canvas.style.transform = '';
+      this._overlay.style.transform = '';
+    } else {
+      this._canvas.style.transition = '';
+      this._overlay.style.transition = '';
+    }
+
+    setTimeout(() => {
+      this._overlay.style.transformOrigin = '';
+      this._overlay.style.transition = '';
+      this._zoomAnimating = false;
+    }, this._props.zoomDuration);
+
+    this._dispatch('gp-zoom-change', null);
+    this._renderToolbar();
   }
 
   // ----- render pipeline -----
@@ -1286,6 +1378,7 @@ class RaisedTreemap extends HTMLElement {
   }
 
   _activeVisibleRootId() {
+    if (this._stretchZoomId) return this._stretchZoomId;
     return this._props.visibleRootId != null ? this._props.visibleRootId : this._internalVisibleRootId;
   }
   _resolvedPalette() { return resolvePalette(this._props.palette); }
@@ -1356,7 +1449,20 @@ class RaisedTreemap extends HTMLElement {
         layoutSubtree(kid.id, sub);
       }
     };
-    layoutSubtree(rootId, { x: 0, y: 0, w, h });
+    // If stretch-zoomed, layout at the original aspect ratio then scale to fill the canvas.
+    // This preserves the tile structure (split directions) from the original view.
+    let layoutW = w, layoutH = h;
+    if (this._stretchZoomId && this._stretchZoomAspect > 0) {
+      layoutH = h;
+      layoutW = Math.round(h * this._stretchZoomAspect);
+    }
+    layoutSubtree(rootId, { x: 0, y: 0, w: layoutW, h: layoutH });
+
+    // Stretch-scale all rects to fill the actual canvas
+    if (layoutW !== w || layoutH !== h) {
+      const sx = w / layoutW, sy = h / layoutH;
+      for (const r of nodeRects.values()) { r.x *= sx; r.w *= sx; r.y *= sy; r.h *= sy; }
+    }
     this._nodeRects = nodeRects;
 
     const palette = this._resolvedPalette();
@@ -1428,6 +1534,9 @@ class RaisedTreemap extends HTMLElement {
       if (bounds) this._overlay.appendChild(overlayBox('sel', bounds, dpr));
     }
     this._updateFocusUI();
+    if (this._zoomInBtn) {
+      this._zoomInBtn.disabled = !this._selectedId || !this._nodeRects || !this._nodeRects.has(this._selectedId);
+    }
     if (p.showLabels) {
       for (const l of this._leaves) {
         if (l.w < 48 * dpr || l.h < 16 * dpr) continue;
@@ -1468,11 +1577,18 @@ class RaisedTreemap extends HTMLElement {
 
     if (want.zoom) {
       const wrap = document.createElement('div');
+      wrap.style.display = 'flex'; wrap.style.gap = '2px';
+      const bZoom = document.createElement('button');
+      bZoom.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" style="vertical-align:-2px"><circle cx="6.5" cy="6.5" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="10" y1="10" x2="14.5" y2="14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="4.5" y1="6.5" x2="8.5" y2="6.5" stroke="currentColor" stroke-width="1.2"/><line x1="6.5" y1="4.5" x2="6.5" y2="8.5" stroke="currentColor" stroke-width="1.2"/></svg>';
+      bZoom.title = 'Zoom into selected node';
+      bZoom.disabled = !this._selectedId || !this._nodeRects || !this._nodeRects.has(this._selectedId);
+      bZoom.addEventListener('click', () => { if (this._selectedId) this.stretchZoomIn(this._selectedId); });
+      this._zoomInBtn = bZoom;
       const b1 = document.createElement('button'); b1.textContent = 'zoom out'; b1.title = 'Zoom to parent';
       b1.addEventListener('click', () => this.zoomOut());
       const b2 = document.createElement('button'); b2.textContent = 'reset'; b2.title = 'Reset zoom';
-      b2.addEventListener('click', () => this.zoomReset());
-      wrap.appendChild(b1); wrap.appendChild(b2);
+      b2.addEventListener('click', () => { this._stretchZoomId = null; this._stretchZoomAspect = 0; this._internalVisibleRootId = null; this._queueRender(); this._dispatch('gp-zoom-change', null); });
+      wrap.appendChild(bZoom); wrap.appendChild(b1); wrap.appendChild(b2);
       this._toolbar.appendChild(wrap);
       this._toolbar.appendChild(sep());
     }
