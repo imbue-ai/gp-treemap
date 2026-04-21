@@ -69,8 +69,7 @@ async function main() {
   const t0 = Date.now();
   const scan = await walk(target);
   const elapsed = Date.now() - t0;
-  const html = buildHtml(target, scan, colorBy);
-  fs.writeFileSync(out, html);
+  buildHtml(out, target, scan, colorBy);
 
   console.log('');
   console.log('scanned ' + target);
@@ -226,8 +225,54 @@ function humanBytes(v) {
   return s + ' ' + units[i];
 }
 
-function buildHtml(target, scan, colorBy) {
+// Streaming HTML builder — writes directly to a file descriptor to avoid
+// hitting V8's ~512 MB string limit on large scans (8M+ files).
+function buildHtml(outPath, target, scan, colorBy) {
   const bundle = fs.readFileSync(BUNDLE_PATH, 'utf8');
+  const fd = fs.openSync(outPath, 'w');
+  const w = (s) => fs.writeSync(fd, s);
+
+  // --- helpers for writing large arrays without giant strings ---
+  const BATCH = 20000;
+
+  // Write a JSON array of strings in batches.
+  function writeJsonStringArray(arr) {
+    w('[');
+    for (let i = 0; i < arr.length; i += BATCH) {
+      if (i > 0) w(',');
+      const slice = arr.slice(i, Math.min(i + BATCH, arr.length));
+      const json = JSON.stringify(slice);
+      w(json.slice(1, -1)); // strip outer [ ]
+    }
+    w(']');
+  }
+  // Write a JSON array of numbers in batches.
+  function writeJsonNumberArray(arr) {
+    w('[');
+    for (let i = 0; i < arr.length; i += BATCH) {
+      if (i > 0) w(',');
+      const slice = arr.slice(i, Math.min(i + BATCH, arr.length));
+      const json = JSON.stringify(slice);
+      w(json.slice(1, -1));
+    }
+    w(']');
+  }
+  // Write base64 of a TypedArray in chunks (3 MB raw per chunk = clean base64).
+  function writeBase64(typedArray) {
+    const buf = Buffer.from(typedArray.buffer, typedArray.byteOffset, typedArray.byteLength);
+    const CHUNK = 3 * 1024 * 1024; // must be multiple of 3 for clean base64 boundaries
+    for (let i = 0; i < buf.length; i += CHUNK) {
+      w(buf.subarray(i, Math.min(i + CHUNK, buf.length)).toString('base64'));
+    }
+  }
+  // Encode a categorical string array to Uint16 enum-index + write base64.
+  function encodeCategorical(arr) {
+    const names = [...new Set(arr)].sort();
+    const toIdx = new Map(names.map((c, i) => [c, i]));
+    const u16 = new Uint16Array(arr.length);
+    for (let i = 0; i < arr.length; i++) u16[i] = toIdx.get(arr[i]);
+    return { names: JSON.stringify(names), u16 };
+  }
 
   // Per-bucket color map for extension mode.
   const extColorMapObj = {
@@ -256,51 +301,15 @@ function buildHtml(target, scan, colorBy) {
     when: (() => { const d = new Date(); const off = -d.getTimezoneOffset(); const sign = off >= 0 ? '+' : '-'; const hh = String(Math.floor(Math.abs(off) / 60)).padStart(2, '0'); const mm = String(Math.abs(off) % 60).padStart(2, '0'); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + 'T' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0') + sign + hh + ':' + mm; })(),
   };
 
-  // Binary-encode parentIndices (Int32Array).
-  const piI32 = Int32Array.from(scan.parentIndices);
-  const piB64 = Buffer.from(piI32.buffer).toString('base64');
-
-  const labelsJson  = JSON.stringify(scan.labels);
-  const valuesJson  = JSON.stringify(scan.values);
-
-  // Encode ALL color variants into the embedded JSON.
-  // Categorical: extension and folder as Uint16 enum-index arrays.
-  function encodeCategorical(arr) {
-    const names = [...new Set(arr)].sort();
-    const toIdx = new Map(names.map((c, i) => [c, i]));
-    const u16 = new Uint16Array(arr.length);
-    for (let i = 0; i < arr.length; i++) u16[i] = toIdx.get(arr[i]);
-    return { names: JSON.stringify(names), b64: Buffer.from(u16.buffer).toString('base64') };
-  }
   const rawExt = encodeCategorical(scan.rawExtColor);
   const ext = encodeCategorical(scan.extColor);
   const folder = encodeCategorical(scan.folderColor);
-
-  // Quantitative: ctime, mtime, and atime as Float64Array base64.
-  const ctimeB64 = Buffer.from(Float64Array.from(scan.ctimes).buffer).toString('base64');
-  const mtimeB64 = Buffer.from(Float64Array.from(scan.mtimes).buffer).toString('base64');
-  const atimeB64 = Buffer.from(Float64Array.from(scan.atimes).buffer).toString('base64');
-
-  const colorDataFields = [
-    `,"rawExtNames":${rawExt.names},"rawExtB64":"${rawExt.b64}"`,
-    `,"extNames":${ext.names},"extB64":"${ext.b64}"`,
-    `,"folderNames":${folder.names},"folderB64":"${folder.b64}"`,
-    `,"ctimeB64":"${ctimeB64}"`,
-    `,"mtimeB64":"${mtimeB64}"`,
-    `,"atimeB64":"${atimeB64}"`,
-  ].join('');
-
-  // Escape </script so the data tag can't be prematurely closed.
-  const embeddedJson = `{"labels":${labelsJson},"values":${valuesJson},"piB64":"${piB64}"${colorDataFields}}`
-    .replace(/<\/script/gi, '<\\/script');
 
   const isCategorical = colorBy === 'extension' || colorBy === 'kind' || colorBy === 'folder';
   const tmColorMode = isCategorical ? 'categorical' : 'quantitative';
   const tmPalette = isCategorical ? 'tokyo-night' : 'viridis';
   const extColorMapJson = JSON.stringify(extColorMapObj);
 
-  // Theme page-color metadata for the dropdown switcher.
-  // The treemap component has its own copy; this is just for the outer page chrome.
   const themePageColors = {
     nord:          { label: 'Nord',             dark: true,  bg: '#2e3440', surface: '#3b4252', border: '#4c566a', fg: '#d8dee9', fgMuted: '#81a1c1', accent: '#88c0d0' },
     solarized:     { label: 'Solarized Dark',   dark: true,  bg: '#002b36', surface: '#073642', border: '#586e75', fg: '#839496', fgMuted: '#657b83', accent: '#268bd2' },
@@ -312,17 +321,16 @@ function buildHtml(target, scan, colorBy) {
     'one-dark':    { label: 'One Dark',           dark: true,  bg: '#282c34', surface: '#2c313a', border: '#3e4452', fg: '#abb2bf', fgMuted: '#828997', accent: '#61afef' },
   };
   const themesJson = JSON.stringify(themePageColors);
-
-  // Build theme <option> list.
   const themeOptions = Object.entries(themePageColors)
     .map(([k, v]) => `<option value="${k}">${escapeHtml(v.label)}</option>`)
     .join('');
 
-  return `<!doctype html>
+  // --- Write the HTML, streaming the large data section ---
+  w(`<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>treemap · ${escapeHtml(target)}</title>
+<title>treemap \xb7 ${escapeHtml(target)}</title>
 <style>
   html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, -apple-system, Segoe UI, sans-serif;
     background: var(--page-bg, #fafafa); color: var(--page-fg, #111); transition: background .15s, color .15s; }
@@ -376,11 +384,43 @@ function buildHtml(target, scan, colorBy) {
 <div id="stats-bar"></div>
 
 <script type="application/json" id="tmdata">
-${embeddedJson}
-</script>
+`);
+
+  // --- Stream the embedded JSON data (the big part) ---
+  w('{"labels":');
+  writeJsonStringArray(scan.labels);
+  w(',"values":');
+  writeJsonNumberArray(scan.values);
+  w(',"piB64":"');
+  writeBase64(Int32Array.from(scan.parentIndices));
+  w('"');
+  // Categorical color variants.
+  w(',"rawExtNames":' + rawExt.names + ',"rawExtB64":"');
+  writeBase64(rawExt.u16);
+  w('"');
+  w(',"extNames":' + ext.names + ',"extB64":"');
+  writeBase64(ext.u16);
+  w('"');
+  w(',"folderNames":' + folder.names + ',"folderB64":"');
+  writeBase64(folder.u16);
+  w('"');
+  // Timestamp variants.
+  w(',"ctimeB64":"');
+  writeBase64(Float64Array.from(scan.ctimes));
+  w('"');
+  w(',"mtimeB64":"');
+  writeBase64(Float64Array.from(scan.mtimes));
+  w('"');
+  w(',"atimeB64":"');
+  writeBase64(Float64Array.from(scan.atimes));
+  w('"}');
+
+  // --- Rest of the HTML (bundle + page scripts) ---
+  w(`
+<\/script>
 <script>
 ${bundle}
-</script>
+<\/script>
 <script>
 (function () {
   function _buf(b64) {
@@ -428,8 +468,6 @@ ${bundle}
     if (!v) return;
     tm.color = v.data;
     var newMap = v.cat ? (v.colorMap || {}) : {};
-    // Update both the live colorMap and the stashed _userColorMap so themes
-    // can toggle overrides correctly.
     tm._props._userColorMap = newMap;
     tm.colorMap = tm.getAttribute('theme') ? {} : newMap;
     if (v.cat) {
@@ -445,7 +483,6 @@ ${bundle}
     }
   };
 
-  // Apply the initial color mode chosen at scan time.
   window._applyColorBy('${colorBy}');
 
   var fmtBytes = function (v) {
@@ -504,14 +541,12 @@ ${bundle}
     if (s.files > 0) parts.push(s.files.toLocaleString() + ' file' + (s.files !== 1 ? 's' : ''));
     if (s.dirs > 0) parts.push(s.dirs.toLocaleString() + ' folder' + (s.dirs !== 1 ? 's' : ''));
     parts.push(fmtBytes(s.bytes));
-    // Per-node metadata for leaf nodes (files).
     if (typeof id === 'number' && isLeaf(id) && variants) {
       var kind = variants.kind.data[id];
       var label = tm.labels[id] || '';
       var dot = label.lastIndexOf('.');
       var ext = dot > 0 ? label.slice(dot) : '';
       if (kind && kind !== 'dir') {
-        // Show ".js (code)" — or just the kind if it IS the raw extension.
         parts.push(ext && ext.slice(1) !== kind ? ext + ' (' + kind + ')' : kind);
       }
       var ct = variants.ctime.data[id];
@@ -526,7 +561,6 @@ ${bundle}
   tm.addEventListener('rt-focus', update);
   tm.addEventListener('rt-target', update);
   tm.addEventListener('rt-zoom-change', update);
-  // Show root stats initially once the tree is built.
   requestAnimationFrame(function () { setTimeout(update, 0); });
 })();
 // Color-by switcher + theme switcher + URL hash sync.
@@ -566,7 +600,6 @@ ${bundle}
   themeSel.addEventListener('change', function () { applyPageTheme(themeSel.value); writeHash(); });
   colorSel.addEventListener('change', function () { applyColor(colorSel.value); writeHash(); });
 
-  // Node IDs in the scan tree are integers; URL params arrive as strings.
   function coerceId(s) { return /^\\d+$/.test(s) ? Number(s) : s; }
   function readHash() {
     try {
@@ -601,10 +634,12 @@ ${bundle}
   tm.addEventListener('rt-target', writeHash);
   tm.addEventListener('rt-focus', writeHash);
 })();
-</script>
+<\/script>
 </body>
 </html>
-`;
+`);
+
+  fs.closeSync(fd);
 }
 
 function escapeHtml(s) {
