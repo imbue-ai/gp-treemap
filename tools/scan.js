@@ -232,7 +232,7 @@ function humanBytes(v) {
 // remaining capacity become "stubs" — leaf placeholders with aggregate values.
 // Their real children live in a child block, inflated on demand in the browser.
 // ---------------------------------------------------------------------------
-function partitionBlocks(scan, targetSize = 5000) {
+function partitionBlocks(scan, targetSize = 50000) {
   const n = scan.labels.length;
   const pi = scan.parentIndices;
 
@@ -330,8 +330,10 @@ function encodeBlock(scan, block, aggValue, aggFiles, aggDirs) {
   for (let i = 0; i < m; i++) {
     const gi = gRows[i];
     labels[i] = scan.labels[gi];
-    // Stubs get the aggregate value so they render at the right size.
-    values[i] = stubSet.has(gi) ? aggValue[gi] : scan.values[gi];
+    // All nodes get the aggregate value: for leaves it equals the file size;
+    // for directories it's the subtree total. The lazy accessor path in the
+    // component uses getValue() directly (no bottom-up aggregation).
+    values[i] = aggValue[gi];
     // Parent index: remap to local, or -1 for block root.
     const gp = scan.parentIndices[gi];
     localPI[i] = globalToLocal.has(gp) ? globalToLocal.get(gp) : -1;
@@ -364,6 +366,7 @@ function encodeBlock(scan, block, aggValue, aggFiles, aggDirs) {
   return {
     labels, values,
     piB64: Buffer.from(localPI.buffer).toString('base64'),
+    grB64: Buffer.from(Int32Array.from(gRows).buffer).toString('base64'), // global row indices → unique node IDs
     rawExtNames: re.names, rawExtB64: re.b64,
     extNames: ec.names, extB64: ec.b64,
     folderNames: fc.names, folderB64: fc.b64,
@@ -513,8 +516,11 @@ function buildHtml(outPath, target, scan, colorBy) {
 ${bundle}
 <\/script>
 <script>
-// Progressive block loader: inflates block 0 synchronously on boot,
-// then lazily inflates child blocks when the user zooms into a stub directory.
+// Progressive block loader — uses the component's lazy tree-accessor API.
+// Each "item" is just a node's global integer ID. The component calls
+// getChildren(id) during layout, which looks up the node store. Blocks are
+// inflated on demand: if a stub's block isn't ready, getChildren returns []
+// (stub renders as a leaf), kicks off async inflate, and re-renders when done.
 (function () {
   var envelope = JSON.parse(document.getElementById('tmdata').textContent);
   var tm = document.getElementById('tm');
@@ -539,149 +545,150 @@ ${bundle}
     return lo !== Infinity ? [lo, hi] : null;
   }
 
-  // --- Global arrays (grow as blocks are expanded) ---
-  var gLabels = [];
-  var gValues = [];
-  var gPI = null;  // Int32Array
-  var gVariants = {
-    extension: { cat: true, data: [], colorMap: null },
-    kind:      { cat: true, data: [], colorMap: ${extColorMapJson} },
-    folder:    { cat: true, data: [], colorMap: null },
-    ctime:     { cat: false, data: [] },
-    mtime:     { cat: false, data: [] },
-    atime:     { cat: false, data: [] },
-  };
+  // --- Node store: id -> { label, value, childIds, colorExt, colorKind, colorFolder, ctime, mtime, atime, stubBlockId?, aggFiles?, aggDirs? } ---
+  var store = new Map();
+  var inflating = new Set(); // block IDs currently being inflated
+  var currentColorMode = '${colorBy}';
+  var extColorMap = ${extColorMapJson};
 
-  // stubMap: globalRow -> { childBlockId, aggValue, aggFiles, aggDirs }
-  var stubMap = new Map();
-  // blockCache: blockId -> decoded block object (inflated but not merged)
-  var blockCache = new Map();
-
-  // Decode a block object (already parsed JSON) into arrays and merge into globals.
-  // parentGlobalRow: the global row of the stub being expanded (-1 for block 0 root).
-  function mergeBlock(blk, parentGlobalRow) {
-    var base = gLabels.length;
+  // Decode a block JSON object and add its nodes to the store.
+  function loadBlock(blk) {
     var m = blk.labels.length;
-    var localPI = new Int32Array(_buf(blk.piB64));
-
-    // For block 0 (root), the root has parentGlobalRow = -1.
-    // For child blocks, the root node is already present as a stub — skip it.
-    var skip = parentGlobalRow >= 0 ? 1 : 0;
-    var appendCount = m - skip;
-
-    // Grow the global parentIndices array.
-    var newPI = new Int32Array(gPI ? gPI.length + appendCount : appendCount);
-    if (gPI) newPI.set(gPI);
-    var piBase = gPI ? gPI.length : 0;
-
-    for (var i = skip; i < m; i++) {
-      var gi = piBase + (i - skip);
-      gLabels.push(blk.labels[i]);
-      gValues.push(blk.values[i]);
-
-      // Remap parentIndex: if parent is the block root (local 0) for a child block,
-      // point to the stub's global row. Otherwise remap to global index.
-      var lp = localPI[i];
-      if (lp === 0 && skip === 1) {
-        newPI[gi] = parentGlobalRow;
-      } else {
-        newPI[gi] = lp < 0 ? -1 : (lp - skip) + piBase;
-      }
-    }
-    gPI = newPI;
-
-    // Decode and append color variants.
+    var pi = new Int32Array(_buf(blk.piB64));
+    var gr = new Int32Array(_buf(blk.grB64));
     var rawExtArr = decodeCat(blk.rawExtNames, blk.rawExtB64);
     var extArr = decodeCat(blk.extNames, blk.extB64);
     var folderArr = decodeCat(blk.folderNames, blk.folderB64);
-    var ct = Array.from(new Float64Array(_buf(blk.ctimeB64)));
-    var mt = Array.from(new Float64Array(_buf(blk.mtimeB64)));
-    var at = Array.from(new Float64Array(_buf(blk.atimeB64)));
-    for (var j = skip; j < m; j++) {
-      gVariants.extension.data.push(rawExtArr[j]);
-      gVariants.kind.data.push(extArr[j]);
-      gVariants.folder.data.push(folderArr[j]);
-      gVariants.ctime.data.push(ct[j]);
-      gVariants.mtime.data.push(mt[j]);
-      gVariants.atime.data.push(at[j]);
+    var ct = new Float64Array(_buf(blk.ctimeB64));
+    var mt = new Float64Array(_buf(blk.mtimeB64));
+    var at = new Float64Array(_buf(blk.atimeB64));
+
+    // Build childIds per node (local).
+    var localChildren = new Array(m);
+    for (var i = 0; i < m; i++) localChildren[i] = null;
+    for (var j = 1; j < m; j++) {
+      var p = pi[j];
+      if (p >= 0) {
+        if (!localChildren[p]) localChildren[p] = [];
+        localChildren[p].push(j);
+      }
     }
 
-    // If expanding a stub, set its value to 0 so buildFromTabular aggregates correctly.
-    if (parentGlobalRow >= 0) {
-      gValues[parentGlobalRow] = 0;
-    }
-
-    // Register new stubs from this block.
+    // Stub set for quick lookup.
+    var stubSet = new Map();
     if (blk.stubs) {
       for (var si = 0; si < blk.stubs.length; si++) {
         var s = blk.stubs[si];
-        var stubGlobal = (s[0] - skip) + piBase;
         // s = [localRow, childBlockId, aggValue, aggFiles, aggDirs]
-        stubMap.set(stubGlobal, { childBlockId: s[1], aggValue: s[2], aggFiles: s[3], aggDirs: s[4] });
+        stubSet.set(s[0], s);
       }
+    }
+
+    for (var k = 0; k < m; k++) {
+      var gid = gr[k];
+      if (store.has(gid)) {
+        // Node already exists (it's a stub from a parent block) — update it
+        // with real children from this block.
+        var existing = store.get(gid);
+        if (localChildren[k]) {
+          existing.childIds = localChildren[k].map(function(li) { return gr[li]; });
+        }
+        continue;
+      }
+      var nd = {
+        label: blk.labels[k],
+        value: blk.values[k],
+        childIds: localChildren[k] ? localChildren[k].map(function(li) { return gr[li]; }) : null,
+        colorExt: rawExtArr[k],
+        colorKind: extArr[k],
+        colorFolder: folderArr[k],
+        ctime: ct[k], mtime: mt[k], atime: at[k],
+      };
+      var stubInfo = stubSet.get(k);
+      if (stubInfo) {
+        nd.stubBlockId = stubInfo[1];
+        nd.aggFiles = stubInfo[3];
+        nd.aggDirs = stubInfo[4];
+      }
+      store.set(gid, nd);
     }
   }
 
-  // Inflate a compressed block (async, returns parsed JSON).
-  function inflateBlockAsync(blockId) {
-    if (blockCache.has(blockId)) return Promise.resolve(blockCache.get(blockId));
+  // Inflate a compressed block (async), add to store, re-render.
+  function ensureBlock(blockId) {
+    if (inflating.has(blockId)) return;
     var b64 = envelope.blocks[blockId];
-    if (!b64) return Promise.resolve(null);
+    if (!b64) return;
+    inflating.add(blockId);
     var bytes = new Uint8Array(atob(b64).split('').map(function(c) { return c.charCodeAt(0); }));
     var ds = new DecompressionStream('raw');
     var writer = ds.writable.getWriter();
     writer.write(bytes);
     writer.close();
-    return new Response(ds.readable).text().then(function(text) {
-      var blk = JSON.parse(text);
-      blockCache.set(blockId, blk);
+    new Response(ds.readable).text().then(function(text) {
+      loadBlock(JSON.parse(text));
       envelope.blocks[blockId] = null; // free compressed data
-      return blk;
+      inflating.delete(blockId);
+      tm._queueRender();
     });
   }
 
-  // Expand a stub: inflate its child block, merge into global arrays, re-feed component.
-  function expandStub(stubGlobalRow) {
-    var info = stubMap.get(stubGlobalRow);
-    if (!info) return Promise.resolve(false);
-    stubMap.delete(stubGlobalRow);
-    return inflateBlockAsync(info.childBlockId).then(function(blk) {
-      if (!blk) return false;
-      mergeBlock(blk, stubGlobalRow);
-      feedComponent();
-      return true;
-    });
+  // --- Accessor functions for the component ---
+  function getChildren(id) {
+    var nd = store.get(id);
+    if (!nd) return null;
+    // Stub whose block hasn't been loaded yet: return null (leaf),
+    // kick off async inflate.
+    if (nd.stubBlockId != null && nd.childIds === null) {
+      ensureBlock(nd.stubBlockId);
+      return null;
+    }
+    if (!nd.childIds) return null;
+    return nd.childIds;  // array of global IDs (each is an "item")
+  }
+  function getValue(id) { var nd = store.get(id); return nd ? nd.value : 0; }
+  function getLabel(id) { var nd = store.get(id); return nd ? nd.label : ''; }
+  function getId(id) { return id; }
+
+  function getColor(id) {
+    var nd = store.get(id);
+    if (!nd) return '';
+    switch (currentColorMode) {
+      case 'extension': return nd.colorExt;
+      case 'kind': return nd.colorKind;
+      case 'folder': return nd.colorFolder;
+      case 'ctime': return nd.ctime;
+      case 'mtime': return nd.mtime;
+      case 'atime': return nd.atime;
+      default: return nd.colorExt;
+    }
   }
 
-  // Push current global arrays into the component (triggers re-render).
-  function feedComponent() {
-    tm._props.labels = gLabels;
-    tm._props.values = gValues;
-    tm._props.parentIndices = gPI;
-    // Apply current color mode.
-    if (window._currentColorMode) window._applyColorBy(window._currentColorMode);
-    else tm._props.color = gVariants.extension.data;
-    tm._queueRender();
-  }
+  // --- Boot: load block 0 synchronously, feed component via accessors ---
+  loadBlock(envelope.block0);
+  var rootId = new Int32Array(_buf(envelope.block0.grB64))[0];
+  tm.root = rootId;
+  tm.getId = getId;
+  tm.getChildren = getChildren;
+  tm.getValue = getValue;
+  tm.getLabel = getLabel;
+  tm.getColor = getColor;
 
-  // --- Boot: merge block 0 synchronously ---
-  mergeBlock(envelope.block0, -1);
-  feedComponent();
+  // Color mode is categorical by default; quantitative for timestamps.
+  var isCat = currentColorMode === 'extension' || currentColorMode === 'kind' || currentColorMode === 'folder';
+  tm.setAttribute('color-mode', isCat ? 'categorical' : 'quantitative');
 
   // Expose for other scripts.
-  window._colorVariants = gVariants;
-  window._stubMap = stubMap;
-  window._expandStub = expandStub;
-
+  window._store = store;
+  window._currentColorMode = currentColorMode;
   window._applyColorBy = function (mode) {
+    currentColorMode = mode;
     window._currentColorMode = mode;
-    var v = gVariants[mode];
-    if (!v) return;
-    tm.color = v.data;
-    var newMap = v.cat ? (v.colorMap || {}) : {};
+    var cat = mode === 'extension' || mode === 'kind' || mode === 'folder';
+    var newMap = cat ? (mode === 'kind' ? extColorMap : {}) : {};
     tm._props._userColorMap = newMap;
     tm.colorMap = tm.getAttribute('theme') ? {} : newMap;
-    if (v.cat) {
+    if (cat) {
       tm.setAttribute('color-mode', 'categorical');
       tm._props._userPalette = 'tokyo-night';
       if (!tm.getAttribute('theme')) tm.setAttribute('palette', 'tokyo-night');
@@ -690,11 +697,17 @@ ${bundle}
       tm.setAttribute('color-mode', 'quantitative');
       tm._props._userPalette = 'viridis';
       if (!tm.getAttribute('theme')) tm.setAttribute('palette', 'viridis');
-      var dom = tsMinMax(v.data);
-      tm.colorDomain = dom || undefined;
+      // Compute domain from all loaded timestamps.
+      var lo = Infinity, hi = -Infinity;
+      store.forEach(function(nd) {
+        var v = mode === 'ctime' ? nd.ctime : mode === 'mtime' ? nd.mtime : nd.atime;
+        if (v > 0) { if (v < lo) lo = v; if (v > hi) hi = v; }
+      });
+      tm.colorDomain = lo !== Infinity ? [lo, hi] : undefined;
     }
+    // getColor already reads currentColorMode, just re-render.
+    tm._queueRender();
   };
-  window._applyColorBy('${colorBy}');
 
   var fmtBytes = function (v) {
     var units = ['B','KB','MB','GB','TB','PB']; var i = 0, n = v || 0;
@@ -702,29 +715,13 @@ ${bundle}
     return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' ' + units[i];
   };
   tm.valueFormatter = tm.valueFormatter || fmtBytes;
-
-  // Intercept zoom/dblclick: expand stubs on demand.
-  tm.addEventListener('rt-dblclick', function(e) {
-    var id = e.detail && e.detail.nodeId;
-    if (id != null && stubMap.has(id)) {
-      expandStub(id);
-    }
-  });
-  // Also expand when stretch-zooming into a stub via breadcrumb.
-  tm.addEventListener('rt-zoom-change', function(e) {
-    var id = e.detail && e.detail.nodeId;
-    if (id != null && stubMap.has(id)) {
-      expandStub(id);
-    }
-  });
 })();
 // Stats bar: subtree counts + per-node metadata for the focused node.
-// For unexpanded stubs, uses the pre-computed aggregates from the scan.
+// Uses the node store; stubs carry pre-computed aggregates from the scan.
 (function () {
   var tm = document.getElementById('tm');
   var bar = document.getElementById('stats-bar');
-  var variants = window._colorVariants;
-  var stubMap = window._stubMap;
+  var store = window._store;
   var envTotalFiles = ${scan.files}, envTotalDirs = ${scan.dirs}, envTotalBytes = ${scan.bytes};
   function fmtBytes(v) {
     var units = ['B','KB','MB','GB','TB','PB']; var i = 0, n = v || 0;
@@ -739,37 +736,33 @@ ${bundle}
       ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
   }
   function subtreeStats(nodeId) {
-    // If this is a stub, use the pre-computed aggregates.
-    var si = stubMap.get(nodeId);
-    if (si) return { files: si.aggFiles, dirs: si.aggDirs, bytes: si.aggValue };
-    var nodes = tm._tree && tm._tree.nodes;
-    if (!nodes) return null;
+    var nd = store.get(nodeId);
+    if (!nd) return null;
+    // Unexpanded stub: use pre-computed aggregates.
+    if (nd.stubBlockId != null && nd.childIds === null) {
+      return { files: nd.aggFiles || 0, dirs: nd.aggDirs || 0, bytes: nd.value };
+    }
     var files = 0, dirs = 0, bytes = 0;
     var stack = [nodeId];
     while (stack.length) {
       var id = stack.pop();
-      var sInfo = stubMap.get(id);
-      if (sInfo) { files += sInfo.aggFiles; dirs += sInfo.aggDirs; bytes += sInfo.aggValue; continue; }
-      var nd = nodes.get(id);
-      if (!nd) continue;
-      if (nd.childIds && nd.childIds.length > 0) {
+      var n = store.get(id);
+      if (!n) continue;
+      if (n.stubBlockId != null && n.childIds === null) {
+        files += n.aggFiles || 0; dirs += n.aggDirs || 0; bytes += n.value; continue;
+      }
+      if (n.childIds && n.childIds.length > 0) {
         dirs++;
-        for (var k = 0; k < nd.childIds.length; k++) stack.push(nd.childIds[k]);
+        for (var k = 0; k < n.childIds.length; k++) stack.push(n.childIds[k]);
       } else {
-        files++;
-        bytes += nd.value || 0;
+        files++; bytes += n.value || 0;
       }
     }
     return { files: files, dirs: dirs, bytes: bytes };
   }
-  function isLeaf(id) {
-    var nd = tm._tree && tm._tree.nodes.get(id);
-    return nd && (!nd.childIds || nd.childIds.length === 0);
-  }
   function update() {
     var id = tm._focusId != null ? tm._focusId : tm._targetId != null ? tm._targetId : tm._tree ? tm._tree.roots[0] : null;
     if (id == null) { bar.textContent = ''; return; }
-    // Root: use full scan totals (not just expanded nodes).
     var root = tm._tree && tm._tree.roots[0];
     var s = (id === root) ? { files: envTotalFiles, dirs: envTotalDirs, bytes: envTotalBytes } : subtreeStats(id);
     if (!s) { bar.textContent = ''; return; }
@@ -777,20 +770,19 @@ ${bundle}
     if (s.files > 0) parts.push(s.files.toLocaleString() + ' file' + (s.files !== 1 ? 's' : ''));
     if (s.dirs > 0) parts.push(s.dirs.toLocaleString() + ' folder' + (s.dirs !== 1 ? 's' : ''));
     parts.push(fmtBytes(s.bytes));
-    if (typeof id === 'number' && isLeaf(id) && !stubMap.has(id) && variants) {
-      var kind = variants.kind.data[id];
-      var label = tm.labels[id] || '';
+    // Per-node metadata for leaf files.
+    var nd = store.get(id);
+    if (nd && !nd.childIds && !nd.stubBlockId) {
+      var kind = nd.colorKind;
+      var label = nd.label || '';
       var dot = label.lastIndexOf('.');
       var ext = dot > 0 ? label.slice(dot) : '';
       if (kind && kind !== 'dir') {
         parts.push(ext && ext.slice(1) !== kind ? ext + ' (' + kind + ')' : kind);
       }
-      var ct = variants.ctime.data[id];
-      var mt = variants.mtime.data[id];
-      var at = variants.atime.data[id];
-      if (ct) parts.push('created: ' + fmtDate(ct));
-      if (mt) parts.push('modified: ' + fmtDate(mt));
-      if (at) parts.push('accessed: ' + fmtDate(at));
+      if (nd.ctime) parts.push('created: ' + fmtDate(nd.ctime));
+      if (nd.mtime) parts.push('modified: ' + fmtDate(nd.mtime));
+      if (nd.atime) parts.push('accessed: ' + fmtDate(nd.atime));
     }
     bar.textContent = parts.join('  |  ');
   }

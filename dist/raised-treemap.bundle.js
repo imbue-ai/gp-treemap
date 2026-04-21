@@ -1649,15 +1649,22 @@ class RaisedTreemap extends HTMLElement {
   _buildTree() {
     const p = this._props;
     const minRelArea = p.minCellArea > 0 ? Math.max(0, p.minCellArea / 100000) : 0;
-    if (p.root && p.getChildren && p.getValue && p.getLabel && p.getId) {
-      return buildFromTree(p.root, {
-        getChildren: p.getChildren, getValue: p.getValue, getLabel: p.getLabel,
-        getColor: p.getColor, getId: p.getId,
-      }, {
-        aggregateFn: p.aggregateFn || undefined,
-        colorAggregateFn: p.colorAggregateFn || undefined,
-        minRelArea,
+    if (p.root != null && p.getChildren && p.getValue && p.getLabel && p.getId) {
+      // Lazy mode: only create the root node. Children are discovered on
+      // demand during _paint() → layoutSubtree(), so the component never
+      // visits nodes that are too small to render.
+      const rootItem = p.root;
+      const rootId = p.getId(rootItem);
+      const v = Number(p.getValue(rootItem)) || 0;
+      const nodes = new Map();
+      nodes.set(rootId, {
+        id: rootId, label: p.getLabel(rootItem), value: v,
+        colorValue: p.getColor ? p.getColor(rootItem) : v,
+        depth: 0, parentId: null, childIds: null,
+        isOther: false, isLocated: false, rect: null, colorIndex: 0,
+        _item: rootItem, _hasExplicitValue: true,
       });
+      return { nodes, roots: [rootId], _lazy: true };
     }
     if (p.labels && (p.parents || p.parentIndices) && p.values) {
       return buildFromTabular(
@@ -1729,11 +1736,49 @@ class RaisedTreemap extends HTMLElement {
       splitBias = rawBias > 1 ? Math.min(rawBias, 4) : Math.max(rawBias, 0.25);
     }
 
+    // Lazy accessor expansion: when the tree is in lazy mode (_lazy flag),
+    // childIds starts as null. We call the user's getChildren accessor to
+    // discover children on demand — only for nodes that the layout actually
+    // recurses into. Sub-pixel nodes are pruned by visible() in layoutTree,
+    // so getChildren is never called for them.
+    const lazy = this._tree._lazy;
+    const _gc = lazy ? p.getChildren : null;
+    const _gv = lazy ? p.getValue : null;
+    const _gl = lazy ? p.getLabel : null;
+    const _gcol = lazy ? p.getColor : null;
+    const _gid = lazy ? p.getId : null;
+
     const layoutSubtree = (nodeId, rect) => {
       inSubtree.add(nodeId);
       nodeRects.set(nodeId, rect);
       const node = nodes.get(nodeId);
       const atCap = node.depth >= cap;
+
+      // Lazy expansion: fetch children from accessor if not yet known.
+      if (lazy && node.childIds === null && node._item != null) {
+        const items = _gc(node._item);
+        if (items && items.length > 0) {
+          node.childIds = [];
+          for (let ci = 0; ci < items.length; ci++) {
+            const cItem = items[ci];
+            const cId = _gid(cItem);
+            const cVal = Number(_gv(cItem)) || 0;
+            if (!nodes.has(cId)) {
+              nodes.set(cId, {
+                id: cId, label: _gl(cItem), value: cVal,
+                colorValue: _gcol ? _gcol(cItem) : cVal,
+                depth: node.depth + 1, parentId: nodeId, childIds: null,
+                isOther: false, isLocated: false, rect: null, colorIndex: 0,
+                _item: cItem, _hasExplicitValue: true,
+              });
+            }
+            node.childIds.push(cId);
+          }
+        } else {
+          node.childIds = [];
+        }
+      }
+
       if (atCap || !node.childIds || node.childIds.length === 0) {
         leafCap.add(nodeId);
         leavesCollect.push({ node, rect });
