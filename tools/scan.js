@@ -25,7 +25,7 @@ async function main() {
   const argv = process.argv.slice(2);
   const noOpen = argv.includes('--no-open');
   let colorBy = 'extension';
-  let blockSize = 50000;
+  let blockSize = 500000;
   const args = [];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--no-open') continue;

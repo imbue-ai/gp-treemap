@@ -36,6 +36,16 @@ When adding new UI state to the URL:
    samples/interactions.html).
 3. Add a test in `tests/url-hash.spec.js`.
 
+## Falsy node IDs
+
+In lazy-tree mode (scan files), node IDs are numeric and the root node's ID
+is `0`. Never use truthiness checks (`!id`, `if (id)`, `!node._item`) to
+test whether an ID or item exists — `0` is falsy in JavaScript. Use explicit
+null checks instead: `id == null`, `id != null`, `node._item == null`.
+
+This has caused bugs where the root node was silently skipped (e.g. the zoom
+path expansion skipping the root because `!0` is `true`).
+
 ## Tests
 
     npx playwright test          # all tests

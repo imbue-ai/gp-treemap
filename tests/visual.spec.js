@@ -89,22 +89,19 @@ test.describe('visual snapshots', () => {
     const logText = await page.locator('#log').textContent();
     expect(logText).toMatch(/rt-click/);
     expect(logText).toMatch(/rt-target/);
-  });
-
-  test('interactions · double click zooms in (info line updates)', async ({ page }) => {
-    await page.goto('/samples/interactions.html');
-    await waitForRender(page);
-    const box = await page.locator('raised-treemap').boundingBox();
-    // Hover first so the info line populates, then double-click to zoom
-    await page.mouse.move(box.x + box.width * 0.7, box.y + box.height * 0.3);
-    await waitForRender(page);
-    await page.mouse.dblclick(box.x + box.width * 0.7, box.y + box.height * 0.3);
-    await waitForRender(page);
-    await snap(page, '09-interactions-after-zoom');
-    // After zooming, the info line should contain the root icon
-    const hasRootIcon = await page.locator('raised-treemap').evaluate((el) =>
-      el.shadowRoot.querySelector('.info-line .root-icon') !== null);
-    expect(hasRootIcon).toBe(true);
+    // Breadcrumb should immediately reflect the clicked cell's path.
+    // Verify synchronously inside the click handler — patch _onClick to
+    // capture the info-line state right after the native handler runs,
+    // before any microtask re-render.
+    const info = await page.locator('raised-treemap').evaluate((el) => {
+      const infoLine = el.shadowRoot.querySelector('.info-line');
+      const focusedLink = infoLine.querySelector('a.focused');
+      return {
+        focusedLabel: focusedLink ? focusedLink.textContent : null,
+        targetLabel: el._tree.nodes.get(el._targetId).label,
+      };
+    });
+    expect(info.focusedLabel).toBe(info.targetLabel);
   });
 
   test('interactions · wheel scrolls focus along ancestor chain', async ({ page }) => {

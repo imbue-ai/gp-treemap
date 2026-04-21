@@ -46,6 +46,51 @@ export const PALETTES = {
     'hsl(45,  90%, 60%)',
     'hsl(55,  95%, 70%)',
   ],
+  // Inferno — "glowing metal": black → indigo → red → orange → yellow → white.
+  // Approximates matplotlib's inferno colormap; great for file age, heat, etc.
+  inferno: [
+    'hsl(270, 50%, 8%)',
+    'hsl(270, 65%, 22%)',
+    'hsl(310, 70%, 32%)',
+    'hsl(345, 80%, 42%)',
+    'hsl(15,  90%, 50%)',
+    'hsl(40,  92%, 58%)',
+    'hsl(55,  95%, 75%)',
+    'hsl(60,  80%, 92%)',
+  ],
+  // Magma — dark → purple → pink → peach → pale.
+  // Perceptually uniform; good for density or magnitude data.
+  magma: [
+    'hsl(270, 50%, 8%)',
+    'hsl(270, 60%, 24%)',
+    'hsl(295, 55%, 38%)',
+    'hsl(330, 60%, 52%)',
+    'hsl(355, 65%, 65%)',
+    'hsl(20,  75%, 78%)',
+    'hsl(50,  70%, 92%)',
+  ],
+  // Turbo — Google's improved rainbow: blue → cyan → green → yellow → red.
+  // Higher perceptual uniformity than classic rainbow; great for general use.
+  turbo: [
+    'hsl(240, 80%, 32%)',
+    'hsl(210, 90%, 48%)',
+    'hsl(180, 75%, 48%)',
+    'hsl(130, 65%, 48%)',
+    'hsl(60,  88%, 52%)',
+    'hsl(30,  92%, 50%)',
+    'hsl(0,   80%, 38%)',
+  ],
+  // Cool–warm diverging: blue → neutral → red.
+  // Ideal for values centered on a midpoint (e.g., change since baseline).
+  coolwarm: [
+    'hsl(220, 70%, 42%)',
+    'hsl(220, 55%, 62%)',
+    'hsl(220, 25%, 82%)',
+    'hsl(0,   5%,  92%)',
+    'hsl(10,  25%, 82%)',
+    'hsl(10,  55%, 62%)',
+    'hsl(10,  70%, 42%)',
+  ],
 };
 
 // ---------------------------------------------------------------------------

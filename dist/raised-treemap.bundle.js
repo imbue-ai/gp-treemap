@@ -1397,10 +1397,11 @@ const STYLE = `
 .info-line a.focused { font-weight:700; color: var(--rt-fg, #000); text-decoration:underline; text-underline-offset:2px; }
 .info-line .sep-slash { color: var(--rt-fg-muted, #999); padding:0 1px; }
 .info-line .val { color: var(--rt-fg-muted, #555); margin-left:6px; }
-.stage { position:relative; flex:1; overflow:hidden; background: var(--rt-stage-bg, #0b0b0b); cursor: default; outline: none; }
-.stage canvas { position:absolute; inset:0; width:100%; height:100%; display:block; image-rendering: pixelated;
+.stage { position:relative; flex:1; overflow:hidden; background: var(--rt-stage-bg, #0b0b0b); cursor: default; outline: none;
+  padding: var(--rt-stage-margin, 4px); }
+.stage canvas { position:absolute; inset: var(--rt-stage-margin, 4px); width:calc(100% - 2 * var(--rt-stage-margin, 4px)); height:calc(100% - 2 * var(--rt-stage-margin, 4px)); display:block; image-rendering: pixelated;
   transform-origin: 0 0; transition: transform var(--rt-zoom-ms, 350ms) ease; }
-.overlay { position:absolute; inset:0; pointer-events:none; transform-origin:0 0; }
+.overlay { position:absolute; inset: var(--rt-stage-margin, 4px); pointer-events:none; transform-origin:0 0; overflow:visible; }
 .overlay .sel, .overlay .loc { position:absolute; box-sizing:border-box; pointer-events:none; }
 .overlay .sel { border:2px solid var(--rt-selected); box-sizing:border-box; }
 .overlay .loc { border:2px solid var(--rt-located); box-shadow: 0 0 0 1px #fff8; }
@@ -1408,11 +1409,11 @@ const STYLE = `
   color: var(--rt-fg, #111);
   text-shadow: 0 0 2px var(--rt-bg, #ffffffcc), 0 0 2px var(--rt-bg, #ffffffcc);
   white-space:nowrap; pointer-events:none; transform: translate(-50%, -50%); }
-.tooltip { position:fixed; pointer-events:none; padding:4px 8px;
+.tooltip { position:fixed; pointer-events:none; padding:6px 10px;
   background: var(--rt-surface, #111d); color: var(--rt-fg, #fff);
   border:1px solid var(--rt-border, transparent);
-  border-radius:4px; font-size:12px; line-height:1.3; z-index:1000; max-width:400px; box-shadow:0 2px 6px #0006; }
-.tooltip b { display:block; font-size:11px; font-weight:600; margin-bottom:1px; }
+  border-radius:4px; font-size:12px; line-height:1.4; z-index:1000; max-width:480px; box-shadow:0 2px 6px #0006; }
+.tooltip b { display:block; font-size:11px; font-weight:600; margin-bottom:2px; overflow-wrap:break-word; }
 `;
 class RaisedTreemap extends HTMLElement {
   static get observedAttributes() {
@@ -1436,8 +1437,36 @@ class RaisedTreemap extends HTMLElement {
 
     this._infoLine = document.createElement('div');
     this._infoLine.className = 'info-line';
-    this._infoLine.innerHTML = '<span>(hover a cell)</span>';
+    this._infoLine.innerHTML = '<span>(click a cell)</span>';
     root.appendChild(this._infoLine);
+
+    // Delegated handlers on the info-line. Single click focuses; double-click
+    // zooms.  Because focusing can make a link bold (changing its width and
+    // shifting siblings), the second click of a double-click may not land on
+    // the same <a>.  We track the last-clicked node ID so the dblclick can
+    // always act on the right node.
+    this._lastBreadcrumbClickId = null;
+    this._lastBreadcrumbClickTime = 0;
+    this._infoLine.addEventListener('click', (e) => {
+      const a = e.target.closest('a[data-node-id]');
+      if (!a) return;
+      e.preventDefault();
+      const nid = a.dataset.nodeId;
+      const coerced = /^\d+$/.test(nid) ? Number(nid) : nid;
+      this._lastBreadcrumbClickId = coerced;
+      this._lastBreadcrumbClickTime = Date.now();
+      this._lastBreadcrumbIsRoot = !!a.dataset.isRoot;
+      if (a.dataset.isRoot) { this._setFocus(coerced); this._stage.focus(); }
+      else this._setFocus(coerced);
+    });
+    this._infoLine.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      // Use tracked ID from the first click (may not match current e.target).
+      const id = this._lastBreadcrumbClickId;
+      if (id == null) return;
+      if (this._lastBreadcrumbIsRoot) this.zoomReset();
+      else this.stretchZoomIn(id);
+    });
 
     this._stage = document.createElement('div');
     this._stage.className = 'stage';
@@ -1464,6 +1493,7 @@ class RaisedTreemap extends HTMLElement {
     this._focusId = null;       // ancestor (or target itself) being highlighted
     this._hoverId = null;
     this._internalVisibleRootId = null;
+    this._visibleRootPath = null;  // array of IDs from tree root → zoom target
     this._wheelAcc = 0;
     this._selectionLocked = false;
     this._hoverRaf = 0;
@@ -1474,7 +1504,7 @@ class RaisedTreemap extends HTMLElement {
     this._onResize = this._onResize.bind(this);
     this._onStageMouse = this._onStageMouse.bind(this);
     this._onClick = this._onClick.bind(this);
-    this._onDblClick = this._onDblClick.bind(this);
+
     this._onWheel = this._onWheel.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
 
@@ -1482,7 +1512,7 @@ class RaisedTreemap extends HTMLElement {
     this._stage.addEventListener('mousemove', this._onStageMouse);
     this._stage.addEventListener('mouseleave', () => { this._hideTooltip(); this._setHover(null); });
     this._stage.addEventListener('click', this._onClick);
-    this._stage.addEventListener('dblclick', this._onDblClick);
+
     this._stage.addEventListener('wheel', this._onWheel, { passive: true });
     this._stage.addEventListener('keydown', this._onKeyDown);
   }
@@ -1592,12 +1622,16 @@ class RaisedTreemap extends HTMLElement {
     this._stretchZoomAspect = nodeRect.w / nodeRect.h;
     this._zoomAnimating = true;
 
-    // Animate: CSS-transform the current canvas to expand the node rect to fill the stage
-    const dpr = this._canvas.width / this._stage.clientWidth;
-    const stageW = this._stage.clientWidth;
-    const stageH = this._stage.clientHeight;
-    const sx = stageW / (nodeRect.w / dpr);
-    const sy = stageH / (nodeRect.h / dpr);
+    // Build zoom path for hash persistence / lazy restore.
+    const chain = [];
+    let cur = this._tree.nodes.get(id);
+    while (cur) { chain.unshift(cur.id); cur = cur.parentId != null ? this._tree.nodes.get(cur.parentId) : null; }
+    this._visibleRootPath = chain;
+
+    // Animate: CSS-transform the current canvas to expand the node rect to fill the canvas area
+    const { cssW: canvasW, cssH: canvasH, dpr } = this._canvasMetrics();
+    const sx = canvasW / (nodeRect.w / dpr);
+    const sy = canvasH / (nodeRect.h / dpr);
     const tx = -(nodeRect.x / dpr) * sx;
     const ty = -(nodeRect.y / dpr) * sy;
     this._canvas.style.transform = `matrix(${sx}, 0, 0, ${sy}, ${tx}, ${ty})`;
@@ -1637,11 +1671,9 @@ class RaisedTreemap extends HTMLElement {
     // Find where the previously-zoomed node sits in the new layout
     const nodeRect = this._nodeRects && this._nodeRects.get(oldId);
     if (nodeRect && nodeRect.w > 0 && nodeRect.h > 0) {
-      const dpr = this._canvas.width / this._stage.clientWidth;
-      const stageW = this._stage.clientWidth;
-      const stageH = this._stage.clientHeight;
-      const sx = stageW / (nodeRect.w / dpr);
-      const sy = stageH / (nodeRect.h / dpr);
+      const { cssW: canvasW, cssH: canvasH, dpr } = this._canvasMetrics();
+      const sx = canvasW / (nodeRect.w / dpr);
+      const sy = canvasH / (nodeRect.h / dpr);
       const tx = -(nodeRect.x / dpr) * sx;
       const ty = -(nodeRect.y / dpr) * sy;
       // Start zoomed-in, animate to identity
@@ -1734,9 +1766,11 @@ class RaisedTreemap extends HTMLElement {
   _paint() {
     const p = this._props;
     const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-    const rect = this._stage.getBoundingClientRect();
-    const cssW = Math.max(1, Math.floor(rect.width));
-    const cssH = Math.max(1, Math.floor(rect.height));
+    const stageRect = this._stage.getBoundingClientRect();
+    const marginStr = getComputedStyle(this._stage).getPropertyValue('--rt-stage-margin') || '4px';
+    const margin = parseFloat(marginStr) || 4;
+    const cssW = Math.max(1, Math.floor(stageRect.width - 2 * margin));
+    const cssH = Math.max(1, Math.floor(stageRect.height - 2 * margin));
     const w = Math.max(1, Math.floor(cssW * dpr));
     const h = Math.max(1, Math.floor(cssH * dpr));
     if (this._canvas.width !== w) this._canvas.width = w;
@@ -1747,6 +1781,38 @@ class RaisedTreemap extends HTMLElement {
 
     const activeRoot = this._activeVisibleRootId();
     const nodes = this._tree.nodes;
+
+    // Lazy mode: if the zoom target isn't in the tree yet, eagerly expand
+    // along the stored zoom path so the target can be used as layout root.
+    if (activeRoot != null && !nodes.has(activeRoot) && this._tree._lazy
+        && this._visibleRootPath && p.getChildren && p.getId && p.getValue && p.getLabel) {
+      for (const pathId of this._visibleRootPath) {
+        if (!nodes.has(pathId)) break;  // path broken — stop
+        const nd = nodes.get(pathId);
+        if (nd.childIds != null || nd._item == null) continue;  // already expanded or no item
+        const items = p.getChildren(nd._item);
+        if (items == null) break;  // data not yet available (e.g. stub block not inflated) — retry next render
+        if (items.length === 0) { nd.childIds = []; continue; }
+        nd.childIds = [];
+        for (let ci = 0; ci < items.length; ci++) {
+          const cItem = items[ci];
+          const cId = p.getId(cItem);
+          const cVal = Number(p.getValue(cItem)) || 0;
+          if (!nodes.has(cId)) {
+            nodes.set(cId, {
+              id: cId, label: p.getLabel(cItem), value: cVal,
+              colorValue: p.getColor ? p.getColor(cItem) : cVal,
+              depth: nd.depth + 1, parentId: pathId, childIds: null,
+              isOther: false, isLocated: false, rect: null, colorIndex: 0,
+              _item: cItem, _hasExplicitValue: true,
+            });
+          }
+          nd.childIds.push(cId);
+        }
+        if (nodes.has(activeRoot)) break;  // found it
+      }
+    }
+
     const rootId = activeRoot != null && nodes.has(activeRoot) ? activeRoot : this._tree.roots[0];
     if (rootId == null) { this._clearCanvas(); return; }
     const rootNode = nodes.get(rootId);
@@ -1854,6 +1920,7 @@ class RaisedTreemap extends HTMLElement {
       }
     };
     layoutSubtree(rootId, { x: 0, y: 0, w, h });
+
     this._nodeRects = nodeRects;
 
     const palette = this._resolvedPalette();
@@ -1981,9 +2048,9 @@ class RaisedTreemap extends HTMLElement {
   }
   _updateToolbarInfo() {
     if (!this._infoEl) return;
-    const id = this._hoverId != null ? this._hoverId : this._targetId;
+    const id = this._targetId;
     if (id == null || !this._tree) {
-      this._infoEl.innerHTML = '<span>(hover a cell)</span>';
+      this._infoEl.innerHTML = '<span>(click a cell)</span>';
       return;
     }
     const n = this._tree.nodes.get(id);
@@ -2001,18 +2068,11 @@ class RaisedTreemap extends HTMLElement {
     const rootIcon = document.createElement('a');
     rootIcon.className = 'root-icon';
     rootIcon.title = 'Click to focus root, double-click to zoom';
+    rootIcon.dataset.nodeId = rootId != null ? rootId : '';
+    rootIcon.dataset.isRoot = '1';
     rootIcon.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" style="vertical-align:-2px"><path d="M8 1.5L1 7h2.5v6.5h4V10h1v3.5h4V7H15z" fill="currentColor"/></svg>';
     const focusId = this._focusId != null ? this._focusId : this._targetId;
     if (rootId != null && focusId === rootId) rootIcon.classList.add('focused');
-    rootIcon.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (rootId != null) this._setFocus(rootId);
-      this._stage.focus();
-    });
-    rootIcon.addEventListener('dblclick', (e) => {
-      e.preventDefault();
-      this.zoomReset();
-    });
     this._infoEl.appendChild(rootIcon);
     chain.forEach((node, i) => {
       if (i > 0) {
@@ -2024,15 +2084,8 @@ class RaisedTreemap extends HTMLElement {
       const a = document.createElement('a');
       a.textContent = node.label;
       a.title = 'Click to focus, double-click to zoom';
+      a.dataset.nodeId = node.id;
       if (node.id === focusId) a.classList.add('focused');
-      a.addEventListener('click', (e) => {
-        e.preventDefault();
-        this._setFocus(node.id);
-      });
-      a.addEventListener('dblclick', (e) => {
-        e.preventDefault();
-        this.stretchZoomIn(node.id);
-      });
       this._infoEl.appendChild(a);
     });
     // Show value for the focused node (if set), otherwise the target/hovered node.
@@ -2050,10 +2103,10 @@ class RaisedTreemap extends HTMLElement {
 
   // ----- hit testing / interactions -----
   _hitTest(e) {
-    const rect = this._stage.getBoundingClientRect();
-    const cssX = e.clientX - rect.left;
-    const cssY = e.clientY - rect.top;
-    const dpr = this._canvas.width / rect.width;
+    const canvasRect = this._canvas.getBoundingClientRect();
+    const cssX = e.clientX - canvasRect.left;
+    const cssY = e.clientY - canvasRect.top;
+    const dpr = this._canvas.width / canvasRect.width;
     const px = cssX * dpr;
     const py = cssY * dpr;
     // linear scan; cells are not overlapping so first hit wins
@@ -2079,7 +2132,6 @@ class RaisedTreemap extends HTMLElement {
   _setHover(id) {
     if (this._hoverId === id) return;
     this._hoverId = id;
-    this._updateToolbarInfo();
   }
   _onClick(e) {
     const id = this._hitTest(e);
@@ -2088,17 +2140,14 @@ class RaisedTreemap extends HTMLElement {
     this._focusId = id;
     this._selectionLocked = true;
     this._stage.focus();
-    this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, this._canvas.width / this._stage.clientWidth);
+    const { cssW, cssH, dpr } = this._canvasMetrics();
+    this._renderOverlay(cssW, cssH, dpr);
+    this._updateToolbarInfo();
     this._dispatch('rt-click', id);
     this._dispatch('rt-target', id);
     this._dispatch('rt-focus', id);
   }
-  _onDblClick(e) {
-    const id = this._hitTest(e);
-    if (id == null) return;
-    this._dispatch('rt-dblclick', id);
-    this.stretchZoomIn(id);
-  }
+
   _onWheel(e) {
     if (this._targetId == null || !this._tree) return;
     this._wheelAcc += e.deltaY;
@@ -2145,7 +2194,8 @@ class RaisedTreemap extends HTMLElement {
     const n = this._tree.nodes.get(id);
     if (!n) return;
     this._tooltip.hidden = false;
-    this._tooltip.innerHTML = `<b>${escapeHtml(this._buildPath(id))}</b><br>${escapeHtml(this._formatValue(n.value))}${n.isOther ? ' (collapsed)' : ''}`;
+    const pathHtml = escapeHtml(this._buildPath(id)).replace(/\//g, '/<wbr>');
+    this._tooltip.innerHTML = `<b>${pathHtml}</b><br>${escapeHtml(this._formatValue(n.value))}${n.isOther ? ' (collapsed)' : ''}`;
     const gap = 12;
     const vw = window.innerWidth;
     const tt = this._tooltip;
@@ -2164,20 +2214,55 @@ class RaisedTreemap extends HTMLElement {
     this.dispatchEvent(new CustomEvent('rt-depth-change', { detail: { displayDepth: d }, bubbles: true, composed: true }));
   }
 
+  _canvasMetrics() {
+    const r = this._canvas.getBoundingClientRect();
+    const cssW = Math.max(1, r.width);
+    const cssH = Math.max(1, r.height);
+    const dpr = this._canvas.width / cssW;
+    return { cssW, cssH, dpr };
+  }
   _setFocus(id) {
     this._focusId = id;
-    const dpr = this._canvas.width / this._stage.clientWidth;
-    this._renderOverlay(this._stage.clientWidth, this._stage.clientHeight, dpr);
-    this._updateToolbarInfo();
+    const { cssW, cssH, dpr } = this._canvasMetrics();
+    this._renderOverlay(cssW, cssH, dpr);
+    this._updateInfoFocus();
     this._dispatch('rt-focus', id);
   }
+  // Light update: toggle .focused class on existing breadcrumb links
+  // without rebuilding the DOM (preserves elements for dblclick).
+  _updateInfoFocus() {
+    if (!this._infoEl) return;
+    const focusId = this._focusId != null ? this._focusId : this._targetId;
+    for (const a of this._infoEl.querySelectorAll('a[data-node-id]')) {
+      const nid = a.dataset.nodeId;
+      const coerced = /^\d+$/.test(nid) ? Number(nid) : nid;
+      a.classList.toggle('focused', coerced === focusId);
+    }
+    // Update displayed value to match focused node.
+    const valSpan = this._infoEl.querySelector('.val');
+    if (valSpan && focusId != null && this._tree) {
+      const n = this._tree.nodes.get(focusId);
+      if (n) valSpan.textContent = '· ' + this._formatValue(n.value);
+    }
+  }
 
-  _setVisibleRoot(id) {
+  _setVisibleRoot(id, path) {
     if (this._props.visibleRootId != null) {
       this._dispatch('rt-zoom-change', id, { intendedRoot: true });
       return;
     }
     this._internalVisibleRootId = id;
+    // Build zoom path from tree if available and no explicit path given.
+    if (path) {
+      this._visibleRootPath = path;
+    } else if (id != null && this._tree && this._tree.nodes.has(id)) {
+      const chain = [];
+      let cur = this._tree.nodes.get(id);
+      while (cur) { chain.unshift(cur.id); cur = cur.parentId != null ? this._tree.nodes.get(cur.parentId) : null; }
+      this._visibleRootPath = chain;
+    } else {
+      this._visibleRootPath = null;
+    }
     this._dispatch('rt-zoom-change', id);
     this._queueRender();
   }
@@ -2198,6 +2283,7 @@ class RaisedTreemap extends HTMLElement {
       depth: node ? node.depth : null,
       ancestorIds,
       isLocated: nodeId ? located.has(nodeId) : false,
+      ...(name === 'rt-zoom-change' && this._visibleRootPath ? { zoomPath: this._visibleRootPath.slice() } : {}),
       ...extra,
     };
     this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
@@ -2274,13 +2360,18 @@ function overlayBox(cls, leaf, dpr) {
   const el = document.createElement('div');
   el.className = cls;
   const cssW = leaf.w / dpr, cssH = leaf.h / dpr;
-  el.style.left = leaf.x / dpr + 'px';
-  el.style.top = leaf.y / dpr + 'px';
-  el.style.width = cssW + 'px';
-  el.style.height = cssH + 'px';
   if (cls === 'sel') {
     const t = Math.max(2, Math.round(Math.max(cssW, cssH) * 0.01));
+    el.style.left = (leaf.x / dpr - t) + 'px';
+    el.style.top = (leaf.y / dpr - t) + 'px';
+    el.style.width = (cssW + 2 * t) + 'px';
+    el.style.height = (cssH + 2 * t) + 'px';
     el.style.borderWidth = t + 'px';
+  } else {
+    el.style.left = leaf.x / dpr + 'px';
+    el.style.top = leaf.y / dpr + 'px';
+    el.style.width = cssW + 'px';
+    el.style.height = cssH + 'px';
   }
   return el;
 }

@@ -302,3 +302,240 @@ test('multi-block scan: stubs expand progressively after async inflate', async (
   fs.unlinkSync(out);
   fs.rmSync(target, { recursive: true, force: true });
 });
+
+test('zoom restores from URL hash in lazy tree', async ({ page }) => {
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-zoomhash-'));
+  buildTree(target, 55);
+
+  const out = path.join(os.tmpdir(), 'rt-zoomhash-' + Date.now() + '.html');
+  const res = spawnSync(process.execPath, [
+    path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+  ], { encoding: 'utf8' });
+  expect(res.status, res.stderr).toBe(0);
+
+  const errs = [];
+  page.on('pageerror', (e) => errs.push(String(e)));
+
+  // First load: render, click a cell to zoom via keyboard (+), capture the hash.
+  await page.goto('file://' + out);
+  await page.waitForTimeout(400);
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+  const box = await page.locator('raised-treemap').boundingBox();
+  await page.mouse.click(box.x + box.width * 0.3, box.y + box.height * 0.3);
+  await page.waitForTimeout(100);
+
+  // Scroll wheel up a few times to focus an ancestor (non-leaf, non-root)
+  for (let i = 0; i < 3; i++) {
+    await page.mouse.wheel(0, -100);
+    await page.waitForTimeout(100);
+  }
+
+  // Zoom into the focused node via keyboard
+  await page.keyboard.press('+');
+  await page.waitForTimeout(100);
+
+  const info = await page.evaluate(() => {
+    const el = document.querySelector('raised-treemap');
+    return {
+      activeRoot: el._activeVisibleRootId(),
+      treeRoot: el._tree.roots[0],
+      zoomPath: el._visibleRootPath,
+      hash: location.hash,
+    };
+  });
+
+  // Should be zoomed into something other than the tree root
+  expect(info.activeRoot).not.toBe(info.treeRoot);
+  expect(info.zoomPath).toBeTruthy();
+  expect(info.zoomPath.length).toBeGreaterThan(1);
+  expect(info.hash).toContain('zoomPath=');
+
+  // Second load: reload with the same hash — zoom should restore.
+  const url = 'file://' + out + info.hash;
+  await page.goto(url);
+  await page.waitForTimeout(400);
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+  const restored = await page.evaluate(() => {
+    const el = document.querySelector('raised-treemap');
+    return {
+      activeRoot: el._activeVisibleRootId(),
+      treeRoot: el._tree.roots[0],
+    };
+  });
+
+  // The zoom root should match what we had before reload
+  expect(restored.activeRoot).toBe(info.activeRoot);
+  expect(restored.activeRoot).not.toBe(restored.treeRoot);
+  expect(errs).toEqual([]);
+
+  fs.unlinkSync(out);
+  fs.rmSync(target, { recursive: true, force: true });
+});
+
+test('zoom path expansion works when root node ID is 0 (falsy)', async ({ page }) => {
+  // Regression: the path expansion skipped the root node because _item was 0
+  // and the check `!nd._item` treated 0 as falsy, preventing child expansion.
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-falsy-root-'));
+  buildTree(target, 42);
+
+  const out = path.join(os.tmpdir(), 'rt-falsy-root-' + Date.now() + '.html');
+  const res = spawnSync(process.execPath, [
+    path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+  ], { encoding: 'utf8' });
+  expect(res.status, res.stderr).toBe(0);
+
+  // First: load normally, zoom into a child of root, capture zoomPath.
+  await page.goto('file://' + out);
+  await page.waitForFunction(() => {
+    const el = document.querySelector('raised-treemap');
+    return el && el._leaves && el._leaves.length > 0;
+  }, { timeout: 10000 });
+  await page.waitForTimeout(300);
+
+  const box = await page.locator('raised-treemap').boundingBox();
+  await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+  await page.waitForTimeout(100);
+  await page.keyboard.press('+');
+  await page.waitForTimeout(200);
+
+  const zoomed = await page.evaluate(() => {
+    const el = document.querySelector('raised-treemap');
+    return {
+      activeRoot: el._activeVisibleRootId(),
+      treeRoot: el._tree.roots[0],
+      zoomPath: el._visibleRootPath,
+      hash: location.hash,
+      leavesInSubtree: el._leaves.length,
+    };
+  });
+  expect(zoomed.treeRoot, 'scan root ID must be 0 for this test').toBe(0);
+  expect(zoomed.activeRoot).not.toBe(0);
+  expect(zoomed.zoomPath[0], 'zoom path must start at root 0').toBe(0);
+
+  // Reload with hash — the path expansion must handle root ID 0 correctly.
+  await page.goto('file://' + out + zoomed.hash);
+  await page.waitForFunction(() => {
+    const el = document.querySelector('raised-treemap');
+    return el && el._leaves && el._leaves.length > 0;
+  }, { timeout: 10000 });
+  await page.waitForTimeout(300);
+
+  const restored = await page.evaluate(() => {
+    const el = document.querySelector('raised-treemap');
+    // Verify all rendered leaves are under the zoom root.
+    const zoomRoot = el._activeVisibleRootId();
+    let wrong = 0;
+    for (const l of el._leaves) {
+      let cur = el._tree.nodes.get(l.id);
+      let ok = false;
+      while (cur) {
+        if (cur.id === zoomRoot) { ok = true; break; }
+        cur = cur.parentId != null ? el._tree.nodes.get(cur.parentId) : null;
+      }
+      if (!ok) wrong++;
+    }
+    return { activeRoot: zoomRoot, leaves: el._leaves.length, wrongBranch: wrong };
+  });
+  expect(restored.activeRoot, 'zoom must restore').toBe(zoomed.activeRoot);
+  expect(restored.wrongBranch, 'all leaves must be under zoom root').toBe(0);
+  // Zoomed view should have fewer leaves than total (unless target is nearly all files)
+  expect(restored.leaves).toBeLessThanOrEqual(zoomed.leavesInSubtree);
+
+  fs.unlinkSync(out);
+  fs.rmSync(target, { recursive: true, force: true });
+});
+
+test('zoom survives async block inflation in multi-block scan', async ({ page }) => {
+  // Build a tree, scan with tiny block size to force stubs on the zoom path.
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-zoomstub-'));
+  buildTree(target, 88);
+
+  const out = path.join(os.tmpdir(), 'rt-zoomstub-' + Date.now() + '.html');
+  const res = spawnSync(process.execPath, [
+    path.join(ROOT, 'tools', 'scan.js'), '--no-open', '--block-size=20', target, out,
+  ], { encoding: 'utf8' });
+  expect(res.status, res.stderr).toBe(0);
+  const blockCount = Number(res.stderr.match(/partitioned into (\d+) blocks/)?.[1] || 0);
+  expect(blockCount, 'must have multiple blocks so stubs exist').toBeGreaterThan(1);
+
+  const errs = [];
+  page.on('pageerror', (e) => errs.push(String(e)));
+
+  // First load: zoom into a non-root node and capture the hash.
+  await page.goto('file://' + out);
+  await page.waitForFunction(() => {
+    const el = document.querySelector('raised-treemap');
+    return el && el._leaves && el._leaves.length > 0;
+  }, { timeout: 10000 });
+  // Let blocks inflate so the full tree is available for interaction.
+  for (let i = 0; i < 5; i++) {
+    await page.waitForTimeout(100);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  }
+
+  // Click a cell, navigate up, zoom in via +
+  const box = await page.locator('raised-treemap').boundingBox();
+  await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+  await page.waitForTimeout(100);
+  await page.mouse.wheel(0, -100);
+  await page.waitForTimeout(100);
+  await page.keyboard.press('+');
+  await page.waitForTimeout(200);
+
+  const zoomed = await page.evaluate(() => {
+    const el = document.querySelector('raised-treemap');
+    return {
+      activeRoot: el._activeVisibleRootId(),
+      treeRoot: el._tree.roots[0],
+      zoomPath: el._visibleRootPath,
+      hash: location.hash,
+    };
+  });
+  expect(zoomed.activeRoot).not.toBe(zoomed.treeRoot);
+  expect(zoomed.zoomPath?.length).toBeGreaterThan(1);
+
+  // Reload with the hash. Before blocks inflate, the zoom target may sit
+  // behind a stub whose block hasn't loaded yet.  getChildren returns null
+  // for stubs, so the eager path expansion can't reach the zoom target on
+  // the first render.  The component must NOT permanently mark those nodes
+  // as childless — it must leave them unexpanded so subsequent renders
+  // (triggered by block inflation) can retry and eventually succeed.
+  await page.goto('file://' + out + zoomed.hash);
+  await page.waitForFunction(() => {
+    const el = document.querySelector('raised-treemap');
+    return el && el._leaves && el._leaves.length > 0;
+  }, { timeout: 10000 });
+
+  // Check zoom state immediately — before block inflation settles.
+  // Even if the zoom target isn't reachable yet (behind a stub), the
+  // _internalVisibleRootId must still be set so that once the stub
+  // inflates and triggers a re-render, the zoom will take effect.
+  const early = await page.evaluate(() => {
+    const el = document.querySelector('raised-treemap');
+    return { internal: el._internalVisibleRootId, path: el._visibleRootPath };
+  });
+  expect(early.internal, 'zoom ID must persist even before stubs inflate').toBe(zoomed.activeRoot);
+  expect(early.path, 'zoom path must persist').toEqual(zoomed.zoomPath);
+
+  // Now wait for block inflation to settle.
+  for (let i = 0; i < 8; i++) {
+    await page.waitForTimeout(100);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  }
+
+  const restored = await page.evaluate(() => {
+    const el = document.querySelector('raised-treemap');
+    return {
+      activeRoot: el._activeVisibleRootId(),
+      treeRoot: el._tree.roots[0],
+    };
+  });
+  expect(restored.activeRoot, 'zoom should survive block inflation').toBe(zoomed.activeRoot);
+  expect(restored.activeRoot).not.toBe(restored.treeRoot);
+  expect(errs).toEqual([]);
+
+  fs.unlinkSync(out);
+  fs.rmSync(target, { recursive: true, force: true });
+});
