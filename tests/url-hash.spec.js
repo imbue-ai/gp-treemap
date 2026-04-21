@@ -309,3 +309,63 @@ test('scan HTML: direct navigation with zoom+target+focus hash params', async ({
     fs.rmSync(target, { recursive: true, force: true });
   }
 });
+
+// Scan data uses integer IDs starting at 0. ID 0 (the root) is falsy in JS.
+// The component must not treat a focusId / hoverId of 0 as "no value".
+test('scan HTML: focusing root (id 0) highlights the home icon, not a breadcrumb', async ({ page }) => {
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-focus-root-'));
+  fs.mkdirSync(path.join(target, 'sub'));
+  fs.writeFileSync(path.join(target, 'sub', 'a.txt'), 'hello');
+  fs.writeFileSync(path.join(target, 'sub', 'b.txt'), 'world');
+  fs.writeFileSync(path.join(target, 'c.txt'), 'test');
+
+  const out = path.join(os.tmpdir(), 'rt-focus-root-' + Date.now() + '.html');
+  try {
+    const res = spawnSync(process.execPath, [
+      path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+    ], { encoding: 'utf8' });
+    expect(res.status, res.stderr).toBe(0);
+
+    await page.goto('file://' + out);
+    await page.waitForTimeout(400);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+    // Click a cell to set a target (so the breadcrumb renders).
+    const box = await page.locator('raised-treemap').boundingBox();
+    await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.waitForTimeout(200);
+
+    // Verify root is id 0 (falsy).
+    const rootId = await page.locator('raised-treemap').evaluate((el) => el._tree.roots[0]);
+    expect(rootId).toBe(0);
+
+    // Focus root — what clicking the home icon does.
+    await page.locator('raised-treemap').evaluate((el) => {
+      el._setFocus(el._tree.roots[0]);
+    });
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+    const state = await page.locator('raised-treemap').evaluate((el) => {
+      const rootIcon = el.shadowRoot.querySelector('.info-line .root-icon');
+      const focusedBreadcrumbs = el.shadowRoot.querySelectorAll('.info-line a.focused:not(.root-icon)');
+      return {
+        focusId: el._focusId,
+        rootId: el._tree.roots[0],
+        homeHasFocused: rootIcon ? rootIcon.classList.contains('focused') : false,
+        focusedBreadcrumbCount: focusedBreadcrumbs.length,
+        hasSelectionBox: el.shadowRoot.querySelector('.overlay .sel') !== null,
+      };
+    });
+
+    expect(state.focusId).toBe(0);
+    // The home icon must have the focused class.
+    expect(state.homeHasFocused, 'home icon should be focused').toBe(true);
+    // No breadcrumb entry should be focused (root is the home icon, not a crumb).
+    expect(state.focusedBreadcrumbCount, 'no breadcrumb should be focused').toBe(0);
+    // Selection box should be visible.
+    expect(state.hasSelectionBox, 'selection box should render').toBe(true);
+  } finally {
+    if (fs.existsSync(out)) fs.unlinkSync(out);
+    fs.rmSync(target, { recursive: true, force: true });
+  }
+});

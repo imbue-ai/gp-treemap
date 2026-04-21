@@ -1828,8 +1828,8 @@ class RaisedTreemap extends HTMLElement {
         this._overlay.appendChild(overlayBox('loc', l, dpr));
       }
     }
-    const focusId = this._focusId || this._targetId;
-    if (focusId) {
+    const focusId = this._focusId != null ? this._focusId : this._targetId;
+    if (focusId != null) {
       const bounds = this._selectionBounds(focusId);
       if (bounds) this._overlay.appendChild(overlayBox('sel', bounds, dpr));
     }
@@ -1889,7 +1889,7 @@ class RaisedTreemap extends HTMLElement {
   }
   _updateToolbarInfo() {
     if (!this._infoEl) return;
-    const id = this._hoverId || this._targetId;
+    const id = this._hoverId != null ? this._hoverId : this._targetId;
     if (id == null || !this._tree) {
       this._infoEl.innerHTML = '<span>(hover a cell)</span>';
       return;
@@ -1910,7 +1910,7 @@ class RaisedTreemap extends HTMLElement {
     rootIcon.className = 'root-icon';
     rootIcon.title = 'Click to focus root, double-click to zoom';
     rootIcon.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" style="vertical-align:-2px"><path d="M8 1.5L1 7h2.5v6.5h4V10h1v3.5h4V7H15z" fill="currentColor"/></svg>';
-    const focusId = this._focusId || this._targetId;
+    const focusId = this._focusId != null ? this._focusId : this._targetId;
     if (rootId != null && focusId === rootId) rootIcon.classList.add('focused');
     rootIcon.addEventListener('click', (e) => {
       e.preventDefault();
@@ -1944,7 +1944,7 @@ class RaisedTreemap extends HTMLElement {
       this._infoEl.appendChild(a);
     });
     // Show value for the focused node (if set), otherwise the target/hovered node.
-    const valNode = (focusId && this._tree.nodes.get(focusId)) || n;
+    const valNode = (focusId != null && this._tree.nodes.get(focusId)) || n;
     const val = document.createElement('span');
     val.className = 'val';
     val.textContent = '· ' + this._formatValue(valNode.value);
@@ -2013,14 +2013,14 @@ class RaisedTreemap extends HTMLElement {
     if (Math.abs(this._wheelAcc) < 80) return;
     const dir = this._wheelAcc > 0 ? 1 : -1;
     this._wheelAcc = 0;
-    const focusId = this._focusId || this._targetId;
+    const focusId = this._focusId != null ? this._focusId : this._targetId;
     const n = this._tree.nodes.get(focusId);
     if (!n) return;
     if (dir < 0 && n.parentId != null) this._setFocus(n.parentId);
     else if (dir > 0 && n.childIds && n.childIds.length) this._setFocus(n.childIds[0]);
   }
   _onKeyDown(e) {
-    const focusId = this._focusId || this._targetId;
+    const focusId = this._focusId != null ? this._focusId : this._targetId;
     if (e.key === '+' || e.key === '=') { if (focusId != null) this._setVisibleRoot(focusId); return; }
     if (e.key === '-') { this.zoomOut(); return; }
     if (e.key === '0') { this.zoomReset(); return; }
@@ -2143,7 +2143,7 @@ class RaisedTreemap extends HTMLElement {
   }
 
   _focusUp() {
-    const cur = this._focusId || this._targetId;
+    const cur = this._focusId != null ? this._focusId : this._targetId;
     if (cur == null || !this._tree) return;
     const n = this._tree.nodes.get(cur);
     if (!n || n.parentId === null) return;
