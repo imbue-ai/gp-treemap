@@ -1650,9 +1650,12 @@ class RaisedTreemap extends HTMLElement {
     const p = this._props;
     const minRelArea = p.minCellArea > 0 ? Math.max(0, p.minCellArea / 100000) : 0;
     if (p.root != null && p.getChildren && p.getValue && p.getLabel && p.getId) {
-      // Lazy mode: only create the root node. Children are discovered on
-      // demand during _paint() → layoutSubtree(), so the component never
-      // visits nodes that are too small to render.
+      // Lazy mode: children are discovered on demand during _paint() →
+      // layoutSubtree(). The tree is cached across renders so that nodes
+      // from previously-inflated blocks aren't re-created each frame.
+      if (this._tree && this._tree._lazy && this._tree._lazyRoot === p.root) {
+        return this._tree; // reuse — new blocks expand it incrementally
+      }
       const rootItem = p.root;
       const rootId = p.getId(rootItem);
       const v = Number(p.getValue(rootItem)) || 0;
@@ -1664,7 +1667,7 @@ class RaisedTreemap extends HTMLElement {
         isOther: false, isLocated: false, rect: null, colorIndex: 0,
         _item: rootItem, _hasExplicitValue: true,
       });
-      return { nodes, roots: [rootId], _lazy: true };
+      return { nodes, roots: [rootId], _lazy: true, _lazyRoot: p.root };
     }
     if (p.labels && (p.parents || p.parentIndices) && p.values) {
       return buildFromTabular(
@@ -1741,6 +1744,7 @@ class RaisedTreemap extends HTMLElement {
     // discover children on demand — only for nodes that the layout actually
     // recurses into. Sub-pixel nodes are pruned by visible() in layoutTree,
     // so getChildren is never called for them.
+    const _stub = Object.freeze([]); // sentinel: "block not loaded yet, retry later"
     const lazy = this._tree._lazy;
     const _gc = lazy ? p.getChildren : null;
     const _gv = lazy ? p.getValue : null;
@@ -1752,10 +1756,14 @@ class RaisedTreemap extends HTMLElement {
       inSubtree.add(nodeId);
       nodeRects.set(nodeId, rect);
       const node = nodes.get(nodeId);
+      // Refresh colorValue from accessor (supports color-mode switching with cached trees).
+      if (lazy && _gcol && node._item != null) node.colorValue = _gcol(node._item);
       const atCap = node.depth >= cap;
 
       // Lazy expansion: fetch children from accessor if not yet known.
-      if (lazy && node.childIds === null && node._item != null) {
+      // _stub sentinel means "block not loaded yet" — re-query each render.
+      // null means "never queried". [] means "confirmed leaf".
+      if (lazy && (node.childIds === null || node.childIds === _stub) && node._item != null) {
         const items = _gc(node._item);
         if (items && items.length > 0) {
           node.childIds = [];
@@ -1774,12 +1782,14 @@ class RaisedTreemap extends HTMLElement {
             }
             node.childIds.push(cId);
           }
+        } else if (items === null) {
+          node.childIds = _stub; // block not loaded yet — retry on next render
         } else {
-          node.childIds = [];
+          node.childIds = []; // confirmed leaf (getChildren returned [])
         }
       }
 
-      if (atCap || !node.childIds || node.childIds.length === 0) {
+      if (atCap || !node.childIds || node.childIds === _stub || node.childIds.length === 0) {
         leafCap.add(nodeId);
         leavesCollect.push({ node, rect });
         return;

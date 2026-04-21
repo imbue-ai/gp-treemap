@@ -620,17 +620,30 @@ ${bundle}
     var b64 = envelope.blocks[blockId];
     if (!b64) return;
     inflating.add(blockId);
-    var bytes = new Uint8Array(atob(b64).split('').map(function(c) { return c.charCodeAt(0); }));
-    var ds = new DecompressionStream('raw');
-    var writer = ds.writable.getWriter();
-    writer.write(bytes);
-    writer.close();
-    new Response(ds.readable).text().then(function(text) {
-      loadBlock(JSON.parse(text));
-      envelope.blocks[blockId] = null; // free compressed data
+    try {
+      var bytes = new Uint8Array(atob(b64).split('').map(function(c) { return c.charCodeAt(0); }));
+      var ds = new DecompressionStream('deflate-raw');
+      var writer = ds.writable.getWriter();
+      writer.write(bytes);
+      writer.close();
+      new Response(ds.readable).text().then(function(text) {
+        loadBlock(JSON.parse(text));
+        envelope.blocks[blockId] = null; // free compressed data
+        inflating.delete(blockId);
+        scheduleRender();
+      });
+    } catch (e) {
       inflating.delete(blockId);
-      tm._queueRender();
-    });
+    }
+  }
+
+  // Throttle re-renders from block inflation: collect completions and
+  // re-render once per animation frame so the microtask queue drains.
+  var renderScheduled = false;
+  function scheduleRender() {
+    if (renderScheduled) return;
+    renderScheduled = true;
+    requestAnimationFrame(function() { renderScheduled = false; tm._queueRender(); });
   }
 
   // --- Accessor functions for the component ---
