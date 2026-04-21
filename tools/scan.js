@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import url from 'node:url';
+import zlib from 'node:zlib';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -225,54 +226,160 @@ function humanBytes(v) {
   return s + ' ' + units[i];
 }
 
+// ---------------------------------------------------------------------------
+// Block partitioning: split the flat scan arrays into subtree-sized blocks.
+// Each block is ~targetSize nodes. Directories whose subtrees exceed the
+// remaining capacity become "stubs" — leaf placeholders with aggregate values.
+// Their real children live in a child block, inflated on demand in the browser.
+// ---------------------------------------------------------------------------
+function partitionBlocks(scan, targetSize = 5000) {
+  const n = scan.labels.length;
+  const pi = scan.parentIndices;
+
+  // Build childIds lists.
+  const childIds = new Array(n);
+  for (let i = 0; i < n; i++) childIds[i] = null;
+  for (let i = 1; i < n; i++) {
+    const p = pi[i];
+    if (childIds[p] === null) childIds[p] = [];
+    childIds[p].push(i);
+  }
+
+  // Subtree node count (reverse pass).
+  const subtreeSize = new Int32Array(n);
+  for (let i = n - 1; i >= 0; i--) {
+    subtreeSize[i] = 1;
+    if (childIds[i]) for (const c of childIds[i]) subtreeSize[i] += subtreeSize[c];
+  }
+
+  // Aggregate byte values (reverse pass).
+  const aggValue = new Float64Array(n);
+  for (let i = n - 1; i >= 0; i--) {
+    aggValue[i] = scan.values[i];
+    if (childIds[i]) for (const c of childIds[i]) aggValue[i] += aggValue[c];
+  }
+
+  // Aggregate file/dir counts.
+  const aggFiles = new Int32Array(n);
+  const aggDirs = new Int32Array(n);
+  for (let i = n - 1; i >= 0; i--) {
+    if (!childIds[i]) { aggFiles[i] = 1; aggDirs[i] = 0; }
+    else {
+      aggFiles[i] = 0; aggDirs[i] = 1;
+      for (const c of childIds[i]) { aggFiles[i] += aggFiles[c]; aggDirs[i] += aggDirs[c]; }
+    }
+  }
+
+  const blocks = []; // each: { globalRows: number[], stubs: {gi, localRow, childBlockId}[] }
+
+  function buildBlock(rootGi, parentBlockId) {
+    const blockId = blocks.length;
+    const block = { globalRows: [], stubs: [] };
+    blocks.push(block);
+
+    // DFS, adding nodes to this block. Large subdirectories become stubs.
+    function visit(gi) {
+      block.globalRows.push(gi);
+      if (!childIds[gi]) return; // leaf
+      for (const c of childIds[gi]) {
+        if (!childIds[c]) {
+          // File — always include.
+          block.globalRows.push(c);
+        } else if (block.globalRows.length + subtreeSize[c] <= targetSize) {
+          visit(c);
+        } else {
+          // Directory too large — add as stub leaf, defer children to a child block.
+          const stubLocalRow = block.globalRows.length;
+          block.globalRows.push(c);
+          block.stubs.push({ gi: c, localRow: stubLocalRow, childBlockId: -1 });
+        }
+      }
+    }
+    visit(rootGi);
+
+    // Recursively create child blocks for stubs.
+    for (const stub of block.stubs) {
+      stub.childBlockId = buildBlock(stub.gi, blockId);
+    }
+    return blockId;
+  }
+  buildBlock(0, -1);
+
+  return { blocks, childIds, aggValue, aggFiles, aggDirs };
+}
+
+// Encode one block as a JSON-serialisable object from the global scan arrays.
+function encodeBlock(scan, block, aggValue, aggFiles, aggDirs) {
+  const gRows = block.globalRows;
+  const m = gRows.length;
+  const globalToLocal = new Map();
+  for (let i = 0; i < m; i++) globalToLocal.set(gRows[i], i);
+
+  const labels = new Array(m);
+  const values = new Array(m);
+  const localPI = new Int32Array(m);
+  const rawExt = new Array(m);
+  const ext = new Array(m);
+  const folder = new Array(m);
+  const ctimes = new Float64Array(m);
+  const mtimes = new Float64Array(m);
+  const atimes = new Float64Array(m);
+
+  const stubSet = new Set(block.stubs.map(s => s.gi));
+
+  for (let i = 0; i < m; i++) {
+    const gi = gRows[i];
+    labels[i] = scan.labels[gi];
+    // Stubs get the aggregate value so they render at the right size.
+    values[i] = stubSet.has(gi) ? aggValue[gi] : scan.values[gi];
+    // Parent index: remap to local, or -1 for block root.
+    const gp = scan.parentIndices[gi];
+    localPI[i] = globalToLocal.has(gp) ? globalToLocal.get(gp) : -1;
+    rawExt[i] = scan.rawExtColor[gi];
+    ext[i] = scan.extColor[gi];
+    folder[i] = scan.folderColor[gi];
+    ctimes[i] = scan.ctimes[gi];
+    mtimes[i] = scan.mtimes[gi];
+    atimes[i] = scan.atimes[gi];
+  }
+
+  // Encode categoricals as Uint16 enum-indexed.
+  function encodeCat(arr) {
+    const names = [...new Set(arr)].sort();
+    const toIdx = new Map(names.map((c, j) => [c, j]));
+    const u16 = new Uint16Array(arr.length);
+    for (let j = 0; j < arr.length; j++) u16[j] = toIdx.get(arr[j]);
+    return { names, b64: Buffer.from(u16.buffer).toString('base64') };
+  }
+
+  const stubs = block.stubs.map(s => [
+    s.localRow, s.childBlockId,
+    aggValue[s.gi], aggFiles[s.gi], aggDirs[s.gi],
+  ]);
+
+  const re = encodeCat(rawExt);
+  const ec = encodeCat(ext);
+  const fc = encodeCat(folder);
+
+  return {
+    labels, values,
+    piB64: Buffer.from(localPI.buffer).toString('base64'),
+    rawExtNames: re.names, rawExtB64: re.b64,
+    extNames: ec.names, extB64: ec.b64,
+    folderNames: fc.names, folderB64: fc.b64,
+    ctimeB64: Buffer.from(ctimes.buffer).toString('base64'),
+    mtimeB64: Buffer.from(mtimes.buffer).toString('base64'),
+    atimeB64: Buffer.from(atimes.buffer).toString('base64'),
+    stubs,
+  };
+}
+
 // Streaming HTML builder — writes directly to a file descriptor to avoid
 // hitting V8's ~512 MB string limit on large scans (8M+ files).
 function buildHtml(outPath, target, scan, colorBy) {
   const bundle = fs.readFileSync(BUNDLE_PATH, 'utf8');
   const fd = fs.openSync(outPath, 'w');
   const w = (s) => fs.writeSync(fd, s);
-
-  // --- helpers for writing large arrays without giant strings ---
-  const BATCH = 20000;
-
-  // Write a JSON array of strings in batches.
-  function writeJsonStringArray(arr) {
-    w('[');
-    for (let i = 0; i < arr.length; i += BATCH) {
-      if (i > 0) w(',');
-      const slice = arr.slice(i, Math.min(i + BATCH, arr.length));
-      const json = JSON.stringify(slice);
-      w(json.slice(1, -1)); // strip outer [ ]
-    }
-    w(']');
-  }
-  // Write a JSON array of numbers in batches.
-  function writeJsonNumberArray(arr) {
-    w('[');
-    for (let i = 0; i < arr.length; i += BATCH) {
-      if (i > 0) w(',');
-      const slice = arr.slice(i, Math.min(i + BATCH, arr.length));
-      const json = JSON.stringify(slice);
-      w(json.slice(1, -1));
-    }
-    w(']');
-  }
-  // Write base64 of a TypedArray in chunks (3 MB raw per chunk = clean base64).
-  function writeBase64(typedArray) {
-    const buf = Buffer.from(typedArray.buffer, typedArray.byteOffset, typedArray.byteLength);
-    const CHUNK = 3 * 1024 * 1024; // must be multiple of 3 for clean base64 boundaries
-    for (let i = 0; i < buf.length; i += CHUNK) {
-      w(buf.subarray(i, Math.min(i + CHUNK, buf.length)).toString('base64'));
-    }
-  }
-  // Encode a categorical string array to Uint16 enum-index + write base64.
-  function encodeCategorical(arr) {
-    const names = [...new Set(arr)].sort();
-    const toIdx = new Map(names.map((c, i) => [c, i]));
-    const u16 = new Uint16Array(arr.length);
-    for (let i = 0; i < arr.length; i++) u16[i] = toIdx.get(arr[i]);
-    return { names: JSON.stringify(names), u16 };
-  }
 
   // Per-bucket color map for extension mode.
   const extColorMapObj = {
@@ -300,10 +407,6 @@ function buildHtml(outPath, target, scan, colorBy) {
     humanSize: humanBytes(scan.bytes),
     when: (() => { const d = new Date(); const off = -d.getTimezoneOffset(); const sign = off >= 0 ? '+' : '-'; const hh = String(Math.floor(Math.abs(off) / 60)).padStart(2, '0'); const mm = String(Math.abs(off) % 60).padStart(2, '0'); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + 'T' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0') + sign + hh + ':' + mm; })(),
   };
-
-  const rawExt = encodeCategorical(scan.rawExtColor);
-  const ext = encodeCategorical(scan.extColor);
-  const folder = encodeCategorical(scan.folderColor);
 
   const isCategorical = colorBy === 'extension' || colorBy === 'kind' || colorBy === 'folder';
   const tmColorMode = isCategorical ? 'categorical' : 'quantitative';
@@ -386,34 +489,22 @@ function buildHtml(outPath, target, scan, colorBy) {
 <script type="application/json" id="tmdata">
 `);
 
-  // --- Stream the embedded JSON data (the big part) ---
-  w('{"labels":');
-  writeJsonStringArray(scan.labels);
-  w(',"values":');
-  writeJsonNumberArray(scan.values);
-  w(',"piB64":"');
-  writeBase64(Int32Array.from(scan.parentIndices));
-  w('"');
-  // Categorical color variants.
-  w(',"rawExtNames":' + rawExt.names + ',"rawExtB64":"');
-  writeBase64(rawExt.u16);
-  w('"');
-  w(',"extNames":' + ext.names + ',"extB64":"');
-  writeBase64(ext.u16);
-  w('"');
-  w(',"folderNames":' + folder.names + ',"folderB64":"');
-  writeBase64(folder.u16);
-  w('"');
-  // Timestamp variants.
-  w(',"ctimeB64":"');
-  writeBase64(Float64Array.from(scan.ctimes));
-  w('"');
-  w(',"mtimeB64":"');
-  writeBase64(Float64Array.from(scan.mtimes));
-  w('"');
-  w(',"atimeB64":"');
-  writeBase64(Float64Array.from(scan.atimes));
-  w('"}');
+  // --- Partition into blocks and write the envelope ---
+  const { blocks, aggValue, aggFiles, aggDirs } = partitionBlocks(scan);
+  process.stderr.write('  partitioned into ' + blocks.length + ' blocks\n');
+
+  // Block 0 is stored as uncompressed JSON for synchronous boot.
+  // Blocks 1+ are deflateRaw + base64 for lazy decompression.
+  const block0Json = JSON.stringify(encodeBlock(scan, blocks[0], aggValue, aggFiles, aggDirs));
+
+  w('{"v":2,"totalFiles":' + scan.files + ',"totalDirs":' + scan.dirs +
+    ',"totalBytes":' + scan.bytes + ',"block0":' + block0Json + ',"blocks":[null');
+  for (let bi = 1; bi < blocks.length; bi++) {
+    const blockJson = JSON.stringify(encodeBlock(scan, blocks[bi], aggValue, aggFiles, aggDirs));
+    const compressed = zlib.deflateRawSync(blockJson, { level: 6 });
+    w(',"' + compressed.toString('base64') + '"');
+  }
+  w(']}');
 
   // --- Rest of the HTML (bundle + page scripts) ---
   w(`
@@ -422,7 +513,13 @@ function buildHtml(outPath, target, scan, colorBy) {
 ${bundle}
 <\/script>
 <script>
+// Progressive block loader: inflates block 0 synchronously on boot,
+// then lazily inflates child blocks when the user zooms into a stub directory.
 (function () {
+  var envelope = JSON.parse(document.getElementById('tmdata').textContent);
+  var tm = document.getElementById('tm');
+
+  // --- Decode helpers ---
   function _buf(b64) {
     var s = atob(b64), b = new Uint8Array(s.length);
     for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i);
@@ -442,29 +539,143 @@ ${bundle}
     return lo !== Infinity ? [lo, hi] : null;
   }
 
-  var raw = JSON.parse(document.getElementById('tmdata').textContent);
-  var tm = document.getElementById('tm');
-  tm.labels = raw.labels;
-  tm.values = raw.values;
-  tm.parentIndices = new Int32Array(_buf(raw.piB64));
-
-  // Pre-decode all color variants.
-  var extColorMap = ${extColorMapJson};
-  var variants = {
-    extension: { cat: true, data: decodeCat(raw.rawExtNames, raw.rawExtB64), colorMap: null },
-    kind:      { cat: true, data: decodeCat(raw.extNames, raw.extB64), colorMap: extColorMap },
-    folder:    { cat: true, data: decodeCat(raw.folderNames, raw.folderB64), colorMap: null },
-    ctime:     { cat: false, data: Array.from(new Float64Array(_buf(raw.ctimeB64))) },
-    mtime:     { cat: false, data: Array.from(new Float64Array(_buf(raw.mtimeB64))) },
-    atime:     { cat: false, data: Array.from(new Float64Array(_buf(raw.atimeB64))) },
+  // --- Global arrays (grow as blocks are expanded) ---
+  var gLabels = [];
+  var gValues = [];
+  var gPI = null;  // Int32Array
+  var gVariants = {
+    extension: { cat: true, data: [], colorMap: null },
+    kind:      { cat: true, data: [], colorMap: ${extColorMapJson} },
+    folder:    { cat: true, data: [], colorMap: null },
+    ctime:     { cat: false, data: [] },
+    mtime:     { cat: false, data: [] },
+    atime:     { cat: false, data: [] },
   };
-  variants.ctime.domain = tsMinMax(variants.ctime.data);
-  variants.mtime.domain = tsMinMax(variants.mtime.data);
-  variants.atime.domain = tsMinMax(variants.atime.data);
 
-  window._colorVariants = variants;
+  // stubMap: globalRow -> { childBlockId, aggValue, aggFiles, aggDirs }
+  var stubMap = new Map();
+  // blockCache: blockId -> decoded block object (inflated but not merged)
+  var blockCache = new Map();
+
+  // Decode a block object (already parsed JSON) into arrays and merge into globals.
+  // parentGlobalRow: the global row of the stub being expanded (-1 for block 0 root).
+  function mergeBlock(blk, parentGlobalRow) {
+    var base = gLabels.length;
+    var m = blk.labels.length;
+    var localPI = new Int32Array(_buf(blk.piB64));
+
+    // For block 0 (root), the root has parentGlobalRow = -1.
+    // For child blocks, the root node is already present as a stub — skip it.
+    var skip = parentGlobalRow >= 0 ? 1 : 0;
+    var appendCount = m - skip;
+
+    // Grow the global parentIndices array.
+    var newPI = new Int32Array(gPI ? gPI.length + appendCount : appendCount);
+    if (gPI) newPI.set(gPI);
+    var piBase = gPI ? gPI.length : 0;
+
+    for (var i = skip; i < m; i++) {
+      var gi = piBase + (i - skip);
+      gLabels.push(blk.labels[i]);
+      gValues.push(blk.values[i]);
+
+      // Remap parentIndex: if parent is the block root (local 0) for a child block,
+      // point to the stub's global row. Otherwise remap to global index.
+      var lp = localPI[i];
+      if (lp === 0 && skip === 1) {
+        newPI[gi] = parentGlobalRow;
+      } else {
+        newPI[gi] = lp < 0 ? -1 : (lp - skip) + piBase;
+      }
+    }
+    gPI = newPI;
+
+    // Decode and append color variants.
+    var rawExtArr = decodeCat(blk.rawExtNames, blk.rawExtB64);
+    var extArr = decodeCat(blk.extNames, blk.extB64);
+    var folderArr = decodeCat(blk.folderNames, blk.folderB64);
+    var ct = Array.from(new Float64Array(_buf(blk.ctimeB64)));
+    var mt = Array.from(new Float64Array(_buf(blk.mtimeB64)));
+    var at = Array.from(new Float64Array(_buf(blk.atimeB64)));
+    for (var j = skip; j < m; j++) {
+      gVariants.extension.data.push(rawExtArr[j]);
+      gVariants.kind.data.push(extArr[j]);
+      gVariants.folder.data.push(folderArr[j]);
+      gVariants.ctime.data.push(ct[j]);
+      gVariants.mtime.data.push(mt[j]);
+      gVariants.atime.data.push(at[j]);
+    }
+
+    // If expanding a stub, set its value to 0 so buildFromTabular aggregates correctly.
+    if (parentGlobalRow >= 0) {
+      gValues[parentGlobalRow] = 0;
+    }
+
+    // Register new stubs from this block.
+    if (blk.stubs) {
+      for (var si = 0; si < blk.stubs.length; si++) {
+        var s = blk.stubs[si];
+        var stubGlobal = (s[0] - skip) + piBase;
+        // s = [localRow, childBlockId, aggValue, aggFiles, aggDirs]
+        stubMap.set(stubGlobal, { childBlockId: s[1], aggValue: s[2], aggFiles: s[3], aggDirs: s[4] });
+      }
+    }
+  }
+
+  // Inflate a compressed block (async, returns parsed JSON).
+  function inflateBlockAsync(blockId) {
+    if (blockCache.has(blockId)) return Promise.resolve(blockCache.get(blockId));
+    var b64 = envelope.blocks[blockId];
+    if (!b64) return Promise.resolve(null);
+    var bytes = new Uint8Array(atob(b64).split('').map(function(c) { return c.charCodeAt(0); }));
+    var ds = new DecompressionStream('raw');
+    var writer = ds.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    return new Response(ds.readable).text().then(function(text) {
+      var blk = JSON.parse(text);
+      blockCache.set(blockId, blk);
+      envelope.blocks[blockId] = null; // free compressed data
+      return blk;
+    });
+  }
+
+  // Expand a stub: inflate its child block, merge into global arrays, re-feed component.
+  function expandStub(stubGlobalRow) {
+    var info = stubMap.get(stubGlobalRow);
+    if (!info) return Promise.resolve(false);
+    stubMap.delete(stubGlobalRow);
+    return inflateBlockAsync(info.childBlockId).then(function(blk) {
+      if (!blk) return false;
+      mergeBlock(blk, stubGlobalRow);
+      feedComponent();
+      return true;
+    });
+  }
+
+  // Push current global arrays into the component (triggers re-render).
+  function feedComponent() {
+    tm._props.labels = gLabels;
+    tm._props.values = gValues;
+    tm._props.parentIndices = gPI;
+    // Apply current color mode.
+    if (window._currentColorMode) window._applyColorBy(window._currentColorMode);
+    else tm._props.color = gVariants.extension.data;
+    tm._queueRender();
+  }
+
+  // --- Boot: merge block 0 synchronously ---
+  mergeBlock(envelope.block0, -1);
+  feedComponent();
+
+  // Expose for other scripts.
+  window._colorVariants = gVariants;
+  window._stubMap = stubMap;
+  window._expandStub = expandStub;
+
   window._applyColorBy = function (mode) {
-    var v = variants[mode];
+    window._currentColorMode = mode;
+    var v = gVariants[mode];
     if (!v) return;
     tm.color = v.data;
     var newMap = v.cat ? (v.colorMap || {}) : {};
@@ -479,10 +690,10 @@ ${bundle}
       tm.setAttribute('color-mode', 'quantitative');
       tm._props._userPalette = 'viridis';
       if (!tm.getAttribute('theme')) tm.setAttribute('palette', 'viridis');
-      tm.colorDomain = v.domain || undefined;
+      var dom = tsMinMax(v.data);
+      tm.colorDomain = dom || undefined;
     }
   };
-
   window._applyColorBy('${colorBy}');
 
   var fmtBytes = function (v) {
@@ -491,12 +702,30 @@ ${bundle}
     return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' ' + units[i];
   };
   tm.valueFormatter = tm.valueFormatter || fmtBytes;
+
+  // Intercept zoom/dblclick: expand stubs on demand.
+  tm.addEventListener('rt-dblclick', function(e) {
+    var id = e.detail && e.detail.nodeId;
+    if (id != null && stubMap.has(id)) {
+      expandStub(id);
+    }
+  });
+  // Also expand when stretch-zooming into a stub via breadcrumb.
+  tm.addEventListener('rt-zoom-change', function(e) {
+    var id = e.detail && e.detail.nodeId;
+    if (id != null && stubMap.has(id)) {
+      expandStub(id);
+    }
+  });
 })();
 // Stats bar: subtree counts + per-node metadata for the focused node.
+// For unexpanded stubs, uses the pre-computed aggregates from the scan.
 (function () {
   var tm = document.getElementById('tm');
   var bar = document.getElementById('stats-bar');
   var variants = window._colorVariants;
+  var stubMap = window._stubMap;
+  var envTotalFiles = ${scan.files}, envTotalDirs = ${scan.dirs}, envTotalBytes = ${scan.bytes};
   function fmtBytes(v) {
     var units = ['B','KB','MB','GB','TB','PB']; var i = 0, n = v || 0;
     while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
@@ -510,12 +739,17 @@ ${bundle}
       ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
   }
   function subtreeStats(nodeId) {
+    // If this is a stub, use the pre-computed aggregates.
+    var si = stubMap.get(nodeId);
+    if (si) return { files: si.aggFiles, dirs: si.aggDirs, bytes: si.aggValue };
     var nodes = tm._tree && tm._tree.nodes;
     if (!nodes) return null;
     var files = 0, dirs = 0, bytes = 0;
     var stack = [nodeId];
     while (stack.length) {
       var id = stack.pop();
+      var sInfo = stubMap.get(id);
+      if (sInfo) { files += sInfo.aggFiles; dirs += sInfo.aggDirs; bytes += sInfo.aggValue; continue; }
       var nd = nodes.get(id);
       if (!nd) continue;
       if (nd.childIds && nd.childIds.length > 0) {
@@ -535,13 +769,15 @@ ${bundle}
   function update() {
     var id = tm._focusId != null ? tm._focusId : tm._targetId != null ? tm._targetId : tm._tree ? tm._tree.roots[0] : null;
     if (id == null) { bar.textContent = ''; return; }
-    var s = subtreeStats(id);
+    // Root: use full scan totals (not just expanded nodes).
+    var root = tm._tree && tm._tree.roots[0];
+    var s = (id === root) ? { files: envTotalFiles, dirs: envTotalDirs, bytes: envTotalBytes } : subtreeStats(id);
     if (!s) { bar.textContent = ''; return; }
     var parts = [];
     if (s.files > 0) parts.push(s.files.toLocaleString() + ' file' + (s.files !== 1 ? 's' : ''));
     if (s.dirs > 0) parts.push(s.dirs.toLocaleString() + ' folder' + (s.dirs !== 1 ? 's' : ''));
     parts.push(fmtBytes(s.bytes));
-    if (typeof id === 'number' && isLeaf(id) && variants) {
+    if (typeof id === 'number' && isLeaf(id) && !stubMap.has(id) && variants) {
       var kind = variants.kind.data[id];
       var label = tm.labels[id] || '';
       var dot = label.lastIndexOf('.');
