@@ -157,7 +157,12 @@ function buildTree(root, seed) {
     const name = 'file_' + f + ext;
     // Deterministic size: 100–10 000 bytes of repeating ASCII.
     const size = 100 + Math.floor(rand() * 9900);
-    fs.writeFileSync(path.join(parent, name), 'x'.repeat(size));
+    const fp = path.join(parent, name);
+    fs.writeFileSync(fp, 'x'.repeat(size));
+    // Spread timestamps over ~2 years so quantitative color modes have diversity.
+    const daysAgo = Math.floor(rand() * 730);
+    const ts = new Date(Date.now() - daysAgo * 86400000);
+    fs.utimesSync(fp, ts, ts);
   }
 }
 
@@ -239,6 +244,23 @@ test('color-by dropdown switches between all modes without errors', async ({ pag
       expect(await tm.getAttribute('palette'), mode + ' palette').toBe(expectedPalette);
     }
   }
+
+  // Quantitative modes (ctime/mtime/atime) should produce diverse colors,
+  // not map everything to a single bin. Regression: theme palettes with few
+  // discrete colors caused all timestamps to land in the same bucket.
+  // Use mtime (not ctime) because utimesSync can set mtime but not ctime.
+  await colorSel.selectOption('mtime');
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  const mtimeColors = await tm.evaluate((el) => {
+    const indices = new Set();
+    for (const l of el._leaves) indices.add(l.lutIndex);
+    return indices.size;
+  });
+  expect(mtimeColors, 'mtime should produce many distinct colors').toBeGreaterThan(5);
+
+  // Switch back to extension for the hash test below.
+  await colorSel.selectOption('extension');
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
   // Verify the URL hash recorded the last switch back to the default.
   // (extension is the default so 'color' param should be absent)

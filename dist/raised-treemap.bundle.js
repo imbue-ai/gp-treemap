@@ -1944,8 +1944,20 @@ class RaisedTreemap extends HTMLElement {
 
     this._nodeRects = nodeRects;
 
-    const palette = this._resolvedPalette();
+    let palette = this._resolvedPalette();
+    // For quantitative mode, interpolate small palettes to 64 stops so the
+    // linear/log scale has fine granularity instead of coarse bins.
+    if (p.colorMode === 'quantitative' && palette.length < 64) {
+      palette = interpolatePalette(palette, 64);
+    }
     const subtree = Array.from(inSubtree).map((id) => nodes.get(id));
+    // Refresh colorValue from getColor — the data source may return different
+    // values depending on the active color mode (e.g. extension vs timestamp).
+    if (lazy && p.getColor) {
+      for (const nd of subtree) {
+        if (nd._item != null) nd.colorValue = p.getColor(nd._item);
+      }
+    }
     resolveColors(subtree, p.colorMode, {
       palette,
       colorScale: p.colorScale,
@@ -2406,6 +2418,28 @@ function parseBgColor(css) {
   const m2 = /^#([0-9a-f]{3})$/i.exec(css.trim());
   if (m2) return { r: parseInt(m2[1][0] + m2[1][0], 16), g: parseInt(m2[1][1] + m2[1][1], 16), b: parseInt(m2[1][2] + m2[1][2], 16) };
   return { r: 16, g: 16, b: 16 };
+}
+
+// Interpolate a small palette (e.g. 7 HSL stops) into `count` evenly spaced
+// entries by linear interpolation in HSL space.
+function interpolatePalette(palette, count) {
+  if (palette.length >= count) return palette;
+  const stops = palette.map((c) => {
+    const m = /hsl\(\s*([\d.]+)\s*,\s*([\d.]+)%?\s*,\s*([\d.]+)%?\s*\)/.exec(c);
+    return m ? [+m[1], +m[2], +m[3]] : [0, 0, 50];
+  });
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1) * (stops.length - 1);
+    const idx = Math.min(stops.length - 2, Math.floor(t));
+    const frac = t - idx;
+    const a = stops[idx], b = stops[idx + 1];
+    const h = a[0] + (b[0] - a[0]) * frac;
+    const s = a[1] + (b[1] - a[1]) * frac;
+    const l = a[2] + (b[2] - a[2]) * frac;
+    out.push(`hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l.toFixed(1)}%)`);
+  }
+  return out;
 }
 
 // Properties that define the data source — changing these invalidates the

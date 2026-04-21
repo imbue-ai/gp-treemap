@@ -634,36 +634,38 @@ ${bundle}
     }
   }
 
-  // Inflate a compressed block (async), add to store, re-render.
-  function ensureBlock(blockId) {
-    if (inflating.has(blockId)) return;
+  // Inflate a single compressed block, add to store. Returns a promise.
+  function inflateBlock(blockId) {
     var b64 = envelope.blocks[blockId];
-    if (!b64) return;
-    inflating.add(blockId);
-    try {
-      var bytes = new Uint8Array(atob(b64).split('').map(function(c) { return c.charCodeAt(0); }));
-      var ds = new DecompressionStream('deflate-raw');
-      var writer = ds.writable.getWriter();
-      writer.write(bytes);
-      writer.close();
-      new Response(ds.readable).text().then(function(text) {
-        loadBlock(JSON.parse(text));
-        envelope.blocks[blockId] = null; // free compressed data
-        inflating.delete(blockId);
-        scheduleRender();
-      });
-    } catch (e) {
-      inflating.delete(blockId);
-    }
+    if (!b64) return Promise.resolve();
+    var bytes = new Uint8Array(atob(b64).split('').map(function(c) { return c.charCodeAt(0); }));
+    var ds = new DecompressionStream('deflate-raw');
+    var writer = ds.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    return new Response(ds.readable).text().then(function(text) {
+      loadBlock(JSON.parse(text));
+      envelope.blocks[blockId] = null; // free compressed data
+    });
   }
 
-  // Throttle re-renders from block inflation: collect completions and
-  // re-render once per animation frame so the microtask queue drains.
-  var renderScheduled = false;
-  function scheduleRender() {
-    if (renderScheduled) return;
-    renderScheduled = true;
-    requestAnimationFrame(function() { renderScheduled = false; tm._queueRender(); });
+  // After the first render, inflate ALL remaining blocks in parallel,
+  // then do one final re-render. This gives exactly two renders:
+  // 1) block 0 only (fast, shows stubs as leaves)
+  // 2) all blocks loaded (complete tree)
+  var allBlocksReady = null;
+  function inflateAllBlocks() {
+    if (allBlocksReady) return allBlocksReady;
+    var promises = [];
+    for (var i = 1; i < envelope.blocks.length; i++) {
+      if (envelope.blocks[i]) promises.push(inflateBlock(i));
+    }
+    allBlocksReady = Promise.all(promises).then(function() {
+      // Invalidate the lazy tree so new children are discovered.
+      if (tm._tree) tm._tree._lazy = true;
+      tm._queueRender();
+    });
+    return allBlocksReady;
   }
 
   // --- Accessor functions for the component ---
@@ -673,10 +675,7 @@ ${bundle}
     // Stub whose block hasn't been loaded yet: return null to signal
     // "not yet available, retry later". The component will leave
     // childIds as null and re-call getChildren on the next render.
-    if (nd.stubBlockId != null && nd.childIds === null) {
-      ensureBlock(nd.stubBlockId);
-      return null;
-    }
+    if (nd.stubBlockId != null && nd.childIds === null) return null;
     // Files (true leaves) return [] so the component marks them as
     // childless and doesn't re-call getChildren on subsequent renders.
     if (!nd.childIds) return [];
@@ -753,7 +752,7 @@ ${bundle}
       tm.setAttribute('color-mode', 'quantitative');
       var qPal = paletteOverride || 'viridis';
       tm._props._userPalette = qPal;
-      if (!tm.getAttribute('theme')) tm.setAttribute('palette', qPal);
+      tm.setAttribute('palette', qPal);
       // Compute domain from all loaded timestamps.
       var lo = Infinity, hi = -Infinity;
       store.forEach(function(nd) {
@@ -772,8 +771,13 @@ ${bundle}
     return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' ' + units[i];
   };
   tm.valueFormatter = tm.valueFormatter || fmtBytes;
+
+  // After the first render (queued via microtask from property setters above),
+  // inflate all remaining blocks in parallel, then render once more.
+  requestAnimationFrame(function() { inflateAllBlocks(); });
   }); // block0Promise.then
   window._bootReady = block0Promise;
+  window._allBlocksReady = block0Promise.then(function() { return inflateAllBlocks(); });
 })();
 // Stats bar: subtree counts + per-node metadata for the focused node.
 // Uses the node store; stubs carry pre-computed aggregates from the scan.
