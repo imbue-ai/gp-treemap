@@ -2,7 +2,7 @@ import { parentPort } from 'node:worker_threads';
 import fs from 'node:fs';
 import path from 'node:path';
 
-parentPort.on('message', ({ dirPath, dirRow, needTimestamps }) => {
+parentPort.on('message', ({ dirPath, dirRow }) => {
   let entries;
   const results = [];
   let unreadable = 0;
@@ -22,8 +22,8 @@ parentPort.on('message', ({ dirPath, dirRow, needTimestamps }) => {
       let st;
       try { st = fs.statSync(path.join(dirPath, ent.name)); }
       catch { unreadable++; continue; }
-      const r = { name: ent.name, isDir: false, size: st.size };
-      if (needTimestamps) r.ts = { ctime: st.ctimeMs, atime: st.atimeMs };
+      const r = { name: ent.name, isDir: false, size: st.size,
+                  ts: { ctime: st.ctimeMs, mtime: st.mtimeMs, atime: st.atimeMs } };
       results.push(r);
     } else {
       unreadable++;

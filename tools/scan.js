@@ -3,7 +3,7 @@
 // renders its size treemap with <raised-treemap>. The output has the bundle and
 // the dataset inlined, so you can open it from anywhere with no server.
 //
-// Usage:  node tools/scan.js [--color=extension|folder|ctime|atime] <dir> [output.html]
+// Usage:  node tools/scan.js [--color=extension|kind|folder|ctime|mtime|atime] <dir> [output.html]
 //                 (or `npm run scan -- [--color=...] <dir> [output.html]`)
 //
 // Symlinks are not followed (we use lstat). Unreadable entries are counted
@@ -18,7 +18,7 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const BUNDLE_PATH = path.join(ROOT, 'dist', 'raised-treemap.bundle.js');
 
-const COLOR_MODES = ['extension', 'folder', 'ctime', 'atime'];
+const COLOR_MODES = ['extension', 'kind', 'folder', 'ctime', 'mtime', 'atime'];
 
 async function main() {
   const argv = process.argv.slice(2);
@@ -46,10 +46,9 @@ async function main() {
     args.push(argv[i]);
   }
   if (args.length < 1 || args[0] === '-h' || args[0] === '--help') {
-    console.error('Usage: node tools/scan.js [--no-open] [--color=extension|folder|ctime|atime] <dir> [output.html]');
+    console.error('Usage: node tools/scan.js [--no-open] [--color=extension|kind|folder|ctime|mtime|atime] <dir> [output.html]');
     process.exit(args[0] === '-h' || args[0] === '--help' ? 0 : 2);
   }
-  const needTimestamps = colorBy === 'ctime' || colorBy === 'atime';
   const target = path.resolve(args[0]);
   const out = args[1]
     ? path.resolve(args[1])
@@ -68,7 +67,7 @@ async function main() {
   }
 
   const t0 = Date.now();
-  const scan = await walk(target, needTimestamps, colorBy);
+  const scan = await walk(target);
   const elapsed = Date.now() - t0;
   const html = buildHtml(target, scan, colorBy);
   fs.writeFileSync(out, html);
@@ -90,21 +89,26 @@ async function main() {
   }
 }
 
-async function walk(rootPath, needTimestamps, colorBy) {
+async function walk(rootPath) {
   const { Worker } = await import('node:worker_threads');
   const NWORKERS = Math.max(2, Math.min(os.cpus().length, 16));
   const workerPath = path.join(__dirname, 'scan-worker.js');
 
-  const labels = [], parentIndices = [], values = [], color = [];
-  const timestamps = needTimestamps ? [] : null;
+  const labels = [], parentIndices = [], values = [];
+  const rawExtColor = [];   // raw lowercased extension per node
+  const extColor = [];      // extKind bucket per node
+  const folderColor = [];   // parent folder label per node
+  const ctimes = [];        // ctimeMs per node
+  const mtimes = [];        // mtimeMs per node
+  const atimes = [];        // atimeMs per node
   let bytes = 0, files = 0, dirs = 0, unreadable = 0;
 
   labels.push(path.basename(rootPath) || rootPath);
-  parentIndices.push(-1); values.push(0); color.push('dir');
-  if (timestamps) timestamps.push(0);
+  parentIndices.push(-1); values.push(0);
+  rawExtColor.push('dir'); extColor.push('dir'); folderColor.push('dir'); ctimes.push(0); mtimes.push(0); atimes.push(0);
   dirs++;
 
-  const queue = [{ dirPath: rootPath, dirRow: 0, needTimestamps }];
+  const queue = [{ dirPath: rootPath, dirRow: 0 }];
   let pending = 0;
 
   let lastPrint = 0;
@@ -145,16 +149,20 @@ async function walk(rootPath, needTimestamps, colorBy) {
             const row = labels.length;
             labels.push(ent.name);
             parentIndices.push(result.dirRow);
-            values.push(0); color.push('dir');
-            if (timestamps) timestamps.push(0);
+            values.push(0);
+            rawExtColor.push('dir'); extColor.push('dir'); folderColor.push('dir'); ctimes.push(0); mtimes.push(0); atimes.push(0);
             dirs++;
-            queue.push({ dirPath: path.join(result.dirPath, ent.name), dirRow: row, needTimestamps });
+            queue.push({ dirPath: path.join(result.dirPath, ent.name), dirRow: row });
           } else {
             labels.push(ent.name);
             parentIndices.push(result.dirRow);
             values.push(ent.size);
-            color.push(colorBy === 'folder' ? labels[result.dirRow] : extKind(ent.name));
-            if (timestamps) timestamps.push(ent.ts ? ent.ts[colorBy] : 0);
+            rawExtColor.push(rawExt(ent.name));
+            extColor.push(extKind(ent.name));
+            folderColor.push(labels[result.dirRow]);
+            ctimes.push(ent.ts ? ent.ts.ctime : 0);
+            mtimes.push(ent.ts ? ent.ts.mtime : 0);
+            atimes.push(ent.ts ? ent.ts.atime : 0);
             bytes += ent.size;
             files++;
           }
@@ -173,7 +181,13 @@ async function walk(rootPath, needTimestamps, colorBy) {
   process.stderr.write('\r' + ' '.repeat(72) + '\r');
   for (const w of workers) w.terminate();
 
-  return { labels, parentIndices, values, color, timestamps, bytes, files, dirs, unreadable };
+  return { labels, parentIndices, values, rawExtColor, extColor, folderColor, ctimes, mtimes, atimes, bytes, files, dirs, unreadable };
+}
+
+// Raw lowercased extension (e.g. 'js', 'png'). Dot-files / no extension → '(none)'.
+function rawExt(name) {
+  const dot = name.lastIndexOf('.');
+  return dot > 0 ? name.slice(dot + 1).toLowerCase() : '(none)';
 }
 
 // Map a filename to a color-key. Curated buckets for common kinds; everything
@@ -214,10 +228,9 @@ function humanBytes(v) {
 
 function buildHtml(target, scan, colorBy) {
   const bundle = fs.readFileSync(BUNDLE_PATH, 'utf8');
-  const isCategorical = colorBy === 'extension' || colorBy === 'folder';
 
   // Per-bucket color map for extension mode.
-  const extColorMap = {
+  const extColorMapObj = {
     image:   'hsl(300, 55%, 55%)',  // magenta
     video:   'hsl(348, 70%, 50%)',  // red
     audio:   'hsl(170, 55%, 45%)',  // teal
@@ -250,50 +263,41 @@ function buildHtml(target, scan, colorBy) {
   const labelsJson  = JSON.stringify(scan.labels);
   const valuesJson  = JSON.stringify(scan.values);
 
-  let colorDataFields, colorSetupJs;
-
-  if (isCategorical) {
-    // Binary-encode color categories as Uint16 enum indices.
-    const colorNames = [...new Set(scan.color)].sort();
-    const colorToIdx = new Map(colorNames.map((c, i) => [c, i]));
-    const colorU16 = new Uint16Array(scan.color.length);
-    for (let i = 0; i < scan.color.length; i++) colorU16[i] = colorToIdx.get(scan.color[i]);
-    const colorB64 = Buffer.from(colorU16.buffer).toString('base64');
-    const colorNamesJson = JSON.stringify(colorNames);
-    const colorMapJson = colorBy === 'extension' ? JSON.stringify(extColorMap) : 'undefined';
-
-    colorDataFields = `,"colorNames":${colorNamesJson},"colorB64":"${colorB64}"`;
-    colorSetupJs = `
-  var cn = raw.colorNames, ci = new Uint16Array(_buf(raw.colorB64));
-  var ca = new Array(ci.length);
-  for (var i = 0; i < ci.length; i++) ca[i] = cn[ci[i]];
-  tm.color = ca;
-  ${colorMapJson !== 'undefined' ? 'tm.colorMap = ' + colorMapJson + ';' : ''}`;
-  } else {
-    // Quantitative: embed timestamps as Float64Array base64.
-    const tsF64 = Float64Array.from(scan.timestamps);
-    const tsB64 = Buffer.from(tsF64.buffer).toString('base64');
-
-    colorDataFields = `,"tsB64":"${tsB64}"`;
-    const timeLabel = colorBy === 'ctime' ? 'created' : 'accessed';
-    colorSetupJs = `
-  var ts = new Float64Array(_buf(raw.tsB64));
-  tm.color = Array.from(ts);
-  // Compute domain excluding zero (directories have no timestamp).
-  var tsMin = Infinity, tsMax = -Infinity;
-  for (var j = 0; j < ts.length; j++) {
-    if (ts[j] > 0) { if (ts[j] < tsMin) tsMin = ts[j]; if (ts[j] > tsMax) tsMax = ts[j]; }
+  // Encode ALL color variants into the embedded JSON.
+  // Categorical: extension and folder as Uint16 enum-index arrays.
+  function encodeCategorical(arr) {
+    const names = [...new Set(arr)].sort();
+    const toIdx = new Map(names.map((c, i) => [c, i]));
+    const u16 = new Uint16Array(arr.length);
+    for (let i = 0; i < arr.length; i++) u16[i] = toIdx.get(arr[i]);
+    return { names: JSON.stringify(names), b64: Buffer.from(u16.buffer).toString('base64') };
   }
-  if (tsMin !== Infinity) tm.colorDomain = [tsMin, tsMax];`;
-  }
+  const rawExt = encodeCategorical(scan.rawExtColor);
+  const ext = encodeCategorical(scan.extColor);
+  const folder = encodeCategorical(scan.folderColor);
+
+  // Quantitative: ctime, mtime, and atime as Float64Array base64.
+  const ctimeB64 = Buffer.from(Float64Array.from(scan.ctimes).buffer).toString('base64');
+  const mtimeB64 = Buffer.from(Float64Array.from(scan.mtimes).buffer).toString('base64');
+  const atimeB64 = Buffer.from(Float64Array.from(scan.atimes).buffer).toString('base64');
+
+  const colorDataFields = [
+    `,"rawExtNames":${rawExt.names},"rawExtB64":"${rawExt.b64}"`,
+    `,"extNames":${ext.names},"extB64":"${ext.b64}"`,
+    `,"folderNames":${folder.names},"folderB64":"${folder.b64}"`,
+    `,"ctimeB64":"${ctimeB64}"`,
+    `,"mtimeB64":"${mtimeB64}"`,
+    `,"atimeB64":"${atimeB64}"`,
+  ].join('');
 
   // Escape </script so the data tag can't be prematurely closed.
   const embeddedJson = `{"labels":${labelsJson},"values":${valuesJson},"piB64":"${piB64}"${colorDataFields}}`
     .replace(/<\/script/gi, '<\\/script');
 
+  const isCategorical = colorBy === 'extension' || colorBy === 'kind' || colorBy === 'folder';
   const tmColorMode = isCategorical ? 'categorical' : 'quantitative';
   const tmPalette = isCategorical ? 'tokyo-night' : 'viridis';
-  const colorLabel = { extension: 'file kind', folder: 'folder', ctime: 'creation time', atime: 'access time' }[colorBy];
+  const extColorMapJson = JSON.stringify(extColorMapObj);
 
   // Theme page-color metadata for the dropdown switcher.
   // The treemap component has its own copy; this is just for the outer page chrome.
@@ -333,7 +337,7 @@ function buildHtml(target, scan, colorBy) {
   #stats-bar { padding: 3px 14px; font-size: 12px; font-variant-numeric: tabular-nums; min-height: 18px;
     color: var(--page-fg-muted, #888); background: var(--page-surface, #fff);
     border-top: 1px solid var(--page-border, #0002); transition: background .15s, color .15s; }
-  #theme-sel { font-size: 12px; padding: 2px 4px; border-radius: 4px;
+  #theme-sel, #color-sel { font-size: 12px; padding: 2px 4px; border-radius: 4px;
     background: var(--page-bg, #fff); color: var(--page-fg, #333);
     border: 1px solid var(--page-border, #ccc); cursor: pointer; }
 </style>
@@ -345,7 +349,16 @@ function buildHtml(target, scan, colorBy) {
   <span class="stat"><b>${stats.dirs.toLocaleString()}</b> directories</span>
   <span class="stat"><b>${stats.humanSize}</b> total</span>
   ${stats.unreadable ? `<span class="stat">(${stats.unreadable.toLocaleString()} unreadable)</span>` : ''}
-  <span class="stat" style="color: var(--page-fg-muted, #888);">colored by <b>${colorLabel}</b></span>
+  <span class="stat" style="color: var(--page-fg-muted, #888);">color
+    <select id="color-sel">
+      <option value="extension">extension</option>
+      <option value="kind">file kind</option>
+      <option value="folder">folder</option>
+      <option value="ctime">created</option>
+      <option value="mtime">modified</option>
+      <option value="atime">accessed</option>
+    </select>
+  </span>
   <span class="stat" style="margin-left:auto;">
     <select id="theme-sel">
       <option value="">Default (light)</option>
@@ -375,12 +388,66 @@ ${bundle}
     for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i);
     return b.buffer;
   }
+  function decodeCat(names, b64) {
+    var ci = new Uint16Array(_buf(b64));
+    var a = new Array(ci.length);
+    for (var i = 0; i < ci.length; i++) a[i] = names[ci[i]];
+    return a;
+  }
+  function tsMinMax(arr) {
+    var lo = Infinity, hi = -Infinity;
+    for (var j = 0; j < arr.length; j++) {
+      if (arr[j] > 0) { if (arr[j] < lo) lo = arr[j]; if (arr[j] > hi) hi = arr[j]; }
+    }
+    return lo !== Infinity ? [lo, hi] : null;
+  }
+
   var raw = JSON.parse(document.getElementById('tmdata').textContent);
   var tm = document.getElementById('tm');
   tm.labels = raw.labels;
   tm.values = raw.values;
   tm.parentIndices = new Int32Array(_buf(raw.piB64));
-${colorSetupJs}
+
+  // Pre-decode all color variants.
+  var extColorMap = ${extColorMapJson};
+  var variants = {
+    extension: { cat: true, data: decodeCat(raw.rawExtNames, raw.rawExtB64), colorMap: null },
+    kind:      { cat: true, data: decodeCat(raw.extNames, raw.extB64), colorMap: extColorMap },
+    folder:    { cat: true, data: decodeCat(raw.folderNames, raw.folderB64), colorMap: null },
+    ctime:     { cat: false, data: Array.from(new Float64Array(_buf(raw.ctimeB64))) },
+    mtime:     { cat: false, data: Array.from(new Float64Array(_buf(raw.mtimeB64))) },
+    atime:     { cat: false, data: Array.from(new Float64Array(_buf(raw.atimeB64))) },
+  };
+  variants.ctime.domain = tsMinMax(variants.ctime.data);
+  variants.mtime.domain = tsMinMax(variants.mtime.data);
+  variants.atime.domain = tsMinMax(variants.atime.data);
+
+  window._colorVariants = variants;
+  window._applyColorBy = function (mode) {
+    var v = variants[mode];
+    if (!v) return;
+    tm.color = v.data;
+    var newMap = v.cat ? (v.colorMap || {}) : {};
+    // Update both the live colorMap and the stashed _userColorMap so themes
+    // can toggle overrides correctly.
+    tm._props._userColorMap = newMap;
+    tm.colorMap = tm.getAttribute('theme') ? {} : newMap;
+    if (v.cat) {
+      tm.setAttribute('color-mode', 'categorical');
+      tm._props._userPalette = 'tokyo-night';
+      if (!tm.getAttribute('theme')) tm.setAttribute('palette', 'tokyo-night');
+      tm.colorDomain = undefined;
+    } else {
+      tm.setAttribute('color-mode', 'quantitative');
+      tm._props._userPalette = 'viridis';
+      if (!tm.getAttribute('theme')) tm.setAttribute('palette', 'viridis');
+      tm.colorDomain = v.domain || undefined;
+    }
+  };
+
+  // Apply the initial color mode chosen at scan time.
+  window._applyColorBy('${colorBy}');
+
   var fmtBytes = function (v) {
     var units = ['B','KB','MB','GB','TB','PB']; var i = 0, n = v || 0;
     while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
@@ -388,14 +455,22 @@ ${colorSetupJs}
   };
   tm.valueFormatter = tm.valueFormatter || fmtBytes;
 })();
-// Stats bar: show file/folder/byte counts for the focused subtree.
+// Stats bar: subtree counts + per-node metadata for the focused node.
 (function () {
   var tm = document.getElementById('tm');
   var bar = document.getElementById('stats-bar');
+  var variants = window._colorVariants;
   function fmtBytes(v) {
     var units = ['B','KB','MB','GB','TB','PB']; var i = 0, n = v || 0;
     while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
     return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' ' + units[i];
+  }
+  function fmtDate(ms) {
+    if (!ms) return '';
+    var d = new Date(ms);
+    var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+      ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
   }
   function subtreeStats(nodeId) {
     var nodes = tm._tree && tm._tree.nodes;
@@ -416,6 +491,10 @@ ${colorSetupJs}
     }
     return { files: files, dirs: dirs, bytes: bytes };
   }
+  function isLeaf(id) {
+    var nd = tm._tree && tm._tree.nodes.get(id);
+    return nd && (!nd.childIds || nd.childIds.length === 0);
+  }
   function update() {
     var id = tm._focusId || tm._targetId || (tm._tree && tm._tree.roots[0]) || null;
     if (id == null) { bar.textContent = ''; return; }
@@ -425,7 +504,24 @@ ${colorSetupJs}
     if (s.files > 0) parts.push(s.files.toLocaleString() + ' file' + (s.files !== 1 ? 's' : ''));
     if (s.dirs > 0) parts.push(s.dirs.toLocaleString() + ' folder' + (s.dirs !== 1 ? 's' : ''));
     parts.push(fmtBytes(s.bytes));
-    bar.textContent = parts.join('  \u00b7  ');
+    // Per-node metadata for leaf nodes (files).
+    if (typeof id === 'number' && isLeaf(id) && variants) {
+      var kind = variants.kind.data[id];
+      var label = tm.labels[id] || '';
+      var dot = label.lastIndexOf('.');
+      var ext = dot > 0 ? label.slice(dot) : '';
+      if (kind && kind !== 'dir') {
+        // Show ".js (code)" — or just the kind if it IS the raw extension.
+        parts.push(ext && ext.slice(1) !== kind ? ext + ' (' + kind + ')' : kind);
+      }
+      var ct = variants.ctime.data[id];
+      var mt = variants.mtime.data[id];
+      var at = variants.atime.data[id];
+      if (ct) parts.push('created: ' + fmtDate(ct));
+      if (mt) parts.push('modified: ' + fmtDate(mt));
+      if (at) parts.push('accessed: ' + fmtDate(at));
+    }
+    bar.textContent = parts.join('  |  ');
   }
   tm.addEventListener('rt-focus', update);
   tm.addEventListener('rt-target', update);
@@ -433,14 +529,17 @@ ${colorSetupJs}
   // Show root stats initially once the tree is built.
   requestAnimationFrame(function () { setTimeout(update, 0); });
 })();
-// Theme switcher + URL hash sync.
+// Color-by switcher + theme switcher + URL hash sync.
 (function () {
   var themes = ${themesJson};
-  var sel = document.getElementById('theme-sel');
+  var themeSel = document.getElementById('theme-sel');
+  var colorSel = document.getElementById('color-sel');
   var tm = document.getElementById('tm');
   var htmlRoot = document.documentElement;
   var DEFAULT_THEME = 'tokyo-night';
+  var DEFAULT_COLOR = '${colorBy}';
   var currentTheme = DEFAULT_THEME;
+  var currentColor = DEFAULT_COLOR;
 
   function applyPageTheme(name) {
     currentTheme = name || '';
@@ -457,9 +556,15 @@ ${colorSetupJs}
         .forEach(function (v) { htmlRoot.style.removeProperty(v); });
     }
     tm.setAttribute('theme', name || '');
-    sel.value = name || '';
+    themeSel.value = name || '';
   }
-  sel.addEventListener('change', function () { applyPageTheme(sel.value); writeHash(); });
+  function applyColor(mode) {
+    currentColor = mode || DEFAULT_COLOR;
+    window._applyColorBy(currentColor);
+    colorSel.value = currentColor;
+  }
+  themeSel.addEventListener('change', function () { applyPageTheme(themeSel.value); writeHash(); });
+  colorSel.addEventListener('change', function () { applyColor(colorSel.value); writeHash(); });
 
   // Node IDs in the scan tree are integers; URL params arrive as strings.
   function coerceId(s) { return /^\\d+$/.test(s) ? Number(s) : s; }
@@ -471,6 +576,7 @@ ${colorSetupJs}
       var t = p.get('target'); if (t) { tm._targetId = coerceId(t); tm._selectionLocked = true; }
       var f = p.get('focus');  if (f) tm._focusId = coerceId(f);
       var th = p.get('theme'); applyPageTheme(th != null ? th : DEFAULT_THEME);
+      var cb = p.get('color'); if (cb) applyColor(cb);
     } catch (_) {}
   }
   function writeHash() {
@@ -482,10 +588,12 @@ ${colorSetupJs}
       var f = tm._focusId;               var root = tm._tree && tm._tree.roots[0];
                                          if (f && f !== t && f !== root) p.set('focus', f);
       if (currentTheme !== DEFAULT_THEME) p.set('theme', currentTheme);
+      if (currentColor !== DEFAULT_COLOR) p.set('color', currentColor);
       var s = p.toString();
       history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
     } catch (_) {}
   }
+  colorSel.value = DEFAULT_COLOR;
   readHash();
   if (location.hash.length > 1) tm._queueRender();
   tm.addEventListener('rt-zoom-change', writeHash);

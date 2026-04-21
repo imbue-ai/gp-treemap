@@ -16,9 +16,9 @@ function parseScanHtml(htmlPath) {
   const raw = JSON.parse(m[1]);
   const piBuf = Buffer.from(raw.piB64, 'base64');
   const parentIndices = Array.from(new Int32Array(piBuf.buffer, piBuf.byteOffset, piBuf.byteLength / 4));
-  const cBuf = Buffer.from(raw.colorB64, 'base64');
+  const cBuf = Buffer.from(raw.extB64, 'base64');
   const colorIdx = new Uint16Array(cBuf.buffer, cBuf.byteOffset, cBuf.byteLength / 2);
-  const color = Array.from(colorIdx).map(i => raw.colorNames[i]);
+  const color = Array.from(colorIdx).map(i => raw.extNames[i]);
   return { labels: raw.labels, values: raw.values, parentIndices, color };
 }
 
@@ -179,6 +179,80 @@ test('scan.js produces a self-contained HTML that renders', async ({ page }) => 
   });
 
   // Cleanup.
+  fs.unlinkSync(out);
+  fs.rmSync(target, { recursive: true, force: true });
+});
+
+test('color-by dropdown switches between all modes without errors', async ({ page }) => {
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-colorby-'));
+  buildTree(target, 99);
+
+  const out = path.join(os.tmpdir(), 'rt-colorby-' + Date.now() + '.html');
+  const res = spawnSync(process.execPath, [
+    path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+  ], { encoding: 'utf8' });
+  expect(res.status, res.stderr).toBe(0);
+
+  const errs = [];
+  page.on('pageerror', (e) => errs.push(String(e)));
+  page.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
+
+  await page.goto('file://' + out);
+  await page.waitForTimeout(400);
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+  const tm = page.locator('raised-treemap');
+  const colorSel = page.locator('#color-sel');
+
+  // Default should be extension (raw extension, categorical).
+  expect(await tm.getAttribute('color-mode')).toBe('categorical');
+  expect(await colorSel.inputValue()).toBe('extension');
+
+  // Switch to each mode and verify the component updates without errors.
+  for (const [mode, expectedColorMode, expectedPalette] of [
+    ['kind',      'categorical',  'tokyo-night'],
+    ['folder',    'categorical',  'tokyo-night'],
+    ['ctime',     'quantitative', 'viridis'],
+    ['mtime',     'quantitative', 'viridis'],
+    ['atime',     'quantitative', 'viridis'],
+    ['extension', 'categorical',  'tokyo-night'],
+  ]) {
+    await colorSel.selectOption(mode);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    expect(await tm.getAttribute('color-mode'), mode + ' color-mode').toBe(expectedColorMode);
+    // When a theme is active the palette attr tracks the theme name, not the
+    // color-mode default, so only check palette when no theme is set.
+    const theme = await tm.getAttribute('theme');
+    if (!theme) {
+      expect(await tm.getAttribute('palette'), mode + ' palette').toBe(expectedPalette);
+    }
+  }
+
+  // Verify the URL hash recorded the last switch back to the default.
+  // (extension is the default so 'color' param should be absent)
+  const hash = await page.evaluate(() => location.hash);
+  expect(hash).not.toContain('color=');
+
+  // Switch to folder and verify hash contains color=folder.
+  await colorSel.selectOption('folder');
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  const hash2 = await page.evaluate(() => location.hash);
+  expect(hash2).toContain('color=folder');
+
+  // Click a cell to focus a leaf node and verify the status bar shows metadata.
+  const tmEl = page.locator('raised-treemap');
+  const box = await tmEl.boundingBox();
+  // Click near center — likely to hit a leaf cell.
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  const barText = await page.locator('#stats-bar').textContent();
+  // For a focused leaf, the bar should include extension/kind and timestamps.
+  // Format is ".ext (kind)" or just "kind" when they match, plus timestamps.
+  expect(barText).toMatch(/\.\w+\s+\(|code|web|doc|image|audio/);
+  expect(barText).toMatch(/modified: \d{4}-/);
+
+  expect(errs, 'no errors during color switching').toEqual([]);
+
   fs.unlinkSync(out);
   fs.rmSync(target, { recursive: true, force: true });
 });
