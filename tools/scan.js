@@ -428,25 +428,26 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
     'rose-pine':   { label: 'Rosé Pine',         dark: true,  bg: '#191724', surface: '#1f1d2e', border: '#26233a', fg: '#e0def4', fgMuted: '#908caa', accent: '#c4a7e7' },
     'one-dark':    { label: 'One Dark',           dark: true,  bg: '#282c34', surface: '#2c313a', border: '#3e4452', fg: '#abb2bf', fgMuted: '#828997', accent: '#61afef' },
   };
-  // Continuous palettes — palette-only (no page chrome).
-  const continuousPalettes = {
-    viridis:  'Viridis',
-    plasma:   'Plasma',
-    inferno:  'Inferno',
-    magma:    'Magma',
-    turbo:    'Turbo',
-    heatmap:  'Heatmap',
-    coolwarm: 'Cool–Warm',
-    rainbow:  'Rainbow',
+  // Standalone palettes available in the palette dropdown.
+  const palettePicks = {
+    '':         '(theme default)',
+    viridis:    'Viridis',
+    plasma:     'Plasma',
+    inferno:    'Inferno',
+    magma:      'Magma',
+    turbo:      'Turbo',
+    heatmap:    'Heatmap',
+    coolwarm:   'Cool–Warm',
+    rainbow:    'Rainbow',
+    'gp-default': 'Default 8-hue',
   };
 
   const themesJson = JSON.stringify(themePageColors);
-  const continuousJson = JSON.stringify(Object.keys(continuousPalettes));
   const themeOptions = Object.entries(themePageColors)
     .map(([k, v]) => `<option value="${k}">${escapeHtml(v.label)}</option>`)
     .join('');
-  const paletteOptions = Object.entries(continuousPalettes)
-    .map(([k, v]) => `<option value="palette:${k}">${escapeHtml(v)}</option>`)
+  const palettePickOptions = Object.entries(palettePicks)
+    .map(([k, v]) => `<option value="${k}">${escapeHtml(v)}</option>`)
     .join('');
 
   // --- Write the HTML, streaming the large data section ---
@@ -469,7 +470,7 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
   #stats-bar { padding: 3px 14px; font-size: 12px; font-variant-numeric: tabular-nums; min-height: 18px;
     color: var(--page-fg-muted, #888); background: var(--page-surface, #fff);
     border-top: 1px solid var(--page-border, #0002); transition: background .15s, color .15s; }
-  #theme-sel, #color-sel { font-size: 12px; padding: 2px 4px; border-radius: 4px;
+  #theme-sel, #palette-sel, #color-sel { font-size: 12px; padding: 2px 4px; border-radius: 4px;
     background: var(--page-bg, #fff); color: var(--page-fg, #333);
     border: 1px solid var(--page-border, #ccc); cursor: pointer; }
 </style>
@@ -491,11 +492,15 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
       <option value="atime">accessed</option>
     </select>
   </span>
+  <span class="stat" style="color: var(--page-fg-muted, #888);">palette
+    <select id="palette-sel">
+      ${palettePickOptions}
+    </select>
+  </span>
   <span class="stat" style="margin-left:auto;">
     <select id="theme-sel">
       <option value="">Default (light)</option>
-      <optgroup label="Themes">${themeOptions}</optgroup>
-      <optgroup label="Palettes">${paletteOptions}</optgroup>
+      ${themeOptions}
     </select>
   </span>
   <span class="stat" style="color: var(--page-fg-muted, #888);">scanned ${escapeHtml(stats.when)}</span>
@@ -720,9 +725,9 @@ ${bundle}
     var newMap = cat ? (mode === 'kind' ? extColorMap : {}) : {};
     tm._props._userColorMap = newMap;
     tm.colorMap = tm.getAttribute('theme') ? {} : newMap;
-    // If the user picked a palette from the dropdown, respect it.
-    var paletteOverride = window._currentTheme && window._currentTheme.indexOf('palette:') === 0
-      ? window._currentTheme.slice(8) : null;
+    // If the user picked a palette from the dropdown, respect it;
+    // otherwise fall back to a sensible default for the color mode.
+    var paletteOverride = window._currentPalette || '';
     if (cat) {
       tm.setAttribute('color-mode', 'categorical');
       var catPal = paletteOverride || 'tokyo-night';
@@ -828,31 +833,23 @@ ${bundle}
   tm.addEventListener('rt-zoom-change', update);
   requestAnimationFrame(function () { setTimeout(update, 0); });
 })();
-// Color-by switcher + theme switcher + URL hash sync.
+// Color-by switcher + theme switcher + palette switcher + URL hash sync.
 (function () {
   var themes = ${themesJson};
-  var continuousPalettes = ${continuousJson};
   var themeSel = document.getElementById('theme-sel');
+  var paletteSel = document.getElementById('palette-sel');
   var colorSel = document.getElementById('color-sel');
   var tm = document.getElementById('tm');
   var htmlRoot = document.documentElement;
   var DEFAULT_THEME = 'tokyo-night';
   var DEFAULT_COLOR = '${colorBy}';
+  var DEFAULT_PALETTE = '';
   var currentTheme = DEFAULT_THEME;
   var currentColor = DEFAULT_COLOR;
+  var currentPalette = DEFAULT_PALETTE;
 
   function applyPageTheme(name) {
     currentTheme = name || '';
-    window._currentTheme = currentTheme;
-    // "palette:<name>" — palette-only, keep current page chrome.
-    if (name && name.indexOf('palette:') === 0) {
-      var palName = name.slice(8);
-      tm.setAttribute('theme', '');
-      tm.setAttribute('palette', palName);
-      tm._props._userPalette = palName;
-      themeSel.value = name;
-      return;
-    }
     var t = name ? themes[name] : null;
     if (t) {
       htmlRoot.style.setProperty('--page-bg', t.bg);
@@ -867,13 +864,36 @@ ${bundle}
     }
     tm.setAttribute('theme', name || '');
     themeSel.value = name || '';
+    // Re-apply palette override (theme change resets palette to theme default).
+    if (currentPalette) applyPalette(currentPalette);
+  }
+  function applyPalette(name) {
+    currentPalette = name || '';
+    window._currentPalette = currentPalette;
+    if (name) {
+      // Override the treemap palette, bypassing the theme's default.
+      tm._props._userPalette = name;
+      tm.setAttribute('palette', name);
+      tm._props.palette = name;
+    } else {
+      // Revert to whatever the active theme provides.
+      var th = currentTheme || '';
+      tm._props._userPalette = th || 'gp-default';
+      tm.setAttribute('palette', th || 'gp-default');
+      tm._props.palette = th || 'gp-default';
+    }
+    tm._queueRender();
+    paletteSel.value = currentPalette;
   }
   function applyColor(mode) {
     currentColor = mode || DEFAULT_COLOR;
     window._applyColorBy(currentColor);
     colorSel.value = currentColor;
+    // Re-apply palette override since _applyColorBy may reset it.
+    if (currentPalette) applyPalette(currentPalette);
   }
   themeSel.addEventListener('change', function () { applyPageTheme(themeSel.value); writeHash(); });
+  paletteSel.addEventListener('change', function () { applyPalette(paletteSel.value); writeHash(); });
   colorSel.addEventListener('change', function () { applyColor(colorSel.value); writeHash(); });
 
   function coerceId(s) { return /^\\d+$/.test(s) ? Number(s) : s; }
@@ -885,6 +905,7 @@ ${bundle}
       var t = p.get('target'); if (t) { tm._targetId = coerceId(t); tm._selectionLocked = true; }
       var f = p.get('focus');  if (f) tm._focusId = coerceId(f);
       var th = p.get('theme'); applyPageTheme(th != null ? th : DEFAULT_THEME);
+      var pl = p.get('palette'); if (pl != null) applyPalette(pl);
       var cb = p.get('color'); if (cb) applyColor(cb);
     } catch (_) {}
   }
@@ -897,6 +918,7 @@ ${bundle}
       var f = tm._focusId;               var root = tm._tree && tm._tree.roots[0];
                                          if (f && f !== t && f !== root) p.set('focus', f);
       if (currentTheme !== DEFAULT_THEME) p.set('theme', currentTheme);
+      if (currentPalette !== DEFAULT_PALETTE) p.set('palette', currentPalette);
       if (currentColor !== DEFAULT_COLOR) p.set('color', currentColor);
       var s = p.toString();
       history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
