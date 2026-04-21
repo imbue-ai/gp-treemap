@@ -12,8 +12,12 @@
  * @param {BalancerNode} root
  * @param {{x:number,y:number,w:number,h:number}} rect
  * @param {(leafId:string, rect:{x,y,w,h}) => void} onLeaf
+ * @param {number} [splitBias=1] — ratio > 1 biases toward vertical splits,
+ *   < 1 toward horizontal. Used by stretch-zoom to preserve the original
+ *   aspect ratio's split directions while laying out at full canvas size.
+ *   The split criterion becomes `w > h * splitBias` instead of `w > h`.
  */
-export function layoutTree(root, rect, onLeaf) {
+export function layoutTree(root, rect, onLeaf, splitBias) {
   if (!root) return;
   if (!visible(rect)) return;
   if (root.isLeaf) {
@@ -22,7 +26,7 @@ export function layoutTree(root, rect, onLeaf) {
   }
   const ratio = root.size > 0 ? root.left.size / root.size : 0.5;
   let r1, r2;
-  if (rect.w > rect.h) {
+  if (rect.w > rect.h * (splitBias || 1)) {
     const w1 = ratio * rect.w;
     r1 = { x: rect.x, y: rect.y, w: w1, h: rect.h };
     r2 = { x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h };
@@ -31,8 +35,8 @@ export function layoutTree(root, rect, onLeaf) {
     r1 = { x: rect.x, y: rect.y, w: rect.w, h: h1 };
     r2 = { x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 };
   }
-  layoutTree(root.left, r1, onLeaf);
-  layoutTree(root.right, r2, onLeaf);
+  layoutTree(root.left, r1, onLeaf, splitBias);
+  layoutTree(root.right, r2, onLeaf, splitBias);
 }
 
 function visible(rect) {

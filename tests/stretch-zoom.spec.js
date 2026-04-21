@@ -410,6 +410,231 @@ test.describe('stretch zoom', () => {
     await snap(page, '14-stretch-zoom-reset');
   });
 
+  // Reproduces the "black holes" bug: stretch-zooming into a narrow node
+  // lays out children at the original (narrow) aspect ratio, then scales
+  // the rects to fill the canvas. The visible() check in layoutTree drops
+  // cells that are sub-pixel in the narrow layout space BEFORE the stretch-
+  // scale is applied — those cells would have been visible after scaling.
+  // The result is background-colored "holes" with no hit-testing.
+  //
+  // This test uses a fixture with a deliberately narrow node ("narrow")
+  // that contains many tiny children. The narrow layout space (~13 px wide)
+  // produces sub-pixel balanced-tree rects that visible() discards.
+  // A regular (non-stretch) zoom into the same node renders all children
+  // at full canvas width, so no cells are dropped.
+  test('stretch zoom into narrow node drops cells that regular zoom keeps (holes bug)', async ({ page }) => {
+    await page.goto('/tests/stretch-zoom-holes.html');
+    await waitForRender(page);
+
+    // Find the "narrow" node by label. With parentIndices (scan-like fast
+    // path), node IDs are integers — row indices, not string labels.
+    const setup = await page.locator('raised-treemap').evaluate((el) => {
+      let narrowId = null;
+      for (const [id, n] of el._tree.nodes) {
+        if (n.label === 'narrow') { narrowId = id; break; }
+      }
+      if (narrowId == null) return null;
+      const nr = el._nodeRects.get(narrowId);
+      if (!nr) return null;
+      const canvasW = el._canvas.width;
+      const canvasH = el._canvas.height;
+      // Count tree leaf descendants of "narrow".
+      let treeChildCount = 0;
+      const stack = [narrowId];
+      while (stack.length) {
+        const nid = stack.pop();
+        const nd = el._tree.nodes.get(nid);
+        if (!nd) continue;
+        if (!nd.childIds || nd.childIds.length === 0) treeChildCount++;
+        else for (const c of nd.childIds) stack.push(c);
+      }
+      return {
+        narrowId,
+        narrowW: nr.w,
+        narrowH: nr.h,
+        aspect: nr.w / nr.h,
+        canvasW,
+        canvasH,
+        treeChildCount,
+      };
+    });
+
+    expect(setup).not.toBeNull();
+    // The narrow node should be thin (much less than half canvas width).
+    expect(setup.narrowW).toBeLessThan(setup.canvasW * 0.1);
+    expect(setup.treeChildCount).toBeGreaterThan(20);
+
+    // --- Stretch-zoom into "narrow" ---
+    await page.locator('raised-treemap').evaluate((el, nid) => {
+      el._targetId = nid;
+      el.stretchZoomIn(nid);
+    }, setup.narrowId);
+    await waitForZoomAnimation(page);
+
+    const stretchResult = await page.locator('raised-treemap').evaluate((el) => {
+      return {
+        leafCount: el._leaves.length,
+        leafIds: el._leaves.map((l) => l.id),
+        stretchZoomId: el._stretchZoomId,
+      };
+    });
+    expect(stretchResult.stretchZoomId).toBe(setup.narrowId);
+
+    // --- Regular zoom into same node (for comparison) ---
+    await page.locator('raised-treemap').evaluate((el, nid) => {
+      // Clear stretch-zoom state and do a regular zoom.
+      el._stretchZoomId = null;
+      el._stretchZoomAspect = 0;
+      el._zoomAnimating = false;
+      el._internalVisibleRootId = nid;
+      el._rebuildAndRender();
+    }, setup.narrowId);
+    await page.evaluate(() =>
+      new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+    const regularResult = await page.locator('raised-treemap').evaluate((el) => {
+      return {
+        leafCount: el._leaves.length,
+        leafIds: el._leaves.map((l) => l.id),
+      };
+    });
+
+    // The bug: stretch zoom renders FEWER leaves than regular zoom because
+    // visible() drops sub-pixel cells before the stretch-scale is applied.
+    // All tree leaf descendants of "narrow" should be rendered in both cases.
+    //
+    // This assertion documents the bug — it will FAIL until the layout is
+    // fixed to account for the post-layout stretch scaling.
+    const missingInStretch = regularResult.leafIds.filter(
+      (id) => !stretchResult.leafIds.includes(id),
+    );
+    expect(
+      missingInStretch,
+      `stretch zoom dropped ${missingInStretch.length} cells that regular zoom renders — these are the "holes"`,
+    ).toHaveLength(0);
+  });
+
+  // Reproduces the "can't zoom out to ancestor" bug: when stretch-zoomed into
+  // a deep node, double-clicking a higher-level breadcrumb entry calls
+  // stretchZoomIn(ancestorId). But stretchZoomIn looks up the ancestor in
+  // _nodeRects, which only contains nodes in the CURRENT visible subtree.
+  // Since the ancestor is above the zoom root, its rect isn't there, and the
+  // call silently returns — the zoom doesn't change.
+  //
+  // Only double-clicking "home" works because it calls zoomReset() →
+  // stretchZoomReset(), which doesn't need _nodeRects.
+  test('stretchZoomIn to ancestor of current zoom root is a no-op (zoom-out bug)', async ({ page }) => {
+    await page.goto('/samples/interactions.html');
+    await waitForRender(page);
+
+    // Find a node at depth >= 2 that has children, so we can zoom into it
+    // and then try to zoom to its grandparent.
+    const setup = await page.locator('raised-treemap').evaluate((el) => {
+      const nodes = el._tree.nodes;
+      for (const n of nodes.values()) {
+        if (n.depth >= 2 && n.childIds && n.childIds.length >= 2) {
+          // Find its ancestors
+          const parent = nodes.get(n.parentId);
+          if (!parent || parent.parentId === null) continue;
+          const grandparent = nodes.get(parent.parentId);
+          if (!grandparent) continue;
+          return {
+            deepId: n.id,
+            parentId: parent.id,
+            grandparentId: grandparent.id,
+          };
+        }
+      }
+      return null;
+    });
+
+    if (!setup) { test.skip(); return; }
+
+    // Stretch-zoom into the deep node.
+    await page.locator('raised-treemap').evaluate((el, id) => {
+      el._targetId = id;
+      el.stretchZoomIn(id);
+    }, setup.deepId);
+    await waitForZoomAnimation(page);
+
+    const zoomedIn = await page.locator('raised-treemap').evaluate((el) => ({
+      stretchZoomId: el._stretchZoomId,
+      activeRoot: el._activeVisibleRootId(),
+    }));
+    expect(zoomedIn.stretchZoomId).toBe(setup.deepId);
+
+    // Now try to zoom OUT to the grandparent — this is what double-clicking
+    // a breadcrumb entry does. The bug: stretchZoomIn can't find the
+    // grandparent in _nodeRects (it's above the current zoom root), so
+    // nothing happens.
+    await page.locator('raised-treemap').evaluate((el, id) => {
+      el.stretchZoomIn(id);
+    }, setup.grandparentId);
+    await waitForZoomAnimation(page);
+
+    const afterZoomOut = await page.locator('raised-treemap').evaluate((el) => ({
+      stretchZoomId: el._stretchZoomId,
+      activeRoot: el._activeVisibleRootId(),
+    }));
+
+    // The zoom SHOULD have changed to the grandparent, but it didn't.
+    // This assertion documents the bug — it will FAIL until stretchZoomIn
+    // is fixed to handle ancestors outside the current subtree.
+    expect(
+      afterZoomOut.activeRoot,
+      'stretchZoomIn to ancestor should change the zoom root (currently a no-op)',
+    ).toBe(setup.grandparentId);
+  });
+
+  // When stretch-zoomed, clicking the home icon sets _focusId to root, but
+  // _selectionBounds returns null because root isn't in _nodeRects (only the
+  // zoom subtree is). The selection box disappears, so the user sees no
+  // visual feedback that the focus changed — it looks like the click did nothing.
+  test('focusing root while stretch-zoomed shows a selection box', async ({ page }) => {
+    await page.goto('/samples/interactions.html');
+    await waitForRender(page);
+
+    // Click a cell and navigate to a parent with children, then zoom in.
+    const box = await page.locator('raised-treemap').boundingBox();
+    await page.mouse.click(box.x + box.width * 0.3, box.y + box.height * 0.3);
+    await waitForRender(page);
+    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
+    await waitForRender(page);
+
+    const didZoom = await page.locator('raised-treemap').evaluate((el) => {
+      const id = el._focusId || el._targetId;
+      if (id) el.stretchZoomIn(id);
+      return !!el._stretchZoomId;
+    });
+    if (!didZoom) { test.skip(); return; }
+    await waitForZoomAnimation(page);
+
+    // Focus root (what clicking the home icon does).
+    await page.locator('raised-treemap').evaluate((el) => {
+      const rootId = el._tree.roots[0];
+      el._setFocus(rootId);
+    });
+    await page.evaluate(() =>
+      new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+    const state = await page.locator('raised-treemap').evaluate((el) => {
+      const rootId = el._tree.roots[0];
+      return {
+        focusId: el._focusId,
+        rootId,
+        hasSelectionBox: el.shadowRoot.querySelector('.overlay .sel') !== null,
+      };
+    });
+
+    expect(state.focusId).toBe(state.rootId);
+    // The selection box must render — it should cover the entire visible area
+    // since the root encompasses the zoom subtree.
+    expect(
+      state.hasSelectionBox,
+      'selection box should be visible when root is focused while zoomed',
+    ).toBe(true);
+  });
+
   test('hit-testing works correctly on stretch-zoomed cells', async ({ page }) => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);

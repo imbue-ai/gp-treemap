@@ -549,8 +549,12 @@ function maxDepth(node) {
  * @param {BalancerNode} root
  * @param {{x:number,y:number,w:number,h:number}} rect
  * @param {(leafId:string, rect:{x,y,w,h}) => void} onLeaf
+ * @param {number} [splitBias=1] — ratio > 1 biases toward vertical splits,
+ *   < 1 toward horizontal. Used by stretch-zoom to preserve the original
+ *   aspect ratio's split directions while laying out at full canvas size.
+ *   The split criterion becomes `w > h * splitBias` instead of `w > h`.
  */
-function layoutTree(root, rect, onLeaf) {
+function layoutTree(root, rect, onLeaf, splitBias) {
   if (!root) return;
   if (!visible(rect)) return;
   if (root.isLeaf) {
@@ -559,7 +563,7 @@ function layoutTree(root, rect, onLeaf) {
   }
   const ratio = root.size > 0 ? root.left.size / root.size : 0.5;
   let r1, r2;
-  if (rect.w > rect.h) {
+  if (rect.w > rect.h * (splitBias || 1)) {
     const w1 = ratio * rect.w;
     r1 = { x: rect.x, y: rect.y, w: w1, h: rect.h };
     r2 = { x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h };
@@ -568,8 +572,8 @@ function layoutTree(root, rect, onLeaf) {
     r1 = { x: rect.x, y: rect.y, w: rect.w, h: h1 };
     r2 = { x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 };
   }
-  layoutTree(root.left, r1, onLeaf);
-  layoutTree(root.right, r2, onLeaf);
+  layoutTree(root.left, r1, onLeaf, splitBias);
+  layoutTree(root.right, r2, onLeaf, splitBias);
 }
 
 function visible(rect) {
@@ -1525,7 +1529,18 @@ class RaisedTreemap extends HTMLElement {
 
   stretchZoomIn(id) {
     if (!id || !this._tree || !this._nodeRects || this._zoomAnimating) return;
-    const nodeRect = this._nodeRects.get(id);
+    let nodeRect = this._nodeRects.get(id);
+
+    // If the target isn't in the current subtree (e.g. it's an ancestor of
+    // the zoom root, or a node in another branch), reset the zoom so the
+    // full tree is laid out and the target's rect becomes available.
+    if (!nodeRect && this._stretchZoomId && this._tree.nodes.has(id)) {
+      this._stretchZoomId = null;
+      this._stretchZoomAspect = 0;
+      this._rebuildAndRender();
+      nodeRect = this._nodeRects.get(id);
+    }
+
     if (!nodeRect || nodeRect.w <= 0 || nodeRect.h <= 0) return;
 
     this._stretchZoomId = id;
@@ -1697,6 +1712,23 @@ class RaisedTreemap extends HTMLElement {
     const pad = Math.max(0, (p.groupPadding || 0) * dpr);
     const nodeRects = new Map(); // rect for every node in the subtree — used for selection highlight
 
+    // When stretch-zoomed, layout at full canvas size but bias split decisions
+    // to match the original aspect ratio. This preserves tile structure (split
+    // directions) while avoiding the sub-pixel visibility holes that occur when
+    // laying out in a tiny space and scaling afterward.
+    //
+    // The bias is capped so extreme aspect ratios don't produce all-vertical
+    // (or all-horizontal) layouts where tiny cells are sub-pixel in the
+    // compressed dimension.  A cap of 4 preserves the first few levels of
+    // split structure while allowing the perpendicular direction at deeper
+    // levels, which redistributes area and keeps cells visible.
+    let splitBias = 1;
+    if (this._stretchZoomId && this._stretchZoomAspect > 0) {
+      const narrowW = Math.max(1, Math.round(h * this._stretchZoomAspect));
+      const rawBias = w / narrowW;
+      splitBias = rawBias > 1 ? Math.min(rawBias, 4) : Math.max(rawBias, 0.25);
+    }
+
     const layoutSubtree = (nodeId, rect) => {
       inSubtree.add(nodeId);
       nodeRects.set(nodeId, rect);
@@ -1711,7 +1743,7 @@ class RaisedTreemap extends HTMLElement {
       const balRoot = balanceChildren(kids.map((k) => ({ id: k.id, size: Math.max(0, k.value) })));
       const childRects = new Map();
       if (balRoot) {
-        layoutTree(balRoot, rect, (id, r) => childRects.set(id, r));
+        layoutTree(balRoot, rect, (id, r) => childRects.set(id, r), splitBias);
       }
       for (const kid of kids) {
         const r = childRects.get(kid.id);
@@ -1729,20 +1761,7 @@ class RaisedTreemap extends HTMLElement {
         layoutSubtree(kid.id, sub);
       }
     };
-    // If stretch-zoomed, layout at the original aspect ratio then scale to fill the canvas.
-    // This preserves the tile structure (split directions) from the original view.
-    let layoutW = w, layoutH = h;
-    if (this._stretchZoomId && this._stretchZoomAspect > 0) {
-      layoutH = h;
-      layoutW = Math.round(h * this._stretchZoomAspect);
-    }
-    layoutSubtree(rootId, { x: 0, y: 0, w: layoutW, h: layoutH });
-
-    // Stretch-scale all rects to fill the actual canvas
-    if (layoutW !== w || layoutH !== h) {
-      const sx = w / layoutW, sy = h / layoutH;
-      for (const r of nodeRects.values()) { r.x *= sx; r.w *= sx; r.y *= sy; r.h *= sy; }
-    }
+    layoutSubtree(rootId, { x: 0, y: 0, w, h });
     this._nodeRects = nodeRects;
 
     const palette = this._resolvedPalette();
@@ -2099,7 +2118,21 @@ class RaisedTreemap extends HTMLElement {
   _selectionBounds(nodeId) {
     // The rect for any node is captured during the layout pass — a parent's rect is
     // exactly the union of its children's rects because the tiling is perfect.
-    return (this._nodeRects && this._nodeRects.get(nodeId)) || null;
+    if (this._nodeRects) {
+      const r = this._nodeRects.get(nodeId);
+      if (r) return r;
+      // If the node is an ancestor of the current zoom root, its bounds
+      // encompass the entire visible area (the zoom root's rect).
+      const activeRoot = this._activeVisibleRootId();
+      if (activeRoot != null && this._tree) {
+        let cur = this._tree.nodes.get(activeRoot);
+        while (cur && cur.parentId != null) {
+          if (cur.parentId === nodeId) return this._nodeRects.get(activeRoot);
+          cur = this._tree.nodes.get(cur.parentId);
+        }
+      }
+    }
+    return null;
   }
 
   _treeMaxDepth() {
