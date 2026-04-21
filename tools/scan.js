@@ -428,9 +428,25 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
     'rose-pine':   { label: 'Rosé Pine',         dark: true,  bg: '#191724', surface: '#1f1d2e', border: '#26233a', fg: '#e0def4', fgMuted: '#908caa', accent: '#c4a7e7' },
     'one-dark':    { label: 'One Dark',           dark: true,  bg: '#282c34', surface: '#2c313a', border: '#3e4452', fg: '#abb2bf', fgMuted: '#828997', accent: '#61afef' },
   };
+  // Continuous palettes — palette-only (no page chrome).
+  const continuousPalettes = {
+    viridis:  'Viridis',
+    plasma:   'Plasma',
+    inferno:  'Inferno',
+    magma:    'Magma',
+    turbo:    'Turbo',
+    heatmap:  'Heatmap',
+    coolwarm: 'Cool–Warm',
+    rainbow:  'Rainbow',
+  };
+
   const themesJson = JSON.stringify(themePageColors);
+  const continuousJson = JSON.stringify(Object.keys(continuousPalettes));
   const themeOptions = Object.entries(themePageColors)
     .map(([k, v]) => `<option value="${k}">${escapeHtml(v.label)}</option>`)
+    .join('');
+  const paletteOptions = Object.entries(continuousPalettes)
+    .map(([k, v]) => `<option value="palette:${k}">${escapeHtml(v)}</option>`)
     .join('');
 
   // --- Write the HTML, streaming the large data section ---
@@ -478,7 +494,8 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
   <span class="stat" style="margin-left:auto;">
     <select id="theme-sel">
       <option value="">Default (light)</option>
-      ${themeOptions}
+      <optgroup label="Themes">${themeOptions}</optgroup>
+      <optgroup label="Palettes">${paletteOptions}</optgroup>
     </select>
   </span>
   <span class="stat" style="color: var(--page-fg-muted, #888);">scanned ${escapeHtml(stats.when)}</span>
@@ -703,15 +720,20 @@ ${bundle}
     var newMap = cat ? (mode === 'kind' ? extColorMap : {}) : {};
     tm._props._userColorMap = newMap;
     tm.colorMap = tm.getAttribute('theme') ? {} : newMap;
+    // If the user picked a palette from the dropdown, respect it.
+    var paletteOverride = window._currentTheme && window._currentTheme.indexOf('palette:') === 0
+      ? window._currentTheme.slice(8) : null;
     if (cat) {
       tm.setAttribute('color-mode', 'categorical');
-      tm._props._userPalette = 'tokyo-night';
-      if (!tm.getAttribute('theme')) tm.setAttribute('palette', 'tokyo-night');
+      var catPal = paletteOverride || 'tokyo-night';
+      tm._props._userPalette = catPal;
+      if (!tm.getAttribute('theme')) tm.setAttribute('palette', catPal);
       tm.colorDomain = undefined;
     } else {
       tm.setAttribute('color-mode', 'quantitative');
-      tm._props._userPalette = 'viridis';
-      if (!tm.getAttribute('theme')) tm.setAttribute('palette', 'viridis');
+      var qPal = paletteOverride || 'viridis';
+      tm._props._userPalette = qPal;
+      if (!tm.getAttribute('theme')) tm.setAttribute('palette', qPal);
       // Compute domain from all loaded timestamps.
       var lo = Infinity, hi = -Infinity;
       store.forEach(function(nd) {
@@ -809,6 +831,7 @@ ${bundle}
 // Color-by switcher + theme switcher + URL hash sync.
 (function () {
   var themes = ${themesJson};
+  var continuousPalettes = ${continuousJson};
   var themeSel = document.getElementById('theme-sel');
   var colorSel = document.getElementById('color-sel');
   var tm = document.getElementById('tm');
@@ -820,6 +843,16 @@ ${bundle}
 
   function applyPageTheme(name) {
     currentTheme = name || '';
+    window._currentTheme = currentTheme;
+    // "palette:<name>" — palette-only, keep current page chrome.
+    if (name && name.indexOf('palette:') === 0) {
+      var palName = name.slice(8);
+      tm.setAttribute('theme', '');
+      tm.setAttribute('palette', palName);
+      tm._props._userPalette = palName;
+      themeSel.value = name;
+      return;
+    }
     var t = name ? themes[name] : null;
     if (t) {
       htmlRoot.style.setProperty('--page-bg', t.bg);
