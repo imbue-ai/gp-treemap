@@ -60,6 +60,51 @@ const PALETTES = {
     'hsl(45,  90%, 60%)',
     'hsl(55,  95%, 70%)',
   ],
+  // Inferno — "glowing metal": black → indigo → red → orange → yellow → white.
+  // Approximates matplotlib's inferno colormap; great for file age, heat, etc.
+  inferno: [
+    'hsl(270, 50%, 8%)',
+    'hsl(270, 65%, 22%)',
+    'hsl(310, 70%, 32%)',
+    'hsl(345, 80%, 42%)',
+    'hsl(15,  90%, 50%)',
+    'hsl(40,  92%, 58%)',
+    'hsl(55,  95%, 75%)',
+    'hsl(60,  80%, 92%)',
+  ],
+  // Magma — dark → purple → pink → peach → pale.
+  // Perceptually uniform; good for density or magnitude data.
+  magma: [
+    'hsl(270, 50%, 8%)',
+    'hsl(270, 60%, 24%)',
+    'hsl(295, 55%, 38%)',
+    'hsl(330, 60%, 52%)',
+    'hsl(355, 65%, 65%)',
+    'hsl(20,  75%, 78%)',
+    'hsl(50,  70%, 92%)',
+  ],
+  // Turbo — Google's improved rainbow: blue → cyan → green → yellow → red.
+  // Higher perceptual uniformity than classic rainbow; great for general use.
+  turbo: [
+    'hsl(240, 80%, 32%)',
+    'hsl(210, 90%, 48%)',
+    'hsl(180, 75%, 48%)',
+    'hsl(130, 65%, 48%)',
+    'hsl(60,  88%, 52%)',
+    'hsl(30,  92%, 50%)',
+    'hsl(0,   80%, 38%)',
+  ],
+  // Cool–warm diverging: blue → neutral → red.
+  // Ideal for values centered on a midpoint (e.g., change since baseline).
+  coolwarm: [
+    'hsl(220, 70%, 42%)',
+    'hsl(220, 55%, 62%)',
+    'hsl(220, 25%, 82%)',
+    'hsl(0,   5%,  92%)',
+    'hsl(10,  25%, 82%)',
+    'hsl(10,  55%, 62%)',
+    'hsl(10,  70%, 42%)',
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -1310,10 +1355,6 @@ function siPrefix(v, p) {
 
 
 
-// Sentinel for lazy tree nodes whose block hasn't loaded yet.
-// Must be a stable reference so === checks work across renders.
-const _STUB = Object.freeze([]);
-
 const DEFAULT_PROPS = {
   labels: null, parents: null, parentIndices: null, values: null, color: null, ids: null,
   root: null, getChildren: null, getValue: null, getLabel: null,
@@ -1654,12 +1695,10 @@ class RaisedTreemap extends HTMLElement {
     const p = this._props;
     const minRelArea = p.minCellArea > 0 ? Math.max(0, p.minCellArea / 100000) : 0;
     if (p.root != null && p.getChildren && p.getValue && p.getLabel && p.getId) {
-      // Lazy mode: children are discovered on demand during _paint() →
-      // layoutSubtree(). The tree is cached across renders so that nodes
-      // from previously-inflated blocks aren't re-created each frame.
-      if (this._tree && this._tree._lazy && this._tree._lazyRoot === p.root) {
-        return this._tree; // reuse — new blocks expand it incrementally
-      }
+      // Lazy mode: start with just the root. Children are discovered on
+      // demand during _paint() → layoutSubtree() by calling getChildren.
+      // Rebuilt from scratch each render — the data source (page script)
+      // decides what's available. No caching, no stale-data bugs.
       const rootItem = p.root;
       const rootId = p.getId(rootItem);
       const v = Number(p.getValue(rootItem)) || 0;
@@ -1671,7 +1710,7 @@ class RaisedTreemap extends HTMLElement {
         isOther: false, isLocated: false, rect: null, colorIndex: 0,
         _item: rootItem, _hasExplicitValue: true,
       });
-      return { nodes, roots: [rootId], _lazy: true, _lazyRoot: p.root };
+      return { nodes, roots: [rootId], _lazy: true };
     }
     if (p.labels && (p.parents || p.parentIndices) && p.values) {
       return buildFromTabular(
@@ -1759,14 +1798,13 @@ class RaisedTreemap extends HTMLElement {
       inSubtree.add(nodeId);
       nodeRects.set(nodeId, rect);
       const node = nodes.get(nodeId);
-      // Refresh colorValue from accessor (supports color-mode switching with cached trees).
-      if (lazy && _gcol && node._item != null) node.colorValue = _gcol(node._item);
       const atCap = node.depth >= cap;
 
-      // Lazy expansion: fetch children from accessor if not yet known.
-      // _stub sentinel means "block not loaded yet" — re-query each render.
-      // null means "never queried". [] means "confirmed leaf".
-      if (lazy && (node.childIds === null || node.childIds === _STUB) && node._item != null) {
+      // Lazy expansion: call getChildren on every render for every visited
+      // node. The data source returns what it has — [] for leaves or stubs
+      // whose blocks haven't loaded yet. No caching in the component;
+      // the data source manages inflation and notifies us to re-render.
+      if (lazy && node._item != null) {
         const items = _gc(node._item);
         if (items && items.length > 0) {
           node.childIds = [];
@@ -1774,25 +1812,21 @@ class RaisedTreemap extends HTMLElement {
             const cItem = items[ci];
             const cId = _gid(cItem);
             const cVal = Number(_gv(cItem)) || 0;
-            if (!nodes.has(cId)) {
-              nodes.set(cId, {
-                id: cId, label: _gl(cItem), value: cVal,
-                colorValue: _gcol ? _gcol(cItem) : cVal,
-                depth: node.depth + 1, parentId: nodeId, childIds: null,
-                isOther: false, isLocated: false, rect: null, colorIndex: 0,
-                _item: cItem, _hasExplicitValue: true,
-              });
-            }
+            nodes.set(cId, {
+              id: cId, label: _gl(cItem), value: cVal,
+              colorValue: _gcol ? _gcol(cItem) : cVal,
+              depth: node.depth + 1, parentId: nodeId, childIds: null,
+              isOther: false, isLocated: false, rect: null, colorIndex: 0,
+              _item: cItem, _hasExplicitValue: true,
+            });
             node.childIds.push(cId);
           }
-        } else if (items === null) {
-          node.childIds = _STUB; // block not loaded yet — retry on next render
         } else {
-          node.childIds = []; // confirmed leaf (getChildren returned [])
+          node.childIds = [];
         }
       }
 
-      if (atCap || !node.childIds || node.childIds === _STUB || node.childIds.length === 0) {
+      if (atCap || !node.childIds || node.childIds.length === 0) {
         leafCap.add(nodeId);
         leavesCollect.push({ node, rect });
         return;
