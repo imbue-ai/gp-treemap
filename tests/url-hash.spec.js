@@ -315,9 +315,10 @@ test('scan HTML: direct navigation with zoom+target+focus hash params', async ({
 test('scan HTML: focusing root (id 0) highlights the home icon, not a breadcrumb', async ({ page }) => {
   const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-focus-root-'));
   fs.mkdirSync(path.join(target, 'sub'));
-  fs.writeFileSync(path.join(target, 'sub', 'a.txt'), 'hello');
-  fs.writeFileSync(path.join(target, 'sub', 'b.txt'), 'world');
-  fs.writeFileSync(path.join(target, 'c.txt'), 'test');
+  fs.writeFileSync(path.join(target, 'sub', 'a.txt'), 'hello');      // 5 B
+  fs.writeFileSync(path.join(target, 'sub', 'b.txt'), 'world');      // 5 B
+  fs.writeFileSync(path.join(target, 'c.txt'), 'test');               // 4 B
+  // Total: 3 files, 1 folder (sub), 14 bytes
 
   const out = path.join(os.tmpdir(), 'rt-focus-root-' + Date.now() + '.html');
   try {
@@ -345,6 +346,7 @@ test('scan HTML: focusing root (id 0) highlights the home icon, not a breadcrumb
     });
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
+    // --- 1. Home icon focused, no breadcrumb entry focused ---
     const state = await page.locator('raised-treemap').evaluate((el) => {
       const rootIcon = el.shadowRoot.querySelector('.info-line .root-icon');
       const focusedBreadcrumbs = el.shadowRoot.querySelectorAll('.info-line a.focused:not(.root-icon)');
@@ -353,17 +355,38 @@ test('scan HTML: focusing root (id 0) highlights the home icon, not a breadcrumb
         rootId: el._tree.roots[0],
         homeHasFocused: rootIcon ? rootIcon.classList.contains('focused') : false,
         focusedBreadcrumbCount: focusedBreadcrumbs.length,
-        hasSelectionBox: el.shadowRoot.querySelector('.overlay .sel') !== null,
       };
     });
-
     expect(state.focusId).toBe(0);
-    // The home icon must have the focused class.
     expect(state.homeHasFocused, 'home icon should be focused').toBe(true);
-    // No breadcrumb entry should be focused (root is the home icon, not a crumb).
     expect(state.focusedBreadcrumbCount, 'no breadcrumb should be focused').toBe(0);
-    // Selection box should be visible.
-    expect(state.hasSelectionBox, 'selection box should render').toBe(true);
+
+    // --- 2. Selection box covers the full canvas ---
+    const selBox = await page.locator('raised-treemap').evaluate((el) => {
+      const sel = el.shadowRoot.querySelector('.overlay .sel');
+      if (!sel) return null;
+      return {
+        left: parseFloat(sel.style.left),
+        top: parseFloat(sel.style.top),
+        width: parseFloat(sel.style.width),
+        height: parseFloat(sel.style.height),
+        stageW: el._stage.clientWidth,
+        stageH: el._stage.clientHeight,
+      };
+    });
+    expect(selBox, 'selection box should exist').not.toBeNull();
+    // Box should start at origin and span the full stage.
+    expect(selBox.left).toBeCloseTo(0, 0);
+    expect(selBox.top).toBeCloseTo(0, 0);
+    expect(selBox.width).toBeCloseTo(selBox.stageW, 0);
+    expect(selBox.height).toBeCloseTo(selBox.stageH, 0);
+
+    // --- 3. Stats bar shows root totals (all files & folders) ---
+    const barText = await page.locator('#stats-bar').textContent();
+    expect(barText, 'stats bar should mention 3 files').toMatch(/3 files/);
+    // 2 folders: root + sub (subtreeStats counts both as directories).
+    expect(barText, 'stats bar should mention folders').toMatch(/2 folders/);
+    expect(barText, 'stats bar should show total size').toMatch(/14/);
   } finally {
     if (fs.existsSync(out)) fs.unlinkSync(out);
     fs.rmSync(target, { recursive: true, force: true });

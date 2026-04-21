@@ -496,7 +496,7 @@ ${bundle}
     return nd && (!nd.childIds || nd.childIds.length === 0);
   }
   function update() {
-    var id = tm._focusId || tm._targetId || (tm._tree && tm._tree.roots[0]) || null;
+    var id = tm._focusId != null ? tm._focusId : tm._targetId != null ? tm._targetId : tm._tree ? tm._tree.roots[0] : null;
     if (id == null) { bar.textContent = ''; return; }
     var s = subtreeStats(id);
     if (!s) { bar.textContent = ''; return; }
