@@ -7,17 +7,25 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import url from 'node:url';
+import zlib from 'node:zlib';
 
 // Parse the embedded data out of a scan HTML file. Returns { labels, parentIndices, values, color }.
-// Parse the embedded data out of a scan HTML file. Handles the v2 block format
-// (reads only block 0 — the root block containing the top-level tree).
+// Handles v2 (block0 inline) and v3 (all blocks compressed) formats.
 function parseScanHtml(htmlPath) {
   const html = fs.readFileSync(htmlPath, 'utf8');
   const m = html.match(/<script type="application\/json" id="tmdata">([\s\S]*?)<\/script>/);
   if (!m) throw new Error('tmdata script tag not found');
   const envelope = JSON.parse(m[1]);
-  // v2 block format: data is in envelope.block0.
-  const raw = envelope.v === 2 ? envelope.block0 : envelope;
+  let raw;
+  if (envelope.v >= 3) {
+    // v3: all blocks compressed. Decompress block 0.
+    const compressed = Buffer.from(envelope.blocks[0], 'base64');
+    raw = JSON.parse(zlib.inflateRawSync(compressed).toString());
+  } else if (envelope.v === 2) {
+    raw = envelope.block0;
+  } else {
+    raw = envelope;
+  }
   const piBuf = Buffer.from(raw.piB64, 'base64');
   const parentIndices = Array.from(new Int32Array(piBuf.buffer, piBuf.byteOffset, piBuf.byteLength / 4));
   const cBuf = Buffer.from(raw.extB64, 'base64');

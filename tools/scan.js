@@ -29,7 +29,7 @@ async function main() {
   const args = [];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--no-open') continue;
-    if (argv[i].startsWith('--block-size=')) { blockSize = Number(argv[i].split('=')[1]) || 50000; continue; }
+    if (argv[i].startsWith('--block-size=')) { blockSize = Number(argv[i].split('=')[1]) || 500000; continue; }
     if (argv[i] === '--color' || argv[i] === '--color-by') {
       colorBy = argv[++i];
       if (!COLOR_MODES.includes(colorBy)) {
@@ -515,16 +515,15 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
   const { blocks, aggValue, aggFiles, aggDirs } = partitionBlocks(scan, blockSize);
   process.stderr.write('  partitioned into ' + blocks.length + ' blocks\n');
 
-  // Block 0 is stored as uncompressed JSON for synchronous boot.
-  // Blocks 1+ are deflateRaw + base64 for lazy decompression.
-  const block0Json = JSON.stringify(encodeBlock(scan, blocks[0], aggValue, aggFiles, aggDirs));
-
-  w('{"v":2,"totalFiles":' + scan.files + ',"totalDirs":' + scan.dirs +
-    ',"totalBytes":' + scan.bytes + ',"block0":' + block0Json + ',"blocks":[null');
-  for (let bi = 1; bi < blocks.length; bi++) {
+  // All blocks (including block 0) are deflateRaw + base64.
+  // Block 0 is decompressed at boot time before the component renders.
+  w('{"v":3,"totalFiles":' + scan.files + ',"totalDirs":' + scan.dirs +
+    ',"totalBytes":' + scan.bytes + ',"blocks":[');
+  for (let bi = 0; bi < blocks.length; bi++) {
     const blockJson = JSON.stringify(encodeBlock(scan, blocks[bi], aggValue, aggFiles, aggDirs));
     const compressed = zlib.deflateRawSync(blockJson, { level: 6 });
-    w(',"' + compressed.toString('base64') + '"');
+    if (bi > 0) w(',');
+    w('"' + compressed.toString('base64') + '"');
   }
   w(']}');
 
@@ -541,7 +540,9 @@ ${bundle}
 // inflated on demand: if a stub's block isn't ready, getChildren returns []
 // (stub renders as a leaf), kicks off async inflate, and re-renders when done.
 (function () {
-  var envelope = JSON.parse(document.getElementById('tmdata').textContent);
+  var raw = JSON.parse(document.getElementById('tmdata').textContent);
+  // v3: all blocks compressed. v2: block0 is inline JSON.
+  var envelope = raw;
   var tm = document.getElementById('tm');
 
   // --- Decode helpers ---
@@ -669,13 +670,16 @@ ${bundle}
   function getChildren(id) {
     var nd = store.get(id);
     if (!nd) return null;
-    // Stub whose block hasn't been loaded yet: return null (leaf),
-    // kick off async inflate.
+    // Stub whose block hasn't been loaded yet: return null to signal
+    // "not yet available, retry later". The component will leave
+    // childIds as null and re-call getChildren on the next render.
     if (nd.stubBlockId != null && nd.childIds === null) {
       ensureBlock(nd.stubBlockId);
       return null;
     }
-    if (!nd.childIds) return null;
+    // Files (true leaves) return [] so the component marks them as
+    // childless and doesn't re-call getChildren on subsequent renders.
+    if (!nd.childIds) return [];
     return nd.childIds;  // array of global IDs (each is an "item")
   }
   function getValue(id) { var nd = store.get(id); return nd ? nd.value : 0; }
@@ -696,9 +700,25 @@ ${bundle}
     }
   }
 
-  // --- Boot: load block 0 synchronously, feed component via accessors ---
-  loadBlock(envelope.block0);
-  var rootId = new Int32Array(_buf(envelope.block0.grB64))[0];
+  // --- Inflate block 0 and boot ---
+  function inflateBlock0(b64) {
+    var bytes = new Uint8Array(atob(b64).split('').map(function(c) { return c.charCodeAt(0); }));
+    var ds = new DecompressionStream('deflate-raw');
+    var writer = ds.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    return new Response(ds.readable).text().then(function(text) {
+      return JSON.parse(text);
+    });
+  }
+  // v3: block0 is compressed like all others; v2: block0 is inline JSON.
+  var block0Promise = envelope.block0
+    ? Promise.resolve(envelope.block0)
+    : inflateBlock0(envelope.blocks[0]);
+  block0Promise.then(function(block0) {
+  loadBlock(block0);
+  envelope.blocks[0] = null; // free compressed data
+  var rootId = new Int32Array(_buf(block0.grB64))[0];
   tm.root = rootId;
   tm.getId = getId;
   tm.getChildren = getChildren;
@@ -752,10 +772,12 @@ ${bundle}
     return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' ' + units[i];
   };
   tm.valueFormatter = tm.valueFormatter || fmtBytes;
+  }); // block0Promise.then
+  window._bootReady = block0Promise;
 })();
 // Stats bar: subtree counts + per-node metadata for the focused node.
 // Uses the node store; stubs carry pre-computed aggregates from the scan.
-(function () {
+window._bootReady.then(function () {
   var tm = document.getElementById('tm');
   var bar = document.getElementById('stats-bar');
   var store = window._store;
@@ -827,14 +849,14 @@ ${bundle}
   tm.addEventListener('rt-target', update);
   tm.addEventListener('rt-zoom-change', update);
   requestAnimationFrame(function () { setTimeout(update, 0); });
-})();
+});
 // Color-by switcher + theme/palette switcher + URL hash sync.
 // The theme dropdown is a single <select> with two optgroups.
 // Themes (plain values like "nord") set page chrome + treemap palette.
 // Palettes ("palette:viridis") override only the treemap palette, keeping
 // the current page chrome. Both are persisted separately in the URL hash
 // so the combination survives reloads.
-(function () {
+window._bootReady.then(function () {
   var themes = ${themesJson};
   var themeSel = document.getElementById('theme-sel');
   var colorSel = document.getElementById('color-sel');
@@ -945,7 +967,7 @@ ${bundle}
   tm.addEventListener('rt-depth-change', writeHash);
   tm.addEventListener('rt-target', writeHash);
   tm.addEventListener('rt-focus', writeHash);
-})();
+});
 <\/script>
 </body>
 </html>

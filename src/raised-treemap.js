@@ -82,6 +82,11 @@ const STYLE = `
   border:1px solid var(--rt-border, transparent);
   border-radius:4px; font-size:12px; line-height:1.4; z-index:1000; max-width:480px; box-shadow:0 2px 6px #0006; }
 .tooltip b { display:block; font-size:11px; font-weight:600; margin-bottom:2px; overflow-wrap:break-word; }
+.spinner { position:absolute; top:8px; right:8px; pointer-events:none; z-index:100;
+  width:18px; height:18px; border:2px solid #fff3; border-top-color:#fffa;
+  border-radius:50%; animation: rt-spin 0.8s linear infinite; }
+.spinner[hidden] { display:none; }
+@keyframes rt-spin { to { transform: rotate(360deg); } }
 `;
 
 export class RaisedTreemap extends HTMLElement {
@@ -148,6 +153,11 @@ export class RaisedTreemap extends HTMLElement {
     this._overlay = document.createElement('div');
     this._overlay.className = 'overlay';
     this._stage.appendChild(this._overlay);
+
+    this._spinner = document.createElement('div');
+    this._spinner.className = 'spinner';
+    this._spinner.hidden = true;
+    this._stage.appendChild(this._spinner);
 
     this._tooltip = document.createElement('div');
     this._tooltip.className = 'tooltip';
@@ -378,8 +388,13 @@ export class RaisedTreemap extends HTMLElement {
 
   _rebuildAndRender() {
     if (!this.isConnected) return;
-    try { this._tree = this._buildTree(); }
-    catch (e) { this._tree = null; this._showErrorToolbar(e.message); return; }
+    // In lazy mode, keep the tree across renders — nodes persist and only
+    // unexpanded stubs get new children when their blocks inflate.
+    // Rebuild from scratch only on the first render or when data changes.
+    if (!this._tree || !this._tree._lazy) {
+      try { this._tree = this._buildTree(); }
+      catch (e) { this._tree = null; this._showErrorToolbar(e.message); return; }
+    }
     if (!this._tree) { this._clearCanvas(); this._renderToolbar(); return; }
     // Auto-focus root on first successful render so Home starts highlighted.
     if (!this._hasRendered && this._tree.roots[0] != null) {
@@ -499,6 +514,7 @@ export class RaisedTreemap extends HTMLElement {
     const leafCap = new Set(); // ids that are rendered as leaves (at cap or true leaves)
     const pad = Math.max(0, (p.groupPadding || 0) * dpr);
     const nodeRects = new Map(); // rect for every node in the subtree — used for selection highlight
+    let pendingStubs = 0; // count of nodes whose data isn't available yet
 
     // When stretch-zoomed, layout at full canvas size but bias split decisions
     // to match the original aspect ratio. This preserves tile structure (split
@@ -535,29 +551,34 @@ export class RaisedTreemap extends HTMLElement {
       const node = nodes.get(nodeId);
       const atCap = node.depth >= cap;
 
-      // Lazy expansion: call getChildren on every render for every visited
-      // node. The data source returns what it has — [] for leaves or stubs
-      // whose blocks haven't loaded yet. No caching in the component;
-      // the data source manages inflation and notifies us to re-render.
-      if (lazy && node._item != null) {
+      // Lazy expansion: only expand nodes whose childIds is still null
+      // (unexpanded stubs or first-visit nodes). Already-expanded nodes
+      // keep their children across renders — no redundant getChildren calls.
+      if (lazy && node._item != null && node.childIds == null) {
         const items = _gc(node._item);
-        if (items && items.length > 0) {
+        if (items == null) {
+          // Data not yet available (stub block not inflated).
+          // Leave childIds as null — will retry on next render.
+          pendingStubs++;
+        } else if (items.length > 0) {
           node.childIds = [];
           for (let ci = 0; ci < items.length; ci++) {
             const cItem = items[ci];
             const cId = _gid(cItem);
             const cVal = Number(_gv(cItem)) || 0;
-            nodes.set(cId, {
-              id: cId, label: _gl(cItem), value: cVal,
-              colorValue: _gcol ? _gcol(cItem) : cVal,
-              depth: node.depth + 1, parentId: nodeId, childIds: null,
-              isOther: false, isLocated: false, rect: null, colorIndex: 0,
-              _item: cItem, _hasExplicitValue: true,
-            });
+            if (!nodes.has(cId)) {
+              nodes.set(cId, {
+                id: cId, label: _gl(cItem), value: cVal,
+                colorValue: _gcol ? _gcol(cItem) : cVal,
+                depth: node.depth + 1, parentId: nodeId, childIds: null,
+                isOther: false, isLocated: false, rect: null, colorIndex: 0,
+                _item: cItem, _hasExplicitValue: true,
+              });
+            }
             node.childIds.push(cId);
           }
         } else {
-          node.childIds = [];
+          node.childIds = [];  // true leaf — no children
         }
       }
 
@@ -645,6 +666,9 @@ export class RaisedTreemap extends HTMLElement {
 
     this._renderOverlay(cssW, cssH, dpr);
     this._updateToolbarInfo();
+
+    // Show spinner while blocks are still inflating (pending stubs exist).
+    if (this._spinner) this._spinner.hidden = pendingStubs === 0;
   }
 
   _renderOverlay(cssW, cssH, dpr) {
@@ -1053,11 +1077,18 @@ function parseBgColor(css) {
   return { r: 16, g: 16, b: 16 };
 }
 
+// Properties that define the data source — changing these invalidates the
+// cached lazy tree so it gets rebuilt from scratch on the next render.
+const DATA_PROPS = new Set(['root', 'labels', 'parents', 'parentIndices', 'values', 'ids', 'getChildren', 'getValue', 'getLabel', 'getId', 'getColor']);
 for (const p of Object.keys(DEFAULT_PROPS)) {
   Object.defineProperty(RaisedTreemap.prototype, p, {
     configurable: true,
     get() { return this._props[p]; },
-    set(v) { this._props[p] = v; this._queueRender(); },
+    set(v) {
+      this._props[p] = v;
+      if (DATA_PROPS.has(p)) this._tree = null;
+      this._queueRender();
+    },
   });
 }
 
