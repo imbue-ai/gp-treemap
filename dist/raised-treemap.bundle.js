@@ -1310,6 +1310,10 @@ function siPrefix(v, p) {
 
 
 
+// Sentinel for lazy tree nodes whose block hasn't loaded yet.
+// Must be a stable reference so === checks work across renders.
+const _STUB = Object.freeze([]);
+
 const DEFAULT_PROPS = {
   labels: null, parents: null, parentIndices: null, values: null, color: null, ids: null,
   root: null, getChildren: null, getValue: null, getLabel: null,
@@ -1744,7 +1748,6 @@ class RaisedTreemap extends HTMLElement {
     // discover children on demand — only for nodes that the layout actually
     // recurses into. Sub-pixel nodes are pruned by visible() in layoutTree,
     // so getChildren is never called for them.
-    const _stub = Object.freeze([]); // sentinel: "block not loaded yet, retry later"
     const lazy = this._tree._lazy;
     const _gc = lazy ? p.getChildren : null;
     const _gv = lazy ? p.getValue : null;
@@ -1763,7 +1766,7 @@ class RaisedTreemap extends HTMLElement {
       // Lazy expansion: fetch children from accessor if not yet known.
       // _stub sentinel means "block not loaded yet" — re-query each render.
       // null means "never queried". [] means "confirmed leaf".
-      if (lazy && (node.childIds === null || node.childIds === _stub) && node._item != null) {
+      if (lazy && (node.childIds === null || node.childIds === _STUB) && node._item != null) {
         const items = _gc(node._item);
         if (items && items.length > 0) {
           node.childIds = [];
@@ -1783,13 +1786,13 @@ class RaisedTreemap extends HTMLElement {
             node.childIds.push(cId);
           }
         } else if (items === null) {
-          node.childIds = _stub; // block not loaded yet — retry on next render
+          node.childIds = _STUB; // block not loaded yet — retry on next render
         } else {
           node.childIds = []; // confirmed leaf (getChildren returned [])
         }
       }
 
-      if (atCap || !node.childIds || node.childIds === _stub || node.childIds.length === 0) {
+      if (atCap || !node.childIds || node.childIds === _STUB || node.childIds.length === 0) {
         leafCap.add(nodeId);
         leavesCollect.push({ node, rect });
         return;

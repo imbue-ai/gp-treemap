@@ -260,3 +260,45 @@ test('color-by dropdown switches between all modes without errors', async ({ pag
   fs.unlinkSync(out);
   fs.rmSync(target, { recursive: true, force: true });
 });
+
+// Forces multi-block partitioning with a tiny block size, then verifies that:
+// 1. The initial render shows cells (block 0 renders)
+// 2. Stub directories expand after their blocks inflate (progressive loading)
+// 3. No JS errors during the entire process
+test('multi-block scan: stubs expand progressively after async inflate', async ({ page }) => {
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-multiblock-'));
+  buildTree(target, 77);  // ~8 dirs, ~120 files
+
+  const out = path.join(os.tmpdir(), 'rt-multiblock-' + Date.now() + '.html');
+  // Use a tiny block size to force multiple blocks from a small fixture.
+  const res = spawnSync(process.execPath, [
+    path.join(ROOT, 'tools', 'scan.js'), '--no-open', '--block-size=20', target, out,
+  ], { encoding: 'utf8' });
+  expect(res.status, res.stderr).toBe(0);
+  expect(res.stderr).toMatch(/partitioned into \d+ blocks/);
+  // Should have more than 1 block.
+  const blockCount = Number(res.stderr.match(/partitioned into (\d+) blocks/)[1]);
+  expect(blockCount).toBeGreaterThan(1);
+
+  const errs = [];
+  page.on('pageerror', (e) => errs.push(String(e)));
+
+  await page.goto('file://' + out);
+  await page.waitForTimeout(400);
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  expect(errs, 'no errors on initial load').toEqual([]);
+
+  // After block inflation (async, but fast for small blocks), all ~120 files
+  // should be visible. Wait a few extra frames for cascading inflations.
+  for (let i = 0; i < 5; i++) {
+    await page.waitForTimeout(100);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  }
+  const cells = await page.locator('raised-treemap').evaluate((el) => el._leaves.length);
+  expect(cells, 'all files should render after block inflation').toBeGreaterThan(100);
+
+  expect(errs, 'no errors during block inflation').toEqual([]);
+
+  fs.unlinkSync(out);
+  fs.rmSync(target, { recursive: true, force: true });
+});

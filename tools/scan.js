@@ -25,9 +25,11 @@ async function main() {
   const argv = process.argv.slice(2);
   const noOpen = argv.includes('--no-open');
   let colorBy = 'extension';
+  let blockSize = 50000;
   const args = [];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--no-open') continue;
+    if (argv[i].startsWith('--block-size=')) { blockSize = Number(argv[i].split('=')[1]) || 50000; continue; }
     if (argv[i] === '--color' || argv[i] === '--color-by') {
       colorBy = argv[++i];
       if (!COLOR_MODES.includes(colorBy)) {
@@ -70,7 +72,7 @@ async function main() {
   const t0 = Date.now();
   const scan = await walk(target);
   const elapsed = Date.now() - t0;
-  buildHtml(out, target, scan, colorBy);
+  buildHtml(out, target, scan, colorBy, blockSize);
 
   console.log('');
   console.log('scanned ' + target);
@@ -379,7 +381,7 @@ function encodeBlock(scan, block, aggValue, aggFiles, aggDirs) {
 
 // Streaming HTML builder — writes directly to a file descriptor to avoid
 // hitting V8's ~512 MB string limit on large scans (8M+ files).
-function buildHtml(outPath, target, scan, colorBy) {
+function buildHtml(outPath, target, scan, colorBy, blockSize) {
   const bundle = fs.readFileSync(BUNDLE_PATH, 'utf8');
   const fd = fs.openSync(outPath, 'w');
   const w = (s) => fs.writeSync(fd, s);
@@ -493,7 +495,7 @@ function buildHtml(outPath, target, scan, colorBy) {
 `);
 
   // --- Partition into blocks and write the envelope ---
-  const { blocks, aggValue, aggFiles, aggDirs } = partitionBlocks(scan);
+  const { blocks, aggValue, aggFiles, aggDirs } = partitionBlocks(scan, blockSize);
   process.stderr.write('  partitioned into ' + blocks.length + ' blocks\n');
 
   // Block 0 is stored as uncompressed JSON for synchronous boot.
