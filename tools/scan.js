@@ -409,7 +409,7 @@ ${colorSetupJs}
 (function () {
   var tm = document.getElementById('tm');
   // Node IDs in the scan tree are integers; URL params arrive as strings.
-  function coerceId(s) { return /^\d+$/.test(s) ? Number(s) : s; }
+  function coerceId(s) { return /^\\d+$/.test(s) ? Number(s) : s; }
   function readHash() {
     try {
       var p = new URLSearchParams(location.hash.slice(1));

@@ -237,3 +237,75 @@ test('scan HTML: numeric IDs round-trip through URL hash', async ({ page }) => {
     fs.rmSync(target, { recursive: true, force: true });
   }
 });
+
+// Reproduces the user scenario: navigate directly to a scan HTML with
+// zoom + target + focus all pre-set in the hash, and verify everything applies.
+test('scan HTML: direct navigation with zoom+target+focus hash params', async ({ page }) => {
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-hash-direct-'));
+  // Create a deeper tree so we have interesting parent/child IDs.
+  fs.mkdirSync(path.join(target, 'aaa'));
+  fs.mkdirSync(path.join(target, 'aaa', 'bbb'));
+  fs.writeFileSync(path.join(target, 'aaa', 'bbb', 'x.txt'), 'x'.repeat(500));
+  fs.writeFileSync(path.join(target, 'aaa', 'bbb', 'y.txt'), 'y'.repeat(500));
+  fs.writeFileSync(path.join(target, 'aaa', 'z.txt'), 'z'.repeat(500));
+  fs.writeFileSync(path.join(target, 'top.txt'), 't'.repeat(500));
+
+  const out = path.join(os.tmpdir(), 'rt-hash-direct-' + Date.now() + '.html');
+  try {
+    const res = spawnSync(process.execPath, [
+      path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+    ], { encoding: 'utf8' });
+    expect(res.status, res.stderr).toBe(0);
+
+    // First load: discover valid node IDs.
+    await page.goto('file://' + out);
+    await page.waitForTimeout(400);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+    // Find a leaf, its parent, and a zoom-worthy ancestor.
+    const ids = await page.locator('raised-treemap').evaluate((el) => {
+      const leaves = el._leaves;
+      if (!leaves.length) return null;
+      // Pick the first leaf that has a grandparent.
+      for (const l of leaves) {
+        const n = el._tree.nodes.get(l.id);
+        if (!n || n.parentId == null) continue;
+        const parent = el._tree.nodes.get(n.parentId);
+        if (!parent || parent.parentId == null) continue;
+        return { leaf: l.id, parent: n.parentId, grandparent: parent.parentId };
+      }
+      return null;
+    });
+    expect(ids).not.toBeNull();
+
+    // Navigate away first to ensure a fresh page load (not a same-page hash change).
+    await page.goto('about:blank');
+    // Now load DIRECTLY with all three params in the hash (the user's scenario).
+    const hash = `#zoom=${ids.grandparent}&target=${ids.leaf}&focus=${ids.parent}`;
+    await page.goto('file://' + out + hash);
+    await page.waitForTimeout(500);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+    const state = await page.locator('raised-treemap').evaluate((el) => ({
+      activeRoot: el._activeVisibleRootId(),
+      targetId: el._targetId,
+      focusId: el._focusId,
+      hasFocusBox: el.shadowRoot.querySelector('.overlay .sel') !== null,
+      infoLinks: el.shadowRoot.querySelectorAll('.info-line a').length,
+      leafCount: el._leaves.length,
+    }));
+
+    // Zoom should be applied — activeRoot matches the grandparent.
+    expect(state.activeRoot).toBe(ids.grandparent);
+    // Target and focus should be restored.
+    expect(state.targetId).toBe(ids.leaf);
+    expect(state.focusId).toBe(ids.parent);
+    // The focus highlight box should render.
+    expect(state.hasFocusBox).toBe(true);
+    // Info line should have clickable breadcrumb links.
+    expect(state.infoLinks).toBeGreaterThan(0);
+  } finally {
+    if (fs.existsSync(out)) fs.unlinkSync(out);
+    fs.rmSync(target, { recursive: true, force: true });
+  }
+});

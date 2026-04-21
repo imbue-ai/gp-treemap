@@ -1471,6 +1471,8 @@ class RaisedTreemap extends HTMLElement {
         host.style.removeProperty(v);
       this._props.palette = this._props._userPalette || 'gp-default';
       this._props.background = this._props._userBackground || '#111';
+      // Restore original colorMap so extension-specific colors come back.
+      if (this._props._userColorMap !== undefined) this._props.colorMap = this._props._userColorMap;
       return;
     }
     host.style.setProperty('--rt-bg', theme.bg);
@@ -1482,6 +1484,10 @@ class RaisedTreemap extends HTMLElement {
     host.style.setProperty('--rt-stage-bg', theme.stageBg);
     this._props._userPalette = this._props._userPalette || this._props.palette;
     this._props._userBackground = this._props._userBackground || this._props.background;
+    // Stash the original colorMap and clear it so all categories use the
+    // theme palette instead of hardcoded per-category overrides.
+    if (this._props._userColorMap === undefined) this._props._userColorMap = this._props.colorMap;
+    this._props.colorMap = {};
     this._props.palette = name;
     this._props.background = theme.stageBg;
   }
