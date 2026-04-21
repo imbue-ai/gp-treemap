@@ -107,6 +107,48 @@ test.describe('visual snapshots', () => {
     expect(hasRootIcon).toBe(true);
   });
 
+  test('interactions · wheel scrolls focus along ancestor chain', async ({ page }) => {
+    await page.goto('/samples/interactions.html');
+    await waitForRender(page);
+    const box = await page.locator('raised-treemap').boundingBox();
+    // Click a cell to set target
+    await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await waitForRender(page);
+    const initial = await page.locator('raised-treemap').evaluate((el) => ({
+      targetId: el._targetId,
+      focusId: el._focusId,
+      depth: el._tree.nodes.get(el._focusId).depth,
+    }));
+    // Scroll down (positive deltaY) to move focus toward root (shallower / zoom out)
+    await page.mouse.wheel(0, 100);
+    await waitForRender(page);
+    const afterUp = await page.locator('raised-treemap').evaluate((el) => ({
+      focusId: el._focusId,
+      depth: el._tree.nodes.get(el._focusId).depth,
+      targetId: el._targetId,
+    }));
+    expect(afterUp.depth).toBeLessThan(initial.depth);
+    expect(afterUp.targetId).toBe(initial.targetId);
+    // Scroll up (negative deltaY) to move focus back toward target (deeper / zoom in)
+    await page.mouse.wheel(0, -100);
+    await waitForRender(page);
+    const afterDown = await page.locator('raised-treemap').evaluate((el) => ({
+      focusId: el._focusId,
+      depth: el._tree.nodes.get(el._focusId).depth,
+    }));
+    expect(afterDown.depth).toBeGreaterThan(afterUp.depth);
+    // Focus must always stay on the target's ancestor chain
+    const onAncestorChain = await page.locator('raised-treemap').evaluate((el) => {
+      let cur = el._tree.nodes.get(el._targetId);
+      while (cur) {
+        if (cur.id === el._focusId) return true;
+        cur = cur.parentId != null ? el._tree.nodes.get(cur.parentId) : null;
+      }
+      return false;
+    });
+    expect(onAncestorChain).toBe(true);
+  });
+
   test('hover shows tooltip', async ({ page }) => {
     await page.goto('/samples/filesystem.html');
     await waitForRender(page);

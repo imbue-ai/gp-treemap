@@ -774,11 +774,19 @@ export class RaisedTreemap extends HTMLElement {
     if (Math.abs(this._wheelAcc) < 80) return;
     const dir = this._wheelAcc > 0 ? 1 : -1;
     this._wheelAcc = 0;
+    // Build ancestor chain from target to root
+    const chain = [this._targetId];
+    let cur = this._tree.nodes.get(this._targetId);
+    while (cur && cur.parentId != null) {
+      chain.push(cur.parentId);
+      cur = this._tree.nodes.get(cur.parentId);
+    }
+    // chain[0] = target (deepest), chain[last] = root (shallowest)
     const focusId = this._focusId != null ? this._focusId : this._targetId;
-    const n = this._tree.nodes.get(focusId);
-    if (!n) return;
-    if (dir < 0 && n.parentId != null) this._setFocus(n.parentId);
-    else if (dir > 0 && n.childIds && n.childIds.length) this._setFocus(n.childIds[0]);
+    const idx = chain.indexOf(focusId);
+    // dir < 0 (scroll up/away) = toward target (deeper), dir > 0 (scroll down/toward you) = toward root (shallower)
+    const nextIdx = idx === -1 ? 0 : idx + (dir > 0 ? 1 : -1);
+    if (nextIdx >= 0 && nextIdx < chain.length) this._setFocus(chain[nextIdx]);
   }
   _onKeyDown(e) {
     const focusId = this._focusId != null ? this._focusId : this._targetId;
