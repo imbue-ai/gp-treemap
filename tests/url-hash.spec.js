@@ -51,29 +51,29 @@ test.describe('URL hash state', () => {
     expect(restoredId).toBe(zoomedId);
   });
 
-  test('depth buttons write hash and reloading restores it', async ({ page }) => {
+  test('depth set via property writes hash and reloading restores it', async ({ page }) => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);
 
-    // Click the depth minus button (fires rt-depth-change → page updates hash)
+    // Set depth programmatically (depth buttons removed; URL param still supported)
     await page.locator('raised-treemap').evaluate((el) => {
-      const btn = el.shadowRoot.querySelector('.depth button');
-      if (btn) btn.click();
+      el.displayDepth = 2;
+      el.dispatchEvent(new CustomEvent('rt-depth-change', { detail: { displayDepth: 2 }, bubbles: true, composed: true }));
     });
     await waitForRender(page);
 
     const hash = await page.evaluate(() => window.location.hash);
-    expect(hash).toMatch(/depth=\d+/);
+    expect(hash).toMatch(/depth=2/);
 
     const depth = await page.locator('raised-treemap').evaluate((el) => el.displayDepth);
-    expect(depth).not.toBe(Infinity);
+    expect(depth).toBe(2);
 
     // Reload with the hash
     await page.goto('/samples/interactions.html' + hash);
     await waitForRender(page);
 
     const restoredDepth = await page.locator('raised-treemap').evaluate((el) => el.displayDepth);
-    expect(restoredDepth).toBe(depth);
+    expect(restoredDepth).toBe(2);
   });
 
   test('combined zoom + depth in hash', async ({ page }) => {

@@ -2,7 +2,7 @@ import { parentPort } from 'node:worker_threads';
 import fs from 'node:fs';
 import path from 'node:path';
 
-parentPort.on('message', ({ dirPath, dirRow }) => {
+parentPort.on('message', ({ dirPath, dirRow, needTimestamps }) => {
   let entries;
   const results = [];
   let unreadable = 0;
@@ -19,10 +19,12 @@ parentPort.on('message', ({ dirPath, dirRow }) => {
     if (ent.isDirectory()) {
       results.push({ name: ent.name, isDir: true });
     } else if (ent.isFile()) {
-      let size = 0;
-      try { size = fs.statSync(path.join(dirPath, ent.name)).size; }
+      let st;
+      try { st = fs.statSync(path.join(dirPath, ent.name)); }
       catch { unreadable++; continue; }
-      results.push({ name: ent.name, isDir: false, size });
+      const r = { name: ent.name, isDir: false, size: st.size };
+      if (needTimestamps) r.ts = { ctime: st.ctimeMs, atime: st.atimeMs };
+      results.push(r);
     } else {
       unreadable++;
     }

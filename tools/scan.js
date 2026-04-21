@@ -292,7 +292,7 @@ function buildHtml(target, scan, colorBy) {
     .replace(/<\/script/gi, '<\\/script');
 
   const tmColorMode = isCategorical ? 'categorical' : 'quantitative';
-  const tmPalette = isCategorical ? 'gp-default' : 'viridis';
+  const tmPalette = isCategorical ? 'tokyo-night' : 'viridis';
   const colorLabel = { extension: 'file kind', folder: 'folder', ctime: 'creation time', atime: 'access time' }[colorBy];
 
   // Theme page-color metadata for the dropdown switcher.
@@ -322,13 +322,17 @@ function buildHtml(target, scan, colorBy) {
 <style>
   html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, -apple-system, Segoe UI, sans-serif;
     background: var(--page-bg, #fafafa); color: var(--page-fg, #111); transition: background .15s, color .15s; }
+  body { display: flex; flex-direction: column; }
   header { padding: 8px 14px; border-bottom: 1px solid var(--page-border, #0002); display: flex; gap: 16px;
     align-items: baseline; flex-wrap: wrap; background: var(--page-surface, #fff); transition: background .15s; }
   header h1 { margin:0; font-size:14px; font-weight:600; font-family: ui-monospace, SF Mono, Menlo, monospace;
     color: var(--page-fg, #222); }
   header .stat { color: var(--page-fg-muted, #555); font-size:13px; font-variant-numeric: tabular-nums; }
   header .stat b { color: var(--page-fg, #000); font-weight:600; }
-  raised-treemap { display:flex; height: calc(100vh - 58px); margin-bottom: 16px; }
+  raised-treemap { display:flex; flex: 1; min-height: 0; }
+  #stats-bar { padding: 3px 14px; font-size: 12px; font-variant-numeric: tabular-nums; min-height: 18px;
+    color: var(--page-fg-muted, #888); background: var(--page-surface, #fff);
+    border-top: 1px solid var(--page-border, #0002); transition: background .15s, color .15s; }
   #theme-sel { font-size: 12px; padding: 2px 4px; border-radius: 4px;
     background: var(--page-bg, #fff); color: var(--page-fg, #333);
     border: 1px solid var(--page-border, #ccc); cursor: pointer; }
@@ -356,6 +360,7 @@ function buildHtml(target, scan, colorBy) {
   gradient-intensity="0.6"
   value-format="b"
   min-cell-area="30"></raised-treemap>
+<div id="stats-bar"></div>
 
 <script type="application/json" id="tmdata">
 ${embeddedJson}
@@ -376,38 +381,86 @@ ${bundle}
   tm.values = raw.values;
   tm.parentIndices = new Int32Array(_buf(raw.piB64));
 ${colorSetupJs}
-  tm.valueFormatter = tm.valueFormatter || function (v) {
+  var fmtBytes = function (v) {
     var units = ['B','KB','MB','GB','TB','PB']; var i = 0, n = v || 0;
     while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
     return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' ' + units[i];
   };
+  tm.valueFormatter = tm.valueFormatter || fmtBytes;
 })();
-// Theme switcher: updates both the page chrome and the <raised-treemap> component.
+// Stats bar: show file/folder/byte counts for the focused subtree.
+(function () {
+  var tm = document.getElementById('tm');
+  var bar = document.getElementById('stats-bar');
+  function fmtBytes(v) {
+    var units = ['B','KB','MB','GB','TB','PB']; var i = 0, n = v || 0;
+    while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+    return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' ' + units[i];
+  }
+  function subtreeStats(nodeId) {
+    var nodes = tm._tree && tm._tree.nodes;
+    if (!nodes) return null;
+    var files = 0, dirs = 0, bytes = 0;
+    var stack = [nodeId];
+    while (stack.length) {
+      var id = stack.pop();
+      var nd = nodes.get(id);
+      if (!nd) continue;
+      if (nd.childIds && nd.childIds.length > 0) {
+        dirs++;
+        for (var k = 0; k < nd.childIds.length; k++) stack.push(nd.childIds[k]);
+      } else {
+        files++;
+        bytes += nd.value || 0;
+      }
+    }
+    return { files: files, dirs: dirs, bytes: bytes };
+  }
+  function update() {
+    var id = tm._focusId || tm._targetId || (tm._tree && tm._tree.roots[0]) || null;
+    if (id == null) { bar.textContent = ''; return; }
+    var s = subtreeStats(id);
+    if (!s) { bar.textContent = ''; return; }
+    var parts = [];
+    if (s.files > 0) parts.push(s.files.toLocaleString() + ' file' + (s.files !== 1 ? 's' : ''));
+    if (s.dirs > 0) parts.push(s.dirs.toLocaleString() + ' folder' + (s.dirs !== 1 ? 's' : ''));
+    parts.push(fmtBytes(s.bytes));
+    bar.textContent = parts.join('  \u00b7  ');
+  }
+  tm.addEventListener('rt-focus', update);
+  tm.addEventListener('rt-target', update);
+  tm.addEventListener('rt-zoom-change', update);
+  // Show root stats initially once the tree is built.
+  requestAnimationFrame(function () { setTimeout(update, 0); });
+})();
+// Theme switcher + URL hash sync.
 (function () {
   var themes = ${themesJson};
   var sel = document.getElementById('theme-sel');
   var tm = document.getElementById('tm');
-  var root = document.documentElement;
+  var htmlRoot = document.documentElement;
+  var DEFAULT_THEME = 'tokyo-night';
+  var currentTheme = DEFAULT_THEME;
+
   function applyPageTheme(name) {
+    currentTheme = name || '';
     var t = name ? themes[name] : null;
     if (t) {
-      root.style.setProperty('--page-bg', t.bg);
-      root.style.setProperty('--page-surface', t.surface);
-      root.style.setProperty('--page-border', t.border);
-      root.style.setProperty('--page-fg', t.fg);
-      root.style.setProperty('--page-fg-muted', t.fgMuted);
-      root.style.setProperty('--page-accent', t.accent);
+      htmlRoot.style.setProperty('--page-bg', t.bg);
+      htmlRoot.style.setProperty('--page-surface', t.surface);
+      htmlRoot.style.setProperty('--page-border', t.border);
+      htmlRoot.style.setProperty('--page-fg', t.fg);
+      htmlRoot.style.setProperty('--page-fg-muted', t.fgMuted);
+      htmlRoot.style.setProperty('--page-accent', t.accent);
     } else {
       ['--page-bg','--page-surface','--page-border','--page-fg','--page-fg-muted','--page-accent']
-        .forEach(function (v) { root.style.removeProperty(v); });
+        .forEach(function (v) { htmlRoot.style.removeProperty(v); });
     }
     tm.setAttribute('theme', name || '');
+    sel.value = name || '';
   }
-  sel.addEventListener('change', function () { applyPageTheme(sel.value); });
-})();
-// Sync UI state with URL hash so copying the URL preserves the view.
-(function () {
-  var tm = document.getElementById('tm');
+  sel.addEventListener('change', function () { applyPageTheme(sel.value); writeHash(); });
+
   // Node IDs in the scan tree are integers; URL params arrive as strings.
   function coerceId(s) { return /^\\d+$/.test(s) ? Number(s) : s; }
   function readHash() {
@@ -417,6 +470,7 @@ ${colorSetupJs}
       var d = p.get('depth');  if (d != null) tm.displayDepth = d === 'Infinity' ? Infinity : Number(d);
       var t = p.get('target'); if (t) { tm._targetId = coerceId(t); tm._selectionLocked = true; }
       var f = p.get('focus');  if (f) tm._focusId = coerceId(f);
+      var th = p.get('theme'); applyPageTheme(th != null ? th : DEFAULT_THEME);
     } catch (_) {}
   }
   function writeHash() {
@@ -425,7 +479,9 @@ ${colorSetupJs}
       var z = tm._activeVisibleRootId(); if (z) p.set('zoom', z);
       var d = tm.displayDepth;           if (d !== Infinity) p.set('depth', String(d));
       var t = tm._targetId;              if (t) p.set('target', t);
-      var f = tm._focusId;               if (f && f !== t) p.set('focus', f);
+      var f = tm._focusId;               var root = tm._tree && tm._tree.roots[0];
+                                         if (f && f !== t && f !== root) p.set('focus', f);
+      if (currentTheme !== DEFAULT_THEME) p.set('theme', currentTheme);
       var s = p.toString();
       history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
     } catch (_) {}

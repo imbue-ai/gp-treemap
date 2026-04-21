@@ -1313,7 +1313,7 @@ const DEFAULT_PROPS = {
   aggregateFn: null, colorAggregateFn: null,
   colorMode: 'categorical', colorScale: 'linear', colorDomain: null,
   colorMap: {}, colorFn: null,
-  palette: 'gp-default', gradientIntensity: 0.5,
+  palette: 'tokyo-night', gradientIntensity: 0.5,
   visibleRootId: null, displayDepth: Infinity, locatedNodeIds: [],
   minCellArea: 16, showLabels: false, groupPadding: 0,
   valueFormat: null, valueFormatter: null,
@@ -1340,14 +1340,14 @@ const STYLE = `
   background: var(--rt-surface, #fafafa); font-variant-numeric: tabular-nums;
   color: var(--rt-fg, #333); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-height:22px;
   display:flex; align-items:center; gap:0; }
-.info-line .root-icon { cursor:pointer; margin-right:4px; color: var(--rt-fg-muted, #999); flex-shrink:0; }
-.info-line .root-icon:hover { color: var(--rt-accent, #0645ad); }
+.info-line .root-icon { cursor:pointer; margin-right:4px; color: var(--rt-fg-muted, #999); flex-shrink:0; text-decoration:none; }
+.info-line .root-icon:hover { color: var(--rt-accent, #0645ad); text-decoration:none; }
+.info-line .root-icon.focused { color: var(--rt-fg, #000); }
 .info-line a { cursor:pointer; color: var(--rt-accent, #0645ad); text-decoration:none; }
 .info-line a:hover { text-decoration:underline; }
 .info-line a.focused { font-weight:700; color: var(--rt-fg, #000); text-decoration:underline; text-underline-offset:2px; }
 .info-line .sep-slash { color: var(--rt-fg-muted, #999); padding:0 1px; }
 .info-line .val { color: var(--rt-fg-muted, #555); margin-left:6px; }
-.toolbar .depth { display:flex; gap:2px; align-items:center; }
 .stage { position:relative; flex:1; overflow:hidden; background: var(--rt-stage-bg, #0b0b0b); cursor: default; outline: none; }
 .stage canvas { position:absolute; inset:0; width:100%; height:100%; display:block; image-rendering: pixelated;
   transform-origin: 0 0; transition: transform var(--rt-zoom-ms, 350ms) ease; }
@@ -1438,7 +1438,12 @@ class RaisedTreemap extends HTMLElement {
     this._stage.addEventListener('keydown', this._onKeyDown);
   }
 
-  connectedCallback() { this._resizeObserver.observe(this._stage); requestAnimationFrame(() => this._queueRender()); }
+  connectedCallback() {
+    this._resizeObserver.observe(this._stage);
+    // Apply default theme if none was set via attribute.
+    if (!this.hasAttribute('theme')) this._applyTheme('tokyo-night');
+    requestAnimationFrame(() => this._queueRender());
+  }
   disconnectedCallback() { this._resizeObserver.disconnect(); }
 
   attributeChangedCallback(name, _old, val) {
@@ -1615,6 +1620,13 @@ class RaisedTreemap extends HTMLElement {
     try { this._tree = this._buildTree(); }
     catch (e) { this._tree = null; this._showErrorToolbar(e.message); return; }
     if (!this._tree) { this._clearCanvas(); this._renderToolbar(); return; }
+    // Auto-focus root on first successful render so Home starts highlighted.
+    if (!this._hasRendered && this._tree.roots[0] != null) {
+      this._hasRendered = true;
+      if (this._focusId == null && this._targetId == null) {
+        this._focusId = this._tree.roots[0];
+      }
+    }
     this._renderToolbar();
     this._paint();
   }
@@ -1829,51 +1841,22 @@ class RaisedTreemap extends HTMLElement {
     const p = this._props;
     const cfg = p.toolbar === false ? false : (typeof p.toolbar === 'object' ? p.toolbar : {});
     this._toolbar.innerHTML = '';
-    if (!cfg) { this._toolbar.style.display = 'none'; this._infoLine.style.display = 'none'; return; }
-    this._toolbar.style.display = '';
+    if (!cfg) {
+      this._toolbar.style.display = 'none';
+      this._infoLine.style.display = 'none';
+      return;
+    }
+    this._toolbar.style.display = 'none'; // toolbar row no longer has visible controls
     const want = {
-      zoom: cfg.zoom !== false,
       info: cfg.info !== false,
-      depth: cfg.depth !== false,
     };
 
-    if (want.zoom) {
-      const b1 = document.createElement('button'); b1.textContent = 'zoom out'; b1.title = 'Zoom to parent';
-      b1.addEventListener('click', () => this.zoomOut());
-      this._toolbar.appendChild(b1);
-      this._toolbar.appendChild(sep());
-    }
     if (want.info) {
       this._infoEl = this._infoLine;
       this._infoLine.style.display = '';
     } else {
       this._infoEl = null;
       this._infoLine.style.display = 'none';
-    }
-    if (want.depth) {
-      const d = document.createElement('div'); d.className = 'depth';
-      d.append(document.createTextNode('depth '));
-      const m = document.createElement('button'); m.textContent = '−';
-      const val = document.createElement('span');
-      val.textContent = this._props.displayDepth === Infinity ? '∞' : String(this._props.displayDepth);
-      val.style.padding = '0 6px';
-      const pl = document.createElement('button'); pl.textContent = '+';
-      m.addEventListener('click', () => {
-        const max = this._treeMaxDepth();
-        const cur = this._props.displayDepth === Infinity ? max : this._props.displayDepth;
-        this._props.displayDepth = Math.max(1, cur - 1); this._queueRender();
-        this._fireDepthChange();
-      });
-      pl.addEventListener('click', () => {
-        const max = this._treeMaxDepth();
-        const cur = this._props.displayDepth === Infinity ? max : this._props.displayDepth;
-        const next = cur + 1;
-        this._props.displayDepth = next > max ? Infinity : next; this._queueRender();
-        this._fireDepthChange();
-      });
-      d.appendChild(m); d.appendChild(val); d.appendChild(pl);
-      this._toolbar.appendChild(d);
-      this._toolbar.appendChild(sep());
     }
   }
 
@@ -1888,7 +1871,10 @@ class RaisedTreemap extends HTMLElement {
   _updateToolbarInfo() {
     if (!this._infoEl) return;
     const id = this._hoverId || this._targetId;
-    if (id == null || !this._tree) { this._infoEl.innerHTML = '<span>(hover a cell)</span>'; return; }
+    if (id == null || !this._tree) {
+      this._infoEl.innerHTML = '<span>(hover a cell)</span>';
+      return;
+    }
     const n = this._tree.nodes.get(id);
     if (!n) return;
     // Build ancestor chain (skip root — its label is in the page header).
@@ -1899,14 +1885,24 @@ class RaisedTreemap extends HTMLElement {
       cur = cur.parentId !== null ? this._tree.nodes.get(cur.parentId) : null;
     }
     this._infoEl.innerHTML = '';
-    // Root sentinel icon — click to reset zoom.
-    const rootIcon = document.createElement('span');
+    // Root sentinel icon — behaves like a breadcrumb element (click to focus root, dblclick to zoom).
+    const rootId = this._tree.roots[0];
+    const rootIcon = document.createElement('a');
     rootIcon.className = 'root-icon';
-    rootIcon.title = 'Reset zoom to root';
+    rootIcon.title = 'Click to focus root, double-click to zoom';
     rootIcon.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" style="vertical-align:-2px"><path d="M8 1.5L1 7h2.5v6.5h4V10h1v3.5h4V7H15z" fill="currentColor"/></svg>';
-    rootIcon.addEventListener('click', () => this.zoomReset());
-    this._infoEl.appendChild(rootIcon);
     const focusId = this._focusId || this._targetId;
+    if (rootId != null && focusId === rootId) rootIcon.classList.add('focused');
+    rootIcon.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (rootId != null) this._setFocus(rootId);
+      this._stage.focus();
+    });
+    rootIcon.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      this.zoomReset();
+    });
+    this._infoEl.appendChild(rootIcon);
     chain.forEach((node, i) => {
       if (i > 0) {
         const slash = document.createElement('span');
@@ -2140,7 +2136,6 @@ class RaisedTreemap extends HTMLElement {
 }
 
 // ---- helpers ----
-function sep() { const s = document.createElement('div'); s.className = 'sep'; return s; }
 function escapeHtml(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
 function overlayBox(cls, leaf, dpr) {
   const el = document.createElement('div');

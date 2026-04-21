@@ -77,7 +77,8 @@
       var z = tm._activeVisibleRootId(); if (z) p.set('zoom', z);
       var d = tm.displayDepth;           if (d !== Infinity) p.set('depth', String(d));
       var t = tm._targetId;              if (t) p.set('target', t);
-      var f = tm._focusId;               if (f && f !== t) p.set('focus', f);
+      var f = tm._focusId;               var root = tm._tree && tm._tree.roots[0];
+                                         if (f && f !== t && f !== root) p.set('focus', f);
       var s = p.toString();
       history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
     } catch (_) {}
