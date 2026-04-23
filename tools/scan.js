@@ -466,9 +466,12 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
   header .stat { color: var(--page-fg-muted, #555); font-size:13px; font-variant-numeric: tabular-nums; }
   header .stat b { color: var(--page-fg, #000); font-weight:600; }
   gp-treemap { display:flex; flex: 1; min-height: 0; }
-  #stats-bar { padding: 3px 14px; font-size: 12px; font-variant-numeric: tabular-nums; min-height: 18px;
+  #bottom-bar { display:flex; align-items:center; gap: 16px; padding: 3px 14px;
+    font-size: 12px; font-variant-numeric: tabular-nums; min-height: 18px;
     color: var(--page-fg-muted, #888); background: var(--page-surface, #fff);
     border-top: 1px solid var(--page-border, #0002); transition: background .15s, color .15s; }
+  #stats-bar { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #scanned-note { flex-shrink: 0; color: var(--page-fg-muted, #888); }
   #theme-sel, #color-sel { font-size: 12px; padding: 2px 4px; border-radius: 4px;
     background: var(--page-bg, #fff); color: var(--page-fg, #333);
     border: 1px solid var(--page-border, #ccc); cursor: pointer; }
@@ -498,7 +501,6 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
       <optgroup label="Palettes">${paletteOptions}</optgroup>
     </select>
   </span>
-  <span class="stat" style="color: var(--page-fg-muted, #888);">scanned ${escapeHtml(stats.when)}</span>
 </header>
 <gp-treemap id="tm"
   color-mode="${tmColorMode}"
@@ -506,7 +508,10 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
   gradient-intensity="0.6"
   value-format="b"
   min-cell-area="30"></gp-treemap>
-<div id="stats-bar"></div>
+<div id="bottom-bar">
+  <div id="stats-bar"></div>
+  <span id="scanned-note">scanned ${escapeHtml(stats.when)}</span>
+</div>
 
 <script type="application/json" id="tmdata">
 `);
