@@ -43,16 +43,23 @@ const STYLE = `
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; font-size:12px;
   color: var(--gp-fg, #222); background: var(--gp-bg, #f4f4f4);
   --gp-selected:#ffffff; --gp-located:#ff1fa3; }
-.toolbar { display:flex; gap:8px; align-items:center; padding:6px 8px;
+.toolbar { display:flex; gap:12px; align-items:center; padding:4px 8px;
   border-bottom:1px solid var(--gp-border, #0001);
-  background: var(--gp-surface, #fafafa); user-select:none; flex-wrap:wrap; min-height:34px; }
+  background: var(--gp-surface, #fafafa); user-select:none; flex-wrap:wrap; min-height:28px;
+  font-size:12px; color: var(--gp-fg-muted, #666); }
 .toolbar .sep { width:1px; height:20px; background: var(--gp-border, #0002); }
-.toolbar button { padding:2px 8px; background: var(--gp-bg, #fff);
+.toolbar button { padding:0 6px; background: var(--gp-bg, #fff);
   border:1px solid var(--gp-border, #0003); border-radius:4px; cursor:pointer;
-  font:inherit; color: var(--gp-fg, inherit); }
+  font:inherit; color: var(--gp-fg, inherit); line-height:18px; }
 .toolbar button:hover { background: var(--gp-surface, #eef); }
 .toolbar button:disabled { opacity:0.35; cursor:default; }
 .toolbar button:disabled:hover { background: var(--gp-bg, #fff); }
+.toolbar .group { display:inline-flex; align-items:center; gap:4px; }
+.toolbar .group label { color: var(--gp-fg-muted, #666); }
+.toolbar .depth-input { width:38px; font-size:12px; padding:2px 4px;
+  background: var(--gp-bg, #fff); color: var(--gp-fg, #333);
+  border:1px solid var(--gp-border, #0003); border-radius:4px;
+  text-align:center; font-variant-numeric: tabular-nums; }
 .info-line { padding:3px 8px; border-bottom:1px solid var(--gp-border, #0001);
   background: var(--gp-surface, #fafafa); font-variant-numeric: tabular-nums;
   color: var(--gp-fg, #333); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-height:22px;
@@ -107,6 +114,7 @@ export class GpTreemap extends HTMLElement {
 
     this._toolbar = document.createElement('div');
     this._toolbar.className = 'toolbar';
+    this._buildToolbarControls();
     root.appendChild(this._toolbar);
 
     this._infoLine = document.createElement('div');
@@ -183,6 +191,7 @@ export class GpTreemap extends HTMLElement {
     this._onResize = this._onResize.bind(this);
     this._onStageMouse = this._onStageMouse.bind(this);
     this._onClick = this._onClick.bind(this);
+    this._onDblClick = this._onDblClick.bind(this);
 
     this._onWheel = this._onWheel.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
@@ -191,6 +200,7 @@ export class GpTreemap extends HTMLElement {
     this._stage.addEventListener('mousemove', this._onStageMouse);
     this._stage.addEventListener('mouseleave', () => { this._hideTooltip(); this._setHover(null); });
     this._stage.addEventListener('click', this._onClick);
+    this._stage.addEventListener('dblclick', this._onDblClick);
 
     this._stage.addEventListener('wheel', this._onWheel, { passive: true });
     this._stage.addEventListener('keydown', this._onKeyDown);
@@ -720,21 +730,121 @@ export class GpTreemap extends HTMLElement {
   }
 
   // ----- toolbar -----
+  // Builds the persistent toolbar controls (depth stepper + labels toggle).
+  // Elements live for the lifetime of the component — _renderToolbar just
+  // syncs their values. That way typing into the depth input isn't
+  // interrupted by re-renders wiping focus.
+  _buildToolbarControls() {
+    const depthGroup = document.createElement('span');
+    depthGroup.className = 'group';
+    const depthLbl = document.createElement('label');
+    depthLbl.textContent = 'Depth';
+    const depthMinus = document.createElement('button');
+    depthMinus.type = 'button';
+    depthMinus.textContent = '\u2212';
+    depthMinus.title = 'show one less level';
+    const depthInput = document.createElement('input');
+    depthInput.type = 'text';
+    depthInput.className = 'depth-input';
+    depthInput.title = 'levels below the zoom root; \u221e for all';
+    const depthPlus = document.createElement('button');
+    depthPlus.type = 'button';
+    depthPlus.textContent = '+';
+    depthPlus.title = 'show one more level';
+    depthGroup.append(depthLbl, depthMinus, depthInput, depthPlus);
+
+    const labelsGroup = document.createElement('label');
+    labelsGroup.className = 'group';
+    const labelsCb = document.createElement('input');
+    labelsCb.type = 'checkbox';
+    const labelsText = document.createTextNode('Labels');
+    labelsGroup.append(labelsCb, labelsText);
+
+    this._toolbar.append(depthGroup, labelsGroup);
+    this._depthInput = depthInput;
+    this._labelsCb = labelsCb;
+
+    const setDepth = (d) => {
+      this._props.displayDepth = (d === Infinity || d == null) ? Infinity : Math.max(0, Number(d) | 0);
+      this._syncToolbarControls();
+      this._queueRender();
+      this.dispatchEvent(new CustomEvent('gp-depth-change', {
+        detail: { displayDepth: this._props.displayDepth }, bubbles: true, composed: true,
+      }));
+    };
+    depthInput.addEventListener('change', () => {
+      const v = depthInput.value.trim();
+      if (v === '' || v === '\u221e' || v.toLowerCase() === 'infinity' || v.toLowerCase() === 'inf') {
+        setDepth(Infinity);
+      } else {
+        const n = Number(v);
+        if (Number.isFinite(n)) setDepth(Math.max(0, Math.round(n)));
+        else this._syncToolbarControls();
+      }
+    });
+    depthMinus.addEventListener('click', () => {
+      const d = this._props.displayDepth;
+      // Stepping down from Infinity: start at the deepest visible level so
+      // the first click immediately collapses the treemap to a useful view.
+      if (d === Infinity) setDepth(this._maxVisibleDepth());
+      else if (d > 0) setDepth(d - 1);
+    });
+    depthPlus.addEventListener('click', () => {
+      const d = this._props.displayDepth;
+      if (d === Infinity) return;
+      setDepth(d + 1);
+    });
+
+    labelsCb.addEventListener('change', () => {
+      this._props.showLabels = !!labelsCb.checked;
+      if (labelsCb.checked) this.setAttribute('show-labels', 'true');
+      else this.removeAttribute('show-labels');
+      this._queueRender();
+    });
+  }
+
+  // How many levels below the current visible root have at least one cell
+  // laid out? Used as the starting value when the user first steps down
+  // from \u221e — picking 0 would just blank the treemap.
+  _maxVisibleDepth() {
+    if (!this._tree) return 1;
+    const rootId = this._activeVisibleRootId() ?? this._tree.roots[0];
+    if (rootId == null) return 1;
+    const base = this._tree.nodes.get(rootId)?.depth ?? 0;
+    let max = 0;
+    for (const n of this._tree.nodes.values()) {
+      const d = n.depth - base;
+      if (d > max) max = d;
+    }
+    return Math.max(1, max);
+  }
+
+  _syncToolbarControls() {
+    if (this._depthInput) {
+      const d = this._props.displayDepth;
+      const active = document.activeElement;
+      // Don't clobber what the user is typing.
+      if (active !== this._depthInput) {
+        this._depthInput.value = (d === Infinity || d == null) ? '\u221e' : String(d);
+      }
+    }
+    if (this._labelsCb) this._labelsCb.checked = !!this._props.showLabels;
+  }
+
   _renderToolbar() {
     const p = this._props;
     const cfg = p.toolbar === false ? false : (typeof p.toolbar === 'object' ? p.toolbar : {});
-    this._toolbar.innerHTML = '';
     if (!cfg) {
       this._toolbar.style.display = 'none';
       this._infoLine.style.display = 'none';
+      this._infoEl = null;
       return;
     }
-    this._toolbar.style.display = 'none'; // toolbar row no longer has visible controls
-    const want = {
-      info: cfg.info !== false,
-    };
-
-    if (want.info) {
+    // Toolbar (depth + labels) is on by default; opt out via toolbar.controls=false.
+    this._toolbar.style.display = cfg.controls === false ? 'none' : '';
+    this._syncToolbarControls();
+    // Info-line (breadcrumb) is on unless explicitly disabled.
+    if (cfg.info !== false) {
       this._infoEl = this._infoLine;
       this._infoLine.style.display = '';
     } else {
@@ -851,6 +961,20 @@ export class GpTreemap extends HTMLElement {
     this._dispatch('gp-click', id);
     this._dispatch('gp-target', id);
     this._dispatch('gp-focus', id);
+  }
+
+  _onDblClick(e) {
+    // Double-click any cell to zoom into it. For depth-truncated cells this
+    // is the natural "drill deeper" gesture — after zooming, the displayDepth
+    // budget re-applies relative to the new visible root.
+    const id = this._hitTest(e);
+    if (id == null || !this._tree) return;
+    const node = this._tree.nodes.get(id);
+    if (!node) return;
+    // If it's a true leaf (no children known), zooming is meaningless.
+    if (node.childIds && node.childIds.length === 0) return;
+    e.preventDefault();
+    this.stretchZoomIn(id);
   }
 
   _onWheel(e) {

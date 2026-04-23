@@ -659,49 +659,27 @@ ${bundle}
   colorSel.addEventListener('change', function () { state.color = colorSel.value; rebuild(); writeHash(); });
 
   // ---- URL hash sync. ----
-  // Format: single URL-encoded JSON blob under the key "s". Previous
-  // versions used individual key=value params (size=...&color=...&theme=...);
-  // we still read that format for backwards compatibility with old URLs.
+  // Format: a single URL-encoded JSON blob under the key "s" (#s={...}).
+  // Decoded content is the application state; the component's slice lives
+  // under "viewer" and is round-tripped via tm.viewerState.
   function readHash() {
     try {
       if (location.hash.length <= 1) return false;
       var raw = location.hash.slice(1);
-      var obj = null;
-      if (raw.charAt(0) === 's' && raw.charAt(1) === '=') {
-        try { obj = JSON.parse(decodeURIComponent(raw.slice(2))); } catch (_) { obj = null; }
-      }
-      if (obj) {
-        // New JSON-blob format.
-        if (obj.size) state.size = obj.size;
-        if (obj.color) state.color = obj.color;
-        if (Array.isArray(obj.path)) state.path = obj.path.slice();
-        if ('colorScale' in obj) state.colorScale = obj.colorScale || DEFAULTS.colorScale;
-        var v = obj.viewer || {};
-        state.theme = 'theme' in v ? (v.theme || '') : '';
-        state.palette = 'palette' in v ? (v.palette || '') : '';
-        state.zoom = v.zoom != null ? v.zoom : null;
-        state.zoomPath = Array.isArray(v.zoomPath) ? v.zoomPath.slice() : null;
-        state.target = v.target != null ? v.target : null;
-        state.focus = v.focus != null ? v.focus : null;
-        state.depth = v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : null);
-      } else {
-        // Legacy key=value format.
-        var p = new URLSearchParams(raw);
-        state.size = p.get('size') || DEFAULTS.size;
-        state.color = p.get('color') || DEFAULTS.color;
-        var pth = p.get('path');
-        state.path = pth ? pth.split(',').filter(Boolean) : DEFAULTS.path.slice();
-        state.theme = p.has('theme') ? p.get('theme') : '';
-        state.palette = p.has('palette') ? p.get('palette') : '';
-        state.colorScale = p.has('colorScale') ? p.get('colorScale') : DEFAULTS.colorScale;
-        state.zoom = p.get('zoom') || null;
-        state.target = p.get('target') || null;
-        state.focus = p.get('focus') || null;
-        var depth = p.get('depth');
-        state.depth = depth ? (depth === 'Infinity' ? Infinity : Number(depth)) : null;
-        var zp = p.get('zoomPath');
-        state.zoomPath = zp ? zp.split(',') : null;
-      }
+      if (!(raw.charAt(0) === 's' && raw.charAt(1) === '=')) return false;
+      var obj = JSON.parse(decodeURIComponent(raw.slice(2)));
+      if (obj.size) state.size = obj.size;
+      if (obj.color) state.color = obj.color;
+      if (Array.isArray(obj.path)) state.path = obj.path.slice();
+      state.colorScale = 'colorScale' in obj ? (obj.colorScale || DEFAULTS.colorScale) : DEFAULTS.colorScale;
+      var v = obj.viewer || {};
+      state.theme = 'theme' in v ? (v.theme || '') : '';
+      state.palette = 'palette' in v ? (v.palette || '') : '';
+      state.zoom = v.zoom != null ? v.zoom : null;
+      state.zoomPath = Array.isArray(v.zoomPath) ? v.zoomPath.slice() : null;
+      state.target = v.target != null ? v.target : null;
+      state.focus = v.focus != null ? v.focus : null;
+      state.depth = v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : null);
       return true;
     } catch (_) { return false; }
   }

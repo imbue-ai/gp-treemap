@@ -297,7 +297,9 @@ test('scan HTML: direct navigation with zoom+target+focus hash params', async ({
     // Navigate away first to ensure a fresh page load (not a same-page hash change).
     await page.goto('about:blank');
     // Now load DIRECTLY with all three params in the hash (the user's scenario).
-    const hash = `#zoom=${ids.grandparent}&target=${ids.leaf}&focus=${ids.parent}`;
+    const hash = '#s=' + encodeURIComponent(JSON.stringify({
+      viewer: { zoom: ids.grandparent, target: ids.leaf, focus: ids.parent },
+    }));
     await page.goto('file://' + out + hash);
     await page.waitForTimeout(500);
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));

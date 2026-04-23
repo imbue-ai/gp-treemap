@@ -926,41 +926,19 @@ window._bootReady.then(function () {
     try {
       if (location.hash.length <= 1) return;
       var raw = location.hash.slice(1);
-      if (raw.charAt(0) === 's' && raw.charAt(1) === '=') {
-        var obj = null;
-        try { obj = JSON.parse(decodeURIComponent(raw.slice(2))); } catch (_) { obj = null; }
-        if (obj) {
-          applyPageTheme('theme' in obj ? (obj.theme || '') : DEFAULT_THEME);
-          applyPalette('palette' in obj ? (obj.palette || '') : '');
-          applyColor(obj.color || DEFAULT_COLOR);
-          var v = obj.viewer || obj;
-          tm.viewerState = {
-            zoom: v.zoom != null ? coerceId(v.zoom) : undefined,
-            zoomPath: Array.isArray(v.zoomPath) ? v.zoomPath.map(coerceId) : undefined,
-            depth: v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : undefined),
-            target: v.target != null ? coerceId(v.target) : undefined,
-            focus: v.focus != null ? coerceId(v.focus) : undefined,
-          };
-          return;
-        }
-      }
-      // Legacy fallback: individual key=value params.
-      var p = new URLSearchParams(raw);
-      var z = p.get('zoom');
-      var zp = p.get('zoomPath');
-      var d = p.get('depth');
-      var t = p.get('target');
-      var f = p.get('focus');
+      if (!(raw.charAt(0) === 's' && raw.charAt(1) === '=')) return;
+      var obj = JSON.parse(decodeURIComponent(raw.slice(2)));
+      applyPageTheme('theme' in obj ? (obj.theme || '') : DEFAULT_THEME);
+      applyPalette('palette' in obj ? (obj.palette || '') : '');
+      applyColor(obj.color || DEFAULT_COLOR);
+      var v = obj.viewer || {};
       tm.viewerState = {
-        zoom: z ? coerceId(z) : undefined,
-        zoomPath: zp ? zp.split(',').map(coerceId) : undefined,
-        depth: d == null ? undefined : (d === 'Infinity' ? Infinity : Number(d)),
-        target: t ? coerceId(t) : undefined,
-        focus: f ? coerceId(f) : undefined,
+        zoom: v.zoom != null ? coerceId(v.zoom) : undefined,
+        zoomPath: Array.isArray(v.zoomPath) ? v.zoomPath.map(coerceId) : undefined,
+        depth: v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : undefined),
+        target: v.target != null ? coerceId(v.target) : undefined,
+        focus: v.focus != null ? coerceId(v.focus) : undefined,
       };
-      var th = p.get('theme'); applyPageTheme(th != null ? th : DEFAULT_THEME);
-      var pl = p.get('palette'); if (pl != null) applyPalette(pl);
-      var cb = p.get('color'); if (cb) applyColor(cb);
     } catch (_) {}
   }
   function writeHash() {
