@@ -708,13 +708,18 @@ export class GpTreemap extends HTMLElement {
       if (bounds) this._overlay.appendChild(overlayBox('sel', bounds, dpr));
     }
     if (p.showLabels) {
+      // Intermediate nodes have no visible cell of their own — each parent's
+      // pixels are subdivided among its children — so we only label leaves.
+      // The label is the leaf's full path from the currently-visible root,
+      // so the tree structure above it is legible without hovering.
+      const visRoot = this._activeVisibleRootId() ?? (this._tree && this._tree.roots[0]);
       for (const l of this._leaves) {
         if (l.w < 48 * dpr || l.h < 16 * dpr) continue;
         const el = document.createElement('div');
         el.className = 'lbl';
         el.style.left = (l.x + l.w / 2) / dpr + 'px';
         el.style.top = (l.y + l.h / 2) / dpr + 'px';
-        el.textContent = l.label;
+        el.textContent = this._pathFromVisibleRoot(l.id, visRoot);
         this._overlay.appendChild(el);
       }
     }
@@ -1184,6 +1189,20 @@ export class GpTreemap extends HTMLElement {
       ...extra,
     };
     this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
+  }
+
+  // Label-rendering helper: leaf id → "a / b / c" joined from the visible
+  // root down (exclusive of the root itself, which is identified by the
+  // breadcrumb's home icon).
+  _pathFromVisibleRoot(leafId, visRoot) {
+    if (!this._tree) return '';
+    const parts = [];
+    let cur = this._tree.nodes.get(leafId);
+    while (cur && cur.id !== visRoot) {
+      parts.unshift(cur.label);
+      cur = cur.parentId != null ? this._tree.nodes.get(cur.parentId) : null;
+    }
+    return parts.join(' / ');
   }
 
   // ----- path / focus helpers -----

@@ -2127,13 +2127,18 @@ class GpTreemap extends HTMLElement {
       if (bounds) this._overlay.appendChild(overlayBox('sel', bounds, dpr));
     }
     if (p.showLabels) {
+      // Intermediate nodes have no visible cell of their own — each parent's
+      // pixels are subdivided among its children — so we only label leaves.
+      // The label is the leaf's full path from the currently-visible root,
+      // so the tree structure above it is legible without hovering.
+      const visRoot = this._activeVisibleRootId() ?? (this._tree && this._tree.roots[0]);
       for (const l of this._leaves) {
         if (l.w < 48 * dpr || l.h < 16 * dpr) continue;
         const el = document.createElement('div');
         el.className = 'lbl';
         el.style.left = (l.x + l.w / 2) / dpr + 'px';
         el.style.top = (l.y + l.h / 2) / dpr + 'px';
-        el.textContent = l.label;
+        el.textContent = this._pathFromVisibleRoot(l.id, visRoot);
         this._overlay.appendChild(el);
       }
     }
@@ -2605,6 +2610,20 @@ class GpTreemap extends HTMLElement {
     this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
   }
 
+  // Label-rendering helper: leaf id → "a / b / c" joined from the visible
+  // root down (exclusive of the root itself, which is identified by the
+  // breadcrumb's home icon).
+  _pathFromVisibleRoot(leafId, visRoot) {
+    if (!this._tree) return '';
+    const parts = [];
+    let cur = this._tree.nodes.get(leafId);
+    while (cur && cur.id !== visRoot) {
+      parts.unshift(cur.label);
+      cur = cur.parentId != null ? this._tree.nodes.get(cur.parentId) : null;
+    }
+    return parts.join(' / ');
+  }
+
   // ----- path / focus helpers -----
   _buildPath(nodeId) {
     if (!this._tree) return '';
@@ -2782,7 +2801,9 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
     colorSel.appendChild(o);
   });
 
-  // State — mirrored in URL hash.
+  // State — mirrored in URL hash. "viewer" holds the component's
+  // viewerState object verbatim; page-level fields (size/color/path/
+  // theme/palette/colorScale) sit alongside it.
   var state = {
     size: DEFAULTS.size,
     color: DEFAULTS.color,
@@ -2790,7 +2811,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
     theme: DEFAULTS.theme,
     palette: DEFAULTS.palette,
     colorScale: DEFAULTS.colorScale,
-    zoom: null, target: null, focus: null, zoomPath: null, depth: null,
+    viewer: {},
   };
 
   var envelope = null;
@@ -3055,21 +3076,14 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
       if (obj.color) state.color = obj.color;
       if (Array.isArray(obj.path)) state.path = obj.path.slice();
       state.colorScale = 'colorScale' in obj ? (obj.colorScale || DEFAULTS.colorScale) : DEFAULTS.colorScale;
-      var v = obj.viewer || {};
-      state.theme = 'theme' in v ? (v.theme || '') : '';
-      state.palette = 'palette' in v ? (v.palette || '') : '';
-      state.zoom = v.zoom != null ? v.zoom : null;
-      state.zoomPath = Array.isArray(v.zoomPath) ? v.zoomPath.slice() : null;
-      state.target = v.target != null ? v.target : null;
-      state.focus = v.focus != null ? v.focus : null;
-      state.depth = v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : null);
+      state.viewer = obj.viewer && typeof obj.viewer === 'object' ? obj.viewer : {};
+      state.theme = 'theme' in state.viewer ? (state.viewer.theme || '') : '';
+      state.palette = 'palette' in state.viewer ? (state.viewer.palette || '') : '';
       return true;
     } catch (_) { return false; }
   }
   function writeHash() {
     try {
-      // Pull the component's state via the new viewerState API and merge
-      // with the page-level fields (size/color/path) into a single blob.
       var v = tm.viewerState || {};
       // Page-side theme/palette take precedence (we're authoritative over
       // page chrome; the component only mirrors them for its own painting).
@@ -3087,23 +3101,12 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
     } catch (_) {}
   }
 
-  // Mirror treemap events into state.
-  tm.addEventListener('gp-zoom-change', function (e) {
-    state.zoom = e.detail && e.detail.nodeId != null && e.detail.nodeId !== '' ? String(e.detail.nodeId) : null;
-    var zp = tm._visibleRootPath; state.zoomPath = zp && zp.length ? zp.slice() : null;
-    writeHash();
-  });
-  tm.addEventListener('gp-target', function (e) {
-    state.target = e.detail && e.detail.nodeId != null ? String(e.detail.nodeId) : null;
-    writeHash();
-  });
-  tm.addEventListener('gp-focus', function (e) {
-    state.focus = e.detail && e.detail.nodeId != null ? String(e.detail.nodeId) : null;
-    writeHash();
-  });
-  tm.addEventListener('gp-depth-change', function () {
-    state.depth = tm.displayDepth; writeHash();
-  });
+  // The component's viewerState is the source of truth for zoom/target/
+  // focus/depth/showLabels — we just pull it fresh at writeHash() time.
+  tm.addEventListener('gp-zoom-change', writeHash);
+  tm.addEventListener('gp-target', writeHash);
+  tm.addEventListener('gp-focus', writeHash);
+  tm.addEventListener('gp-depth-change', writeHash);
 
   // ---- Boot: inflate envelope, set controls, render. ----
   var raw = document.getElementById('tmdata').textContent;
@@ -3148,15 +3151,8 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
 
     rebuild();
 
-    // Restore the component-level state (zoom/target/focus/depth/etc.)
-    // via the component's viewerState setter — single JSON-shaped restore.
-    tm.viewerState = {
-      zoom: state.zoom || undefined,
-      zoomPath: state.zoomPath || undefined,
-      target: state.target || undefined,
-      focus: state.focus || undefined,
-      depth: state.depth != null ? state.depth : undefined,
-    };
+    // Hand the component's slice of state back to it in one shot.
+    tm.viewerState = state.viewer;
 
     // If no hash was present, populate it with the current defaults.
     if (!hadHash) writeHash();
