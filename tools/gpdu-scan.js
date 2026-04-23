@@ -3,7 +3,7 @@
 // renders its size treemap with <gp-treemap>. The output has the bundle and
 // the dataset inlined, so you can open it from anywhere with no server.
 //
-// Usage:  node tools/scan.js [--color=extension|kind|folder|ctime|mtime|atime] <dir> [output.html]
+// Usage:  node tools/gpdu-scan.js [--color=extension|kind|folder|ctime|mtime|atime] <dir> [output.html]
 //                 (or `npm run scan -- [--color=...] <dir> [output.html]`)
 //
 // Symlinks are not followed (we use lstat). Unreadable entries are counted
@@ -49,7 +49,7 @@ async function main() {
     args.push(argv[i]);
   }
   if (args.length < 1 || args[0] === '-h' || args[0] === '--help') {
-    console.error('Usage: node tools/scan.js [--no-open] [--color=extension|kind|folder|ctime|mtime|atime] <dir> [output.html]');
+    console.error('Usage: node tools/gpdu-scan.js [--no-open] [--color=extension|kind|folder|ctime|mtime|atime] <dir> [output.html]');
     process.exit(args[0] === '-h' || args[0] === '--help' ? 0 : 2);
   }
   const target = path.resolve(args[0]);

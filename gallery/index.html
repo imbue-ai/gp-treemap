@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>gp-treemap gallery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    color-scheme: light dark;
+    --fg: #1a1a1a;
+    --muted: #555;
+    --bg: #fafafa;
+    --card-bg: #fff;
+    --border: #e2e2e2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fg: #eee;
+      --muted: #aaa;
+      --bg: #111;
+      --card-bg: #181818;
+      --border: #2a2a2a;
+    }
+  }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.5;
+  }
+  main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  header { margin-bottom: 2.5rem; }
+  header h1 { margin: 0 0 0.5rem; font-size: 2rem; }
+  header p { margin: 0; color: var(--muted); }
+  header a { color: inherit; }
+  .entry {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.25rem 0;
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+  }
+  .entry h2 { margin: 0 0 0.5rem; font-size: 1.25rem; }
+  .entry p { margin: 0 0 1rem; color: var(--muted); }
+  .entry .frame-wrap {
+    margin: 0 -1.25rem;
+    border-top: 1px solid var(--border);
+    background: #000;
+  }
+  .entry iframe {
+    display: block;
+    width: 100%;
+    height: 720px;
+    border: 0;
+  }
+  .entry .links {
+    padding: 0.75rem 0 1.25rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  .entry .links a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>gp-treemap gallery</h1>
+    <p>
+      Interactive sample visualizations built with
+      <a href="https://github.com/imbue-ai/gp-treemap">gp-treemap</a>.
+      Each entry below is a self-contained HTML file — bundle and dataset
+      are inlined, so they render from any URL (or <code>file://</code>)
+      with no server.
+    </p>
+  </header>
+
+  <section class="entry">
+    <h2>gp-treemap source tree — disk usage</h2>
+    <p>
+      The gp-treemap repository looking at itself. Produced by running
+      <code>gpdu</code> (aka <code>tools/gpdu-scan.js</code>) over the
+      working tree, <code>.git</code> and <code>node_modules</code>
+      included. Cells are sized by bytes on disk and colored by file
+      extension; hover for exact sizes, click to zoom.
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="gp-treemap-source-tree-disk-usage.html"
+        title="gp-treemap source tree — disk usage"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="gp-treemap-source-tree-disk-usage.html">Open full-page →</a>
+    </div>
+  </section>
+</main>
+</body>
+</html>

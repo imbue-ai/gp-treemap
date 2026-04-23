@@ -1,6 +1,6 @@
 // Tests that UI state is persisted in the URL hash and restored when the page
 // loads with hash parameters. The hash sync logic lives in the page
-// (samples/interactions.html, scan.js template), not in the component itself.
+// (samples/interactions.html, gpdu-scan.js template), not in the component itself.
 import { test, expect } from '@playwright/test';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -208,7 +208,7 @@ test('scan HTML: numeric IDs round-trip through URL hash', async ({ page }) => {
   const out = path.join(os.tmpdir(), 'gp-hash-test-' + Date.now() + '.html');
   try {
     const res = spawnSync(process.execPath, [
-      path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+      path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', target, out,
     ], { encoding: 'utf8' });
     expect(res.status, res.stderr).toBe(0);
 
@@ -266,7 +266,7 @@ test('scan HTML: direct navigation with zoom+target+focus hash params', async ({
   const out = path.join(os.tmpdir(), 'gp-hash-direct-' + Date.now() + '.html');
   try {
     const res = spawnSync(process.execPath, [
-      path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+      path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', target, out,
     ], { encoding: 'utf8' });
     expect(res.status, res.stderr).toBe(0);
 
@@ -336,7 +336,7 @@ test('scan HTML: focusing root (id 0) highlights the home icon, not a breadcrumb
   const out = path.join(os.tmpdir(), 'gp-focus-root-' + Date.now() + '.html');
   try {
     const res = spawnSync(process.execPath, [
-      path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+      path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', target, out,
     ], { encoding: 'utf8' });
     expect(res.status, res.stderr).toBe(0);
 

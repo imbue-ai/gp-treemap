@@ -1,4 +1,4 @@
-// Exercises tools/scan.js on a synthetic directory tree, loads the generated
+// Exercises tools/gpdu-scan.js on a synthetic directory tree, loads the generated
 // HTML over file:// (the primary way a user will open it), and snapshots the
 // result to tests/screenshots/.
 import { test, expect } from '@playwright/test';
@@ -35,7 +35,7 @@ function parseScanHtml(htmlPath) {
 }
 
 function runScan(srcDir, outFile) {
-  const res = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'scan.js'), '--no-open', srcDir, outFile], {
+  const res = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', srcDir, outFile], {
     encoding: 'utf8', timeout: 30000,
   });
   return res;
@@ -166,14 +166,14 @@ function buildTree(root, seed) {
   }
 }
 
-test('scan.js produces a self-contained HTML that renders', async ({ page }) => {
+test('gpdu-scan.js produces a self-contained HTML that renders', async ({ page }) => {
   // Create a hermetic, repeatable temp directory tree.
   const target = fs.mkdtempSync(path.join(os.tmpdir(), 'gp-scan-test-'));
   buildTree(target, 42);
 
   const out = path.join(os.tmpdir(), 'gp-treemap-scan-' + Date.now() + '.html');
   const res = spawnSync(process.execPath, [
-    path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+    path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', target, out,
   ], { encoding: 'utf8' });
   expect(res.status, res.stderr).toBe(0);
   expect(fs.existsSync(out)).toBe(true);
@@ -206,7 +206,7 @@ test('color-by dropdown switches between all modes without errors', async ({ pag
 
   const out = path.join(os.tmpdir(), 'gp-colorby-' + Date.now() + '.html');
   const res = spawnSync(process.execPath, [
-    path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+    path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', target, out,
   ], { encoding: 'utf8' });
   expect(res.status, res.stderr).toBe(0);
 
@@ -302,7 +302,7 @@ test('multi-block scan: stubs expand progressively after async inflate', async (
   const out = path.join(os.tmpdir(), 'gp-multiblock-' + Date.now() + '.html');
   // Use a tiny block size to force multiple blocks from a small fixture.
   const res = spawnSync(process.execPath, [
-    path.join(ROOT, 'tools', 'scan.js'), '--no-open', '--block-size=20', target, out,
+    path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', '--block-size=20', target, out,
   ], { encoding: 'utf8' });
   expect(res.status, res.stderr).toBe(0);
   expect(res.stderr).toMatch(/partitioned into \d+ blocks/);
@@ -339,7 +339,7 @@ test('zoom restores from URL hash in lazy tree', async ({ page }) => {
 
   const out = path.join(os.tmpdir(), 'gp-zoomhash-' + Date.now() + '.html');
   const res = spawnSync(process.execPath, [
-    path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+    path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', target, out,
   ], { encoding: 'utf8' });
   expect(res.status, res.stderr).toBe(0);
 
@@ -412,7 +412,7 @@ test('zoom path expansion works when root node ID is 0 (falsy)', async ({ page }
 
   const out = path.join(os.tmpdir(), 'gp-falsy-root-' + Date.now() + '.html');
   const res = spawnSync(process.execPath, [
-    path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
+    path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', target, out,
   ], { encoding: 'utf8' });
   expect(res.status, res.stderr).toBe(0);
 
@@ -484,7 +484,7 @@ test('zoom survives async block inflation in multi-block scan', async ({ page })
 
   const out = path.join(os.tmpdir(), 'gp-zoomstub-' + Date.now() + '.html');
   const res = spawnSync(process.execPath, [
-    path.join(ROOT, 'tools', 'scan.js'), '--no-open', '--block-size=20', target, out,
+    path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', '--block-size=20', target, out,
   ], { encoding: 'utf8' });
   expect(res.status, res.stderr).toBe(0);
   const blockCount = Number(res.stderr.match(/partitioned into (\d+) blocks/)?.[1] || 0);
