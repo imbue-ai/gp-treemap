@@ -354,7 +354,6 @@ function buildHtml(outPath, title, columns, info, rows, defaults, flags) {
       <div id="path-menu-pop"></div>
     </div>
   </div>
-  <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
   <span class="spacer"></span>
   <div class="ctl">
     <label>Theme</label>
@@ -370,6 +369,7 @@ function buildHtml(outPath, title, columns, info, rows, defaults, flags) {
       ${paletteOptions}
     </select>
   </div>
+  <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
 </div>
 <div id="help-modal" class="help-modal-backdrop">
   <div class="help-modal" role="dialog" aria-label="Help">

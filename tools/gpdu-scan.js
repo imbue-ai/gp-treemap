@@ -521,7 +521,6 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
       <option value="atime">accessed</option>
     </select>
   </span>
-  <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
   <span class="spacer"></span>
   <span>theme
     <select id="theme-sel">
@@ -535,6 +534,7 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
       ${paletteOptions}
     </select>
   </span>
+  <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
 </div>
 <div id="help-modal" class="help-modal-backdrop">
   <div class="help-modal" role="dialog" aria-label="Help">
