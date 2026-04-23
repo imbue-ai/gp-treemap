@@ -2135,7 +2135,10 @@ class GpTreemap extends HTMLElement {
     depthPlus.addEventListener('click', () => {
       const d = this._props.displayDepth;
       if (d === Infinity) return;
-      setDepth(d + 1);
+      // Once we've opened up as many levels as the tree actually has,
+      // snap straight to \u221e so the +/- stepper reads "show everything"
+      // rather than a magic-feeling integer.
+      setDepth(d + 1 >= this._maxVisibleDepth() ? Infinity : d + 1);
     });
 
     labelsCb.addEventListener('change', () => {
