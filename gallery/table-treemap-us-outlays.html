@@ -1,0 +1,2988 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>treemap · US federal outlays FY2024 — Treasury MTS (USD)</title>
+<style>
+  html, body { margin:0; padding:0; height:100%; font-family: system-ui,-apple-system,Segoe UI,sans-serif;
+    background: var(--page-bg, #fafafa); color: var(--page-fg, #111); transition: background .15s, color .15s; }
+  body { display:flex; flex-direction:column; }
+  header { padding: 8px 14px; border-bottom: 1px solid var(--page-border, #0002);
+    display:flex; gap: 12px 18px; align-items:center; flex-wrap:wrap;
+    background: var(--page-surface, #fff); transition: background .15s; }
+  header h1 { margin:0; font-size:14px; font-weight:600; font-family: ui-monospace, SF Mono, Menlo, monospace;
+    color: var(--page-fg, #222); min-width:0; overflow:hidden; text-overflow:ellipsis; }
+  .ctl { display:flex; align-items:center; gap:6px; font-size:12px; color: var(--page-fg-muted, #666); }
+  .ctl label { color: var(--page-fg-muted, #666); }
+  select, button { font-size:12px; padding:2px 6px; border-radius:4px;
+    background: var(--page-bg, #fff); color: var(--page-fg, #333);
+    border: 1px solid var(--page-border, #ccc); cursor:pointer; }
+  gp-treemap { display:flex; flex:1; min-height:0; }
+  #bottom-bar { display:flex; align-items:center; gap:16px; padding: 3px 14px;
+    font-size:12px; min-height:18px; color: var(--page-fg-muted, #888);
+    background: var(--page-surface, #fff); border-top: 1px solid var(--page-border, #0002); }
+  #chips-wrap { display:flex; align-items:center; gap:6px; flex-wrap:wrap; position:relative; }
+  #chips { display:flex; gap:4px; align-items:center; padding:2px 4px; min-height: 24px;
+    border:1px dashed var(--page-border, #ccc); border-radius:6px; min-width: 40px; }
+  .chip { display:inline-flex; align-items:center; gap:4px;
+    background: var(--page-accent, #3b82f6); color: white;
+    padding: 2px 8px; border-radius: 999px; font-size:11px;
+    cursor: grab; user-select:none; white-space:nowrap; }
+  .chip.dragging { opacity:.4; }
+  .chip.drop-before { box-shadow: -3px 0 0 0 var(--page-fg, #fff); }
+  .chip.drop-after  { box-shadow:  3px 0 0 0 var(--page-fg, #fff); }
+  .chip .x { cursor:pointer; opacity:.6; padding: 0 2px; }
+  .chip .x:hover { opacity:1; }
+  #path-menu { position: relative; }
+  #path-menu-btn { padding: 2px 8px; }
+  #path-menu-pop { display:none; position:absolute; z-index:50; top: 100%; left: 0;
+    margin-top:4px; max-height: 360px; overflow: auto;
+    background: var(--page-surface, #fff); color: var(--page-fg, #222);
+    border:1px solid var(--page-border, #ccc); border-radius:6px;
+    padding:6px 0; min-width: 220px; box-shadow: 0 2px 12px #0004; }
+  #path-menu-pop.open { display:block; }
+  #path-menu-pop label { display:flex; align-items:center; gap:8px; padding: 3px 12px;
+    font-size:12px; cursor:pointer; white-space:nowrap; }
+  #path-menu-pop label:hover { background: var(--page-border, #0001); }
+</style>
+</head>
+<body>
+<header>
+  <h1>US federal outlays FY2024 — Treasury MTS (USD)</h1>
+  <div class="ctl"><label>Size</label><select id="size-sel"></select></div>
+  <div class="ctl"><label>Color</label><select id="color-sel"></select></div>
+  <div class="ctl" id="chips-wrap">
+    <label>Path</label>
+    <div id="chips"></div>
+    <div id="path-menu">
+      <button id="path-menu-btn">+</button>
+      <div id="path-menu-pop"></div>
+    </div>
+  </div>
+  <div class="ctl" style="margin-left:auto;">
+    <select id="theme-sel">
+      <option value="">Default (light)</option>
+      <optgroup label="Themes"><option value="nord">Nord</option><option value="solarized">Solarized Dark</option><option value="dracula">Dracula</option><option value="catppuccin">Catppuccin Mocha</option><option value="gruvbox">Gruvbox Dark</option><option value="tokyo-night">Tokyo Night</option><option value="rose-pine">Rosé Pine</option><option value="one-dark">One Dark</option></optgroup>
+      <optgroup label="Palettes"><option value="palette:viridis">Viridis</option><option value="palette:plasma">Plasma</option><option value="palette:inferno">Inferno</option><option value="palette:magma">Magma</option><option value="palette:turbo">Turbo</option><option value="palette:heatmap">Heatmap</option><option value="palette:coolwarm">Cool–Warm</option><option value="palette:rainbow">Rainbow</option><option value="palette:gp-default">Default 8-hue</option></optgroup>
+    </select>
+  </div>
+</header>
+<gp-treemap id="tm"
+  color-mode="categorical"
+  palette="tokyo-night"
+  gradient-intensity="0.6"
+  min-cell-area="0"></gp-treemap>
+<div id="bottom-bar">
+  <div id="stats-bar"></div>
+  <span id="row-count">517 rows</span>
+</div>
+
+<script type="application/json" id="tmdata">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</script>
+<script>
+/* gp-treemap — single-file build (generated by tools/build.js) */
+(function(){ "use strict";
+/* ---- src/hash.js ---- */
+// FNV-1a 32-bit. Deterministic across runs; used for hash-based color assignment.
+function fnv1a(str) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+  }
+  return h >>> 0;
+}
+
+/* ---- src/palettes.js ---- */
+// Built-in palettes. All stored as hsl(h,s%,l%) strings so the gradient generator
+// can nudge l up/down to produce lighter/darker stops without parsing RGB.
+const PALETTES = {
+  // Default palette: 8 saturated hues, one per file-kind category.
+  'gp-default': [
+    'hsl(211, 70%, 52%)',  // blue
+    'hsl(354, 70%, 53%)',  // red
+    'hsl(138, 55%, 45%)',  // green
+    'hsl(188, 70%, 48%)',  // cyan
+    'hsl(300, 55%, 55%)',  // magenta
+    'hsl(26,  85%, 55%)',  // orange
+    'hsl(48,  85%, 55%)',  // yellow
+    'hsl(264, 55%, 58%)',  // purple
+  ],
+  heatmap: [
+    'hsl(240, 70%, 55%)',
+    'hsl(200, 70%, 55%)',
+    'hsl(150, 65%, 50%)',
+    'hsl(60,  80%, 55%)',
+    'hsl(30,  85%, 55%)',
+    'hsl(0,   80%, 55%)',
+  ],
+  rainbow: [
+    'hsl(0,   75%, 55%)',
+    'hsl(40,  80%, 55%)',
+    'hsl(80,  65%, 50%)',
+    'hsl(140, 60%, 48%)',
+    'hsl(200, 70%, 50%)',
+    'hsl(260, 60%, 58%)',
+    'hsl(320, 60%, 58%)',
+  ],
+  viridis: [
+    'hsl(276, 55%, 26%)',
+    'hsl(254, 50%, 38%)',
+    'hsl(210, 40%, 44%)',
+    'hsl(170, 40%, 46%)',
+    'hsl(130, 50%, 50%)',
+    'hsl(80,  70%, 55%)',
+    'hsl(55,  85%, 65%)',
+  ],
+  plasma: [
+    'hsl(260, 70%, 30%)',
+    'hsl(295, 70%, 40%)',
+    'hsl(330, 75%, 50%)',
+    'hsl(15,  85%, 55%)',
+    'hsl(45,  90%, 60%)',
+    'hsl(55,  95%, 70%)',
+  ],
+  // Inferno — "glowing metal": black → indigo → red → orange → yellow → white.
+  // Approximates matplotlib's inferno colormap; great for file age, heat, etc.
+  inferno: [
+    'hsl(270, 50%, 8%)',
+    'hsl(270, 65%, 22%)',
+    'hsl(310, 70%, 32%)',
+    'hsl(345, 80%, 42%)',
+    'hsl(15,  90%, 50%)',
+    'hsl(40,  92%, 58%)',
+    'hsl(55,  95%, 75%)',
+    'hsl(60,  80%, 92%)',
+  ],
+  // Magma — dark → purple → pink → peach → pale.
+  // Perceptually uniform; good for density or magnitude data.
+  magma: [
+    'hsl(270, 50%, 8%)',
+    'hsl(270, 60%, 24%)',
+    'hsl(295, 55%, 38%)',
+    'hsl(330, 60%, 52%)',
+    'hsl(355, 65%, 65%)',
+    'hsl(20,  75%, 78%)',
+    'hsl(50,  70%, 92%)',
+  ],
+  // Turbo — Google's improved rainbow: blue → cyan → green → yellow → red.
+  // Higher perceptual uniformity than classic rainbow; great for general use.
+  turbo: [
+    'hsl(240, 80%, 32%)',
+    'hsl(210, 90%, 48%)',
+    'hsl(180, 75%, 48%)',
+    'hsl(130, 65%, 48%)',
+    'hsl(60,  88%, 52%)',
+    'hsl(30,  92%, 50%)',
+    'hsl(0,   80%, 38%)',
+  ],
+  // Cool–warm diverging: blue → neutral → red.
+  // Ideal for values centered on a midpoint (e.g., change since baseline).
+  coolwarm: [
+    'hsl(220, 70%, 42%)',
+    'hsl(220, 55%, 62%)',
+    'hsl(220, 25%, 82%)',
+    'hsl(0,   5%,  92%)',
+    'hsl(10,  25%, 82%)',
+    'hsl(10,  55%, 62%)',
+    'hsl(10,  70%, 42%)',
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// Themes — full-page color schemes combining a categorical treemap palette
+// with chrome/page colors. Each theme uses ALL of its source palette colors.
+//
+// Attribution:
+//   Nord            — Arctic Ice Studio & Sven Greb · github.com/nordtheme/nord (MIT)
+//   Solarized       — Ethan Schoonover · github.com/altercation/solarized (MIT)
+//   Dracula         — Zeno Rocha · github.com/dracula/dracula-theme (MIT)
+//   Catppuccin      — Catppuccin Org · github.com/catppuccin/catppuccin (MIT)
+//   Gruvbox         — Pavel Pertsev (morhetz) · github.com/morhetz/gruvbox (MIT)
+//   Tokyo Night     — enkia · github.com/enkia/tokyo-night-vscode-theme (MIT)
+//   Rosé Pine       — Rosé Pine · github.com/rose-pine/rose-pine-theme (MIT)
+//   One Dark        — GitHub (Atom) · github.com/atom/one-dark-syntax (MIT)
+// ---------------------------------------------------------------------------
+const THEMES = {
+  // ── Nord ────────────────────────────────────────────────────────────────
+  // Polar Night: nord0–nord3  |  Snow Storm: nord4–nord6
+  // Frost: nord7–nord10       |  Aurora: nord11–nord15
+  nord: {
+    label: 'Nord',
+    dark: true,
+    bg:      '#2e3440', // nord0
+    surface: '#3b4252', // nord1
+    border:  '#4c566a', // nord3
+    fg:      '#d8dee9', // nord4
+    fgMuted: '#81a1c1', // nord9
+    accent:  '#88c0d0', // nord8
+    stageBg: '#2e3440', // nord0
+    palette: [
+      '#5e81ac', // nord10 — blue
+      '#bf616a', // nord11 — red
+      '#a3be8c', // nord14 — green
+      '#88c0d0', // nord8  — frost cyan
+      '#b48ead', // nord15 — purple
+      '#d08770', // nord12 — orange
+      '#ebcb8b', // nord13 — yellow
+      '#8fbcbb', // nord7  — frost teal
+      '#81a1c1', // nord9  — frost grey-blue
+    ],
+  },
+
+  // ── Solarized Dark ─────────────────────────────────────────────────────
+  // Base tones: base03–base3  |  Accent: yellow–green
+  solarized: {
+    label: 'Solarized Dark',
+    dark: true,
+    bg:      '#002b36', // base03
+    surface: '#073642', // base02
+    border:  '#586e75', // base01
+    fg:      '#839496', // base0
+    fgMuted: '#657b83', // base00
+    accent:  '#268bd2', // blue
+    stageBg: '#002b36', // base03
+    palette: [
+      '#268bd2', // blue
+      '#dc322f', // red
+      '#859900', // green
+      '#2aa198', // cyan
+      '#d33682', // magenta
+      '#cb4b16', // orange
+      '#b58900', // yellow
+      '#6c71c4', // violet
+    ],
+  },
+
+  // ── Dracula ────────────────────────────────────────────────────────────
+  // Background · Current Line · Foreground · Comment + 8 accents
+  dracula: {
+    label: 'Dracula',
+    dark: true,
+    bg:      '#282a36', // Background
+    surface: '#44475a', // Current Line
+    border:  '#6272a4', // Comment
+    fg:      '#f8f8f2', // Foreground
+    fgMuted: '#6272a4', // Comment
+    accent:  '#bd93f9', // Purple
+    stageBg: '#282a36', // Background
+    palette: [
+      '#bd93f9', // Purple
+      '#ff5555', // Red
+      '#50fa7b', // Green
+      '#8be9fd', // Cyan
+      '#ff79c6', // Pink
+      '#ffb86c', // Orange
+      '#f1fa8c', // Yellow
+      '#6272a4', // Comment (blue-grey)
+    ],
+  },
+
+  // ── Catppuccin Mocha ───────────────────────────────────────────────────
+  // 14 accent hues + 12 base tones (Base → Crust, Text → Overlay)
+  catppuccin: {
+    label: 'Catppuccin Mocha',
+    dark: true,
+    bg:      '#1e1e2e', // Base
+    surface: '#313244', // Surface0
+    border:  '#45475a', // Surface1
+    fg:      '#cdd6f4', // Text
+    fgMuted: '#a6adc8', // Subtext0
+    accent:  '#cba6f7', // Mauve
+    stageBg: '#181825', // Mantle
+    palette: [
+      '#89b4fa', // Blue
+      '#f38ba8', // Red
+      '#a6e3a1', // Green
+      '#89dceb', // Sky
+      '#cba6f7', // Mauve
+      '#fab387', // Peach
+      '#f9e2af', // Yellow
+      '#f5c2e7', // Pink
+      '#94e2d5', // Teal
+      '#74c7ec', // Sapphire
+      '#b4befe', // Lavender
+      '#eba0ac', // Maroon
+      '#f5e0dc', // Rosewater
+      '#f2cdcd', // Flamingo
+    ],
+  },
+
+  // ── Gruvbox Dark ───────────────────────────────────────────────────────
+  // Dark bg0–bg4 · Light fg0–fg4 · Bright accents (dark-mode foreground)
+  gruvbox: {
+    label: 'Gruvbox Dark',
+    dark: true,
+    bg:      '#282828', // bg0
+    surface: '#3c3836', // bg1
+    border:  '#504945', // bg2
+    fg:      '#ebdbb2', // fg1
+    fgMuted: '#a89984', // fg4
+    accent:  '#fabd2f', // bright yellow
+    stageBg: '#1d2021', // bg0_h
+    palette: [
+      '#83a598', // bright blue
+      '#fb4934', // bright red
+      '#b8bb26', // bright green
+      '#8ec07c', // bright aqua
+      '#d3869b', // bright purple
+      '#fe8019', // bright orange
+      '#fabd2f', // bright yellow
+      '#928374', // gray
+    ],
+  },
+
+  // ── Tokyo Night ────────────────────────────────────────────────────────
+  // Deep indigo bg · Cool-toned syntax across the full hue range
+  'tokyo-night': {
+    label: 'Tokyo Night',
+    dark: true,
+    bg:      '#1a1b26', // editor bg
+    surface: '#16161e', // sidebar bg
+    border:  '#0f0f14', // borders
+    fg:      '#c0caf5', // foreground
+    fgMuted: '#787c99', // muted fg
+    accent:  '#7aa2f7', // blue
+    stageBg: '#1a1b26', // editor bg
+    palette: [
+      '#7aa2f7', // blue — functions
+      '#f7768e', // red — tags, keywords
+      '#9ece6a', // green — strings
+      '#7dcfff', // cyan — properties
+      '#bb9af7', // purple — storage/keywords
+      '#ff9e64', // orange — constants
+      '#e0af68', // yellow — parameters
+      '#73daca', // teal — object keys
+      '#0db9d7', // dark cyan — types
+      '#9d7cd8', // dark purple — modifiers
+      '#89ddff', // ice blue — operators
+      '#b4f9f8', // mint — regexp
+    ],
+  },
+
+  // ── Rosé Pine ──────────────────────────────────────────────────────────
+  // Soho vibes — muted warm tones over a dusky base
+  'rose-pine': {
+    label: 'Rosé Pine',
+    dark: true,
+    bg:      '#191724', // Base
+    surface: '#1f1d2e', // Surface
+    border:  '#26233a', // Overlay
+    fg:      '#e0def4', // Text
+    fgMuted: '#908caa', // Subtle
+    accent:  '#c4a7e7', // Iris
+    stageBg: '#191724', // Base
+    palette: [
+      '#31748f', // Pine
+      '#eb6f92', // Love
+      '#9ccfd8', // Foam
+      '#c4a7e7', // Iris
+      '#ebbcba', // Rose
+      '#f6c177', // Gold
+    ],
+  },
+
+  // ── One Dark ───────────────────────────────────────────────────────────
+  // Atom's signature dark theme — balanced hues on a cool neutral bg
+  'one-dark': {
+    label: 'One Dark',
+    dark: true,
+    bg:      'hsl(220, 13%, 18%)',   // syntax-bg
+    surface: 'hsl(220, 13%, 22%)',   // slightly lighter
+    border:  'hsl(220, 10%, 30%)',   // mid-tone
+    fg:      'hsl(220, 14%, 71%)',   // mono-1
+    fgMuted: 'hsl(220, 9%, 55%)',    // mono-2
+    accent:  'hsl(207, 82%, 66%)',   // hue-2 (blue)
+    stageBg: 'hsl(220, 13%, 16%)',   // slightly darker than bg
+    palette: [
+      'hsl(207, 82%, 66%)', // hue-2  — blue
+      'hsl(355, 65%, 65%)', // hue-5  — red
+      'hsl(95,  38%, 62%)', // hue-4  — green
+      'hsl(187, 47%, 55%)', // hue-1  — cyan
+      'hsl(286, 60%, 67%)', // hue-3  — purple
+      'hsl(29,  54%, 61%)', // hue-6  — orange
+      'hsl(39,  67%, 69%)', // hue-6-2 — yellow
+      'hsl(5,   48%, 51%)', // hue-5-2 — dark red
+    ],
+  },
+};
+function resolvePalette(spec) {
+  if (!spec) return PALETTES['gp-default'];
+  if (typeof spec === 'string') {
+    if (PALETTES[spec]) return PALETTES[spec];
+    if (THEMES[spec]) return THEMES[spec].palette;
+    return PALETTES['gp-default'];
+  }
+  if (Array.isArray(spec.colors) && spec.colors.length >= 2) return spec.colors;
+  if (spec.name) {
+    if (PALETTES[spec.name]) return PALETTES[spec.name];
+    if (THEMES[spec.name]) return THEMES[spec.name].palette;
+  }
+  return PALETTES['gp-default'];
+}
+
+// Parse 'hsl(h, s%, l%)' → {h, s, l}. Falls through to a mid-gray for other forms.
+function parseHsl(str) {
+  const m = /hsl\(\s*([\-\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*\)/i.exec(str);
+  if (!m) return { h: 0, s: 0, l: 50, raw: str };
+  return { h: +m[1], s: +m[2], l: +m[3] };
+}
+function toHsl({ h, s, l }) {
+  const clampPct = (v) => Math.max(0, Math.min(100, v));
+  return `hsl(${h}, ${clampPct(s)}%, ${clampPct(l)}%)`;
+}
+
+/* ---- src/color-scale.js ---- */
+// Scale builders. Each returns (value) => integer palette index.
+function buildLinearScale(domain, paletteLen) {
+  const [min, max] = domain;
+  const n = paletteLen;
+  if (max === min) return () => 0;
+  return (v) => {
+    const t = (v - min) / (max - min);
+    const clamped = Math.max(0, Math.min(1, t));
+    return Math.min(n - 1, Math.floor(clamped * n));
+  };
+}
+function buildLogScale(domain, paletteLen) {
+  const [min, max] = domain;
+  if (min <= 0 || max <= 0) {
+    throw new Error('log scale requires positive domain');
+  }
+  const lmin = Math.log(min), lmax = Math.log(max);
+  const n = paletteLen;
+  if (lmax === lmin) return () => 0;
+  return (v) => {
+    if (v <= 0) throw new Error('log scale value must be > 0');
+    const t = (Math.log(v) - lmin) / (lmax - lmin);
+    const clamped = Math.max(0, Math.min(1, t));
+    return Math.min(n - 1, Math.floor(clamped * n));
+  };
+}
+
+// Diverging: [min, mid, max] → [0, floor(n/2), n-1].
+function buildDivergingScale(domain, paletteLen) {
+  const [min, mid, max] = domain;
+  const n = paletteLen;
+  const midIdx = Math.floor(n / 2);
+  return (v) => {
+    if (v <= mid) {
+      if (mid === min) return 0;
+      const t = (v - min) / (mid - min);
+      const clamped = Math.max(0, Math.min(1, t));
+      return Math.round(clamped * midIdx);
+    } else {
+      if (max === mid) return n - 1;
+      const t = (v - mid) / (max - mid);
+      const clamped = Math.max(0, Math.min(1, t));
+      return Math.min(n - 1, midIdx + Math.round(clamped * (n - 1 - midIdx)));
+    }
+  };
+}
+function buildQuantileScale(values, paletteLen) {
+  const sorted = values.slice().sort((a, b) => a - b);
+  const n = paletteLen;
+  return (v) => {
+    // rank of v in sorted (first index >= v); binary search
+    let lo = 0, hi = sorted.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (sorted[mid] < v) lo = mid + 1; else hi = mid;
+    }
+    const rank = lo / Math.max(1, sorted.length - 1);
+    return Math.min(n - 1, Math.floor(rank * n));
+  };
+}
+function autoDomain(values) {
+  let min = +Infinity, max = -Infinity;
+  for (const v of values) {
+    if (typeof v === 'number' && Number.isFinite(v)) {
+      if (v < min) min = v;
+      if (v > max) max = v;
+    }
+  }
+  if (!Number.isFinite(min)) { min = 0; max = 1; }
+  return [min, max];
+}
+
+/* ---- src/color-resolver.js ---- */
+
+
+/**
+ * Assigns `colorIndex` (and an optional `colorOverride` CSS color) to every
+ * rendered node.
+ *
+ * @param {TreeNode[]} nodes flat array
+ * @param {string} mode 'categorical' | 'quantitative' | 'depth'
+ * @param {Object} opts
+ */
+function resolveColors(nodes, mode, opts = {}) {
+  const {
+    palette,
+    colorScale = 'linear',
+    colorDomain, // [min, max] or [min, mid, max]
+    colorMap = {},
+    colorFn,
+  } = opts;
+  const n = palette.length;
+
+  if (typeof colorFn === 'function') {
+    for (const node of nodes) {
+      const v = colorFn(node);
+      if (typeof v === 'string') node.colorOverride = v;
+      else if (Number.isFinite(v)) node.colorIndex = ((v | 0) % n + n) % n;
+    }
+    return;
+  }
+
+  if (mode === 'depth') {
+    for (const node of nodes) node.colorIndex = node.depth % n;
+    return;
+  }
+
+  if (mode === 'categorical') {
+    for (const node of nodes) {
+      const key = String(node.colorValue);
+      if (Object.prototype.hasOwnProperty.call(colorMap, key)) {
+        node.colorOverride = colorMap[key];
+      } else {
+        node.colorIndex = fnv1a(key) % n;
+      }
+    }
+    return;
+  }
+
+  // quantitative
+  const numericValues = nodes.map((nd) => +nd.colorValue).filter(Number.isFinite);
+  let scale;
+  if (colorScale === 'linear') {
+    const d = colorDomain || autoDomain(numericValues);
+    scale = buildLinearScale(d, n);
+  } else if (colorScale === 'log') {
+    const d = colorDomain || autoDomain(numericValues);
+    scale = buildLogScale(d, n);
+  } else if (colorScale === 'quantile') {
+    scale = buildQuantileScale(numericValues, n);
+  } else if (colorScale === 'diverging') {
+    const d = colorDomain || (() => {
+      const [mn, mx] = autoDomain(numericValues);
+      return [mn, (mn + mx) / 2, mx];
+    })();
+    scale = buildDivergingScale(d, n);
+  } else {
+    throw new Error('unknown colorScale: ' + colorScale);
+  }
+  for (const node of nodes) {
+    const v = +node.colorValue;
+    node.colorIndex = Number.isFinite(v) ? scale(v) : 0;
+  }
+}
+
+/* ---- src/balancer.js ---- */
+// Balanced binary grouping of sized items, GP-style: always merge the two
+// smallest remaining subtrees. Result is a binary tree whose leaves are the
+// original items and whose internal nodes carry cumulative size.
+
+// A tiny index-based min-heap keyed by `size` (ties broken by insertion order
+// to keep the ordering deterministic for tests).
+class MinHeap {
+  constructor() { this.arr = []; this.counter = 0; }
+  push(node) {
+    const entry = { node, seq: this.counter++ };
+    this.arr.push(entry);
+    this._up(this.arr.length - 1);
+  }
+  pop() {
+    const top = this.arr[0];
+    const last = this.arr.pop();
+    if (this.arr.length) { this.arr[0] = last; this._down(0); }
+    return top ? top.node : null;
+  }
+  size() { return this.arr.length; }
+  _lt(a, b) {
+    if (a.node.size !== b.node.size) return a.node.size < b.node.size;
+    return a.seq < b.seq;
+  }
+  _up(i) {
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (this._lt(this.arr[i], this.arr[p])) {
+        [this.arr[i], this.arr[p]] = [this.arr[p], this.arr[i]];
+        i = p;
+      } else break;
+    }
+  }
+  _down(i) {
+    const n = this.arr.length;
+    for (;;) {
+      const l = i * 2 + 1, r = l + 1;
+      let best = i;
+      if (l < n && this._lt(this.arr[l], this.arr[best])) best = l;
+      if (r < n && this._lt(this.arr[r], this.arr[best])) best = r;
+      if (best === i) break;
+      [this.arr[i], this.arr[best]] = [this.arr[best], this.arr[i]];
+      i = best;
+    }
+  }
+}
+
+/**
+ * @param {{id:string, size:number}[]} items
+ * @returns {BalancerNode|null}
+ */
+function balanceChildren(items) {
+  if (!items.length) return null;
+  if (items.length === 1) {
+    const it = items[0];
+    return { id: it.id, size: it.size, isLeaf: true, left: null, right: null };
+  }
+  const heap = new MinHeap();
+  for (const it of items) {
+    heap.push({ id: it.id, size: it.size, isLeaf: true, left: null, right: null });
+  }
+  while (heap.size() > 1) {
+    const a = heap.pop();
+    const b = heap.pop();
+    heap.push({
+      id: null,
+      size: a.size + b.size,
+      isLeaf: false,
+      // left = the smaller-or-equal one so child ordering is stable
+      left: a, right: b,
+    });
+  }
+  return heap.pop();
+}
+
+// Max depth of the balancer tree (for tests).
+function maxDepth(node) {
+  if (!node) return 0;
+  if (node.isLeaf) return 1;
+  return 1 + Math.max(maxDepth(node.left), maxDepth(node.right));
+}
+
+/* ---- src/layout.js ---- */
+// Slice-and-dice layout on a pre-balanced binary tree.
+//
+// Each call assigns a rect to the subtree. Internal (balancer) nodes are split;
+// the ratio is (left.size / node.size). We split along the longer axis.
+// Visibility check: the rect must enclose at least one integer pixel
+// center, i.e. floor(x + w + 0.5) - floor(x + 0.5) > 0. This matches
+// GrandPerspective's TreeLayoutBuilder — we deliberately avoid any area-based
+// cutoff because an area check applied to internal balancer nodes drops whole
+// buckets of children and leaves uncovered (background-coloured) holes.
+
+/**
+ * @param {BalancerNode} root
+ * @param {{x:number,y:number,w:number,h:number}} rect
+ * @param {(leafId:string, rect:{x,y,w,h}) => void} onLeaf
+ * @param {number} [splitBias=1] — ratio > 1 biases toward vertical splits,
+ *   < 1 toward horizontal. Used by stretch-zoom to preserve the original
+ *   aspect ratio's split directions while laying out at full canvas size.
+ *   The split criterion becomes `w > h * splitBias` instead of `w > h`.
+ */
+function layoutTree(root, rect, onLeaf, splitBias) {
+  if (!root) return;
+  if (!visible(rect)) return;
+  if (root.isLeaf) {
+    onLeaf(root.id, rect);
+    return;
+  }
+  const ratio = root.size > 0 ? root.left.size / root.size : 0.5;
+  let r1, r2;
+  if (rect.w > rect.h * (splitBias || 1)) {
+    const w1 = ratio * rect.w;
+    r1 = { x: rect.x, y: rect.y, w: w1, h: rect.h };
+    r2 = { x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h };
+  } else {
+    const h1 = ratio * rect.h;
+    r1 = { x: rect.x, y: rect.y, w: rect.w, h: h1 };
+    r2 = { x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 };
+  }
+  layoutTree(root.left, r1, onLeaf, splitBias);
+  layoutTree(root.right, r2, onLeaf, splitBias);
+}
+
+function visible(rect) {
+  const dx = Math.floor(rect.x + rect.w + 0.5) - Math.floor(rect.x + 0.5);
+  const dy = Math.floor(rect.y + rect.h + 0.5) - Math.floor(rect.y + 0.5);
+  return dx > 0 && dy > 0;
+}
+
+/* ---- src/builder.js ---- */
+// Data ingestion. Converts tabular (labels/parents/values) or accessor-based
+// tree input into a flat Map<id, TreeNode> plus roots. Also handles:
+//   - parent-value aggregation (aggregateFn)
+//   - parent-color aggregation (colorAggregateFn)
+//   - collapsing children that won't render into a synthetic `other` node
+//
+// Notes:
+// - Tabular mode uses `ids` if supplied, else builds IDs from the ancestor
+//   chain joined with \x00 so they are stable across runs.
+// - Collapse is *approximate*: we check each node's share of its parent's
+//   value against `minRelArea`. True pixel-level pruning happens inside the
+//   layout pass; this step just preserves the spec's "synthetic `other`" rule.
+function buildFromTabular(data, opts = {}) {
+  const { labels, parents, values, parentIndices } = data;
+  const color = data.color;
+  const ids = data.ids;
+  const n = labels.length;
+  if (!Array.isArray(labels) || values == null || typeof values.length !== 'number') {
+    throw new Error('buildFromTabular: labels/values required');
+  }
+
+  // Fast path: parentIndices is an integer array (or TypedArray) where
+  // parentIndices[i] is the row index of node i's parent (-1 for roots).
+  // Parents always appear before children, enabling O(n) passes with no
+  // string-ID synthesis — critical for large datasets (millions of rows).
+  if (parentIndices != null && typeof parentIndices.length === 'number') {
+    if (parentIndices.length !== n) throw new Error('buildFromTabular: parentIndices length mismatch');
+
+    const nodes = new Map();
+    // Use integer row index as ID. childIds allocated lazily only for parents
+    // (leaves keep childIds:null), saving ~400 MB on 10M-file datasets.
+    for (let i = 0; i < n; i++) {
+      nodes.set(i, {
+        id: i, label: labels[i], value: Number(values[i]) || 0,
+        colorValue: color ? color[i] : values[i],
+        depth: 0, parentId: parentIndices[i] >= 0 ? parentIndices[i] : null,
+        childIds: null,
+        isOther: false, isLocated: false, rect: null, colorIndex: 0, _hasExplicitValue: true,
+      });
+    }
+
+    // Wire children — O(n), no hashing.
+    for (let i = 0; i < n; i++) {
+      const pi = parentIndices[i];
+      if (pi < 0) continue;
+      const parent = nodes.get(pi);
+      if (parent.childIds === null) parent.childIds = [];
+      parent.childIds.push(i);
+    }
+
+    // Depth: O(n) forward pass (parents guaranteed before children).
+    for (let i = 0; i < n; i++) {
+      const pi = parentIndices[i];
+      if (pi >= 0) nodes.get(i).depth = nodes.get(pi).depth + 1;
+    }
+
+    // Value aggregation: O(n) reverse pass — each child adds to its parent.
+    for (let i = n - 1; i >= 0; i--) {
+      const pi = parentIndices[i];
+      if (pi >= 0) nodes.get(pi).value += nodes.get(i).value;
+    }
+
+    const roots = [];
+    for (let i = 0; i < n; i++) if (parentIndices[i] < 0) roots.push(i);
+    return { nodes, roots };
+  }
+
+  // Legacy path: parents as string IDs or labels.
+  if (!(Array.isArray(parents))) throw new Error('buildFromTabular: parents or parentIndices required');
+  if (labels.length !== parents.length || labels.length !== values.length) {
+    throw new Error('buildFromTabular: arrays must be same length');
+  }
+
+  const idOfRow = new Array(n);
+  const byLabelForParent = new Map(); // parent_id → Map<label, rowIndex>
+  for (let i = 0; i < n; i++) {
+    const key = parents[i] || '';
+    if (!byLabelForParent.has(key)) byLabelForParent.set(key, new Map());
+    byLabelForParent.get(key).set(labels[i], i);
+  }
+
+  // Build id→row index once for O(1) parent lookups.
+  const idToRow = ids ? new Map(ids.map((id, i) => [id, i])) : null;
+
+  function resolveId(i, seen = new Set()) {
+    if (idOfRow[i] !== undefined) return idOfRow[i];
+    if (seen.has(i)) throw new Error('buildFromTabular: parent cycle at row ' + i);
+    seen.add(i);
+    if (ids && ids[i]) { idOfRow[i] = ids[i]; return ids[i]; }
+    const parentKey = parents[i] || '';
+    if (!parentKey) { idOfRow[i] = labels[i]; return idOfRow[i]; }
+    if (ids) {
+      const parentRow = idToRow.get(parentKey);
+      if (parentRow == null) throw new Error('buildFromTabular: unknown parent id ' + parentKey);
+      const pid = resolveId(parentRow, seen);
+      idOfRow[i] = pid + '\x00' + labels[i];
+      return idOfRow[i];
+    } else {
+      if (byLabelForParent.get('').has(parentKey)) {
+        const parentRow = byLabelForParent.get('').get(parentKey);
+        const pid = resolveId(parentRow, seen);
+        idOfRow[i] = pid + '\x00' + labels[i];
+        return idOfRow[i];
+      }
+      idOfRow[i] = parentKey + '\x00' + labels[i];
+      return idOfRow[i];
+    }
+  }
+  for (let i = 0; i < n; i++) resolveId(i);
+
+  const nodes = new Map();
+  for (let i = 0; i < n; i++) {
+    const id = idOfRow[i];
+    nodes.set(id, {
+      id, label: labels[i], value: Number(values[i]) || 0,
+      colorValue: color ? color[i] : values[i],
+      depth: 0, parentId: null, childIds: [],
+      isOther: false, isLocated: false, rect: null, colorIndex: 0, _hasExplicitValue: true,
+    });
+  }
+
+  for (let i = 0; i < n; i++) {
+    const id = idOfRow[i];
+    const pkey = parents[i] || '';
+    if (!pkey) continue;
+    let parentId;
+    if (ids) {
+      const parentRow = idToRow.get(pkey);
+      if (parentRow == null) throw new Error('buildFromTabular: unknown parent id ' + pkey);
+      parentId = idOfRow[parentRow];
+    } else if (byLabelForParent.get('').has(pkey)) {
+      parentId = idOfRow[byLabelForParent.get('').get(pkey)];
+    } else {
+      parentId = pkey;
+    }
+    if (!nodes.has(parentId)) {
+      throw new Error('buildFromTabular: orphan row ' + id + ' (parent ' + parentId + ' missing)');
+    }
+    const node = nodes.get(id);
+    node.parentId = parentId;
+    nodes.get(parentId).childIds.push(id);
+  }
+
+  return finalize(nodes, opts);
+}
+function buildFromTree(root, accessors, opts = {}) {
+  if (!accessors || typeof accessors.getId !== 'function') {
+    throw new Error('buildFromTree: getId is required');
+  }
+  const { getChildren, getValue, getLabel, getColor, getId } = accessors;
+  const nodes = new Map();
+  function visit(item, parentId) {
+    const id = getId(item);
+    if (nodes.has(id)) throw new Error('buildFromTree: duplicate id ' + id);
+    const v = Number(getValue(item)) || 0;
+    nodes.set(id, {
+      id,
+      label: getLabel(item),
+      value: v,
+      colorValue: getColor ? getColor(item) : v,
+      depth: 0,
+      parentId,
+      childIds: [],
+      isOther: false,
+      isLocated: false,
+      rect: null,
+      colorIndex: 0,
+      _hasExplicitValue: true,
+    });
+    const children = (getChildren && getChildren(item)) || [];
+    for (const c of children) {
+      visit(c, id);
+      nodes.get(id).childIds.push(getId(c));
+    }
+  }
+  visit(root, null);
+  return finalize(nodes, opts);
+}
+
+// Post-process: aggregate missing values up, compute depth, collapse small children.
+function finalize(nodes, opts) {
+  const {
+    aggregateFn = (vals) => vals.reduce((a, b) => a + b, 0),
+    colorAggregateFn = defaultColorAggregate,
+    minRelArea = 0, // children whose (value/parent.value) < minRelArea fold into `other`
+  } = opts;
+
+  // Find root(s).
+  const roots = [];
+  for (const n of nodes.values()) if (n.parentId === null) roots.push(n.id);
+
+  // Topologically compute values (post-order) — iterative to avoid stack overflow.
+  const order = [];
+  const stack = [...roots];
+  const seen = new Set();
+  while (stack.length) {
+    const id = stack[stack.length - 1];
+    if (!seen.has(id)) {
+      seen.add(id);
+      const children = nodes.get(id).childIds || [];
+      for (const c of children) if (!seen.has(c)) stack.push(c);
+    } else {
+      stack.pop();
+      order.push(id);
+    }
+  }
+
+  // Compute depth top-down — iterative.
+  const depthStack = roots.map((r) => [r, 0]);
+  while (depthStack.length) {
+    const [id, d] = depthStack.pop();
+    nodes.get(id).depth = d;
+    for (const c of nodes.get(id).childIds || []) depthStack.push([c, d + 1]);
+  }
+
+  // Aggregate parent value/color from children if leaf children exist.
+  for (const id of order) {
+    const n = nodes.get(id);
+    if (n.childIds.length === 0) continue;
+    const childValues = n.childIds.map((c) => nodes.get(c).value);
+    // If parent had no explicit value, replace with aggregation.
+    n.value = aggregateFn(childValues);
+    if (!n._hasExplicitValue || n.colorValue === undefined || n.colorValue === null) {
+      const cvs = n.childIds.map((c) => nodes.get(c).colorValue);
+      n.colorValue = colorAggregateFn(cvs);
+    }
+  }
+
+  // Collapse small siblings into synthetic `other` per parent.
+  if (minRelArea > 0) {
+    // Iteratively delete a subtree so we don't leave orphan descendants in
+    // `nodes` when we collapse a small child.
+    function deleteSubtree(nid) {
+      const stk = [nid];
+      while (stk.length) {
+        const cur = stk.pop();
+        const nn = nodes.get(cur);
+        if (!nn) continue;
+        for (const c of nn.childIds || []) stk.push(c);
+        nodes.delete(cur);
+      }
+    }
+    for (const id of Array.from(nodes.keys())) {
+      const n = nodes.get(id);
+      if (!n) continue; // may have been deleted by a prior collapse
+      if (n.childIds.length < 2) continue;
+      const small = [];
+      const kept = [];
+      for (const cid of n.childIds) {
+        const c = nodes.get(cid);
+        if (!c) continue; // ditto
+        if (n.value > 0 && c.value / n.value < minRelArea) small.push(cid);
+        else kept.push(cid);
+      }
+      if (small.length >= 2) {
+        const otherId = id + '\x00__other__';
+        const size = small.reduce((a, cid) => a + nodes.get(cid).value, 0);
+        nodes.set(otherId, {
+          id: otherId,
+          label: 'other',
+          value: size,
+          colorValue: colorAggregateFn(small.map((cid) => nodes.get(cid).colorValue)),
+          depth: n.depth + 1,
+          parentId: id,
+          childIds: [],
+          isOther: true,
+          isLocated: false,
+          rect: null,
+          colorIndex: 0,
+          _hasExplicitValue: true,
+        });
+        for (const cid of small) deleteSubtree(cid);
+        n.childIds = kept.concat([otherId]);
+      }
+    }
+  }
+
+  return { nodes, roots };
+}
+
+function defaultColorAggregate(vals) {
+  if (!vals.length) return 0;
+  if (typeof vals[0] === 'number') {
+    let sum = 0, n = 0;
+    for (const v of vals) if (Number.isFinite(v)) { sum += v; n++; }
+    return n ? sum / n : 0;
+  }
+  return vals[0]; // first-child semantics for categorical values
+}
+
+/* ---- src/lut.js ---- */
+// Brightness-ramp lookup tables (LUTs) for treemap cell shading.
+//
+// A LUT is a 256-entry RGBA byte array:
+//   * index 0    — darkest shade of the base color
+//   * index 128  — approximately the base color itself
+//   * index 255  — lightest shade of the base color
+//
+// Ramp construction:
+//   Work in linear RGB (sRGB decoded to the 0..1 linear domain). Pick a dark
+//   target T_dark = (0,0,0) and a light target T_light = (1,1,1). For the
+//   bottom half, linearly interpolate from T_dark to the base color. For the
+//   top half, linearly interpolate from the base color to T_light. Multiply
+//   the span by `intensity` so that:
+//      intensity = 0  → every entry equals the base color (flat LUT)
+//      intensity = 1  → index 0 is black, index 255 is white
+//   Finally re-encode each linear sample to sRGB and store as bytes.
+//
+// Working in linear RGB (instead of raw gamma-encoded sRGB) keeps the
+// mid-tones from looking muddy when the intensity is high: the perceived
+// brightness changes smoothly from one end of the ramp to the other.
+
+const MID = 128;
+
+/**
+ * Build one LUT per palette entry.
+ *
+ * @param {string[]} palette   CSS `hsl(h, s%, l%)` color strings
+ * @param {number}   intensity in [0,1]; 0 = flat, 1 = full black→white range
+ * @returns {Uint8ClampedArray[]}
+ */
+function buildLUTs(palette, intensity) {
+  const k = clamp01(intensity);
+  const out = new Array(palette.length);
+  for (let i = 0; i < palette.length; i++) {
+    const rgb = parseCssColor(palette[i]) || [128, 128, 128];
+    out[i] = buildRamp(rgb[0], rgb[1], rgb[2], k);
+  }
+  return out;
+}
+
+/**
+ * Build a LUT from an arbitrary CSS color string. Falls back to medium gray
+ * for anything we can't parse.
+ *
+ * @param {string} css
+ * @param {number} intensity in [0,1]
+ * @returns {Uint8ClampedArray}
+ */
+function buildLUTForCssColor(css, intensity) {
+  const rgb = parseCssColor(css) || [128, 128, 128];
+  return buildRamp(rgb[0], rgb[1], rgb[2], clamp01(intensity));
+}
+
+// ---------------------------------------------------------------------------
+// LUT core
+// ---------------------------------------------------------------------------
+
+function buildRamp(r8, g8, b8, intensity) {
+  const lut = new Uint8ClampedArray(256 * 4);
+
+  // Convert base color to linear RGB once.
+  const br = srgbToLinear(r8 / 255);
+  const bg = srgbToLinear(g8 / 255);
+  const bb = srgbToLinear(b8 / 255);
+
+  for (let i = 0; i < 256; i++) {
+    let lr, lg, lb;
+    if (i <= MID) {
+      // Dark half: index 0 → dark target (0); index 128 → base color.
+      // t runs from 0 (at i=0) to 1 (at i=128).
+      const t = i / MID;
+      // Lerp a reduced-intensity dark target toward the base color.
+      // We scale the travel by `intensity`: at intensity 0 we stay on base,
+      // at intensity 1 we reach pure black at i=0.
+      const mix = 1 - intensity * (1 - t);
+      lr = br * mix;
+      lg = bg * mix;
+      lb = bb * mix;
+    } else {
+      // Light half: index 128 → base, index 255 → light target (1).
+      // t runs from 0 (at i=128) to 1 (at i=255).
+      const t = (i - MID) / (255 - MID);
+      const s = intensity * t;
+      lr = br + (1 - br) * s;
+      lg = bg + (1 - bg) * s;
+      lb = bb + (1 - bb) * s;
+    }
+    const off = i * 4;
+    lut[off]     = Math.round(linearToSrgb(lr) * 255);
+    lut[off + 1] = Math.round(linearToSrgb(lg) * 255);
+    lut[off + 2] = Math.round(linearToSrgb(lb) * 255);
+    lut[off + 3] = 255;
+  }
+  return lut;
+}
+
+// ---------------------------------------------------------------------------
+// sRGB <-> linear
+// ---------------------------------------------------------------------------
+
+function srgbToLinear(c) {
+  // c is in [0,1]. Standard sRGB EOTF.
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function linearToSrgb(c) {
+  if (c <= 0) return 0;
+  if (c >= 1) return 1;
+  return c <= 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+}
+
+// ---------------------------------------------------------------------------
+// CSS color parsing (a tiny self-contained parser; no regex backrefs needed)
+// ---------------------------------------------------------------------------
+
+/**
+ * Parse a CSS color string into an [r, g, b] triple of 0..255 integers.
+ * Returns null if the input isn't recognized. Accepts:
+ *   hsl(h, s%, l%)
+ *   rgb(r, g, b)
+ *   #rgb  or  #rrggbb
+ */
+function parseCssColor(input) {
+  if (typeof input !== 'string') return null;
+  const s = input.trim();
+
+  if (s.charAt(0) === '#') return parseHex(s);
+
+  const lower = s.toLowerCase();
+  if (lower.startsWith('hsl')) return parseFnHsl(s);
+  if (lower.startsWith('rgb')) return parseFnRgb(s);
+  return null;
+}
+
+function parseHex(s) {
+  const hex = s.slice(1);
+  if (hex.length === 3) {
+    const r = hexByte(hex[0] + hex[0]);
+    const g = hexByte(hex[1] + hex[1]);
+    const b = hexByte(hex[2] + hex[2]);
+    if (r < 0 || g < 0 || b < 0) return null;
+    return [r, g, b];
+  }
+  if (hex.length === 6) {
+    const r = hexByte(hex.slice(0, 2));
+    const g = hexByte(hex.slice(2, 4));
+    const b = hexByte(hex.slice(4, 6));
+    if (r < 0 || g < 0 || b < 0) return null;
+    return [r, g, b];
+  }
+  return null;
+}
+
+function hexByte(pair) {
+  const v = parseInt(pair, 16);
+  return Number.isFinite(v) && /^[0-9a-fA-F]{2}$/.test(pair) ? v : -1;
+}
+
+function parseFnRgb(s) {
+  const args = extractArgs(s);
+  if (!args || args.length < 3) return null;
+  const r = parseByte(args[0]);
+  const g = parseByte(args[1]);
+  const b = parseByte(args[2]);
+  if (r == null || g == null || b == null) return null;
+  return [r, g, b];
+}
+
+function parseFnHsl(s) {
+  const args = extractArgs(s);
+  if (!args || args.length < 3) return null;
+  const h = parseFloat(args[0]);
+  const ss = parsePercent(args[1]);
+  const ll = parsePercent(args[2]);
+  if (!isFinite(h) || ss == null || ll == null) return null;
+  return hslToRgb(((h % 360) + 360) % 360 / 360, ss, ll);
+}
+
+function extractArgs(s) {
+  const open = s.indexOf('(');
+  const close = s.lastIndexOf(')');
+  if (open < 0 || close < open) return null;
+  return s.slice(open + 1, close).split(',').map((t) => t.trim());
+}
+
+function parseByte(token) {
+  if (token.endsWith('%')) {
+    const p = parseFloat(token);
+    if (!isFinite(p)) return null;
+    return Math.round(clamp01(p / 100) * 255);
+  }
+  const v = parseFloat(token);
+  if (!isFinite(v)) return null;
+  return Math.max(0, Math.min(255, Math.round(v)));
+}
+
+function parsePercent(token) {
+  const v = parseFloat(token);
+  if (!isFinite(v)) return null;
+  return clamp01(v / 100);
+}
+
+/**
+ * HSL (each channel in [0,1]) → RGB (each in 0..255 ints).
+ * Classic piecewise formula.
+ */
+function hslToRgb(h, s, l) {
+  if (s === 0) {
+    const v = Math.round(l * 255);
+    return [v, v, v];
+  }
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  return [
+    Math.round(hueSlice(p, q, h + 1 / 3) * 255),
+    Math.round(hueSlice(p, q, h) * 255),
+    Math.round(hueSlice(p, q, h - 1 / 3) * 255),
+  ];
+}
+
+function hueSlice(p, q, t) {
+  if (t < 0) t += 1;
+  if (t > 1) t -= 1;
+  if (t < 1 / 6) return p + (q - p) * 6 * t;
+  if (t < 1 / 2) return q;
+  if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+  return p;
+}
+
+// ---------------------------------------------------------------------------
+// Misc
+// ---------------------------------------------------------------------------
+
+function clamp01(v) {
+  return v < 0 ? 0 : v > 1 ? 1 : v;
+}
+
+/* ---- src/painter.js ---- */
+// Pixel-level "raised tile" renderer for treemap cells.
+//
+// Each cell is split along its TL→BR diagonal into two triangular halves:
+//
+//     .----------------.
+//     |\     upper    .|
+//     | \    right   . |
+//     |  \          .  |
+//     |   \        .   |
+//     |    \      .    |  diagonal from (0,0) to (w-1,h-1)
+//     |     \    .     |
+//     |      \  .      |
+//     |  lower\.       |
+//     |  left  \       |
+//     '----------------'
+//
+// For a pixel at (i,j) inside a cell of size (w,h), the side is chosen by
+// comparing the two normalized coordinates i/w and j/h:
+//   * i/w  >  j/h   →  upper-right triangle; brightness comes from i (horizontal)
+//   * i/w  <= j/h   →  lower-left  triangle; brightness comes from j (vertical)
+// The leftmost column (i=0) and the topmost row (j=0) both map to the
+// brightest LUT entry (255); the rightmost column and bottom row map to the
+// darkest (0). The two triangles meet along the diagonal at a matching index,
+// which yields a crisp seam from top-left to bottom-right.
+//
+// The LUT is an RGBA byte table with 256 entries, so we read 4 bytes per
+// pixel from it and copy them straight into the destination buffer.
+
+/**
+ * Paint a single cell into the ImageData backing buffer.
+ *
+ * @param {Uint8ClampedArray} data   destination RGBA buffer
+ * @param {number} stride            pixels per row in `data`
+ * @param {number} x,y,w,h           integer rect (already clipped to buffer)
+ * @param {Uint8ClampedArray} lut    256 RGBA entries (1024 bytes)
+ */
+function paintCell(data, stride, x, y, w, h, lut) {
+  if (w <= 0 || h <= 0) return;
+
+  // Precompute the scale factors that map an in-cell coordinate in [0, w-1]
+  // or [0, h-1] to a LUT index in [0, 255]. We want:
+  //    i = 0     -> 255  (brightest)
+  //    i = w-1   -> 0    (darkest)
+  // which is   idx = 255 * (w - 1 - i) / (w - 1).
+  // For w = 1 the single column uses the mid-LUT (index 128) so a 1-pixel
+  // cell looks like the base color rather than pure bright or pure dark.
+  const xScale = w > 1 ? 255 / (w - 1) : 0;
+  const yScale = h > 1 ? 255 / (h - 1) : 0;
+  const xMid = w > 1 ? 0 : 128;  // offset added when w == 1
+  const yMid = h > 1 ? 0 : 128;
+
+  // Hoist as much as possible out of the inner loop.
+  const rowStride = stride * 4;
+  let rowBase = (y * stride + x) * 4;
+
+  for (let j = 0; j < h; j++) {
+    // Normalized vertical position in [0,1].
+    const jNorm = h > 1 ? j / (h - 1) : 0;
+    const jIdx = h > 1 ? ((h - 1 - j) * yScale + 0.5) | 0 : yMid;
+
+    let p = rowBase;
+    for (let i = 0; i < w; i++) {
+      const iNorm = w > 1 ? i / (w - 1) : 0;
+      let idx;
+      if (iNorm > jNorm) {
+        // Upper-right triangle: brightness depends on horizontal position.
+        idx = w > 1 ? ((w - 1 - i) * xScale + 0.5) | 0 : xMid;
+      } else {
+        // Lower-left triangle (includes the diagonal).
+        idx = jIdx;
+      }
+      const lp = idx << 2;  // idx * 4
+      data[p]     = lut[lp];
+      data[p + 1] = lut[lp + 1];
+      data[p + 2] = lut[lp + 2];
+      data[p + 3] = lut[lp + 3];
+      p += 4;
+    }
+    rowBase += rowStride;
+  }
+}
+
+/**
+ * Fill the background then paint every cell.
+ *
+ * @param {ImageData} image
+ * @param {Array<{x:number,y:number,w:number,h:number,lutIndex:number}>} cells
+ * @param {Uint8ClampedArray[]} luts
+ * @param {{r:number,g:number,b:number}} background
+ */
+function paintAll(image, cells, luts, background) {
+  const data = image.data;
+  const width = image.width;
+  const height = image.height;
+
+  const bg = background || { r: 0, g: 0, b: 0 };
+  const br = bg.r | 0, bg2 = bg.g | 0, bb = bg.b | 0;
+
+  // Paint the background. Unrolled to copy a 4-pixel "pattern" into the
+  // remainder of the buffer via Uint8ClampedArray.set — this is much faster
+  // than a plain byte-by-byte loop on large canvases.
+  const seed = 16; // bytes = 4 pixels
+  for (let p = 0; p < seed && p < data.length; p += 4) {
+    data[p]     = br;
+    data[p + 1] = bg2;
+    data[p + 2] = bb;
+    data[p + 3] = 255;
+  }
+  let filled = Math.min(seed, data.length);
+  while (filled < data.length) {
+    const chunk = Math.min(filled, data.length - filled);
+    data.copyWithin(filled, 0, chunk);
+    filled += chunk;
+  }
+
+  // Paint every cell. Cell rects may be fractional; we snap edges to integer
+  // pixel boundaries using round(edge) so adjacent cells meet exactly.
+  for (let k = 0; k < cells.length; k++) {
+    const c = cells[k];
+    const x0 = Math.round(c.x);
+    const y0 = Math.round(c.y);
+    const x1 = Math.round(c.x + c.w);
+    const y1 = Math.round(c.y + c.h);
+    const rx = x0 < 0 ? 0 : x0;
+    const ry = y0 < 0 ? 0 : y0;
+    const rxEnd = x1 > width  ? width  : x1;
+    const ryEnd = y1 > height ? height : y1;
+    const rw = rxEnd - rx;
+    const rh = ryEnd - ry;
+    if (rw <= 0 || rh <= 0) continue;
+    paintCell(data, width, rx, ry, rw, rh, luts[c.lutIndex]);
+  }
+}
+
+/* ---- src/format.js ---- */
+// Small d3-format-ish subset sufficient for valueFormat: we handle `,d`,
+// SI suffixes (`.2s`), percent (`.1%`), fixed (`.2f`) and bytes (`b`).
+function applyFormat(value, fmt) {
+  if (!fmt) return String(value);
+  // Custom 'b' for bytes.
+  if (fmt === 'b' || fmt === 'bytes') return humanBytes(value);
+  // ,d
+  if (fmt === ',d') return Number(value).toLocaleString();
+  const m = /^\.(\d+)([sfp%])$/.exec(fmt);
+  if (m) {
+    const p = +m[1], kind = m[2];
+    if (kind === 'f') return Number(value).toFixed(p);
+    if (kind === '%') return (Number(value) * 100).toFixed(p) + '%';
+    if (kind === 'p') return (Number(value) * 100).toFixed(p) + '%';
+    if (kind === 's') return siPrefix(value, p);
+  }
+  return String(value);
+}
+
+function humanBytes(v) {
+  const abs = Math.abs(v);
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  let i = 0;
+  let n = abs;
+  while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+  const s = (v < 0 ? '-' : '') + (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2));
+  return s + ' ' + units[i];
+}
+
+function siPrefix(v, p) {
+  const abs = Math.abs(v);
+  const units = ['', 'k', 'M', 'G', 'T', 'P'];
+  let i = 0;
+  let n = abs;
+  while (n >= 1000 && i < units.length - 1) { n /= 1000; i++; }
+  const s = (v < 0 ? '-' : '') + n.toFixed(p);
+  return s + units[i];
+}
+
+/* ---- src/gp-treemap.js ---- */
+// <gp-treemap> — a standards-compliant Custom Element rendering an
+// interactive treemap with a "raised tile" look: bright upper-left, dark
+// lower-right, with a crisp diagonal seam between the two halves of every
+// cell.
+//
+// Rendering: a single <canvas> is painted pixel-by-pixel (see
+// src/painter.js). Cells have no explicit stroke borders — the shading
+// gradient alone defines the edge between neighbours. A parallel flat array
+// of cell rects powers hit-testing, so hover/click still work without
+// per-cell SVG nodes. The toolbar and tooltip are plain DOM.
+//
+// The spec describes a Stencil/Worker pipeline. This is a single-file
+// ES-module realization; layout and painting run on the main thread, which
+// is fine up to a few thousand visible cells — see Open Question #6 in
+// spec.md and the README.
+
+
+
+
+
+
+
+
+const DEFAULT_PROPS = {
+  labels: null, parents: null, parentIndices: null, values: null, color: null, ids: null,
+  root: null, getChildren: null, getValue: null, getLabel: null,
+  getColor: null, getId: null,
+  aggregateFn: null, colorAggregateFn: null,
+  colorMode: 'categorical', colorScale: 'linear', colorDomain: null,
+  colorMap: {}, colorFn: null,
+  palette: 'tokyo-night', gradientIntensity: 0.5,
+  visibleRootId: null, displayDepth: Infinity, locatedNodeIds: [],
+  minCellArea: 16, showLabels: false, groupPadding: 0,
+  valueFormat: null, valueFormatter: null,
+  toolbar: true, zoomDuration: 350, tooltip: true, tooltipInToolbar: true,
+  background: '#111',
+};
+
+const STYLE = `
+:host { display:flex; flex-direction:column; position:relative; overflow:hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; font-size:12px;
+  color: var(--gp-fg, #222); background: var(--gp-bg, #f4f4f4);
+  --gp-selected:#ffffff; --gp-located:#ff1fa3; }
+.toolbar { display:flex; gap:8px; align-items:center; padding:6px 8px;
+  border-bottom:1px solid var(--gp-border, #0001);
+  background: var(--gp-surface, #fafafa); user-select:none; flex-wrap:wrap; min-height:34px; }
+.toolbar .sep { width:1px; height:20px; background: var(--gp-border, #0002); }
+.toolbar button { padding:2px 8px; background: var(--gp-bg, #fff);
+  border:1px solid var(--gp-border, #0003); border-radius:4px; cursor:pointer;
+  font:inherit; color: var(--gp-fg, inherit); }
+.toolbar button:hover { background: var(--gp-surface, #eef); }
+.toolbar button:disabled { opacity:0.35; cursor:default; }
+.toolbar button:disabled:hover { background: var(--gp-bg, #fff); }
+.info-line { padding:3px 8px; border-bottom:1px solid var(--gp-border, #0001);
+  background: var(--gp-surface, #fafafa); font-variant-numeric: tabular-nums;
+  color: var(--gp-fg, #333); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-height:22px;
+  display:flex; align-items:center; gap:0; }
+.info-line .root-icon { cursor:pointer; margin-right:4px; color: var(--gp-fg-muted, #999); flex-shrink:0; text-decoration:none; }
+.info-line .root-icon:hover { color: var(--gp-accent, #0645ad); text-decoration:none; }
+.info-line .root-icon.focused { color: var(--gp-fg, #000); }
+.info-line a { cursor:pointer; color: var(--gp-accent, #0645ad); text-decoration:none; }
+.info-line a:hover { text-decoration:underline; }
+.info-line a.focused { font-weight:700; color: var(--gp-fg, #000); text-decoration:underline; text-underline-offset:2px; }
+.info-line .sep-slash { color: var(--gp-fg-muted, #999); padding:0 1px; }
+.info-line .val { color: var(--gp-fg-muted, #555); margin-left:6px; }
+.stage { position:relative; flex:1; overflow:hidden; background: var(--gp-stage-bg, #0b0b0b); cursor: default; outline: none;
+  padding: var(--gp-stage-margin, 4px); }
+.stage canvas { position:absolute; inset: var(--gp-stage-margin, 4px); width:calc(100% - 2 * var(--gp-stage-margin, 4px)); height:calc(100% - 2 * var(--gp-stage-margin, 4px)); display:block; image-rendering: pixelated;
+  transform-origin: 0 0; transition: transform var(--gp-zoom-ms, 350ms) ease; }
+.overlay { position:absolute; inset: var(--gp-stage-margin, 4px); pointer-events:none; transform-origin:0 0; overflow:visible; }
+.overlay .sel, .overlay .loc { position:absolute; box-sizing:border-box; pointer-events:none; }
+.overlay .sel { border:2px solid var(--gp-selected); box-sizing:border-box; }
+.overlay .loc { border:2px solid var(--gp-located); box-shadow: 0 0 0 1px #fff8; }
+.overlay .lbl { position:absolute; font-size:11px; font-weight:500; line-height:1; padding:1px 3px;
+  color: var(--gp-fg, #111);
+  text-shadow: 0 0 2px var(--gp-bg, #ffffffcc), 0 0 2px var(--gp-bg, #ffffffcc);
+  white-space:nowrap; pointer-events:none; transform: translate(-50%, -50%); }
+.tooltip { position:fixed; pointer-events:none; padding:6px 10px;
+  background: var(--gp-surface, #111d); color: var(--gp-fg, #fff);
+  border:1px solid var(--gp-border, transparent);
+  border-radius:4px; font-size:12px; line-height:1.4; z-index:1000; max-width:480px; box-shadow:0 2px 6px #0006; }
+.tooltip b { display:block; font-size:11px; font-weight:600; margin-bottom:2px; overflow-wrap:break-word; }
+.spinner { position:absolute; top:8px; right:8px; pointer-events:none; z-index:100;
+  width:18px; height:18px; border:2px solid #fff3; border-top-color:#fffa;
+  border-radius:50%; animation: gp-spin 0.8s linear infinite; }
+.spinner[hidden] { display:none; }
+@keyframes gp-spin { to { transform: rotate(360deg); } }
+`;
+class GpTreemap extends HTMLElement {
+  static get observedAttributes() {
+    return [
+      'color-mode','color-scale','palette','gradient-intensity','visible-root-id',
+      'display-depth','min-cell-area','show-labels','value-format','toolbar',
+      'zoom-duration','tooltip','background','group-padding','theme',
+    ];
+  }
+
+  constructor() {
+    super();
+    const root = this.attachShadow({ mode: 'open' });
+    const style = document.createElement('style');
+    style.textContent = STYLE;
+    root.appendChild(style);
+
+    this._toolbar = document.createElement('div');
+    this._toolbar.className = 'toolbar';
+    root.appendChild(this._toolbar);
+
+    this._infoLine = document.createElement('div');
+    this._infoLine.className = 'info-line';
+    this._infoLine.innerHTML = '<span>(click a cell)</span>';
+    root.appendChild(this._infoLine);
+
+    // Delegated handlers on the info-line. Single click focuses; double-click
+    // zooms.  Because focusing can make a link bold (changing its width and
+    // shifting siblings), the second click of a double-click may not land on
+    // the same <a>.  We track the last-clicked node ID so the dblclick can
+    // always act on the right node.
+    this._lastBreadcrumbClickId = null;
+    this._lastBreadcrumbClickTime = 0;
+    this._infoLine.addEventListener('click', (e) => {
+      const a = e.target.closest('a[data-node-id]');
+      if (!a) return;
+      e.preventDefault();
+      const nid = a.dataset.nodeId;
+      const coerced = /^\d+$/.test(nid) ? Number(nid) : nid;
+      this._lastBreadcrumbClickId = coerced;
+      this._lastBreadcrumbClickTime = Date.now();
+      this._lastBreadcrumbIsRoot = !!a.dataset.isRoot;
+      if (a.dataset.isRoot) { this._setFocus(coerced); this._stage.focus(); }
+      else this._setFocus(coerced);
+    });
+    this._infoLine.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      // Use tracked ID from the first click (may not match current e.target).
+      const id = this._lastBreadcrumbClickId;
+      if (id == null) return;
+      if (this._lastBreadcrumbIsRoot) this.zoomReset();
+      else this.stretchZoomIn(id);
+    });
+
+    this._stage = document.createElement('div');
+    this._stage.className = 'stage';
+    this._stage.tabIndex = 0;
+    root.appendChild(this._stage);
+
+    this._canvas = document.createElement('canvas');
+    this._stage.appendChild(this._canvas);
+
+    this._overlay = document.createElement('div');
+    this._overlay.className = 'overlay';
+    this._stage.appendChild(this._overlay);
+
+    this._spinner = document.createElement('div');
+    this._spinner.className = 'spinner';
+    this._spinner.hidden = true;
+    this._stage.appendChild(this._spinner);
+
+    this._tooltip = document.createElement('div');
+    this._tooltip.className = 'tooltip';
+    this._tooltip.hidden = true;
+    root.appendChild(this._tooltip);
+
+    this._props = { ...DEFAULT_PROPS };
+    this._tree = null;
+    this._leaves = [];                     // flat leaves with rect + lutIndex
+    this._leafById = new Map();
+    this._targetId = null;      // leaf cell the user clicked
+    this._focusId = null;       // ancestor (or target itself) being highlighted
+    this._hoverId = null;
+    this._internalVisibleRootId = null;
+    this._visibleRootPath = null;  // array of IDs from tree root → zoom target
+    this._wheelAcc = 0;
+    this._selectionLocked = false;
+    this._hoverRaf = 0;
+    this._stretchZoomId = null;   // node zoomed into with preserved aspect
+    this._stretchZoomAspect = 0;  // original w/h ratio of zoomed node's rect
+    this._zoomAnimating = false;  // true during zoom animation
+
+    this._onResize = this._onResize.bind(this);
+    this._onStageMouse = this._onStageMouse.bind(this);
+    this._onClick = this._onClick.bind(this);
+
+    this._onWheel = this._onWheel.bind(this);
+    this._onKeyDown = this._onKeyDown.bind(this);
+
+    this._resizeObserver = new ResizeObserver(this._onResize);
+    this._stage.addEventListener('mousemove', this._onStageMouse);
+    this._stage.addEventListener('mouseleave', () => { this._hideTooltip(); this._setHover(null); });
+    this._stage.addEventListener('click', this._onClick);
+
+    this._stage.addEventListener('wheel', this._onWheel, { passive: true });
+    this._stage.addEventListener('keydown', this._onKeyDown);
+  }
+
+  connectedCallback() {
+    this._resizeObserver.observe(this._stage);
+    // Apply default theme if none was set via attribute.
+    if (!this.hasAttribute('theme')) this._applyTheme('tokyo-night');
+    requestAnimationFrame(() => this._queueRender());
+  }
+  disconnectedCallback() { this._resizeObserver.disconnect(); }
+
+  attributeChangedCallback(name, _old, val) {
+    switch (name) {
+      case 'color-mode': this._props.colorMode = val || 'categorical'; break;
+      case 'color-scale': this._props.colorScale = val || 'linear'; break;
+      case 'palette': this._props.palette = val || 'gp-default'; break;
+      case 'gradient-intensity': this._props.gradientIntensity = Number(val); break;
+      case 'visible-root-id': this._props.visibleRootId = val || null; break;
+      case 'display-depth': this._props.displayDepth = val == null ? Infinity : Number(val); break;
+      case 'min-cell-area': this._props.minCellArea = Number(val); break;
+      case 'show-labels': this._props.showLabels = val != null && val !== 'false'; break;
+      case 'value-format': this._props.valueFormat = val; break;
+      case 'toolbar': this._props.toolbar = val === 'false' ? false : (val || true); break;
+      case 'zoom-duration': this._props.zoomDuration = Number(val); break;
+      case 'tooltip': this._props.tooltip = val !== 'false'; break;
+      case 'background': this._props.background = val || '#111'; break;
+      case 'group-padding': this._props.groupPadding = Number(val) || 0; break;
+      case 'theme': this._applyTheme(val); break;
+    }
+    this._queueRender();
+  }
+
+  _applyTheme(name) {
+    const host = this.shadowRoot.host;
+    const theme = name ? THEMES[name] : null;
+    if (!theme) {
+      // Clear theme vars — revert to defaults.
+      for (const v of ['--gp-bg','--gp-surface','--gp-border','--gp-fg','--gp-fg-muted','--gp-accent','--gp-stage-bg'])
+        host.style.removeProperty(v);
+      this._props.palette = this._props._userPalette || 'gp-default';
+      this._props.background = this._props._userBackground || '#111';
+      // Restore original colorMap so extension-specific colors come back.
+      if (this._props._userColorMap !== undefined) this._props.colorMap = this._props._userColorMap;
+      return;
+    }
+    host.style.setProperty('--gp-bg', theme.bg);
+    host.style.setProperty('--gp-surface', theme.surface);
+    host.style.setProperty('--gp-border', theme.border);
+    host.style.setProperty('--gp-fg', theme.fg);
+    host.style.setProperty('--gp-fg-muted', theme.fgMuted);
+    host.style.setProperty('--gp-accent', theme.accent);
+    host.style.setProperty('--gp-stage-bg', theme.stageBg);
+    this._props._userPalette = this._props._userPalette || this._props.palette;
+    this._props._userBackground = this._props._userBackground || this._props.background;
+    // Stash the original colorMap and clear it so all categories use the
+    // theme palette instead of hardcoded per-category overrides.
+    if (this._props._userColorMap === undefined) this._props._userColorMap = this._props.colorMap;
+    this._props.colorMap = {};
+    this._props.palette = name;
+    this._props.background = theme.stageBg;
+  }
+
+  // ----- public methods -----
+  locateNode(id) {
+    const ids = new Set(this._props.locatedNodeIds || []);
+    ids.add(id);
+    this._props.locatedNodeIds = Array.from(ids);
+    this._queueRender();
+  }
+  findRenderedAncestor(id) {
+    if (!this._tree) return null;
+    let cur = this._tree.nodes.get(id);
+    while (cur) {
+      if (this._leafById.has(cur.id)) return cur;
+      cur = cur.parentId !== null ? this._tree.nodes.get(cur.parentId) : null;
+    }
+    return null;
+  }
+  zoomTo(id) { if (id == null || (this._tree && this._tree.nodes.has(id))) this._setVisibleRoot(id); }
+  zoomReset() { if (this._stretchZoomId) { this.stretchZoomReset(); return; } this._setVisibleRoot(null); }
+  zoomOut() {
+    if (this._stretchZoomId) { this.stretchZoomReset(); return; }
+    const vr = this._activeVisibleRootId();
+    if (vr == null || !this._tree) return;
+    const n = this._tree.nodes.get(vr);
+    this._setVisibleRoot(n && n.parentId !== null ? n.parentId : null);
+  }
+
+  stretchZoomIn(id) {
+    if (!id || !this._tree || !this._nodeRects || this._zoomAnimating) return;
+    let nodeRect = this._nodeRects.get(id);
+
+    // If the target isn't in the current subtree (e.g. it's an ancestor of
+    // the zoom root, or a node in another branch), reset the zoom so the
+    // full tree is laid out and the target's rect becomes available.
+    if (!nodeRect && this._stretchZoomId && this._tree.nodes.has(id)) {
+      this._stretchZoomId = null;
+      this._stretchZoomAspect = 0;
+      this._rebuildAndRender();
+      nodeRect = this._nodeRects.get(id);
+    }
+
+    if (!nodeRect || nodeRect.w <= 0 || nodeRect.h <= 0) return;
+
+    this._stretchZoomId = id;
+    this._stretchZoomAspect = nodeRect.w / nodeRect.h;
+    this._zoomAnimating = true;
+
+    // Build zoom path for hash persistence / lazy restore.
+    const chain = [];
+    let cur = this._tree.nodes.get(id);
+    while (cur) { chain.unshift(cur.id); cur = cur.parentId != null ? this._tree.nodes.get(cur.parentId) : null; }
+    this._visibleRootPath = chain;
+
+    // Animate: CSS-transform the current canvas to expand the node rect to fill the canvas area
+    const { cssW: canvasW, cssH: canvasH, dpr } = this._canvasMetrics();
+    const sx = canvasW / (nodeRect.w / dpr);
+    const sy = canvasH / (nodeRect.h / dpr);
+    const tx = -(nodeRect.x / dpr) * sx;
+    const ty = -(nodeRect.y / dpr) * sy;
+    this._canvas.style.transform = `matrix(${sx}, 0, 0, ${sy}, ${tx}, ${ty})`;
+    // Also scale the overlay to match
+    this._overlay.style.transform = `matrix(${sx}, 0, 0, ${sy}, ${tx}, ${ty})`;
+    this._overlay.style.transformOrigin = '0 0';
+
+    setTimeout(() => {
+      this._canvas.style.transition = 'none';
+      this._overlay.style.transition = 'none';
+      this._rebuildAndRender();  // renders zoomed content at full resolution
+      this._canvas.style.transform = '';
+      this._overlay.style.transform = '';
+      this._overlay.style.transformOrigin = '';
+      this._canvas.offsetHeight; // force reflow
+      this._canvas.style.transition = '';
+      this._overlay.style.transition = '';
+      this._zoomAnimating = false;
+    }, this._props.zoomDuration);
+
+    this._dispatch('gp-zoom-change', id);
+    this._renderToolbar();
+  }
+
+  stretchZoomReset() {
+    if (!this._stretchZoomId || this._zoomAnimating) return;
+    const oldId = this._stretchZoomId;
+    this._stretchZoomId = null;
+    this._stretchZoomAspect = 0;
+    this._zoomAnimating = true;
+
+    // Re-render the unzoomed layout (synchronous)
+    this._canvas.style.transition = 'none';
+    this._overlay.style.transition = 'none';
+    this._rebuildAndRender();
+
+    // Find where the previously-zoomed node sits in the new layout
+    const nodeRect = this._nodeRects && this._nodeRects.get(oldId);
+    if (nodeRect && nodeRect.w > 0 && nodeRect.h > 0) {
+      const { cssW: canvasW, cssH: canvasH, dpr } = this._canvasMetrics();
+      const sx = canvasW / (nodeRect.w / dpr);
+      const sy = canvasH / (nodeRect.h / dpr);
+      const tx = -(nodeRect.x / dpr) * sx;
+      const ty = -(nodeRect.y / dpr) * sy;
+      // Start zoomed-in, animate to identity
+      this._canvas.style.transform = `matrix(${sx}, 0, 0, ${sy}, ${tx}, ${ty})`;
+      this._overlay.style.transform = `matrix(${sx}, 0, 0, ${sy}, ${tx}, ${ty})`;
+      this._overlay.style.transformOrigin = '0 0';
+      this._canvas.offsetHeight; // force reflow
+      this._canvas.style.transition = '';
+      this._overlay.style.transition = `transform ${this._props.zoomDuration}ms ease`;
+      this._canvas.style.transform = '';
+      this._overlay.style.transform = '';
+    } else {
+      this._canvas.style.transition = '';
+      this._overlay.style.transition = '';
+    }
+
+    setTimeout(() => {
+      this._overlay.style.transformOrigin = '';
+      this._overlay.style.transition = '';
+      this._zoomAnimating = false;
+    }, this._props.zoomDuration);
+
+    this._dispatch('gp-zoom-change', null);
+    this._renderToolbar();
+  }
+
+  // ----- render pipeline -----
+  _queueRender() {
+    if (this._pending) return;
+    this._pending = true;
+    queueMicrotask(() => { this._pending = false; this._rebuildAndRender(); });
+  }
+
+  _rebuildAndRender() {
+    if (!this.isConnected) return;
+    // In lazy mode, keep the tree across renders — nodes persist and only
+    // unexpanded stubs get new children when their blocks inflate.
+    // Rebuild from scratch only on the first render or when data changes.
+    if (!this._tree || !this._tree._lazy) {
+      try { this._tree = this._buildTree(); }
+      catch (e) { this._tree = null; this._showErrorToolbar(e.message); return; }
+    }
+    if (!this._tree) { this._clearCanvas(); this._renderToolbar(); return; }
+    // Auto-focus root on first successful render so Home starts highlighted.
+    if (!this._hasRendered && this._tree.roots[0] != null) {
+      this._hasRendered = true;
+      if (this._focusId == null && this._targetId == null) {
+        this._focusId = this._tree.roots[0];
+      }
+    }
+    this._renderToolbar();
+    this._paint();
+  }
+
+  _buildTree() {
+    const p = this._props;
+    const minRelArea = p.minCellArea > 0 ? Math.max(0, p.minCellArea / 100000) : 0;
+    if (p.root != null && p.getChildren && p.getValue && p.getLabel && p.getId) {
+      // Lazy mode: start with just the root. Children are discovered on
+      // demand during _paint() → layoutSubtree() by calling getChildren.
+      // Rebuilt from scratch each render — the data source (page script)
+      // decides what's available. No caching, no stale-data bugs.
+      const rootItem = p.root;
+      const rootId = p.getId(rootItem);
+      const v = Number(p.getValue(rootItem)) || 0;
+      const nodes = new Map();
+      nodes.set(rootId, {
+        id: rootId, label: p.getLabel(rootItem), value: v,
+        colorValue: p.getColor ? p.getColor(rootItem) : v,
+        depth: 0, parentId: null, childIds: null,
+        isOther: false, isLocated: false, rect: null, colorIndex: 0,
+        _item: rootItem, _hasExplicitValue: true,
+      });
+      return { nodes, roots: [rootId], _lazy: true };
+    }
+    if (p.labels && (p.parents || p.parentIndices) && p.values) {
+      return buildFromTabular(
+        { labels: p.labels, parents: p.parents, parentIndices: p.parentIndices, values: p.values, color: p.color, ids: p.ids },
+        {
+          aggregateFn: p.aggregateFn || undefined,
+          colorAggregateFn: p.colorAggregateFn || undefined,
+          minRelArea,
+        },
+      );
+    }
+    return null;
+  }
+
+  _activeVisibleRootId() {
+    if (this._stretchZoomId) return this._stretchZoomId;
+    return this._props.visibleRootId != null ? this._props.visibleRootId : this._internalVisibleRootId;
+  }
+  _resolvedPalette() { return resolvePalette(this._props.palette); }
+
+  _paint() {
+    const p = this._props;
+    const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+    const stageRect = this._stage.getBoundingClientRect();
+    const marginStr = getComputedStyle(this._stage).getPropertyValue('--gp-stage-margin') || '4px';
+    const margin = parseFloat(marginStr) || 4;
+    const cssW = Math.max(1, Math.floor(stageRect.width - 2 * margin));
+    const cssH = Math.max(1, Math.floor(stageRect.height - 2 * margin));
+    const w = Math.max(1, Math.floor(cssW * dpr));
+    const h = Math.max(1, Math.floor(cssH * dpr));
+    if (this._canvas.width !== w) this._canvas.width = w;
+    if (this._canvas.height !== h) this._canvas.height = h;
+    this._canvas.style.width = cssW + 'px';
+    this._canvas.style.height = cssH + 'px';
+    this._canvas.style.setProperty('--gp-zoom-ms', `${p.zoomDuration}ms`);
+
+    const activeRoot = this._activeVisibleRootId();
+    const nodes = this._tree.nodes;
+
+    // Lazy mode: if the zoom target isn't in the tree yet, eagerly expand
+    // along the stored zoom path so the target can be used as layout root.
+    if (activeRoot != null && !nodes.has(activeRoot) && this._tree._lazy
+        && this._visibleRootPath && p.getChildren && p.getId && p.getValue && p.getLabel) {
+      for (const pathId of this._visibleRootPath) {
+        if (!nodes.has(pathId)) break;  // path broken — stop
+        const nd = nodes.get(pathId);
+        if (nd.childIds != null || nd._item == null) continue;  // already expanded or no item
+        const items = p.getChildren(nd._item);
+        if (items == null) break;  // data not yet available (e.g. stub block not inflated) — retry next render
+        if (items.length === 0) { nd.childIds = []; continue; }
+        nd.childIds = [];
+        for (let ci = 0; ci < items.length; ci++) {
+          const cItem = items[ci];
+          const cId = p.getId(cItem);
+          const cVal = Number(p.getValue(cItem)) || 0;
+          if (!nodes.has(cId)) {
+            nodes.set(cId, {
+              id: cId, label: p.getLabel(cItem), value: cVal,
+              colorValue: p.getColor ? p.getColor(cItem) : cVal,
+              depth: nd.depth + 1, parentId: pathId, childIds: null,
+              isOther: false, isLocated: false, rect: null, colorIndex: 0,
+              _item: cItem, _hasExplicitValue: true,
+            });
+          }
+          nd.childIds.push(cId);
+        }
+        if (nodes.has(activeRoot)) break;  // found it
+      }
+    }
+
+    const rootId = activeRoot != null && nodes.has(activeRoot) ? activeRoot : this._tree.roots[0];
+    if (rootId == null) { this._clearCanvas(); return; }
+    const rootNode = nodes.get(rootId);
+    const baseDepth = rootNode.depth;
+    const cap = baseDepth + (p.displayDepth === Infinity ? 99 : Math.max(0, p.displayDepth));
+
+    // Hierarchical layout: at each non-leaf node we balance its direct
+    // children into a binary tree and lay that out inside the node's rect.
+    // This keeps siblings grouped, so the parent-structure is visible in the
+    // layout the way GrandPerspective's is (no need for explicit borders).
+    // `groupPadding` (css pixels, inset per parent level) lets the user make
+    // the grouping more obvious; default 0 matches GP's flush-tile look.
+    const leavesCollect = [];
+    const inSubtree = new Set();
+    const leafCap = new Set(); // ids that are rendered as leaves (at cap or true leaves)
+    const pad = Math.max(0, (p.groupPadding || 0) * dpr);
+    const nodeRects = new Map(); // rect for every node in the subtree — used for selection highlight
+    let pendingStubs = 0; // count of nodes whose data isn't available yet
+
+    // When stretch-zoomed, layout at full canvas size but bias split decisions
+    // to match the original aspect ratio. This preserves tile structure (split
+    // directions) while avoiding the sub-pixel visibility holes that occur when
+    // laying out in a tiny space and scaling afterward.
+    //
+    // The bias is capped so extreme aspect ratios don't produce all-vertical
+    // (or all-horizontal) layouts where tiny cells are sub-pixel in the
+    // compressed dimension.  A cap of 4 preserves the first few levels of
+    // split structure while allowing the perpendicular direction at deeper
+    // levels, which redistributes area and keeps cells visible.
+    let splitBias = 1;
+    if (this._stretchZoomId && this._stretchZoomAspect > 0) {
+      const narrowW = Math.max(1, Math.round(h * this._stretchZoomAspect));
+      const rawBias = w / narrowW;
+      splitBias = rawBias > 1 ? Math.min(rawBias, 4) : Math.max(rawBias, 0.25);
+    }
+
+    // Lazy accessor expansion: when the tree is in lazy mode (_lazy flag),
+    // childIds starts as null. We call the user's getChildren accessor to
+    // discover children on demand — only for nodes that the layout actually
+    // recurses into. Sub-pixel nodes are pruned by visible() in layoutTree,
+    // so getChildren is never called for them.
+    const lazy = this._tree._lazy;
+    const _gc = lazy ? p.getChildren : null;
+    const _gv = lazy ? p.getValue : null;
+    const _gl = lazy ? p.getLabel : null;
+    const _gcol = lazy ? p.getColor : null;
+    const _gid = lazy ? p.getId : null;
+
+    const layoutSubtree = (nodeId, rect) => {
+      inSubtree.add(nodeId);
+      nodeRects.set(nodeId, rect);
+      const node = nodes.get(nodeId);
+      const atCap = node.depth >= cap;
+
+      // Lazy expansion: only expand nodes whose childIds is still null
+      // (unexpanded stubs or first-visit nodes). Already-expanded nodes
+      // keep their children across renders — no redundant getChildren calls.
+      if (lazy && node._item != null && node.childIds == null) {
+        const items = _gc(node._item);
+        if (items == null) {
+          // Data not yet available (stub block not inflated).
+          // Leave childIds as null — will retry on next render.
+          pendingStubs++;
+        } else if (items.length > 0) {
+          node.childIds = [];
+          for (let ci = 0; ci < items.length; ci++) {
+            const cItem = items[ci];
+            const cId = _gid(cItem);
+            const cVal = Number(_gv(cItem)) || 0;
+            if (!nodes.has(cId)) {
+              nodes.set(cId, {
+                id: cId, label: _gl(cItem), value: cVal,
+                colorValue: _gcol ? _gcol(cItem) : cVal,
+                depth: node.depth + 1, parentId: nodeId, childIds: null,
+                isOther: false, isLocated: false, rect: null, colorIndex: 0,
+                _item: cItem, _hasExplicitValue: true,
+              });
+            }
+            node.childIds.push(cId);
+          }
+        } else {
+          node.childIds = [];  // true leaf — no children
+        }
+      }
+
+      if (atCap || !node.childIds || node.childIds.length === 0) {
+        leafCap.add(nodeId);
+        leavesCollect.push({ node, rect });
+        return;
+      }
+      const kids = node.childIds.map((cid) => nodes.get(cid));
+      const balRoot = balanceChildren(kids.map((k) => ({ id: k.id, size: Math.max(0, k.value) })));
+      const childRects = new Map();
+      if (balRoot) {
+        layoutTree(balRoot, rect, (id, r) => childRects.set(id, r), splitBias);
+      }
+      for (const kid of kids) {
+        const r = childRects.get(kid.id);
+        if (!r) continue;
+        // Inset this group's rect so sibling groups get a visible gutter.
+        // Only apply padding to non-leaf groups (a leaf's rect is its own).
+        let sub = r;
+        if (pad > 0 && kid.childIds && kid.childIds.length > 0) {
+          const px = Math.min(pad, r.w / 2 - 1);
+          const py = Math.min(pad, r.h / 2 - 1);
+          if (px > 0 && py > 0) {
+            sub = { x: r.x + px, y: r.y + py, w: r.w - 2 * px, h: r.h - 2 * py };
+          }
+        }
+        layoutSubtree(kid.id, sub);
+      }
+    };
+    layoutSubtree(rootId, { x: 0, y: 0, w, h });
+
+    this._nodeRects = nodeRects;
+
+    let palette = this._resolvedPalette();
+    // For quantitative mode, interpolate small palettes to 64 stops so the
+    // linear/log scale has fine granularity instead of coarse bins.
+    if (p.colorMode === 'quantitative' && palette.length < 64) {
+      palette = interpolatePalette(palette, 64);
+    }
+    const subtree = Array.from(inSubtree).map((id) => nodes.get(id));
+    // Refresh colorValue from getColor — the data source may return different
+    // values depending on the active color mode (e.g. extension vs timestamp).
+    if (lazy && p.getColor) {
+      for (const nd of subtree) {
+        if (nd._item != null) nd.colorValue = p.getColor(nd._item);
+      }
+    }
+    resolveColors(subtree, p.colorMode, {
+      palette,
+      colorScale: p.colorScale,
+      colorDomain: p.colorDomain,
+      colorMap: p.colorMap || {},
+      colorFn: p.colorFn,
+    });
+
+    // Build the flat `assigned` map that the rest of the pipeline expects.
+    const leaves = leavesCollect.map((x) => x.node);
+    const assigned = new Map();
+    for (const { node, rect } of leavesCollect) assigned.set(node.id, rect);
+
+    // Build LUTs (one per palette color; extras appended for each unique colorOverride).
+    const luts = buildLUTs(palette, p.gradientIntensity);
+    const overrideIndex = new Map();
+    const renderLeaves = [];
+    this._leafById = new Map();
+    for (const n of leaves) {
+      if (!assigned.has(n.id)) continue;
+      const r = assigned.get(n.id);
+      let lutIndex;
+      if (n.colorOverride) {
+        let idx = overrideIndex.get(n.colorOverride);
+        if (idx === undefined) {
+          idx = luts.length;
+          luts.push(buildLUTForCssColor(n.colorOverride, p.gradientIntensity));
+          overrideIndex.set(n.colorOverride, idx);
+        }
+        lutIndex = idx;
+      } else {
+        lutIndex = n.colorIndex;
+      }
+      const leaf = {
+        id: n.id, label: n.label, value: n.value, depth: n.depth,
+        parentId: n.parentId, isOther: n.isOther,
+        x: r.x, y: r.y, w: r.w, h: r.h, lutIndex,
+      };
+      renderLeaves.push(leaf);
+      this._leafById.set(n.id, leaf);
+    }
+    this._leaves = renderLeaves;
+
+    // Paint into the canvas in one ImageData allocation.
+    const ctx = this._canvas.getContext('2d', { alpha: false });
+    const image = ctx.createImageData(w, h);
+    paintAll(image, renderLeaves, luts, parseBgColor(p.background));
+    ctx.putImageData(image, 0, 0);
+
+    this._renderOverlay(cssW, cssH, dpr);
+    this._updateToolbarInfo();
+
+    // Show spinner while blocks are still inflating (pending stubs exist).
+    if (this._spinner) this._spinner.hidden = pendingStubs === 0;
+  }
+
+  _renderOverlay(cssW, cssH, dpr) {
+    const p = this._props;
+    this._overlay.innerHTML = '';
+    const located = new Set(p.locatedNodeIds || []);
+    for (const l of this._leaves) {
+      if (located.has(l.id)) {
+        this._overlay.appendChild(overlayBox('loc', l, dpr));
+      }
+    }
+    const focusId = this._focusId != null ? this._focusId : this._targetId;
+    if (focusId != null) {
+      const bounds = this._selectionBounds(focusId);
+      if (bounds) this._overlay.appendChild(overlayBox('sel', bounds, dpr));
+    }
+    if (p.showLabels) {
+      for (const l of this._leaves) {
+        if (l.w < 48 * dpr || l.h < 16 * dpr) continue;
+        const el = document.createElement('div');
+        el.className = 'lbl';
+        el.style.left = (l.x + l.w / 2) / dpr + 'px';
+        el.style.top = (l.y + l.h / 2) / dpr + 'px';
+        el.textContent = l.label;
+        this._overlay.appendChild(el);
+      }
+    }
+  }
+
+  _clearCanvas() {
+    const ctx = this._canvas.getContext('2d', { alpha: false });
+    ctx.fillStyle = this._props.background;
+    ctx.fillRect(0, 0, this._canvas.width, this._canvas.height);
+    this._overlay.innerHTML = '';
+    this._leaves = [];
+    this._leafById = new Map();
+  }
+
+  // ----- toolbar -----
+  _renderToolbar() {
+    const p = this._props;
+    const cfg = p.toolbar === false ? false : (typeof p.toolbar === 'object' ? p.toolbar : {});
+    this._toolbar.innerHTML = '';
+    if (!cfg) {
+      this._toolbar.style.display = 'none';
+      this._infoLine.style.display = 'none';
+      return;
+    }
+    this._toolbar.style.display = 'none'; // toolbar row no longer has visible controls
+    const want = {
+      info: cfg.info !== false,
+    };
+
+    if (want.info) {
+      this._infoEl = this._infoLine;
+      this._infoLine.style.display = '';
+    } else {
+      this._infoEl = null;
+      this._infoLine.style.display = 'none';
+    }
+  }
+
+  _showErrorToolbar(msg) {
+    this._toolbar.innerHTML = '';
+    const s = document.createElement('span');
+    s.textContent = 'gp-treemap: ' + msg;
+    s.style.color = '#b00';
+    this._toolbar.appendChild(s);
+    this._clearCanvas();
+  }
+  _updateToolbarInfo() {
+    if (!this._infoEl) return;
+    const id = this._targetId;
+    if (id == null || !this._tree) {
+      this._infoEl.innerHTML = '<span>(click a cell)</span>';
+      return;
+    }
+    const n = this._tree.nodes.get(id);
+    if (!n) return;
+    // Build ancestor chain (skip root — its label is in the page header).
+    const chain = [];
+    let cur = this._tree.nodes.get(id);
+    while (cur) {
+      if (cur.parentId !== null) chain.unshift(cur);
+      cur = cur.parentId !== null ? this._tree.nodes.get(cur.parentId) : null;
+    }
+    this._infoEl.innerHTML = '';
+    // Root sentinel icon — behaves like a breadcrumb element (click to focus root, dblclick to zoom).
+    const rootId = this._tree.roots[0];
+    const rootIcon = document.createElement('a');
+    rootIcon.className = 'root-icon';
+    rootIcon.title = 'Click to focus root, double-click to zoom';
+    rootIcon.dataset.nodeId = rootId != null ? rootId : '';
+    rootIcon.dataset.isRoot = '1';
+    rootIcon.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" style="vertical-align:-2px"><path d="M8 1.5L1 7h2.5v6.5h4V10h1v3.5h4V7H15z" fill="currentColor"/></svg>';
+    const focusId = this._focusId != null ? this._focusId : this._targetId;
+    if (rootId != null && focusId === rootId) rootIcon.classList.add('focused');
+    this._infoEl.appendChild(rootIcon);
+    chain.forEach((node, i) => {
+      if (i > 0) {
+        const slash = document.createElement('span');
+        slash.className = 'sep-slash';
+        slash.textContent = '/';
+        this._infoEl.appendChild(slash);
+      }
+      const a = document.createElement('a');
+      a.textContent = node.label;
+      a.title = 'Click to focus, double-click to zoom';
+      a.dataset.nodeId = node.id;
+      if (node.id === focusId) a.classList.add('focused');
+      this._infoEl.appendChild(a);
+    });
+    // Show value for the focused node (if set), otherwise the target/hovered node.
+    const valNode = (focusId != null && this._tree.nodes.get(focusId)) || n;
+    const val = document.createElement('span');
+    val.className = 'val';
+    val.textContent = '· ' + this._formatValue(valNode.value);
+    this._infoEl.appendChild(val);
+  }
+  _formatValue(v) {
+    if (typeof this._props.valueFormatter === 'function') return this._props.valueFormatter(v);
+    if (this._props.valueFormat) return applyFormat(v, this._props.valueFormat);
+    return v.toLocaleString();
+  }
+
+  // ----- hit testing / interactions -----
+  _hitTest(e) {
+    const canvasRect = this._canvas.getBoundingClientRect();
+    const cssX = e.clientX - canvasRect.left;
+    const cssY = e.clientY - canvasRect.top;
+    const dpr = this._canvas.width / canvasRect.width;
+    const px = cssX * dpr;
+    const py = cssY * dpr;
+    // linear scan; cells are not overlapping so first hit wins
+    for (const l of this._leaves) {
+      if (px >= l.x && px < l.x + l.w && py >= l.y && py < l.y + l.h) return l.id;
+    }
+    return null;
+  }
+
+  _onStageMouse(e) {
+    if (this._hoverRaf) return;
+    this._hoverRaf = requestAnimationFrame(() => {
+      this._hoverRaf = 0;
+      const id = this._hitTest(e);
+      this._setHover(id);
+      if (this._props.tooltip && id) this._showTooltip(e, id); else this._hideTooltip();
+      if (id) {
+        this._dispatch('gp-hover', id);
+        this._dispatch('gp-mouseover', id);
+      }
+    });
+  }
+  _setHover(id) {
+    if (this._hoverId === id) return;
+    this._hoverId = id;
+  }
+  _onClick(e) {
+    const id = this._hitTest(e);
+    if (id == null) return;
+    this._targetId = id;
+    this._focusId = id;
+    this._selectionLocked = true;
+    this._stage.focus();
+    const { cssW, cssH, dpr } = this._canvasMetrics();
+    this._renderOverlay(cssW, cssH, dpr);
+    this._updateToolbarInfo();
+    this._dispatch('gp-click', id);
+    this._dispatch('gp-target', id);
+    this._dispatch('gp-focus', id);
+  }
+
+  _onWheel(e) {
+    if (this._targetId == null || !this._tree) return;
+    this._wheelAcc += e.deltaY;
+    if (Math.abs(this._wheelAcc) < 80) return;
+    const dir = this._wheelAcc > 0 ? 1 : -1;
+    this._wheelAcc = 0;
+    // Build ancestor chain from target to root
+    const chain = [this._targetId];
+    let cur = this._tree.nodes.get(this._targetId);
+    while (cur && cur.parentId != null) {
+      chain.push(cur.parentId);
+      cur = this._tree.nodes.get(cur.parentId);
+    }
+    // chain[0] = target (deepest), chain[last] = root (shallowest)
+    const focusId = this._focusId != null ? this._focusId : this._targetId;
+    const idx = chain.indexOf(focusId);
+    // dir < 0 (scroll up/away) = toward target (deeper), dir > 0 (scroll down/toward you) = toward root (shallower)
+    const nextIdx = idx === -1 ? 0 : idx + (dir > 0 ? 1 : -1);
+    if (nextIdx >= 0 && nextIdx < chain.length) this._setFocus(chain[nextIdx]);
+  }
+  _onKeyDown(e) {
+    const focusId = this._focusId != null ? this._focusId : this._targetId;
+    if (e.key === '+' || e.key === '=') { if (focusId != null) this._setVisibleRoot(focusId); return; }
+    if (e.key === '-') { this.zoomOut(); return; }
+    if (e.key === '0') { this.zoomReset(); return; }
+    if (!this._selectionLocked || !this._tree || focusId == null) return;
+    const n = this._tree.nodes.get(focusId);
+    if (!n) return;
+    const parent = n.parentId !== null ? this._tree.nodes.get(n.parentId) : null;
+    let next = null;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      if (parent) { const i = parent.childIds.indexOf(n.id); next = parent.childIds[Math.max(0, i - 1)]; }
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      if (parent) { const i = parent.childIds.indexOf(n.id); next = parent.childIds[Math.min(parent.childIds.length - 1, i + 1)]; }
+    } else if (e.key === 'Enter') {
+      if (n.childIds && n.childIds.length) next = n.childIds[0];
+    } else if (e.key === 'Escape') {
+      this._focusUp(); return;
+    } else { return; }
+    if (next != null) this._setFocus(next);
+  }
+  _showTooltip(e, id) {
+    if (!this._tree) return;
+    const n = this._tree.nodes.get(id);
+    if (!n) return;
+    this._tooltip.hidden = false;
+    const pathHtml = escapeHtml(this._buildPath(id)).replace(/\//g, '/<wbr>');
+    this._tooltip.innerHTML = `<b>${pathHtml}</b><br>${escapeHtml(this._formatValue(n.value))}${n.isOther ? ' (collapsed)' : ''}`;
+    const gap = 12;
+    const vw = window.innerWidth;
+    const tt = this._tooltip;
+    // Measure tooltip width: temporarily show off-screen to get actual size
+    tt.style.left = '-9999px'; tt.style.top = '-9999px';
+    const tw = tt.offsetWidth;
+    const flipX = e.clientX + gap + tw > vw;
+    const x = flipX ? e.clientX - gap - tw : e.clientX + gap;
+    tt.style.left = x + 'px';
+    tt.style.top = (e.clientY + gap) + 'px';
+  }
+  _hideTooltip() { this._tooltip.hidden = true; }
+
+  _fireDepthChange() {
+    const d = this._props.displayDepth;
+    this.dispatchEvent(new CustomEvent('gp-depth-change', { detail: { displayDepth: d }, bubbles: true, composed: true }));
+  }
+
+  _canvasMetrics() {
+    const r = this._canvas.getBoundingClientRect();
+    const cssW = Math.max(1, r.width);
+    const cssH = Math.max(1, r.height);
+    const dpr = this._canvas.width / cssW;
+    return { cssW, cssH, dpr };
+  }
+  _setFocus(id) {
+    this._focusId = id;
+    const { cssW, cssH, dpr } = this._canvasMetrics();
+    this._renderOverlay(cssW, cssH, dpr);
+    this._updateInfoFocus();
+    this._dispatch('gp-focus', id);
+  }
+  // Light update: toggle .focused class on existing breadcrumb links
+  // without rebuilding the DOM (preserves elements for dblclick).
+  _updateInfoFocus() {
+    if (!this._infoEl) return;
+    const focusId = this._focusId != null ? this._focusId : this._targetId;
+    for (const a of this._infoEl.querySelectorAll('a[data-node-id]')) {
+      const nid = a.dataset.nodeId;
+      const coerced = /^\d+$/.test(nid) ? Number(nid) : nid;
+      a.classList.toggle('focused', coerced === focusId);
+    }
+    // Update displayed value to match focused node.
+    const valSpan = this._infoEl.querySelector('.val');
+    if (valSpan && focusId != null && this._tree) {
+      const n = this._tree.nodes.get(focusId);
+      if (n) valSpan.textContent = '· ' + this._formatValue(n.value);
+    }
+  }
+
+  _setVisibleRoot(id, path) {
+    if (this._props.visibleRootId != null) {
+      this._dispatch('gp-zoom-change', id, { intendedRoot: true });
+      return;
+    }
+    this._internalVisibleRootId = id;
+    // Build zoom path from tree if available and no explicit path given.
+    if (path) {
+      this._visibleRootPath = path;
+    } else if (id != null && this._tree && this._tree.nodes.has(id)) {
+      const chain = [];
+      let cur = this._tree.nodes.get(id);
+      while (cur) { chain.unshift(cur.id); cur = cur.parentId != null ? this._tree.nodes.get(cur.parentId) : null; }
+      this._visibleRootPath = chain;
+    } else {
+      this._visibleRootPath = null;
+    }
+    this._dispatch('gp-zoom-change', id);
+    this._queueRender();
+  }
+  _dispatch(name, nodeId, extra = {}) {
+    if (!this._tree) return;
+    if (nodeId && !this._tree.nodes.has(nodeId)) {
+      if (name !== 'gp-zoom-change') return;
+    }
+    const node = nodeId ? this._tree.nodes.get(nodeId) : null;
+    const ancestorIds = [];
+    if (node) { let cur = node; while (cur && cur.parentId) { ancestorIds.push(cur.parentId); cur = this._tree.nodes.get(cur.parentId); } }
+    const located = new Set(this._props.locatedNodeIds || []);
+    const detail = {
+      nodeId: nodeId || null,
+      label: node ? node.label : null,
+      value: node ? node.value : null,
+      colorValue: node ? node.colorValue : null,
+      depth: node ? node.depth : null,
+      ancestorIds,
+      isLocated: nodeId ? located.has(nodeId) : false,
+      ...(name === 'gp-zoom-change' && this._visibleRootPath ? { zoomPath: this._visibleRootPath.slice() } : {}),
+      ...extra,
+    };
+    this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
+  }
+
+  // ----- path / focus helpers -----
+  _buildPath(nodeId) {
+    if (!this._tree) return '';
+    const chain = [];
+    let cur = this._tree.nodes.get(nodeId);
+    while (cur) {
+      if (cur.parentId !== null) chain.unshift(cur.label); // skip root (shown in header)
+      cur = cur.parentId !== null ? this._tree.nodes.get(cur.parentId) : null;
+    }
+    return chain.join('/');
+  }
+
+  _selectionBounds(nodeId) {
+    // The rect for any node is captured during the layout pass — a parent's rect is
+    // exactly the union of its children's rects because the tiling is perfect.
+    if (this._nodeRects) {
+      const r = this._nodeRects.get(nodeId);
+      if (r) return r;
+      // If the node is an ancestor of the current zoom root, its bounds
+      // encompass the entire visible area (the zoom root's rect).
+      const activeRoot = this._activeVisibleRootId();
+      if (activeRoot != null && this._tree) {
+        let cur = this._tree.nodes.get(activeRoot);
+        while (cur && cur.parentId != null) {
+          if (cur.parentId === nodeId) return this._nodeRects.get(activeRoot);
+          cur = this._tree.nodes.get(cur.parentId);
+        }
+      }
+    }
+    return null;
+  }
+
+  _treeMaxDepth() {
+    if (!this._tree) return 10;
+    let max = 0;
+    for (const n of this._tree.nodes.values()) if (n.depth > max) max = n.depth;
+    return max;
+  }
+
+  _focusUp() {
+    const cur = this._focusId != null ? this._focusId : this._targetId;
+    if (cur == null || !this._tree) return;
+    const n = this._tree.nodes.get(cur);
+    if (!n || n.parentId === null) return;
+    this._setFocus(n.parentId);
+  }
+
+
+  _onResize() {
+    // Immediate CSS scale, then debounce repaint.
+    const rect = this._stage.getBoundingClientRect();
+    if (this._lastCssSize && this._lastCssSize.w && this._lastCssSize.h) {
+      const sx = rect.width / this._lastCssSize.w;
+      const sy = rect.height / this._lastCssSize.h;
+      if (sx !== 1 || sy !== 1) this._canvas.style.transform = `scale(${sx}, ${sy})`;
+    }
+    clearTimeout(this._resizeTimer);
+    this._resizeTimer = setTimeout(() => {
+      this._canvas.style.transform = '';
+      this._lastCssSize = { w: rect.width, h: rect.height };
+      this._rebuildAndRender();
+    }, 150);
+  }
+}
+
+// ---- helpers ----
+function escapeHtml(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+function overlayBox(cls, leaf, dpr) {
+  const el = document.createElement('div');
+  el.className = cls;
+  const cssW = leaf.w / dpr, cssH = leaf.h / dpr;
+  if (cls === 'sel') {
+    const t = Math.max(2, Math.round(Math.max(cssW, cssH) * 0.01));
+    el.style.left = (leaf.x / dpr - t) + 'px';
+    el.style.top = (leaf.y / dpr - t) + 'px';
+    el.style.width = (cssW + 2 * t) + 'px';
+    el.style.height = (cssH + 2 * t) + 'px';
+    el.style.borderWidth = t + 'px';
+  } else {
+    el.style.left = leaf.x / dpr + 'px';
+    el.style.top = leaf.y / dpr + 'px';
+    el.style.width = cssW + 'px';
+    el.style.height = cssH + 'px';
+  }
+  return el;
+}
+function parseBgColor(css) {
+  if (typeof css !== 'string') return { r: 20, g: 20, b: 20 };
+  const m = /^#([0-9a-f]{6})$/i.exec(css.trim());
+  if (m) return { r: parseInt(m[1].slice(0, 2), 16), g: parseInt(m[1].slice(2, 4), 16), b: parseInt(m[1].slice(4, 6), 16) };
+  const m2 = /^#([0-9a-f]{3})$/i.exec(css.trim());
+  if (m2) return { r: parseInt(m2[1][0] + m2[1][0], 16), g: parseInt(m2[1][1] + m2[1][1], 16), b: parseInt(m2[1][2] + m2[1][2], 16) };
+  return { r: 16, g: 16, b: 16 };
+}
+
+// Interpolate a small palette (e.g. 7 HSL stops) into `count` evenly spaced
+// entries by linear interpolation in HSL space.
+function interpolatePalette(palette, count) {
+  if (palette.length >= count) return palette;
+  const stops = palette.map((c) => {
+    const m = /hsl\(\s*([\d.]+)\s*,\s*([\d.]+)%?\s*,\s*([\d.]+)%?\s*\)/.exec(c);
+    return m ? [+m[1], +m[2], +m[3]] : [0, 0, 50];
+  });
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1) * (stops.length - 1);
+    const idx = Math.min(stops.length - 2, Math.floor(t));
+    const frac = t - idx;
+    const a = stops[idx], b = stops[idx + 1];
+    const h = a[0] + (b[0] - a[0]) * frac;
+    const s = a[1] + (b[1] - a[1]) * frac;
+    const l = a[2] + (b[2] - a[2]) * frac;
+    out.push(`hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l.toFixed(1)}%)`);
+  }
+  return out;
+}
+
+// Properties that define the data source — changing these invalidates the
+// cached lazy tree so it gets rebuilt from scratch on the next render.
+const DATA_PROPS = new Set(['root', 'labels', 'parents', 'parentIndices', 'values', 'ids', 'getChildren', 'getValue', 'getLabel', 'getId', 'getColor']);
+for (const p of Object.keys(DEFAULT_PROPS)) {
+  Object.defineProperty(GpTreemap.prototype, p, {
+    configurable: true,
+    get() { return this._props[p]; },
+    set(v) {
+      this._props[p] = v;
+      if (DATA_PROPS.has(p)) this._tree = null;
+      this._queueRender();
+    },
+  });
+}
+
+if (!customElements.get('gp-treemap')) customElements.define('gp-treemap', GpTreemap);
+
+try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, balanceChildren, maxDepth, layoutTree, buildFromTabular, buildFromTree, buildLinearScale, buildLogScale, buildDivergingScale, buildQuantileScale, autoDomain, resolveColors, paintCell, paintAll, buildLUTs }; } catch (e) {}
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var DEFAULTS = {"size":"Gross_Outlays","color":"Category","path":["Category","Agency","Bureau"],"theme":"tokyo-night","palette":"viridis"};
+  var THEMES = {"nord":{"label":"Nord","bg":"#2e3440","surface":"#3b4252","border":"#4c566a","fg":"#d8dee9","fgMuted":"#81a1c1","accent":"#88c0d0"},"solarized":{"label":"Solarized Dark","bg":"#002b36","surface":"#073642","border":"#586e75","fg":"#839496","fgMuted":"#657b83","accent":"#268bd2"},"dracula":{"label":"Dracula","bg":"#282a36","surface":"#44475a","border":"#6272a4","fg":"#f8f8f2","fgMuted":"#6272a4","accent":"#bd93f9"},"catppuccin":{"label":"Catppuccin Mocha","bg":"#1e1e2e","surface":"#313244","border":"#45475a","fg":"#cdd6f4","fgMuted":"#a6adc8","accent":"#cba6f7"},"gruvbox":{"label":"Gruvbox Dark","bg":"#282828","surface":"#3c3836","border":"#504945","fg":"#ebdbb2","fgMuted":"#a89984","accent":"#fabd2f"},"tokyo-night":{"label":"Tokyo Night","bg":"#1a1b26","surface":"#16161e","border":"#0f0f14","fg":"#c0caf5","fgMuted":"#787c99","accent":"#7aa2f7"},"rose-pine":{"label":"Rosé Pine","bg":"#191724","surface":"#1f1d2e","border":"#26233a","fg":"#e0def4","fgMuted":"#908caa","accent":"#c4a7e7"},"one-dark":{"label":"One Dark","bg":"#282c34","surface":"#2c313a","border":"#3e4452","fg":"#abb2bf","fgMuted":"#828997","accent":"#61afef"}};
+  var ALL_COLS = ["Category","Agency","Bureau","Program","Gross_Outlays","Net_Outlays","Prior_Year_Outlays","YoY_Change_Pct","Fiscal_Year","_row"];
+  var NUMERIC_NONNEG = ["Gross_Outlays","Net_Outlays","Prior_Year_Outlays","Fiscal_Year","_row"];
+
+  // ---- Decode the inlined dataset. ----
+  function b64ToBytes(b64) {
+    var s = atob(b64), b = new Uint8Array(s.length);
+    for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i);
+    return b;
+  }
+  function inflateRaw(bytes) {
+    var ds = new DecompressionStream('deflate-raw');
+    var w = ds.writable.getWriter(); w.write(bytes); w.close();
+    return new Response(ds.readable).text();
+  }
+
+  var tm = document.getElementById('tm');
+  var sizeSel = document.getElementById('size-sel');
+  var colorSel = document.getElementById('color-sel');
+  var chipsEl = document.getElementById('chips');
+  var pathMenuBtn = document.getElementById('path-menu-btn');
+  var pathMenuPop = document.getElementById('path-menu-pop');
+  var themeSel = document.getElementById('theme-sel');
+  var statsBar = document.getElementById('stats-bar');
+
+  // Populate size / color dropdowns.
+  NUMERIC_NONNEG.forEach(function (c) {
+    var o = document.createElement('option'); o.value = c; o.textContent = c;
+    sizeSel.appendChild(o);
+  });
+  ALL_COLS.forEach(function (c) {
+    var o = document.createElement('option'); o.value = c; o.textContent = c;
+    colorSel.appendChild(o);
+  });
+
+  // State — mirrored in URL hash.
+  var state = {
+    size: DEFAULTS.size,
+    color: DEFAULTS.color,
+    path: DEFAULTS.path.slice(),
+    theme: DEFAULTS.theme,
+    palette: DEFAULTS.palette,
+    zoom: null, target: null, focus: null, zoomPath: null, depth: null,
+  };
+
+  var envelope = null;
+  var rowCount = 0;
+  var colByName = {};       // colName → { index, kind, dict, buf }
+
+  function renderChips() {
+    chipsEl.innerHTML = '';
+    state.path.forEach(function (col, i) {
+      var c = document.createElement('span');
+      c.className = 'chip'; c.draggable = true; c.dataset.col = col; c.dataset.idx = String(i);
+      c.textContent = col;
+      var x = document.createElement('span'); x.className = 'x'; x.textContent = '×';
+      x.addEventListener('click', function (e) {
+        e.stopPropagation();
+        state.path = state.path.filter(function (_, j) { return j !== i; });
+        renderChips(); rebuild(); writeHash();
+      });
+      c.appendChild(x);
+      // Drag reorder.
+      c.addEventListener('dragstart', function (e) {
+        c.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', String(i));
+      });
+      c.addEventListener('dragend', function () {
+        c.classList.remove('dragging');
+        Array.prototype.forEach.call(chipsEl.querySelectorAll('.chip'), function (el) {
+          el.classList.remove('drop-before'); el.classList.remove('drop-after');
+        });
+      });
+      c.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        var r = c.getBoundingClientRect();
+        var before = (e.clientX - r.left) < r.width / 2;
+        Array.prototype.forEach.call(chipsEl.querySelectorAll('.chip'), function (el) {
+          el.classList.remove('drop-before'); el.classList.remove('drop-after');
+        });
+        c.classList.add(before ? 'drop-before' : 'drop-after');
+      });
+      c.addEventListener('drop', function (e) {
+        e.preventDefault();
+        var from = Number(e.dataTransfer.getData('text/plain'));
+        var r = c.getBoundingClientRect();
+        var before = (e.clientX - r.left) < r.width / 2;
+        var to = Number(c.dataset.idx) + (before ? 0 : 1);
+        if (from < to) to--;
+        if (from === to) return;
+        var next = state.path.slice();
+        var moved = next.splice(from, 1)[0];
+        next.splice(to, 0, moved);
+        state.path = next;
+        renderChips(); rebuild(); writeHash();
+      });
+      chipsEl.appendChild(c);
+    });
+  }
+
+  function renderPathMenu() {
+    pathMenuPop.innerHTML = '';
+    ALL_COLS.forEach(function (c) {
+      var lbl = document.createElement('label');
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = state.path.indexOf(c) >= 0;
+      cb.addEventListener('change', function () {
+        if (cb.checked) {
+          if (state.path.indexOf(c) < 0) state.path.push(c);
+        } else {
+          state.path = state.path.filter(function (x) { return x !== c; });
+        }
+        renderChips(); rebuild(); writeHash();
+      });
+      lbl.appendChild(cb);
+      lbl.appendChild(document.createTextNode(' ' + c));
+      pathMenuPop.appendChild(lbl);
+    });
+  }
+  pathMenuBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    renderPathMenu();
+    pathMenuPop.classList.toggle('open');
+  });
+  document.addEventListener('click', function (e) {
+    if (!pathMenuPop.contains(e.target) && e.target !== pathMenuBtn) pathMenuPop.classList.remove('open');
+  });
+
+  // ---- Build the treemap from the current state. ----
+  // We produce labels / parents / values / ids / color arrays and hand them
+  // to <gp-treemap>. IDs are path-encoded so they are stable across rebuilds.
+  var tree = null;
+
+  var I32_NULL = -0x80000000;
+  function isNumericKind(k) { return k === 'f64' || k === 'i32' || k === 'rowidx'; }
+  function colNumValue(ci, ri) {
+    if (ci.kind === 'rowidx') return ri + 1;
+    if (ci.kind === 'i32') { var v = ci.buf[ri]; return v === I32_NULL ? NaN : v; }
+    return ci.buf[ri]; // f64 — NaN for null
+  }
+  function colSegValue(ci, ri) {
+    if (ci.kind === 'rowidx') return String(ri + 1);
+    if (ci.kind === 'f64') { var f = ci.buf[ri]; return Number.isFinite(f) ? String(f) : '(blank)'; }
+    if (ci.kind === 'i32') { var n2 = ci.buf[ri]; return n2 === I32_NULL ? '(blank)' : String(n2); }
+    var k = ci.buf[ri]; return k === ci.nullIdx ? '(blank)' : ci.dict[k];
+  }
+  function colorIsNumeric() {
+    if (!state.color) return false;
+    var ci = colByName[state.color];
+    return !!(ci && isNumericKind(ci.kind));
+  }
+
+  function rebuild() {
+    if (!envelope) return;
+    var pathCols = state.path.slice();
+    var sizeCol = state.size;
+    var colorCol = state.color;
+    var cIsNum = colorIsNumeric();
+
+    var ROOT_ID = '__root__';
+    var labels = ['All'];
+    var parents = [''];          // '' means "no parent" (root)
+    var values = [0];
+    var ids = [ROOT_ID];
+    var colorSum = [0], colorCnt = [0], colorCat = [null];
+    var byKey = new Map(); byKey.set(ROOT_ID, 0);
+
+    var sizeCI = colByName[sizeCol] || null;
+    var colorCI = colByName[colorCol] || null;
+    var pathCI = pathCols.map(function (c) { return colByName[c] || null; });
+
+    for (var ri = 0; ri < rowCount; ri++) {
+      var size = sizeCI ? colNumValue(sizeCI, ri) : 0;
+      if (!Number.isFinite(size) || size < 0) continue;
+      var parentKey = ROOT_ID;
+      for (var pcol = 0; pcol < pathCols.length; pcol++) {
+        var ci = pathCI[pcol];
+        var seg = ci ? colSegValue(ci, ri) : '(blank)';
+        if (seg === '' || seg == null) seg = '(blank)';
+        seg = seg.replace(/\x00/g, '_');
+        var key = parentKey === ROOT_ID ? seg : parentKey + '\x00' + seg;
+        var idx = byKey.get(key);
+        if (idx === undefined) {
+          idx = labels.length;
+          byKey.set(key, idx);
+          labels.push(seg);
+          parents.push(parentKey);
+          values.push(0);
+          ids.push(key);
+          colorSum.push(0); colorCnt.push(0); colorCat.push(null);
+        }
+        values[idx] += size;
+        if (colorCI) {
+          if (cIsNum) {
+            var cn = colNumValue(colorCI, ri);
+            if (Number.isFinite(cn)) { colorSum[idx] += cn * size; colorCnt[idx] += size; }
+          } else if (colorCat[idx] == null) {
+            var ki = colorCI.buf[ri];
+            if (ki !== colorCI.nullIdx) colorCat[idx] = colorCI.dict[ki];
+          }
+        }
+        parentKey = key;
+      }
+      values[0] += size;
+    }
+
+    var color = new Array(labels.length);
+    for (var i = 0; i < labels.length; i++) {
+      if (cIsNum) color[i] = colorCnt[i] ? colorSum[i] / colorCnt[i] : null;
+      else color[i] = colorCat[i];
+    }
+
+    tree = { labels: labels, parents: parents, values: values, ids: ids, color: color };
+
+    // Adjust color-mode attribute before setting data.
+    tm.setAttribute('color-mode', cIsNum ? 'quantitative' : 'categorical');
+    if (cIsNum) {
+      var lo = Infinity, hi = -Infinity;
+      for (var j = 0; j < color.length; j++) {
+        var v = color[j];
+        if (typeof v === 'number' && Number.isFinite(v)) {
+          if (v < lo) lo = v;
+          if (v > hi) hi = v;
+        }
+      }
+      tm.colorDomain = (lo !== Infinity && lo < hi) ? [lo, hi] : undefined;
+    } else {
+      tm.colorDomain = undefined;
+    }
+
+    tm.ids = tree.ids;
+    tm.labels = tree.labels;
+    tm.parents = tree.parents;
+    tm.values = tree.values;
+    tm.color = tree.color;
+
+    // Re-apply palette if user overrode the theme's default.
+    if (state.palette) applyPalette(state.palette);
+  }
+
+  function applyPageTheme(name) {
+    var t = name ? THEMES[name] : null;
+    var r = document.documentElement;
+    if (t) {
+      r.style.setProperty('--page-bg', t.bg);
+      r.style.setProperty('--page-surface', t.surface);
+      r.style.setProperty('--page-border', t.border);
+      r.style.setProperty('--page-fg', t.fg);
+      r.style.setProperty('--page-fg-muted', t.fgMuted);
+      r.style.setProperty('--page-accent', t.accent);
+    } else {
+      ['--page-bg','--page-surface','--page-border','--page-fg','--page-fg-muted','--page-accent']
+        .forEach(function (v) { r.style.removeProperty(v); });
+    }
+    tm.setAttribute('theme', name || '');
+    if (state.palette) applyPalette(state.palette);
+    syncThemeDropdown();
+  }
+  function applyPalette(name) {
+    state.palette = name || '';
+    if (name) {
+      tm._props._userPalette = name;
+      tm.setAttribute('palette', name);
+      tm._props.palette = name;
+    } else {
+      var th = state.theme || '';
+      tm._props._userPalette = th || 'gp-default';
+      tm.setAttribute('palette', th || 'gp-default');
+      tm._props.palette = th || 'gp-default';
+    }
+    tm._queueRender && tm._queueRender();
+    syncThemeDropdown();
+  }
+  function syncThemeDropdown() {
+    themeSel.value = state.palette ? 'palette:' + state.palette : (state.theme || '');
+  }
+
+  themeSel.addEventListener('change', function () {
+    var v = themeSel.value;
+    if (v.indexOf('palette:') === 0) {
+      state.palette = v.slice(8);
+      applyPalette(state.palette);
+    } else {
+      state.palette = '';
+      state.theme = v;
+      applyPageTheme(v);
+    }
+    writeHash();
+  });
+  sizeSel.addEventListener('change', function () { state.size = sizeSel.value; rebuild(); writeHash(); });
+  colorSel.addEventListener('change', function () { state.color = colorSel.value; rebuild(); writeHash(); });
+
+  // ---- URL hash sync. ----
+  function coerceId(s) { return s; } // path IDs are strings
+  function readHash() {
+    try {
+      if (location.hash.length <= 1) return false;
+      // A populated hash is the single source of truth: any param that is
+      // absent is treated as "not set", NOT as "fall back to the build-time
+      // default". Otherwise a URL like #theme=nord would silently inherit
+      // the CLI --palette override that was baked into DEFAULTS.
+      var p = new URLSearchParams(location.hash.slice(1));
+      state.size = p.get('size') || DEFAULTS.size;
+      state.color = p.get('color') || DEFAULTS.color;
+      var pth = p.get('path');
+      state.path = pth ? pth.split(',').filter(Boolean) : DEFAULTS.path.slice();
+      state.theme = p.has('theme') ? p.get('theme') : '';
+      state.palette = p.has('palette') ? p.get('palette') : '';
+      state.zoom = p.get('zoom') || null;
+      state.target = p.get('target') || null;
+      state.focus = p.get('focus') || null;
+      var depth = p.get('depth');
+      state.depth = depth ? (depth === 'Infinity' ? Infinity : Number(depth)) : null;
+      var zp = p.get('zoomPath');
+      state.zoomPath = zp ? zp.split(',') : null;
+      return true;
+    } catch (_) { return false; }
+  }
+  function writeHash() {
+    try {
+      var p = new URLSearchParams();
+      // Always emit everything so the URL captures the complete state.
+      p.set('size', state.size);
+      p.set('color', state.color);
+      p.set('path', state.path.join(','));
+      if (state.theme) p.set('theme', state.theme);
+      if (state.palette) p.set('palette', state.palette);
+      if (state.zoom) p.set('zoom', state.zoom);
+      if (state.zoomPath && state.zoomPath.length) p.set('zoomPath', state.zoomPath.join(','));
+      if (state.target) p.set('target', state.target);
+      if (state.focus && state.focus !== state.target) p.set('focus', state.focus);
+      if (state.depth != null && state.depth !== Infinity) p.set('depth', String(state.depth));
+      var s = p.toString();
+      history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+    } catch (_) {}
+  }
+
+  // Mirror treemap events into state.
+  tm.addEventListener('gp-zoom-change', function (e) {
+    state.zoom = e.detail && e.detail.nodeId != null && e.detail.nodeId !== '' ? String(e.detail.nodeId) : null;
+    var zp = tm._visibleRootPath; state.zoomPath = zp && zp.length ? zp.slice() : null;
+    writeHash();
+  });
+  tm.addEventListener('gp-target', function (e) {
+    state.target = e.detail && e.detail.nodeId != null ? String(e.detail.nodeId) : null;
+    writeHash();
+  });
+  tm.addEventListener('gp-focus', function (e) {
+    state.focus = e.detail && e.detail.nodeId != null ? String(e.detail.nodeId) : null;
+    writeHash();
+  });
+  tm.addEventListener('gp-depth-change', function () {
+    state.depth = tm.displayDepth; writeHash();
+  });
+
+  // ---- Boot: inflate envelope, set controls, render. ----
+  var raw = document.getElementById('tmdata').textContent;
+  inflateRaw(b64ToBytes(raw)).then(function (text) {
+    envelope = JSON.parse(text);
+    rowCount = envelope.rowCount;
+    // Decode column buffers into TypedArrays. Each column is either a
+    // Float64Array (kind='f64', null = NaN) or a Uint16/Uint32 dictionary
+    // index (null = top-bit sentinel).
+    envelope.colInfo.forEach(function (ci, i) {
+      var buf = null;
+      var nullIdx = null;
+      if (ci.kind === 'rowidx') {
+        // Synthesize 1..N so sizeof(HTML) doesn't grow with the row count.
+        buf = { length: rowCount, isRowIdx: true };
+      } else {
+        var bytes = b64ToBytes(envelope.colBuffers[i]);
+        if (ci.kind === 'f64')       buf = new Float64Array(bytes.buffer, bytes.byteOffset, rowCount);
+        else if (ci.kind === 'i32')  buf = new Int32Array(bytes.buffer, bytes.byteOffset, rowCount);
+        else if (ci.kind === 'u32')  { buf = new Uint32Array(bytes.buffer, bytes.byteOffset, rowCount); nullIdx = 0xFFFFFFFF; }
+        else /* u16 */               { buf = new Uint16Array(bytes.buffer, bytes.byteOffset, rowCount); nullIdx = 0xFFFF; }
+      }
+      colByName[ci.name] = {
+        index: i, kind: ci.kind, dict: ci.dict || null, nullIdx: nullIdx, buf: buf,
+      };
+    });
+    // Free the base64 column strings now that they're decoded.
+    envelope.colBuffers = null;
+
+    var hadHash = readHash();
+    // Validate size/color/path against available columns (fall back to defaults).
+    if (NUMERIC_NONNEG.indexOf(state.size) < 0) state.size = DEFAULTS.size;
+    if (ALL_COLS.indexOf(state.color) < 0) state.color = DEFAULTS.color;
+    state.path = state.path.filter(function (c) { return ALL_COLS.indexOf(c) >= 0; });
+    if (state.path.length === 0) state.path = DEFAULTS.path.slice();
+
+    sizeSel.value = state.size;
+    colorSel.value = state.color;
+    renderChips();
+    applyPageTheme(state.theme);
+    if (state.palette) applyPalette(state.palette);
+
+    rebuild();
+
+    // If no hash was present, populate it with the current defaults.
+    if (!hadHash) writeHash();
+
+    // Restore zoom/target from hash after the first render.
+    if (state.zoomPath && state.zoomPath.length) tm._visibleRootPath = state.zoomPath.slice();
+    if (state.zoom) tm._internalVisibleRootId = state.zoom;
+    if (state.target) { tm._targetId = state.target; tm._selectionLocked = true; }
+    if (state.focus) tm._focusId = state.focus;
+    if (state.zoom || state.target) tm._queueRender && tm._queueRender();
+
+    // Stats bar.
+    var bar = statsBar;
+    function fmt(n) {
+      if (typeof n !== 'number') return String(n);
+      if (Math.abs(n) >= 1e9) return (n/1e9).toFixed(2) + 'B';
+      if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(2) + 'M';
+      if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(2) + 'k';
+      return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    }
+    function update() {
+      var id = tm._focusId != null ? tm._focusId : tm._targetId != null ? tm._targetId : null;
+      var node = id != null && tm._tree ? tm._tree.nodes.get(id) : null;
+      if (!node) { bar.textContent = state.size + ': ' + fmt(tree ? tree.values[0] : 0); return; }
+      var parts = [node.id || 'All', state.size + ': ' + fmt(node.value)];
+      if (state.color && state.color !== state.size) {
+        parts.push(state.color + ': ' + (typeof node.colorValue === 'number' ? fmt(node.colorValue) : String(node.colorValue)));
+      }
+      bar.textContent = parts.join('   |   ');
+    }
+    tm.addEventListener('gp-focus', update);
+    tm.addEventListener('gp-target', update);
+    tm.addEventListener('gp-zoom-change', update);
+    requestAnimationFrame(function () { setTimeout(update, 0); });
+    window._allBlocksReady = Promise.resolve();
+  });
+})();
+</script>
+</body>
+</html>

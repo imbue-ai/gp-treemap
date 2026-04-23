@@ -1,0 +1,1860 @@
+{"Continent":"Asia","Country":"Afghanistan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Afghanistan","Year":2023,"Fuel":"Coal","Generation_TWh":0.03}
+{"Continent":"Asia","Country":"Afghanistan","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Asia","Country":"Afghanistan","Year":2023,"Fuel":"Hydro","Generation_TWh":0.75}
+{"Continent":"Asia","Country":"Afghanistan","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Afghanistan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.1}
+{"Continent":"Asia","Country":"Afghanistan","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Afghanistan","Year":2023,"Fuel":"Solar","Generation_TWh":0.09}
+{"Continent":"Asia","Country":"Afghanistan","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Albania","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Europe","Country":"Albania","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Albania","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Europe","Country":"Albania","Year":2023,"Fuel":"Hydro","Generation_TWh":8.71}
+{"Continent":"Europe","Country":"Albania","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Albania","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Europe","Country":"Albania","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Albania","Year":2023,"Fuel":"Solar","Generation_TWh":0.3}
+{"Continent":"Europe","Country":"Albania","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Algeria","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Algeria","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Algeria","Year":2023,"Fuel":"Gas","Generation_TWh":94.64}
+{"Continent":"Africa","Country":"Algeria","Year":2023,"Fuel":"Hydro","Generation_TWh":0.02}
+{"Continent":"Africa","Country":"Algeria","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Algeria","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.33}
+{"Continent":"Africa","Country":"Algeria","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Algeria","Year":2023,"Fuel":"Solar","Generation_TWh":0.87}
+{"Continent":"Africa","Country":"Algeria","Year":2023,"Fuel":"Wind","Generation_TWh":0.02}
+{"Continent":"Oceania","Country":"American Samoa","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Oceania","Country":"American Samoa","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"American Samoa","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"American Samoa","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Oceania","Country":"American Samoa","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"American Samoa","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.17}
+{"Continent":"Oceania","Country":"American Samoa","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"American Samoa","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Oceania","Country":"American Samoa","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Angola","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.05}
+{"Continent":"Africa","Country":"Angola","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Angola","Year":2023,"Fuel":"Gas","Generation_TWh":1.39}
+{"Continent":"Africa","Country":"Angola","Year":2023,"Fuel":"Hydro","Generation_TWh":11.22}
+{"Continent":"Africa","Country":"Angola","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Angola","Year":2023,"Fuel":"Other Fossil","Generation_TWh":2.7}
+{"Continent":"Africa","Country":"Angola","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Angola","Year":2023,"Fuel":"Solar","Generation_TWh":0.39}
+{"Continent":"Africa","Country":"Angola","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Antigua and Barbuda","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Antigua and Barbuda","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Antigua and Barbuda","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Antigua and Barbuda","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Antigua and Barbuda","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Antigua and Barbuda","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.34}
+{"Continent":"North America","Country":"Antigua and Barbuda","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Antigua and Barbuda","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"North America","Country":"Antigua and Barbuda","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"South America","Country":"Argentina","Year":2023,"Fuel":"Bioenergy","Generation_TWh":2.4}
+{"Continent":"South America","Country":"Argentina","Year":2023,"Fuel":"Coal","Generation_TWh":1.83}
+{"Continent":"South America","Country":"Argentina","Year":2023,"Fuel":"Gas","Generation_TWh":76.32}
+{"Continent":"South America","Country":"Argentina","Year":2023,"Fuel":"Hydro","Generation_TWh":31.49}
+{"Continent":"South America","Country":"Argentina","Year":2023,"Fuel":"Nuclear","Generation_TWh":8.96}
+{"Continent":"South America","Country":"Argentina","Year":2023,"Fuel":"Other Fossil","Generation_TWh":9.8}
+{"Continent":"South America","Country":"Argentina","Year":2023,"Fuel":"Solar","Generation_TWh":3.28}
+{"Continent":"South America","Country":"Argentina","Year":2023,"Fuel":"Wind","Generation_TWh":14.48}
+{"Continent":"Asia","Country":"Armenia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Armenia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Armenia","Year":2023,"Fuel":"Gas","Generation_TWh":3.72}
+{"Continent":"Asia","Country":"Armenia","Year":2023,"Fuel":"Hydro","Generation_TWh":1.65}
+{"Continent":"Asia","Country":"Armenia","Year":2023,"Fuel":"Nuclear","Generation_TWh":2.51}
+{"Continent":"Asia","Country":"Armenia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Asia","Country":"Armenia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Armenia","Year":2023,"Fuel":"Solar","Generation_TWh":0.77}
+{"Continent":"Asia","Country":"Armenia","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"South America","Country":"Aruba","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"South America","Country":"Aruba","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"South America","Country":"Aruba","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"South America","Country":"Aruba","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"South America","Country":"Aruba","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Aruba","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.83}
+{"Continent":"South America","Country":"Aruba","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"South America","Country":"Aruba","Year":2023,"Fuel":"Solar","Generation_TWh":0.03}
+{"Continent":"South America","Country":"Aruba","Year":2023,"Fuel":"Wind","Generation_TWh":0.14}
+{"Continent":"Oceania","Country":"Australia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":3.13}
+{"Continent":"Oceania","Country":"Australia","Year":2023,"Fuel":"Coal","Generation_TWh":125.61}
+{"Continent":"Oceania","Country":"Australia","Year":2023,"Fuel":"Gas","Generation_TWh":46.67}
+{"Continent":"Oceania","Country":"Australia","Year":2023,"Fuel":"Hydro","Generation_TWh":15.08}
+{"Continent":"Oceania","Country":"Australia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":5.76}
+{"Continent":"Oceania","Country":"Australia","Year":2023,"Fuel":"Solar","Generation_TWh":44.99}
+{"Continent":"Oceania","Country":"Australia","Year":2023,"Fuel":"Wind","Generation_TWh":31.87}
+{"Continent":"Europe","Country":"Austria","Year":2023,"Fuel":"Bioenergy","Generation_TWh":4.56}
+{"Continent":"Europe","Country":"Austria","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Austria","Year":2023,"Fuel":"Gas","Generation_TWh":7.5}
+{"Continent":"Europe","Country":"Austria","Year":2023,"Fuel":"Hydro","Generation_TWh":40.67}
+{"Continent":"Europe","Country":"Austria","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Austria","Year":2023,"Fuel":"Other Fossil","Generation_TWh":3.32}
+{"Continent":"Europe","Country":"Austria","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Austria","Year":2023,"Fuel":"Solar","Generation_TWh":6.89}
+{"Continent":"Europe","Country":"Austria","Year":2023,"Fuel":"Wind","Generation_TWh":8.04}
+{"Continent":"Asia","Country":"Azerbaijan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.11}
+{"Continent":"Asia","Country":"Azerbaijan","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Azerbaijan","Year":2023,"Fuel":"Gas","Generation_TWh":27.08}
+{"Continent":"Asia","Country":"Azerbaijan","Year":2023,"Fuel":"Hydro","Generation_TWh":1.64}
+{"Continent":"Asia","Country":"Azerbaijan","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Azerbaijan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.11}
+{"Continent":"Asia","Country":"Azerbaijan","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Azerbaijan","Year":2023,"Fuel":"Solar","Generation_TWh":0.07}
+{"Continent":"Asia","Country":"Azerbaijan","Year":2023,"Fuel":"Wind","Generation_TWh":0.08}
+{"Continent":"North America","Country":"Bahamas (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Bahamas (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Bahamas (the)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Bahamas (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Bahamas (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Bahamas (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":2.19}
+{"Continent":"North America","Country":"Bahamas (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Bahamas (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"North America","Country":"Bahamas (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bahrain","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bahrain","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bahrain","Year":2023,"Fuel":"Gas","Generation_TWh":37.38}
+{"Continent":"Asia","Country":"Bahrain","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bahrain","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bahrain","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bahrain","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bahrain","Year":2023,"Fuel":"Solar","Generation_TWh":0.09}
+{"Continent":"Asia","Country":"Bahrain","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bangladesh","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bangladesh","Year":2023,"Fuel":"Coal","Generation_TWh":10.69}
+{"Continent":"Asia","Country":"Bangladesh","Year":2023,"Fuel":"Gas","Generation_TWh":66.43}
+{"Continent":"Asia","Country":"Bangladesh","Year":2023,"Fuel":"Hydro","Generation_TWh":0.65}
+{"Continent":"Asia","Country":"Bangladesh","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bangladesh","Year":2023,"Fuel":"Other Fossil","Generation_TWh":21.89}
+{"Continent":"Asia","Country":"Bangladesh","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bangladesh","Year":2023,"Fuel":"Solar","Generation_TWh":1.07}
+{"Continent":"Asia","Country":"Bangladesh","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Barbados","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Barbados","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Barbados","Year":2023,"Fuel":"Gas","Generation_TWh":0.03}
+{"Continent":"North America","Country":"Barbados","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Barbados","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Barbados","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.98}
+{"Continent":"North America","Country":"Barbados","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Barbados","Year":2023,"Fuel":"Solar","Generation_TWh":0.09}
+{"Continent":"North America","Country":"Barbados","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Belarus","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.53}
+{"Continent":"Europe","Country":"Belarus","Year":2023,"Fuel":"Coal","Generation_TWh":0.02}
+{"Continent":"Europe","Country":"Belarus","Year":2023,"Fuel":"Gas","Generation_TWh":26.99}
+{"Continent":"Europe","Country":"Belarus","Year":2023,"Fuel":"Hydro","Generation_TWh":0.39}
+{"Continent":"Europe","Country":"Belarus","Year":2023,"Fuel":"Nuclear","Generation_TWh":11.73}
+{"Continent":"Europe","Country":"Belarus","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.66}
+{"Continent":"Europe","Country":"Belarus","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Belarus","Year":2023,"Fuel":"Solar","Generation_TWh":0.23}
+{"Continent":"Europe","Country":"Belarus","Year":2023,"Fuel":"Wind","Generation_TWh":0.19}
+{"Continent":"Europe","Country":"Belgium","Year":2023,"Fuel":"Bioenergy","Generation_TWh":3.79}
+{"Continent":"Europe","Country":"Belgium","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Belgium","Year":2023,"Fuel":"Gas","Generation_TWh":18.3}
+{"Continent":"Europe","Country":"Belgium","Year":2023,"Fuel":"Hydro","Generation_TWh":0.4}
+{"Continent":"Europe","Country":"Belgium","Year":2023,"Fuel":"Nuclear","Generation_TWh":32.93}
+{"Continent":"Europe","Country":"Belgium","Year":2023,"Fuel":"Other Fossil","Generation_TWh":3.44}
+{"Continent":"Europe","Country":"Belgium","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Belgium","Year":2023,"Fuel":"Solar","Generation_TWh":7.83}
+{"Continent":"Europe","Country":"Belgium","Year":2023,"Fuel":"Wind","Generation_TWh":15.44}
+{"Continent":"North America","Country":"Belize","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.15}
+{"Continent":"North America","Country":"Belize","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Belize","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Belize","Year":2023,"Fuel":"Hydro","Generation_TWh":0.24}
+{"Continent":"North America","Country":"Belize","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Belize","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.05}
+{"Continent":"North America","Country":"Belize","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Belize","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"North America","Country":"Belize","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Benin","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Benin","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Benin","Year":2023,"Fuel":"Gas","Generation_TWh":0.73}
+{"Continent":"Africa","Country":"Benin","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Benin","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Benin","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.24}
+{"Continent":"Africa","Country":"Benin","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Benin","Year":2023,"Fuel":"Solar","Generation_TWh":0.03}
+{"Continent":"Africa","Country":"Benin","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Bermuda","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"North America","Country":"Bermuda","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Bermuda","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Bermuda","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Bermuda","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Bermuda","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.63}
+{"Continent":"North America","Country":"Bermuda","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Bermuda","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"North America","Country":"Bermuda","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bhutan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bhutan","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bhutan","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bhutan","Year":2023,"Fuel":"Hydro","Generation_TWh":11.16}
+{"Continent":"Asia","Country":"Bhutan","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bhutan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bhutan","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bhutan","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Asia","Country":"Bhutan","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"South America","Country":"Bolivia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.42}
+{"Continent":"South America","Country":"Bolivia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"South America","Country":"Bolivia","Year":2023,"Fuel":"Gas","Generation_TWh":8.18}
+{"Continent":"South America","Country":"Bolivia","Year":2023,"Fuel":"Hydro","Generation_TWh":2.97}
+{"Continent":"South America","Country":"Bolivia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Bolivia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.19}
+{"Continent":"South America","Country":"Bolivia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"South America","Country":"Bolivia","Year":2023,"Fuel":"Solar","Generation_TWh":0.35}
+{"Continent":"South America","Country":"Bolivia","Year":2023,"Fuel":"Wind","Generation_TWh":0.44}
+{"Continent":"Europe","Country":"Bosnia Herzegovina","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.04}
+{"Continent":"Europe","Country":"Bosnia Herzegovina","Year":2023,"Fuel":"Coal","Generation_TWh":9.7}
+{"Continent":"Europe","Country":"Bosnia Herzegovina","Year":2023,"Fuel":"Gas","Generation_TWh":0.01}
+{"Continent":"Europe","Country":"Bosnia Herzegovina","Year":2023,"Fuel":"Hydro","Generation_TWh":6.75}
+{"Continent":"Europe","Country":"Bosnia Herzegovina","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Bosnia Herzegovina","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.07}
+{"Continent":"Europe","Country":"Bosnia Herzegovina","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Bosnia Herzegovina","Year":2023,"Fuel":"Solar","Generation_TWh":0.25}
+{"Continent":"Europe","Country":"Bosnia Herzegovina","Year":2023,"Fuel":"Wind","Generation_TWh":0.36}
+{"Continent":"Africa","Country":"Botswana","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Botswana","Year":2023,"Fuel":"Coal","Generation_TWh":3.19}
+{"Continent":"Africa","Country":"Botswana","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Botswana","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Botswana","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Botswana","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.03}
+{"Continent":"Africa","Country":"Botswana","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Botswana","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Botswana","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"South America","Country":"Brazil","Year":2023,"Fuel":"Bioenergy","Generation_TWh":57.76}
+{"Continent":"South America","Country":"Brazil","Year":2023,"Fuel":"Coal","Generation_TWh":13.31}
+{"Continent":"South America","Country":"Brazil","Year":2023,"Fuel":"Gas","Generation_TWh":38.59}
+{"Continent":"South America","Country":"Brazil","Year":2023,"Fuel":"Hydro","Generation_TWh":426}
+{"Continent":"South America","Country":"Brazil","Year":2023,"Fuel":"Nuclear","Generation_TWh":14.5}
+{"Continent":"South America","Country":"Brazil","Year":2023,"Fuel":"Other Fossil","Generation_TWh":11.53}
+{"Continent":"South America","Country":"Brazil","Year":2023,"Fuel":"Solar","Generation_TWh":50.63}
+{"Continent":"South America","Country":"Brazil","Year":2023,"Fuel":"Wind","Generation_TWh":95.8}
+{"Continent":"Asia","Country":"Brunei Darussalam","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Brunei Darussalam","Year":2023,"Fuel":"Coal","Generation_TWh":1.14}
+{"Continent":"Asia","Country":"Brunei Darussalam","Year":2023,"Fuel":"Gas","Generation_TWh":4.42}
+{"Continent":"Asia","Country":"Brunei Darussalam","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Brunei Darussalam","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Brunei Darussalam","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.04}
+{"Continent":"Asia","Country":"Brunei Darussalam","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Brunei Darussalam","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Asia","Country":"Brunei Darussalam","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Bulgaria","Year":2023,"Fuel":"Bioenergy","Generation_TWh":1.87}
+{"Continent":"Europe","Country":"Bulgaria","Year":2023,"Fuel":"Coal","Generation_TWh":11.73}
+{"Continent":"Europe","Country":"Bulgaria","Year":2023,"Fuel":"Gas","Generation_TWh":1.94}
+{"Continent":"Europe","Country":"Bulgaria","Year":2023,"Fuel":"Hydro","Generation_TWh":3.08}
+{"Continent":"Europe","Country":"Bulgaria","Year":2023,"Fuel":"Nuclear","Generation_TWh":16.16}
+{"Continent":"Europe","Country":"Bulgaria","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.2}
+{"Continent":"Europe","Country":"Bulgaria","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Bulgaria","Year":2023,"Fuel":"Solar","Generation_TWh":3.52}
+{"Continent":"Europe","Country":"Bulgaria","Year":2023,"Fuel":"Wind","Generation_TWh":1.58}
+{"Continent":"Africa","Country":"Burkina Faso","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.09}
+{"Continent":"Africa","Country":"Burkina Faso","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Burkina Faso","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Burkina Faso","Year":2023,"Fuel":"Hydro","Generation_TWh":0.09}
+{"Continent":"Africa","Country":"Burkina Faso","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Burkina Faso","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.42}
+{"Continent":"Africa","Country":"Burkina Faso","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Burkina Faso","Year":2023,"Fuel":"Solar","Generation_TWh":0.09}
+{"Continent":"Africa","Country":"Burkina Faso","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Burundi","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Burundi","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Burundi","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Burundi","Year":2023,"Fuel":"Hydro","Generation_TWh":0.37}
+{"Continent":"Africa","Country":"Burundi","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Burundi","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.12}
+{"Continent":"Africa","Country":"Burundi","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Burundi","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Burundi","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cabo Verde","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cabo Verde","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cabo Verde","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cabo Verde","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cabo Verde","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cabo Verde","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.36}
+{"Continent":"Africa","Country":"Cabo Verde","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cabo Verde","Year":2023,"Fuel":"Solar","Generation_TWh":0.07}
+{"Continent":"Africa","Country":"Cabo Verde","Year":2023,"Fuel":"Wind","Generation_TWh":0.07}
+{"Continent":"Asia","Country":"Cambodia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.07}
+{"Continent":"Asia","Country":"Cambodia","Year":2023,"Fuel":"Coal","Generation_TWh":7.82}
+{"Continent":"Asia","Country":"Cambodia","Year":2023,"Fuel":"Hydro","Generation_TWh":4.84}
+{"Continent":"Asia","Country":"Cambodia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.05}
+{"Continent":"Asia","Country":"Cambodia","Year":2023,"Fuel":"Solar","Generation_TWh":0.82}
+{"Continent":"Africa","Country":"Cameroon","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.04}
+{"Continent":"Africa","Country":"Cameroon","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cameroon","Year":2023,"Fuel":"Gas","Generation_TWh":1.59}
+{"Continent":"Africa","Country":"Cameroon","Year":2023,"Fuel":"Hydro","Generation_TWh":5.23}
+{"Continent":"Africa","Country":"Cameroon","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cameroon","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.34}
+{"Continent":"Africa","Country":"Cameroon","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cameroon","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"Africa","Country":"Cameroon","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Canada","Year":2023,"Fuel":"Bioenergy","Generation_TWh":9.8}
+{"Continent":"North America","Country":"Canada","Year":2023,"Fuel":"Coal","Generation_TWh":23.74}
+{"Continent":"North America","Country":"Canada","Year":2023,"Fuel":"Gas","Generation_TWh":102.88}
+{"Continent":"North America","Country":"Canada","Year":2023,"Fuel":"Hydro","Generation_TWh":360.74}
+{"Continent":"North America","Country":"Canada","Year":2023,"Fuel":"Nuclear","Generation_TWh":88.43}
+{"Continent":"North America","Country":"Canada","Year":2023,"Fuel":"Other Fossil","Generation_TWh":6.89}
+{"Continent":"North America","Country":"Canada","Year":2023,"Fuel":"Solar","Generation_TWh":8.4}
+{"Continent":"North America","Country":"Canada","Year":2023,"Fuel":"Wind","Generation_TWh":40.51}
+{"Continent":"North America","Country":"Cayman Islands (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Cayman Islands (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Cayman Islands (the)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Cayman Islands (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Cayman Islands (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Cayman Islands (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.68}
+{"Continent":"North America","Country":"Cayman Islands (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Cayman Islands (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"North America","Country":"Cayman Islands (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Central African Republic (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Central African Republic (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Central African Republic (the)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Central African Republic (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":0.14}
+{"Continent":"Africa","Country":"Central African Republic (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Central African Republic (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Africa","Country":"Central African Republic (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Central African Republic (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Central African Republic (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Chad","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Chad","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Chad","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Chad","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Chad","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Chad","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.34}
+{"Continent":"Africa","Country":"Chad","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Chad","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Chad","Year":2023,"Fuel":"Wind","Generation_TWh":0.01}
+{"Continent":"South America","Country":"Chile","Year":2023,"Fuel":"Bioenergy","Generation_TWh":5.2}
+{"Continent":"South America","Country":"Chile","Year":2023,"Fuel":"Coal","Generation_TWh":14.5}
+{"Continent":"South America","Country":"Chile","Year":2023,"Fuel":"Gas","Generation_TWh":16.76}
+{"Continent":"South America","Country":"Chile","Year":2023,"Fuel":"Hydro","Generation_TWh":23.3}
+{"Continent":"South America","Country":"Chile","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Chile","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.63}
+{"Continent":"South America","Country":"Chile","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.44}
+{"Continent":"South America","Country":"Chile","Year":2023,"Fuel":"Solar","Generation_TWh":17.94}
+{"Continent":"South America","Country":"Chile","Year":2023,"Fuel":"Wind","Generation_TWh":9.46}
+{"Continent":"Asia","Country":"China","Year":2023,"Fuel":"Bioenergy","Generation_TWh":198.2}
+{"Continent":"Asia","Country":"China","Year":2023,"Fuel":"Coal","Generation_TWh":5752.74}
+{"Continent":"Asia","Country":"China","Year":2023,"Fuel":"Gas","Generation_TWh":297.8}
+{"Continent":"Asia","Country":"China","Year":2023,"Fuel":"Hydro","Generation_TWh":1226}
+{"Continent":"Asia","Country":"China","Year":2023,"Fuel":"Nuclear","Generation_TWh":434.72}
+{"Continent":"Asia","Country":"China","Year":2023,"Fuel":"Other Fossil","Generation_TWh":76.97}
+{"Continent":"Asia","Country":"China","Year":2023,"Fuel":"Solar","Generation_TWh":584.15}
+{"Continent":"Asia","Country":"China","Year":2023,"Fuel":"Wind","Generation_TWh":885.87}
+{"Continent":"South America","Country":"Colombia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":2.21}
+{"Continent":"South America","Country":"Colombia","Year":2023,"Fuel":"Coal","Generation_TWh":9.2}
+{"Continent":"South America","Country":"Colombia","Year":2023,"Fuel":"Gas","Generation_TWh":16.19}
+{"Continent":"South America","Country":"Colombia","Year":2023,"Fuel":"Hydro","Generation_TWh":54.22}
+{"Continent":"South America","Country":"Colombia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Colombia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":3.19}
+{"Continent":"South America","Country":"Colombia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"South America","Country":"Colombia","Year":2023,"Fuel":"Solar","Generation_TWh":1.35}
+{"Continent":"South America","Country":"Colombia","Year":2023,"Fuel":"Wind","Generation_TWh":0.22}
+{"Continent":"Africa","Country":"Comoros (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Comoros (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Comoros (the)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Comoros (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Comoros (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Comoros (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.14}
+{"Continent":"Africa","Country":"Comoros (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Comoros (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Comoros (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Congo (the Democratic Republic of the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Congo (the Democratic Republic of the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Congo (the Democratic Republic of the)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Congo (the Democratic Republic of the)","Year":2023,"Fuel":"Hydro","Generation_TWh":13.42}
+{"Continent":"Africa","Country":"Congo (the Democratic Republic of the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Congo (the Democratic Republic of the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Africa","Country":"Congo (the Democratic Republic of the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Congo (the Democratic Republic of the)","Year":2023,"Fuel":"Solar","Generation_TWh":2.2}
+{"Continent":"Africa","Country":"Congo (the Democratic Republic of the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Congo (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.03}
+{"Continent":"Africa","Country":"Congo (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Congo (the)","Year":2023,"Fuel":"Gas","Generation_TWh":3.81}
+{"Continent":"Africa","Country":"Congo (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":1.22}
+{"Continent":"Africa","Country":"Congo (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Congo (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.29}
+{"Continent":"Africa","Country":"Congo (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Congo (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Congo (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Cook Islands (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Cook Islands (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Cook Islands (the)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Cook Islands (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Cook Islands (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Cook Islands (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.02}
+{"Continent":"Oceania","Country":"Cook Islands (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Cook Islands (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"Oceania","Country":"Cook Islands (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Costa Rica","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.06}
+{"Continent":"North America","Country":"Costa Rica","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Costa Rica","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Costa Rica","Year":2023,"Fuel":"Hydro","Generation_TWh":8.54}
+{"Continent":"North America","Country":"Costa Rica","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Costa Rica","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.01}
+{"Continent":"North America","Country":"Costa Rica","Year":2023,"Fuel":"Other Renewables","Generation_TWh":1.53}
+{"Continent":"North America","Country":"Costa Rica","Year":2023,"Fuel":"Solar","Generation_TWh":0.09}
+{"Continent":"North America","Country":"Costa Rica","Year":2023,"Fuel":"Wind","Generation_TWh":1.49}
+{"Continent":"Africa","Country":"Cote d'Ivoire","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.09}
+{"Continent":"Africa","Country":"Cote d'Ivoire","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cote d'Ivoire","Year":2023,"Fuel":"Gas","Generation_TWh":7.65}
+{"Continent":"Africa","Country":"Cote d'Ivoire","Year":2023,"Fuel":"Hydro","Generation_TWh":3.2}
+{"Continent":"Africa","Country":"Cote d'Ivoire","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cote d'Ivoire","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.02}
+{"Continent":"Africa","Country":"Cote d'Ivoire","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Cote d'Ivoire","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"Africa","Country":"Cote d'Ivoire","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Croatia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":1.05}
+{"Continent":"Europe","Country":"Croatia","Year":2023,"Fuel":"Coal","Generation_TWh":1.33}
+{"Continent":"Europe","Country":"Croatia","Year":2023,"Fuel":"Gas","Generation_TWh":3.86}
+{"Continent":"Europe","Country":"Croatia","Year":2023,"Fuel":"Hydro","Generation_TWh":8.16}
+{"Continent":"Europe","Country":"Croatia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Croatia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.02}
+{"Continent":"Europe","Country":"Croatia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.02}
+{"Continent":"Europe","Country":"Croatia","Year":2023,"Fuel":"Solar","Generation_TWh":0.41}
+{"Continent":"Europe","Country":"Croatia","Year":2023,"Fuel":"Wind","Generation_TWh":2.59}
+{"Continent":"North America","Country":"Cuba","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.33}
+{"Continent":"North America","Country":"Cuba","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Cuba","Year":2023,"Fuel":"Gas","Generation_TWh":2.5}
+{"Continent":"North America","Country":"Cuba","Year":2023,"Fuel":"Hydro","Generation_TWh":0.12}
+{"Continent":"North America","Country":"Cuba","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Cuba","Year":2023,"Fuel":"Other Fossil","Generation_TWh":16.52}
+{"Continent":"North America","Country":"Cuba","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Cuba","Year":2023,"Fuel":"Solar","Generation_TWh":0.21}
+{"Continent":"North America","Country":"Cuba","Year":2023,"Fuel":"Wind","Generation_TWh":0.06}
+{"Continent":"Europe","Country":"Cyprus","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.05}
+{"Continent":"Europe","Country":"Cyprus","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Cyprus","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Europe","Country":"Cyprus","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Europe","Country":"Cyprus","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Cyprus","Year":2023,"Fuel":"Other Fossil","Generation_TWh":4.24}
+{"Continent":"Europe","Country":"Cyprus","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Cyprus","Year":2023,"Fuel":"Solar","Generation_TWh":0.83}
+{"Continent":"Europe","Country":"Cyprus","Year":2023,"Fuel":"Wind","Generation_TWh":0.21}
+{"Continent":"Europe","Country":"Czechia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":5.19}
+{"Continent":"Europe","Country":"Czechia","Year":2023,"Fuel":"Coal","Generation_TWh":29.94}
+{"Continent":"Europe","Country":"Czechia","Year":2023,"Fuel":"Gas","Generation_TWh":3.68}
+{"Continent":"Europe","Country":"Czechia","Year":2023,"Fuel":"Hydro","Generation_TWh":2.36}
+{"Continent":"Europe","Country":"Czechia","Year":2023,"Fuel":"Nuclear","Generation_TWh":30.41}
+{"Continent":"Europe","Country":"Czechia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.63}
+{"Continent":"Europe","Country":"Czechia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Czechia","Year":2023,"Fuel":"Solar","Generation_TWh":2.89}
+{"Continent":"Europe","Country":"Czechia","Year":2023,"Fuel":"Wind","Generation_TWh":0.7}
+{"Continent":"Europe","Country":"Denmark","Year":2023,"Fuel":"Bioenergy","Generation_TWh":6.21}
+{"Continent":"Europe","Country":"Denmark","Year":2023,"Fuel":"Coal","Generation_TWh":2.53}
+{"Continent":"Europe","Country":"Denmark","Year":2023,"Fuel":"Gas","Generation_TWh":1}
+{"Continent":"Europe","Country":"Denmark","Year":2023,"Fuel":"Hydro","Generation_TWh":0.02}
+{"Continent":"Europe","Country":"Denmark","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Denmark","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.08}
+{"Continent":"Europe","Country":"Denmark","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Denmark","Year":2023,"Fuel":"Solar","Generation_TWh":3.66}
+{"Continent":"Europe","Country":"Denmark","Year":2023,"Fuel":"Wind","Generation_TWh":19.39}
+{"Continent":"Africa","Country":"Djibouti","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Djibouti","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Djibouti","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Djibouti","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Djibouti","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Djibouti","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.13}
+{"Continent":"Africa","Country":"Djibouti","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Djibouti","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Djibouti","Year":2023,"Fuel":"Wind","Generation_TWh":0.07}
+{"Continent":"North America","Country":"Dominica","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Dominica","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Dominica","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Dominica","Year":2023,"Fuel":"Hydro","Generation_TWh":0.02}
+{"Continent":"North America","Country":"Dominica","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Dominica","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.13}
+{"Continent":"North America","Country":"Dominica","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Dominica","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"North America","Country":"Dominica","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Dominican Republic (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.21}
+{"Continent":"North America","Country":"Dominican Republic (the)","Year":2023,"Fuel":"Coal","Generation_TWh":7.72}
+{"Continent":"North America","Country":"Dominican Republic (the)","Year":2023,"Fuel":"Gas","Generation_TWh":7.3}
+{"Continent":"North America","Country":"Dominican Republic (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":1.47}
+{"Continent":"North America","Country":"Dominican Republic (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Dominican Republic (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":5.3}
+{"Continent":"North America","Country":"Dominican Republic (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Dominican Republic (the)","Year":2023,"Fuel":"Solar","Generation_TWh":1.36}
+{"Continent":"North America","Country":"Dominican Republic (the)","Year":2023,"Fuel":"Wind","Generation_TWh":1.2}
+{"Continent":"South America","Country":"Ecuador","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.39}
+{"Continent":"South America","Country":"Ecuador","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"South America","Country":"Ecuador","Year":2023,"Fuel":"Gas","Generation_TWh":0.95}
+{"Continent":"South America","Country":"Ecuador","Year":2023,"Fuel":"Hydro","Generation_TWh":25.73}
+{"Continent":"South America","Country":"Ecuador","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Ecuador","Year":2023,"Fuel":"Other Fossil","Generation_TWh":8.5}
+{"Continent":"South America","Country":"Ecuador","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"South America","Country":"Ecuador","Year":2023,"Fuel":"Solar","Generation_TWh":0.04}
+{"Continent":"South America","Country":"Ecuador","Year":2023,"Fuel":"Wind","Generation_TWh":0.21}
+{"Continent":"Africa","Country":"Egypt","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Egypt","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Egypt","Year":2023,"Fuel":"Gas","Generation_TWh":179.37}
+{"Continent":"Africa","Country":"Egypt","Year":2023,"Fuel":"Hydro","Generation_TWh":15.05}
+{"Continent":"Africa","Country":"Egypt","Year":2023,"Fuel":"Other Fossil","Generation_TWh":16.58}
+{"Continent":"Africa","Country":"Egypt","Year":2023,"Fuel":"Solar","Generation_TWh":4.93}
+{"Continent":"Africa","Country":"Egypt","Year":2023,"Fuel":"Wind","Generation_TWh":5.99}
+{"Continent":"North America","Country":"El Salvador","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.8}
+{"Continent":"North America","Country":"El Salvador","Year":2023,"Fuel":"Hydro","Generation_TWh":1.49}
+{"Continent":"North America","Country":"El Salvador","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.73}
+{"Continent":"North America","Country":"El Salvador","Year":2023,"Fuel":"Other Renewables","Generation_TWh":1.59}
+{"Continent":"North America","Country":"El Salvador","Year":2023,"Fuel":"Solar","Generation_TWh":1.2}
+{"Continent":"North America","Country":"El Salvador","Year":2023,"Fuel":"Wind","Generation_TWh":0.17}
+{"Continent":"Africa","Country":"Equatorial Guinea","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Equatorial Guinea","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Equatorial Guinea","Year":2023,"Fuel":"Gas","Generation_TWh":1.07}
+{"Continent":"Africa","Country":"Equatorial Guinea","Year":2023,"Fuel":"Hydro","Generation_TWh":0.35}
+{"Continent":"Africa","Country":"Equatorial Guinea","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Equatorial Guinea","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Equatorial Guinea","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Equatorial Guinea","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Equatorial Guinea","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Eritrea","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Eritrea","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Eritrea","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Eritrea","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Eritrea","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Eritrea","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.44}
+{"Continent":"Africa","Country":"Eritrea","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Eritrea","Year":2023,"Fuel":"Solar","Generation_TWh":0.05}
+{"Continent":"Africa","Country":"Eritrea","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Estonia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":1.38}
+{"Continent":"Europe","Country":"Estonia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Estonia","Year":2023,"Fuel":"Gas","Generation_TWh":0.02}
+{"Continent":"Europe","Country":"Estonia","Year":2023,"Fuel":"Hydro","Generation_TWh":0.02}
+{"Continent":"Europe","Country":"Estonia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Estonia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":2.92}
+{"Continent":"Europe","Country":"Estonia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Estonia","Year":2023,"Fuel":"Solar","Generation_TWh":0.72}
+{"Continent":"Europe","Country":"Estonia","Year":2023,"Fuel":"Wind","Generation_TWh":0.68}
+{"Continent":"Africa","Country":"Eswatini","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.21}
+{"Continent":"Africa","Country":"Eswatini","Year":2023,"Fuel":"Coal","Generation_TWh":0.02}
+{"Continent":"Africa","Country":"Eswatini","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Eswatini","Year":2023,"Fuel":"Hydro","Generation_TWh":0.4}
+{"Continent":"Africa","Country":"Eswatini","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Eswatini","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Africa","Country":"Eswatini","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Eswatini","Year":2023,"Fuel":"Solar","Generation_TWh":0.03}
+{"Continent":"Africa","Country":"Eswatini","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Ethiopia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Ethiopia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Ethiopia","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Ethiopia","Year":2023,"Fuel":"Hydro","Generation_TWh":17.13}
+{"Continent":"Africa","Country":"Ethiopia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Ethiopia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Africa","Country":"Ethiopia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.03}
+{"Continent":"Africa","Country":"Ethiopia","Year":2023,"Fuel":"Solar","Generation_TWh":0.04}
+{"Continent":"Africa","Country":"Ethiopia","Year":2023,"Fuel":"Wind","Generation_TWh":0.56}
+{"Continent":"South America","Country":"Falkland Islands (the) [Malvinas]","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"South America","Country":"Falkland Islands (the) [Malvinas]","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"South America","Country":"Falkland Islands (the) [Malvinas]","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"South America","Country":"Falkland Islands (the) [Malvinas]","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"South America","Country":"Falkland Islands (the) [Malvinas]","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Falkland Islands (the) [Malvinas]","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.01}
+{"Continent":"South America","Country":"Falkland Islands (the) [Malvinas]","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"South America","Country":"Falkland Islands (the) [Malvinas]","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"South America","Country":"Falkland Islands (the) [Malvinas]","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Faroe Islands (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"Europe","Country":"Faroe Islands (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Faroe Islands (the)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Europe","Country":"Faroe Islands (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":0.13}
+{"Continent":"Europe","Country":"Faroe Islands (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Faroe Islands (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.26}
+{"Continent":"Europe","Country":"Faroe Islands (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Faroe Islands (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Europe","Country":"Faroe Islands (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0.09}
+{"Continent":"Oceania","Country":"Fiji","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.12}
+{"Continent":"Oceania","Country":"Fiji","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Fiji","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Fiji","Year":2023,"Fuel":"Hydro","Generation_TWh":0.6}
+{"Continent":"Oceania","Country":"Fiji","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Fiji","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.42}
+{"Continent":"Oceania","Country":"Fiji","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Fiji","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Oceania","Country":"Fiji","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Finland","Year":2023,"Fuel":"Bioenergy","Generation_TWh":11.34}
+{"Continent":"Europe","Country":"Finland","Year":2023,"Fuel":"Coal","Generation_TWh":1.56}
+{"Continent":"Europe","Country":"Finland","Year":2023,"Fuel":"Gas","Generation_TWh":0.66}
+{"Continent":"Europe","Country":"Finland","Year":2023,"Fuel":"Hydro","Generation_TWh":15.2}
+{"Continent":"Europe","Country":"Finland","Year":2023,"Fuel":"Nuclear","Generation_TWh":34.31}
+{"Continent":"Europe","Country":"Finland","Year":2023,"Fuel":"Other Fossil","Generation_TWh":2.69}
+{"Continent":"Europe","Country":"Finland","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Finland","Year":2023,"Fuel":"Solar","Generation_TWh":0.72}
+{"Continent":"Europe","Country":"Finland","Year":2023,"Fuel":"Wind","Generation_TWh":15.04}
+{"Continent":"Europe","Country":"France","Year":2023,"Fuel":"Bioenergy","Generation_TWh":9.94}
+{"Continent":"Europe","Country":"France","Year":2023,"Fuel":"Coal","Generation_TWh":1.61}
+{"Continent":"Europe","Country":"France","Year":2023,"Fuel":"Gas","Generation_TWh":30.02}
+{"Continent":"Europe","Country":"France","Year":2023,"Fuel":"Hydro","Generation_TWh":55.9}
+{"Continent":"Europe","Country":"France","Year":2023,"Fuel":"Nuclear","Generation_TWh":338.2}
+{"Continent":"Europe","Country":"France","Year":2023,"Fuel":"Other Fossil","Generation_TWh":9.43}
+{"Continent":"Europe","Country":"France","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.58}
+{"Continent":"Europe","Country":"France","Year":2023,"Fuel":"Solar","Generation_TWh":22.59}
+{"Continent":"Europe","Country":"France","Year":2023,"Fuel":"Wind","Generation_TWh":50.48}
+{"Continent":"South America","Country":"French Guiana","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.06}
+{"Continent":"South America","Country":"French Guiana","Year":2023,"Fuel":"Hydro","Generation_TWh":0.52}
+{"Continent":"South America","Country":"French Guiana","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.34}
+{"Continent":"South America","Country":"French Guiana","Year":2023,"Fuel":"Solar","Generation_TWh":0.06}
+{"Continent":"Oceania","Country":"French Polynesia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Oceania","Country":"French Polynesia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"French Polynesia","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"French Polynesia","Year":2023,"Fuel":"Hydro","Generation_TWh":0.19}
+{"Continent":"Oceania","Country":"French Polynesia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"French Polynesia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.47}
+{"Continent":"Oceania","Country":"French Polynesia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"French Polynesia","Year":2023,"Fuel":"Solar","Generation_TWh":0.05}
+{"Continent":"Oceania","Country":"French Polynesia","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gabon","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Gabon","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gabon","Year":2023,"Fuel":"Gas","Generation_TWh":1.14}
+{"Continent":"Africa","Country":"Gabon","Year":2023,"Fuel":"Hydro","Generation_TWh":0.91}
+{"Continent":"Africa","Country":"Gabon","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gabon","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.53}
+{"Continent":"Africa","Country":"Gabon","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gabon","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gabon","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gambia (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gambia (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gambia (the)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gambia (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gambia (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gambia (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.51}
+{"Continent":"Africa","Country":"Gambia (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gambia (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Gambia (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Georgia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Georgia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Georgia","Year":2023,"Fuel":"Gas","Generation_TWh":3.45}
+{"Continent":"Asia","Country":"Georgia","Year":2023,"Fuel":"Hydro","Generation_TWh":10.86}
+{"Continent":"Asia","Country":"Georgia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Georgia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Asia","Country":"Georgia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Georgia","Year":2023,"Fuel":"Solar","Generation_TWh":0.03}
+{"Continent":"Asia","Country":"Georgia","Year":2023,"Fuel":"Wind","Generation_TWh":0.09}
+{"Continent":"Europe","Country":"Germany","Year":2023,"Fuel":"Bioenergy","Generation_TWh":51.26}
+{"Continent":"Europe","Country":"Germany","Year":2023,"Fuel":"Coal","Generation_TWh":124.78}
+{"Continent":"Europe","Country":"Germany","Year":2023,"Fuel":"Gas","Generation_TWh":76.66}
+{"Continent":"Europe","Country":"Germany","Year":2023,"Fuel":"Hydro","Generation_TWh":21.24}
+{"Continent":"Europe","Country":"Germany","Year":2023,"Fuel":"Nuclear","Generation_TWh":7.22}
+{"Continent":"Europe","Country":"Germany","Year":2023,"Fuel":"Other Fossil","Generation_TWh":20.96}
+{"Continent":"Europe","Country":"Germany","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.19}
+{"Continent":"Europe","Country":"Germany","Year":2023,"Fuel":"Solar","Generation_TWh":63.87}
+{"Continent":"Europe","Country":"Germany","Year":2023,"Fuel":"Wind","Generation_TWh":140.54}
+{"Continent":"Africa","Country":"Ghana","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.02}
+{"Continent":"Africa","Country":"Ghana","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Ghana","Year":2023,"Fuel":"Gas","Generation_TWh":14.39}
+{"Continent":"Africa","Country":"Ghana","Year":2023,"Fuel":"Hydro","Generation_TWh":9.19}
+{"Continent":"Africa","Country":"Ghana","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Ghana","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.55}
+{"Continent":"Africa","Country":"Ghana","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Ghana","Year":2023,"Fuel":"Solar","Generation_TWh":0.15}
+{"Continent":"Africa","Country":"Ghana","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Gibraltar","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Europe","Country":"Gibraltar","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Gibraltar","Year":2023,"Fuel":"Gas","Generation_TWh":0.19}
+{"Continent":"Europe","Country":"Gibraltar","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Europe","Country":"Gibraltar","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Gibraltar","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.04}
+{"Continent":"Europe","Country":"Gibraltar","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Gibraltar","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Europe","Country":"Gibraltar","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Greece","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.65}
+{"Continent":"Europe","Country":"Greece","Year":2023,"Fuel":"Coal","Generation_TWh":4.59}
+{"Continent":"Europe","Country":"Greece","Year":2023,"Fuel":"Gas","Generation_TWh":15.98}
+{"Continent":"Europe","Country":"Greece","Year":2023,"Fuel":"Hydro","Generation_TWh":3.82}
+{"Continent":"Europe","Country":"Greece","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Greece","Year":2023,"Fuel":"Other Fossil","Generation_TWh":3.98}
+{"Continent":"Europe","Country":"Greece","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Greece","Year":2023,"Fuel":"Solar","Generation_TWh":8.89}
+{"Continent":"Europe","Country":"Greece","Year":2023,"Fuel":"Wind","Generation_TWh":11.02}
+{"Continent":"North America","Country":"Greenland","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.02}
+{"Continent":"North America","Country":"Greenland","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Greenland","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Greenland","Year":2023,"Fuel":"Hydro","Generation_TWh":0.48}
+{"Continent":"North America","Country":"Greenland","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Greenland","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.11}
+{"Continent":"North America","Country":"Greenland","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Greenland","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"North America","Country":"Greenland","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Grenada","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Grenada","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Grenada","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Grenada","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Grenada","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Grenada","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.24}
+{"Continent":"North America","Country":"Grenada","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Grenada","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"North America","Country":"Grenada","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Guadeloupe","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.26}
+{"Continent":"North America","Country":"Guadeloupe","Year":2023,"Fuel":"Coal","Generation_TWh":0.22}
+{"Continent":"North America","Country":"Guadeloupe","Year":2023,"Fuel":"Hydro","Generation_TWh":0.01}
+{"Continent":"North America","Country":"Guadeloupe","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.86}
+{"Continent":"North America","Country":"Guadeloupe","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.11}
+{"Continent":"North America","Country":"Guadeloupe","Year":2023,"Fuel":"Solar","Generation_TWh":0.11}
+{"Continent":"North America","Country":"Guadeloupe","Year":2023,"Fuel":"Wind","Generation_TWh":0.1}
+{"Continent":"Oceania","Country":"Guam","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Guam","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Guam","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Guam","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Guam","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Guam","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.66}
+{"Continent":"Oceania","Country":"Guam","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Guam","Year":2023,"Fuel":"Solar","Generation_TWh":0.14}
+{"Continent":"Oceania","Country":"Guam","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Guatemala","Year":2023,"Fuel":"Bioenergy","Generation_TWh":3.46}
+{"Continent":"North America","Country":"Guatemala","Year":2023,"Fuel":"Coal","Generation_TWh":2.38}
+{"Continent":"North America","Country":"Guatemala","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Guatemala","Year":2023,"Fuel":"Hydro","Generation_TWh":5.65}
+{"Continent":"North America","Country":"Guatemala","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Guatemala","Year":2023,"Fuel":"Other Fossil","Generation_TWh":2.5}
+{"Continent":"North America","Country":"Guatemala","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.34}
+{"Continent":"North America","Country":"Guatemala","Year":2023,"Fuel":"Solar","Generation_TWh":0.24}
+{"Continent":"North America","Country":"Guatemala","Year":2023,"Fuel":"Wind","Generation_TWh":0.34}
+{"Continent":"Africa","Country":"Guinea","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea","Year":2023,"Fuel":"Hydro","Generation_TWh":2.95}
+{"Continent":"Africa","Country":"Guinea","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.02}
+{"Continent":"Africa","Country":"Guinea","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea","Year":2023,"Fuel":"Solar","Generation_TWh":0.03}
+{"Continent":"Africa","Country":"Guinea","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea-Bissau","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea-Bissau","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea-Bissau","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea-Bissau","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea-Bissau","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea-Bissau","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.08}
+{"Continent":"Africa","Country":"Guinea-Bissau","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea-Bissau","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Guinea-Bissau","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"South America","Country":"Guyana","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.02}
+{"Continent":"South America","Country":"Guyana","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"South America","Country":"Guyana","Year":2023,"Fuel":"Gas","Generation_TWh":0.01}
+{"Continent":"South America","Country":"Guyana","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"South America","Country":"Guyana","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Guyana","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.33}
+{"Continent":"South America","Country":"Guyana","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"South America","Country":"Guyana","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"South America","Country":"Guyana","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Haiti","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Haiti","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Haiti","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Haiti","Year":2023,"Fuel":"Hydro","Generation_TWh":0.19}
+{"Continent":"North America","Country":"Haiti","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Haiti","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.66}
+{"Continent":"North America","Country":"Haiti","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Haiti","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"North America","Country":"Haiti","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Honduras","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.83}
+{"Continent":"North America","Country":"Honduras","Year":2023,"Fuel":"Coal","Generation_TWh":0.06}
+{"Continent":"North America","Country":"Honduras","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Honduras","Year":2023,"Fuel":"Hydro","Generation_TWh":3.88}
+{"Continent":"North America","Country":"Honduras","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Honduras","Year":2023,"Fuel":"Other Fossil","Generation_TWh":5.64}
+{"Continent":"North America","Country":"Honduras","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.35}
+{"Continent":"North America","Country":"Honduras","Year":2023,"Fuel":"Solar","Generation_TWh":1.04}
+{"Continent":"North America","Country":"Honduras","Year":2023,"Fuel":"Wind","Generation_TWh":0.69}
+{"Continent":"Asia","Country":"Hong Kong","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.16}
+{"Continent":"Asia","Country":"Hong Kong","Year":2023,"Fuel":"Coal","Generation_TWh":12.56}
+{"Continent":"Asia","Country":"Hong Kong","Year":2023,"Fuel":"Gas","Generation_TWh":24.39}
+{"Continent":"Asia","Country":"Hong Kong","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Hong Kong","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Hong Kong","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.44}
+{"Continent":"Asia","Country":"Hong Kong","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Hong Kong","Year":2023,"Fuel":"Solar","Generation_TWh":0.2}
+{"Continent":"Asia","Country":"Hong Kong","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Hungary","Year":2023,"Fuel":"Bioenergy","Generation_TWh":1.56}
+{"Continent":"Europe","Country":"Hungary","Year":2023,"Fuel":"Coal","Generation_TWh":2.49}
+{"Continent":"Europe","Country":"Hungary","Year":2023,"Fuel":"Gas","Generation_TWh":7.28}
+{"Continent":"Europe","Country":"Hungary","Year":2023,"Fuel":"Hydro","Generation_TWh":0.22}
+{"Continent":"Europe","Country":"Hungary","Year":2023,"Fuel":"Nuclear","Generation_TWh":15.92}
+{"Continent":"Europe","Country":"Hungary","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.47}
+{"Continent":"Europe","Country":"Hungary","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.02}
+{"Continent":"Europe","Country":"Hungary","Year":2023,"Fuel":"Solar","Generation_TWh":6.93}
+{"Continent":"Europe","Country":"Hungary","Year":2023,"Fuel":"Wind","Generation_TWh":0.65}
+{"Continent":"Europe","Country":"Iceland","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Europe","Country":"Iceland","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Iceland","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Europe","Country":"Iceland","Year":2023,"Fuel":"Hydro","Generation_TWh":14.1}
+{"Continent":"Europe","Country":"Iceland","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Iceland","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Europe","Country":"Iceland","Year":2023,"Fuel":"Other Renewables","Generation_TWh":5.7}
+{"Continent":"Europe","Country":"Iceland","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Europe","Country":"Iceland","Year":2023,"Fuel":"Wind","Generation_TWh":0.01}
+{"Continent":"Asia","Country":"India","Year":2023,"Fuel":"Bioenergy","Generation_TWh":23.01}
+{"Continent":"Asia","Country":"India","Year":2023,"Fuel":"Coal","Generation_TWh":1445.44}
+{"Continent":"Asia","Country":"India","Year":2023,"Fuel":"Gas","Generation_TWh":50.8}
+{"Continent":"Asia","Country":"India","Year":2023,"Fuel":"Hydro","Generation_TWh":149.43}
+{"Continent":"Asia","Country":"India","Year":2023,"Fuel":"Nuclear","Generation_TWh":48.2}
+{"Continent":"Asia","Country":"India","Year":2023,"Fuel":"Other Fossil","Generation_TWh":3.85}
+{"Continent":"Asia","Country":"India","Year":2023,"Fuel":"Solar","Generation_TWh":115.42}
+{"Continent":"Asia","Country":"India","Year":2023,"Fuel":"Wind","Generation_TWh":82.11}
+{"Continent":"Asia","Country":"Indonesia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":22.48}
+{"Continent":"Asia","Country":"Indonesia","Year":2023,"Fuel":"Coal","Generation_TWh":216.78}
+{"Continent":"Asia","Country":"Indonesia","Year":2023,"Fuel":"Gas","Generation_TWh":62.04}
+{"Continent":"Asia","Country":"Indonesia","Year":2023,"Fuel":"Hydro","Generation_TWh":24.59}
+{"Continent":"Asia","Country":"Indonesia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":6.58}
+{"Continent":"Asia","Country":"Indonesia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":16.94}
+{"Continent":"Asia","Country":"Indonesia","Year":2023,"Fuel":"Solar","Generation_TWh":0.71}
+{"Continent":"Asia","Country":"Indonesia","Year":2023,"Fuel":"Wind","Generation_TWh":0.48}
+{"Continent":"Asia","Country":"Iran (Islamic Republic of)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.02}
+{"Continent":"Asia","Country":"Iran (Islamic Republic of)","Year":2023,"Fuel":"Coal","Generation_TWh":0.71}
+{"Continent":"Asia","Country":"Iran (Islamic Republic of)","Year":2023,"Fuel":"Gas","Generation_TWh":321.96}
+{"Continent":"Asia","Country":"Iran (Islamic Republic of)","Year":2023,"Fuel":"Hydro","Generation_TWh":22.82}
+{"Continent":"Asia","Country":"Iran (Islamic Republic of)","Year":2023,"Fuel":"Nuclear","Generation_TWh":6.64}
+{"Continent":"Asia","Country":"Iran (Islamic Republic of)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":27.98}
+{"Continent":"Asia","Country":"Iran (Islamic Republic of)","Year":2023,"Fuel":"Solar","Generation_TWh":0.68}
+{"Continent":"Asia","Country":"Iran (Islamic Republic of)","Year":2023,"Fuel":"Wind","Generation_TWh":1.21}
+{"Continent":"Asia","Country":"Iraq","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Iraq","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Iraq","Year":2023,"Fuel":"Gas","Generation_TWh":75.68}
+{"Continent":"Asia","Country":"Iraq","Year":2023,"Fuel":"Hydro","Generation_TWh":1.38}
+{"Continent":"Asia","Country":"Iraq","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Iraq","Year":2023,"Fuel":"Other Fossil","Generation_TWh":67.57}
+{"Continent":"Asia","Country":"Iraq","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Iraq","Year":2023,"Fuel":"Solar","Generation_TWh":0.38}
+{"Continent":"Asia","Country":"Iraq","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Ireland","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.83}
+{"Continent":"Europe","Country":"Ireland","Year":2023,"Fuel":"Coal","Generation_TWh":1.21}
+{"Continent":"Europe","Country":"Ireland","Year":2023,"Fuel":"Gas","Generation_TWh":15.36}
+{"Continent":"Europe","Country":"Ireland","Year":2023,"Fuel":"Hydro","Generation_TWh":0.94}
+{"Continent":"Europe","Country":"Ireland","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Ireland","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.7}
+{"Continent":"Europe","Country":"Ireland","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Ireland","Year":2023,"Fuel":"Solar","Generation_TWh":0.65}
+{"Continent":"Europe","Country":"Ireland","Year":2023,"Fuel":"Wind","Generation_TWh":11.86}
+{"Continent":"Asia","Country":"Israel","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.11}
+{"Continent":"Asia","Country":"Israel","Year":2023,"Fuel":"Coal","Generation_TWh":13.1}
+{"Continent":"Asia","Country":"Israel","Year":2023,"Fuel":"Gas","Generation_TWh":54.7}
+{"Continent":"Asia","Country":"Israel","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Israel","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Israel","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.5}
+{"Continent":"Asia","Country":"Israel","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Israel","Year":2023,"Fuel":"Solar","Generation_TWh":8.56}
+{"Continent":"Asia","Country":"Israel","Year":2023,"Fuel":"Wind","Generation_TWh":0.46}
+{"Continent":"Europe","Country":"Italy","Year":2023,"Fuel":"Bioenergy","Generation_TWh":16.01}
+{"Continent":"Europe","Country":"Italy","Year":2023,"Fuel":"Coal","Generation_TWh":13.22}
+{"Continent":"Europe","Country":"Italy","Year":2023,"Fuel":"Gas","Generation_TWh":119.02}
+{"Continent":"Europe","Country":"Italy","Year":2023,"Fuel":"Hydro","Generation_TWh":40.52}
+{"Continent":"Europe","Country":"Italy","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Italy","Year":2023,"Fuel":"Other Fossil","Generation_TWh":12.79}
+{"Continent":"Europe","Country":"Italy","Year":2023,"Fuel":"Other Renewables","Generation_TWh":5.69}
+{"Continent":"Europe","Country":"Italy","Year":2023,"Fuel":"Solar","Generation_TWh":30.71}
+{"Continent":"Europe","Country":"Italy","Year":2023,"Fuel":"Wind","Generation_TWh":23.59}
+{"Continent":"North America","Country":"Jamaica","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.06}
+{"Continent":"North America","Country":"Jamaica","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Jamaica","Year":2023,"Fuel":"Gas","Generation_TWh":2.81}
+{"Continent":"North America","Country":"Jamaica","Year":2023,"Fuel":"Hydro","Generation_TWh":0.12}
+{"Continent":"North America","Country":"Jamaica","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Jamaica","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.38}
+{"Continent":"North America","Country":"Jamaica","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Jamaica","Year":2023,"Fuel":"Solar","Generation_TWh":0.13}
+{"Continent":"North America","Country":"Jamaica","Year":2023,"Fuel":"Wind","Generation_TWh":0.27}
+{"Continent":"Asia","Country":"Japan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":42.01}
+{"Continent":"Asia","Country":"Japan","Year":2023,"Fuel":"Coal","Generation_TWh":326.93}
+{"Continent":"Asia","Country":"Japan","Year":2023,"Fuel":"Gas","Generation_TWh":346.98}
+{"Continent":"Asia","Country":"Japan","Year":2023,"Fuel":"Hydro","Generation_TWh":74.53}
+{"Continent":"Asia","Country":"Japan","Year":2023,"Fuel":"Nuclear","Generation_TWh":77.46}
+{"Continent":"Asia","Country":"Japan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":32.5}
+{"Continent":"Asia","Country":"Japan","Year":2023,"Fuel":"Solar","Generation_TWh":96.36}
+{"Continent":"Asia","Country":"Japan","Year":2023,"Fuel":"Wind","Generation_TWh":9.96}
+{"Continent":"Asia","Country":"Jordan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Jordan","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Jordan","Year":2023,"Fuel":"Gas","Generation_TWh":14.67}
+{"Continent":"Asia","Country":"Jordan","Year":2023,"Fuel":"Hydro","Generation_TWh":0.02}
+{"Continent":"Asia","Country":"Jordan","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Jordan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":3.88}
+{"Continent":"Asia","Country":"Jordan","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Jordan","Year":2023,"Fuel":"Solar","Generation_TWh":3.45}
+{"Continent":"Asia","Country":"Jordan","Year":2023,"Fuel":"Wind","Generation_TWh":1.75}
+{"Continent":"Asia","Country":"Kazakhstan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"Asia","Country":"Kazakhstan","Year":2023,"Fuel":"Coal","Generation_TWh":65.25}
+{"Continent":"Asia","Country":"Kazakhstan","Year":2023,"Fuel":"Gas","Generation_TWh":33.25}
+{"Continent":"Asia","Country":"Kazakhstan","Year":2023,"Fuel":"Hydro","Generation_TWh":8.8}
+{"Continent":"Asia","Country":"Kazakhstan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.63}
+{"Continent":"Asia","Country":"Kazakhstan","Year":2023,"Fuel":"Solar","Generation_TWh":1.87}
+{"Continent":"Asia","Country":"Kazakhstan","Year":2023,"Fuel":"Wind","Generation_TWh":3.78}
+{"Continent":"Africa","Country":"Kenya","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.2}
+{"Continent":"Africa","Country":"Kenya","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Kenya","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Kenya","Year":2023,"Fuel":"Hydro","Generation_TWh":2.67}
+{"Continent":"Africa","Country":"Kenya","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Kenya","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.31}
+{"Continent":"Africa","Country":"Kenya","Year":2023,"Fuel":"Other Renewables","Generation_TWh":6.03}
+{"Continent":"Africa","Country":"Kenya","Year":2023,"Fuel":"Solar","Generation_TWh":0.58}
+{"Continent":"Africa","Country":"Kenya","Year":2023,"Fuel":"Wind","Generation_TWh":2.01}
+{"Continent":"Oceania","Country":"Kiribati","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Kiribati","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Kiribati","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Kiribati","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Kiribati","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Kiribati","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.03}
+{"Continent":"Oceania","Country":"Kiribati","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Kiribati","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Oceania","Country":"Kiribati","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Korea (the Democratic People's Republic of)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Korea (the Democratic People's Republic of)","Year":2023,"Fuel":"Coal","Generation_TWh":9.23}
+{"Continent":"Asia","Country":"Korea (the Democratic People's Republic of)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Asia","Country":"Korea (the Democratic People's Republic of)","Year":2023,"Fuel":"Hydro","Generation_TWh":16.6}
+{"Continent":"Asia","Country":"Korea (the Democratic People's Republic of)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Korea (the Democratic People's Republic of)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.74}
+{"Continent":"Asia","Country":"Korea (the Democratic People's Republic of)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Korea (the Democratic People's Republic of)","Year":2023,"Fuel":"Solar","Generation_TWh":0.15}
+{"Continent":"Asia","Country":"Korea (the Democratic People's Republic of)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Kosovo","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Europe","Country":"Kosovo","Year":2023,"Fuel":"Coal","Generation_TWh":5.53}
+{"Continent":"Europe","Country":"Kosovo","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Europe","Country":"Kosovo","Year":2023,"Fuel":"Hydro","Generation_TWh":0.39}
+{"Continent":"Europe","Country":"Kosovo","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Kosovo","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.01}
+{"Continent":"Europe","Country":"Kosovo","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Kosovo","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Europe","Country":"Kosovo","Year":2023,"Fuel":"Wind","Generation_TWh":0.4}
+{"Continent":"Asia","Country":"Kuwait","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Kuwait","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Kuwait","Year":2023,"Fuel":"Gas","Generation_TWh":55.06}
+{"Continent":"Asia","Country":"Kuwait","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Kuwait","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Kuwait","Year":2023,"Fuel":"Other Fossil","Generation_TWh":32.79}
+{"Continent":"Asia","Country":"Kuwait","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Kuwait","Year":2023,"Fuel":"Solar","Generation_TWh":0.19}
+{"Continent":"Asia","Country":"Kuwait","Year":2023,"Fuel":"Wind","Generation_TWh":1.72}
+{"Continent":"Asia","Country":"Kyrgyzstan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Kyrgyzstan","Year":2023,"Fuel":"Coal","Generation_TWh":1.59}
+{"Continent":"Asia","Country":"Kyrgyzstan","Year":2023,"Fuel":"Gas","Generation_TWh":0.2}
+{"Continent":"Asia","Country":"Kyrgyzstan","Year":2023,"Fuel":"Hydro","Generation_TWh":11.76}
+{"Continent":"Asia","Country":"Kyrgyzstan","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Kyrgyzstan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.05}
+{"Continent":"Asia","Country":"Kyrgyzstan","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Kyrgyzstan","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Asia","Country":"Kyrgyzstan","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Lao People's Democratic Republic (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.04}
+{"Continent":"Asia","Country":"Lao People's Democratic Republic (the)","Year":2023,"Fuel":"Coal","Generation_TWh":12.18}
+{"Continent":"Asia","Country":"Lao People's Democratic Republic (the)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Asia","Country":"Lao People's Democratic Republic (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":40}
+{"Continent":"Asia","Country":"Lao People's Democratic Republic (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Lao People's Democratic Republic (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Asia","Country":"Lao People's Democratic Republic (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Lao People's Democratic Republic (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0.08}
+{"Continent":"Asia","Country":"Lao People's Democratic Republic (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Latvia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.66}
+{"Continent":"Europe","Country":"Latvia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Latvia","Year":2023,"Fuel":"Gas","Generation_TWh":1.42}
+{"Continent":"Europe","Country":"Latvia","Year":2023,"Fuel":"Hydro","Generation_TWh":3.79}
+{"Continent":"Europe","Country":"Latvia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Latvia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Europe","Country":"Latvia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Latvia","Year":2023,"Fuel":"Solar","Generation_TWh":0.24}
+{"Continent":"Europe","Country":"Latvia","Year":2023,"Fuel":"Wind","Generation_TWh":0.27}
+{"Continent":"Asia","Country":"Lebanon","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.03}
+{"Continent":"Asia","Country":"Lebanon","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Lebanon","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Asia","Country":"Lebanon","Year":2023,"Fuel":"Hydro","Generation_TWh":0.7}
+{"Continent":"Asia","Country":"Lebanon","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Lebanon","Year":2023,"Fuel":"Other Fossil","Generation_TWh":4.14}
+{"Continent":"Asia","Country":"Lebanon","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Lebanon","Year":2023,"Fuel":"Solar","Generation_TWh":1.4}
+{"Continent":"Asia","Country":"Lebanon","Year":2023,"Fuel":"Wind","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Lesotho","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Lesotho","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Lesotho","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Lesotho","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Lesotho","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Lesotho","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Africa","Country":"Lesotho","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Lesotho","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Lesotho","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Liberia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Liberia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Liberia","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Liberia","Year":2023,"Fuel":"Hydro","Generation_TWh":0.35}
+{"Continent":"Africa","Country":"Liberia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Liberia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.26}
+{"Continent":"Africa","Country":"Liberia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Liberia","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Liberia","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Libya","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Libya","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Libya","Year":2023,"Fuel":"Gas","Generation_TWh":24.9}
+{"Continent":"Africa","Country":"Libya","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Libya","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Libya","Year":2023,"Fuel":"Other Fossil","Generation_TWh":8.84}
+{"Continent":"Africa","Country":"Libya","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Libya","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Libya","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Lithuania","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.76}
+{"Continent":"Europe","Country":"Lithuania","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Lithuania","Year":2023,"Fuel":"Gas","Generation_TWh":0.58}
+{"Continent":"Europe","Country":"Lithuania","Year":2023,"Fuel":"Hydro","Generation_TWh":0.45}
+{"Continent":"Europe","Country":"Lithuania","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Lithuania","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.28}
+{"Continent":"Europe","Country":"Lithuania","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Lithuania","Year":2023,"Fuel":"Solar","Generation_TWh":0.69}
+{"Continent":"Europe","Country":"Lithuania","Year":2023,"Fuel":"Wind","Generation_TWh":2.54}
+{"Continent":"Europe","Country":"Luxembourg","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.38}
+{"Continent":"Europe","Country":"Luxembourg","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Luxembourg","Year":2023,"Fuel":"Gas","Generation_TWh":0.09}
+{"Continent":"Europe","Country":"Luxembourg","Year":2023,"Fuel":"Hydro","Generation_TWh":0.09}
+{"Continent":"Europe","Country":"Luxembourg","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Luxembourg","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.06}
+{"Continent":"Europe","Country":"Luxembourg","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Luxembourg","Year":2023,"Fuel":"Solar","Generation_TWh":0.29}
+{"Continent":"Europe","Country":"Luxembourg","Year":2023,"Fuel":"Wind","Generation_TWh":0.5}
+{"Continent":"Asia","Country":"Macao","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.22}
+{"Continent":"Asia","Country":"Macao","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Macao","Year":2023,"Fuel":"Gas","Generation_TWh":0.37}
+{"Continent":"Asia","Country":"Macao","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Macao","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Macao","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.07}
+{"Continent":"Asia","Country":"Macao","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Macao","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Asia","Country":"Macao","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Madagascar","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.03}
+{"Continent":"Africa","Country":"Madagascar","Year":2023,"Fuel":"Coal","Generation_TWh":0.51}
+{"Continent":"Africa","Country":"Madagascar","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Madagascar","Year":2023,"Fuel":"Hydro","Generation_TWh":0.98}
+{"Continent":"Africa","Country":"Madagascar","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Madagascar","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.88}
+{"Continent":"Africa","Country":"Madagascar","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Madagascar","Year":2023,"Fuel":"Solar","Generation_TWh":0.08}
+{"Continent":"Africa","Country":"Madagascar","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Malawi","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.05}
+{"Continent":"Africa","Country":"Malawi","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Malawi","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Malawi","Year":2023,"Fuel":"Hydro","Generation_TWh":1.69}
+{"Continent":"Africa","Country":"Malawi","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Malawi","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.08}
+{"Continent":"Africa","Country":"Malawi","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Malawi","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Malawi","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Malaysia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":1.23}
+{"Continent":"Asia","Country":"Malaysia","Year":2023,"Fuel":"Coal","Generation_TWh":81.4}
+{"Continent":"Asia","Country":"Malaysia","Year":2023,"Fuel":"Gas","Generation_TWh":69.23}
+{"Continent":"Asia","Country":"Malaysia","Year":2023,"Fuel":"Hydro","Generation_TWh":31.51}
+{"Continent":"Asia","Country":"Malaysia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.19}
+{"Continent":"Asia","Country":"Malaysia","Year":2023,"Fuel":"Solar","Generation_TWh":3.24}
+{"Continent":"Asia","Country":"Malaysia","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Maldives","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Maldives","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Maldives","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Asia","Country":"Maldives","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Maldives","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Maldives","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.79}
+{"Continent":"Asia","Country":"Maldives","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Maldives","Year":2023,"Fuel":"Solar","Generation_TWh":0.06}
+{"Continent":"Asia","Country":"Maldives","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mali","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.07}
+{"Continent":"Africa","Country":"Mali","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mali","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mali","Year":2023,"Fuel":"Hydro","Generation_TWh":0.97}
+{"Continent":"Africa","Country":"Mali","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mali","Year":2023,"Fuel":"Other Fossil","Generation_TWh":4.82}
+{"Continent":"Africa","Country":"Mali","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mali","Year":2023,"Fuel":"Solar","Generation_TWh":0.15}
+{"Continent":"Africa","Country":"Mali","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Malta","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"Europe","Country":"Malta","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Malta","Year":2023,"Fuel":"Gas","Generation_TWh":2.01}
+{"Continent":"Europe","Country":"Malta","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Europe","Country":"Malta","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Malta","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.02}
+{"Continent":"Europe","Country":"Malta","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Malta","Year":2023,"Fuel":"Solar","Generation_TWh":0.31}
+{"Continent":"Europe","Country":"Malta","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Martinique","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.24}
+{"Continent":"North America","Country":"Martinique","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Martinique","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.12}
+{"Continent":"North America","Country":"Martinique","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.01}
+{"Continent":"North America","Country":"Martinique","Year":2023,"Fuel":"Solar","Generation_TWh":0.11}
+{"Continent":"North America","Country":"Martinique","Year":2023,"Fuel":"Wind","Generation_TWh":0.03}
+{"Continent":"Africa","Country":"Mauritania","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mauritania","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mauritania","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mauritania","Year":2023,"Fuel":"Hydro","Generation_TWh":0.21}
+{"Continent":"Africa","Country":"Mauritania","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mauritania","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.64}
+{"Continent":"Africa","Country":"Mauritania","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mauritania","Year":2023,"Fuel":"Solar","Generation_TWh":0.14}
+{"Continent":"Africa","Country":"Mauritania","Year":2023,"Fuel":"Wind","Generation_TWh":0.1}
+{"Continent":"Africa","Country":"Mauritius","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.32}
+{"Continent":"Africa","Country":"Mauritius","Year":2023,"Fuel":"Coal","Generation_TWh":1.1}
+{"Continent":"Africa","Country":"Mauritius","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mauritius","Year":2023,"Fuel":"Hydro","Generation_TWh":0.09}
+{"Continent":"Africa","Country":"Mauritius","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mauritius","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.6}
+{"Continent":"Africa","Country":"Mauritius","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mauritius","Year":2023,"Fuel":"Solar","Generation_TWh":0.15}
+{"Continent":"Africa","Country":"Mauritius","Year":2023,"Fuel":"Wind","Generation_TWh":0.01}
+{"Continent":"North America","Country":"Mexico","Year":2023,"Fuel":"Bioenergy","Generation_TWh":6.63}
+{"Continent":"North America","Country":"Mexico","Year":2023,"Fuel":"Coal","Generation_TWh":13.53}
+{"Continent":"North America","Country":"Mexico","Year":2023,"Fuel":"Gas","Generation_TWh":219.24}
+{"Continent":"North America","Country":"Mexico","Year":2023,"Fuel":"Hydro","Generation_TWh":20.61}
+{"Continent":"North America","Country":"Mexico","Year":2023,"Fuel":"Nuclear","Generation_TWh":12.39}
+{"Continent":"North America","Country":"Mexico","Year":2023,"Fuel":"Other Fossil","Generation_TWh":35.26}
+{"Continent":"North America","Country":"Mexico","Year":2023,"Fuel":"Solar","Generation_TWh":23.34}
+{"Continent":"North America","Country":"Mexico","Year":2023,"Fuel":"Wind","Generation_TWh":20.7}
+{"Continent":"Europe","Country":"Moldova","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"Europe","Country":"Moldova","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Moldova","Year":2023,"Fuel":"Gas","Generation_TWh":5.44}
+{"Continent":"Europe","Country":"Moldova","Year":2023,"Fuel":"Hydro","Generation_TWh":0.32}
+{"Continent":"Europe","Country":"Moldova","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Moldova","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.3}
+{"Continent":"Europe","Country":"Moldova","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Moldova","Year":2023,"Fuel":"Solar","Generation_TWh":0.09}
+{"Continent":"Europe","Country":"Moldova","Year":2023,"Fuel":"Wind","Generation_TWh":0.19}
+{"Continent":"Asia","Country":"Mongolia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Mongolia","Year":2023,"Fuel":"Coal","Generation_TWh":7.06}
+{"Continent":"Asia","Country":"Mongolia","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Asia","Country":"Mongolia","Year":2023,"Fuel":"Hydro","Generation_TWh":0.06}
+{"Continent":"Asia","Country":"Mongolia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Mongolia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.47}
+{"Continent":"Asia","Country":"Mongolia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Mongolia","Year":2023,"Fuel":"Solar","Generation_TWh":0.19}
+{"Continent":"Asia","Country":"Mongolia","Year":2023,"Fuel":"Wind","Generation_TWh":0.51}
+{"Continent":"Europe","Country":"Montenegro","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Europe","Country":"Montenegro","Year":2023,"Fuel":"Coal","Generation_TWh":1.64}
+{"Continent":"Europe","Country":"Montenegro","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Europe","Country":"Montenegro","Year":2023,"Fuel":"Hydro","Generation_TWh":2.22}
+{"Continent":"Europe","Country":"Montenegro","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Montenegro","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Europe","Country":"Montenegro","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Montenegro","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"Europe","Country":"Montenegro","Year":2023,"Fuel":"Wind","Generation_TWh":0.31}
+{"Continent":"North America","Country":"Montserrat","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Montserrat","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Montserrat","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Montserrat","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Montserrat","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Montserrat","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.01}
+{"Continent":"North America","Country":"Montserrat","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Montserrat","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"North America","Country":"Montserrat","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Morocco","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.04}
+{"Continent":"Africa","Country":"Morocco","Year":2023,"Fuel":"Coal","Generation_TWh":27.15}
+{"Continent":"Africa","Country":"Morocco","Year":2023,"Fuel":"Gas","Generation_TWh":4.26}
+{"Continent":"Africa","Country":"Morocco","Year":2023,"Fuel":"Hydro","Generation_TWh":0.52}
+{"Continent":"Africa","Country":"Morocco","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Morocco","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.83}
+{"Continent":"Africa","Country":"Morocco","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Morocco","Year":2023,"Fuel":"Solar","Generation_TWh":2.11}
+{"Continent":"Africa","Country":"Morocco","Year":2023,"Fuel":"Wind","Generation_TWh":6.55}
+{"Continent":"Africa","Country":"Mozambique","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.13}
+{"Continent":"Africa","Country":"Mozambique","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mozambique","Year":2023,"Fuel":"Gas","Generation_TWh":3.12}
+{"Continent":"Africa","Country":"Mozambique","Year":2023,"Fuel":"Hydro","Generation_TWh":16.48}
+{"Continent":"Africa","Country":"Mozambique","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mozambique","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.16}
+{"Continent":"Africa","Country":"Mozambique","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Mozambique","Year":2023,"Fuel":"Solar","Generation_TWh":0.07}
+{"Continent":"Africa","Country":"Mozambique","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Myanmar","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.27}
+{"Continent":"Asia","Country":"Myanmar","Year":2023,"Fuel":"Coal","Generation_TWh":1.12}
+{"Continent":"Asia","Country":"Myanmar","Year":2023,"Fuel":"Gas","Generation_TWh":10.04}
+{"Continent":"Asia","Country":"Myanmar","Year":2023,"Fuel":"Hydro","Generation_TWh":9.43}
+{"Continent":"Asia","Country":"Myanmar","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Myanmar","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.13}
+{"Continent":"Asia","Country":"Myanmar","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Myanmar","Year":2023,"Fuel":"Solar","Generation_TWh":0.11}
+{"Continent":"Asia","Country":"Myanmar","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Namibia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Namibia","Year":2023,"Fuel":"Coal","Generation_TWh":0.03}
+{"Continent":"Africa","Country":"Namibia","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Namibia","Year":2023,"Fuel":"Hydro","Generation_TWh":1.32}
+{"Continent":"Africa","Country":"Namibia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Namibia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Namibia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Namibia","Year":2023,"Fuel":"Solar","Generation_TWh":0.51}
+{"Continent":"Africa","Country":"Namibia","Year":2023,"Fuel":"Wind","Generation_TWh":0.02}
+{"Continent":"Oceania","Country":"Nauru","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Nauru","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Nauru","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Nauru","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Nauru","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Nauru","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.04}
+{"Continent":"Oceania","Country":"Nauru","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Nauru","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Nauru","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Nepal","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Nepal","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Nepal","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Asia","Country":"Nepal","Year":2023,"Fuel":"Hydro","Generation_TWh":10.59}
+{"Continent":"Asia","Country":"Nepal","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Nepal","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Asia","Country":"Nepal","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Nepal","Year":2023,"Fuel":"Solar","Generation_TWh":0.1}
+{"Continent":"Asia","Country":"Nepal","Year":2023,"Fuel":"Wind","Generation_TWh":0.01}
+{"Continent":"Europe","Country":"Netherlands","Year":2023,"Fuel":"Bioenergy","Generation_TWh":7.64}
+{"Continent":"Europe","Country":"Netherlands","Year":2023,"Fuel":"Coal","Generation_TWh":8.71}
+{"Continent":"Europe","Country":"Netherlands","Year":2023,"Fuel":"Gas","Generation_TWh":46.09}
+{"Continent":"Europe","Country":"Netherlands","Year":2023,"Fuel":"Hydro","Generation_TWh":0.07}
+{"Continent":"Europe","Country":"Netherlands","Year":2023,"Fuel":"Nuclear","Generation_TWh":3.99}
+{"Continent":"Europe","Country":"Netherlands","Year":2023,"Fuel":"Other Fossil","Generation_TWh":4.33}
+{"Continent":"Europe","Country":"Netherlands","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Netherlands","Year":2023,"Fuel":"Solar","Generation_TWh":19.61}
+{"Continent":"Europe","Country":"Netherlands","Year":2023,"Fuel":"Wind","Generation_TWh":29.52}
+{"Continent":"Oceania","Country":"New Caledonia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Oceania","Country":"New Caledonia","Year":2023,"Fuel":"Coal","Generation_TWh":1.14}
+{"Continent":"Oceania","Country":"New Caledonia","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"New Caledonia","Year":2023,"Fuel":"Hydro","Generation_TWh":0.54}
+{"Continent":"Oceania","Country":"New Caledonia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"New Caledonia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.14}
+{"Continent":"Oceania","Country":"New Caledonia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"New Caledonia","Year":2023,"Fuel":"Solar","Generation_TWh":0.23}
+{"Continent":"Oceania","Country":"New Caledonia","Year":2023,"Fuel":"Wind","Generation_TWh":0.04}
+{"Continent":"Oceania","Country":"New Zealand","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.66}
+{"Continent":"Oceania","Country":"New Zealand","Year":2023,"Fuel":"Coal","Generation_TWh":0.53}
+{"Continent":"Oceania","Country":"New Zealand","Year":2023,"Fuel":"Gas","Generation_TWh":3.36}
+{"Continent":"Oceania","Country":"New Zealand","Year":2023,"Fuel":"Hydro","Generation_TWh":26.17}
+{"Continent":"Oceania","Country":"New Zealand","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"New Zealand","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.56}
+{"Continent":"Oceania","Country":"New Zealand","Year":2023,"Fuel":"Other Renewables","Generation_TWh":7.73}
+{"Continent":"Oceania","Country":"New Zealand","Year":2023,"Fuel":"Solar","Generation_TWh":0.37}
+{"Continent":"Oceania","Country":"New Zealand","Year":2023,"Fuel":"Wind","Generation_TWh":3.51}
+{"Continent":"North America","Country":"Nicaragua","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.89}
+{"Continent":"North America","Country":"Nicaragua","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Nicaragua","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Nicaragua","Year":2023,"Fuel":"Hydro","Generation_TWh":0.65}
+{"Continent":"North America","Country":"Nicaragua","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Nicaragua","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.7}
+{"Continent":"North America","Country":"Nicaragua","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.69}
+{"Continent":"North America","Country":"Nicaragua","Year":2023,"Fuel":"Solar","Generation_TWh":0.03}
+{"Continent":"North America","Country":"Nicaragua","Year":2023,"Fuel":"Wind","Generation_TWh":0.56}
+{"Continent":"Africa","Country":"Niger (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Niger (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0.17}
+{"Continent":"Africa","Country":"Niger (the)","Year":2023,"Fuel":"Gas","Generation_TWh":0.05}
+{"Continent":"Africa","Country":"Niger (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Niger (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Niger (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.73}
+{"Continent":"Africa","Country":"Niger (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Niger (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"Africa","Country":"Niger (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Nigeria","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.06}
+{"Continent":"Africa","Country":"Nigeria","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Nigeria","Year":2023,"Fuel":"Gas","Generation_TWh":31.64}
+{"Continent":"Africa","Country":"Nigeria","Year":2023,"Fuel":"Hydro","Generation_TWh":9.11}
+{"Continent":"Africa","Country":"Nigeria","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Nigeria","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Africa","Country":"Nigeria","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Nigeria","Year":2023,"Fuel":"Solar","Generation_TWh":0.11}
+{"Continent":"Africa","Country":"Nigeria","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Niue","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Niue","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Niue","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Niue","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Niue","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Niue","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Niue","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Niue","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Niue","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"North Macedonia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.07}
+{"Continent":"Europe","Country":"North Macedonia","Year":2023,"Fuel":"Coal","Generation_TWh":2.77}
+{"Continent":"Europe","Country":"North Macedonia","Year":2023,"Fuel":"Gas","Generation_TWh":1.38}
+{"Continent":"Europe","Country":"North Macedonia","Year":2023,"Fuel":"Hydro","Generation_TWh":1.62}
+{"Continent":"Europe","Country":"North Macedonia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"North Macedonia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.53}
+{"Continent":"Europe","Country":"North Macedonia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"North Macedonia","Year":2023,"Fuel":"Solar","Generation_TWh":0.36}
+{"Continent":"Europe","Country":"North Macedonia","Year":2023,"Fuel":"Wind","Generation_TWh":0.16}
+{"Continent":"Europe","Country":"Norway","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.25}
+{"Continent":"Europe","Country":"Norway","Year":2023,"Fuel":"Coal","Generation_TWh":0.03}
+{"Continent":"Europe","Country":"Norway","Year":2023,"Fuel":"Gas","Generation_TWh":1.53}
+{"Continent":"Europe","Country":"Norway","Year":2023,"Fuel":"Hydro","Generation_TWh":136.71}
+{"Continent":"Europe","Country":"Norway","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Norway","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.79}
+{"Continent":"Europe","Country":"Norway","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Norway","Year":2023,"Fuel":"Solar","Generation_TWh":0.36}
+{"Continent":"Europe","Country":"Norway","Year":2023,"Fuel":"Wind","Generation_TWh":13.96}
+{"Continent":"Asia","Country":"Oman","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Oman","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Oman","Year":2023,"Fuel":"Gas","Generation_TWh":41.2}
+{"Continent":"Asia","Country":"Oman","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Oman","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Oman","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.6}
+{"Continent":"Asia","Country":"Oman","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Oman","Year":2023,"Fuel":"Solar","Generation_TWh":2.1}
+{"Continent":"Asia","Country":"Oman","Year":2023,"Fuel":"Wind","Generation_TWh":0.1}
+{"Continent":"Asia","Country":"Pakistan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":1.77}
+{"Continent":"Asia","Country":"Pakistan","Year":2023,"Fuel":"Coal","Generation_TWh":26.44}
+{"Continent":"Asia","Country":"Pakistan","Year":2023,"Fuel":"Gas","Generation_TWh":45.51}
+{"Continent":"Asia","Country":"Pakistan","Year":2023,"Fuel":"Hydro","Generation_TWh":37.9}
+{"Continent":"Asia","Country":"Pakistan","Year":2023,"Fuel":"Nuclear","Generation_TWh":22.44}
+{"Continent":"Asia","Country":"Pakistan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":20.51}
+{"Continent":"Asia","Country":"Pakistan","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Pakistan","Year":2023,"Fuel":"Solar","Generation_TWh":11.35}
+{"Continent":"Asia","Country":"Pakistan","Year":2023,"Fuel":"Wind","Generation_TWh":6.05}
+{"Continent":"Asia","Country":"Palestine, State of","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Palestine, State of","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Palestine, State of","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Asia","Country":"Palestine, State of","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Palestine, State of","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Palestine, State of","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.51}
+{"Continent":"Asia","Country":"Palestine, State of","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Palestine, State of","Year":2023,"Fuel":"Solar","Generation_TWh":0.34}
+{"Continent":"Asia","Country":"Palestine, State of","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Panama","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.04}
+{"Continent":"North America","Country":"Panama","Year":2023,"Fuel":"Coal","Generation_TWh":0.46}
+{"Continent":"North America","Country":"Panama","Year":2023,"Fuel":"Gas","Generation_TWh":2.79}
+{"Continent":"North America","Country":"Panama","Year":2023,"Fuel":"Hydro","Generation_TWh":6.15}
+{"Continent":"North America","Country":"Panama","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Panama","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.91}
+{"Continent":"North America","Country":"Panama","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Panama","Year":2023,"Fuel":"Solar","Generation_TWh":0.87}
+{"Continent":"North America","Country":"Panama","Year":2023,"Fuel":"Wind","Generation_TWh":0.89}
+{"Continent":"Oceania","Country":"Papua New Guinea","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"Oceania","Country":"Papua New Guinea","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Papua New Guinea","Year":2023,"Fuel":"Gas","Generation_TWh":0.91}
+{"Continent":"Oceania","Country":"Papua New Guinea","Year":2023,"Fuel":"Hydro","Generation_TWh":1}
+{"Continent":"Oceania","Country":"Papua New Guinea","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Papua New Guinea","Year":2023,"Fuel":"Other Fossil","Generation_TWh":2.7}
+{"Continent":"Oceania","Country":"Papua New Guinea","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.1}
+{"Continent":"Oceania","Country":"Papua New Guinea","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Oceania","Country":"Papua New Guinea","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"South America","Country":"Paraguay","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.24}
+{"Continent":"South America","Country":"Paraguay","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"South America","Country":"Paraguay","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"South America","Country":"Paraguay","Year":2023,"Fuel":"Hydro","Generation_TWh":52.8}
+{"Continent":"South America","Country":"Paraguay","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Paraguay","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"South America","Country":"Paraguay","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"South America","Country":"Paraguay","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"South America","Country":"Paraguay","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"South America","Country":"Peru","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.6}
+{"Continent":"South America","Country":"Peru","Year":2023,"Fuel":"Coal","Generation_TWh":0.04}
+{"Continent":"South America","Country":"Peru","Year":2023,"Fuel":"Gas","Generation_TWh":27.44}
+{"Continent":"South America","Country":"Peru","Year":2023,"Fuel":"Hydro","Generation_TWh":29.73}
+{"Continent":"South America","Country":"Peru","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Peru","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.29}
+{"Continent":"South America","Country":"Peru","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"South America","Country":"Peru","Year":2023,"Fuel":"Solar","Generation_TWh":0.84}
+{"Continent":"South America","Country":"Peru","Year":2023,"Fuel":"Wind","Generation_TWh":1.93}
+{"Continent":"Asia","Country":"Philippines (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":1.32}
+{"Continent":"Asia","Country":"Philippines (the)","Year":2023,"Fuel":"Coal","Generation_TWh":73.75}
+{"Continent":"Asia","Country":"Philippines (the)","Year":2023,"Fuel":"Gas","Generation_TWh":16.67}
+{"Continent":"Asia","Country":"Philippines (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":10.09}
+{"Continent":"Asia","Country":"Philippines (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Philippines (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.3}
+{"Continent":"Asia","Country":"Philippines (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":10.43}
+{"Continent":"Asia","Country":"Philippines (the)","Year":2023,"Fuel":"Solar","Generation_TWh":1.82}
+{"Continent":"Asia","Country":"Philippines (the)","Year":2023,"Fuel":"Wind","Generation_TWh":1.35}
+{"Continent":"Europe","Country":"Poland","Year":2023,"Fuel":"Bioenergy","Generation_TWh":8.16}
+{"Continent":"Europe","Country":"Poland","Year":2023,"Fuel":"Coal","Generation_TWh":98.85}
+{"Continent":"Europe","Country":"Poland","Year":2023,"Fuel":"Gas","Generation_TWh":16.49}
+{"Continent":"Europe","Country":"Poland","Year":2023,"Fuel":"Hydro","Generation_TWh":2.41}
+{"Continent":"Europe","Country":"Poland","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Poland","Year":2023,"Fuel":"Other Fossil","Generation_TWh":4.32}
+{"Continent":"Europe","Country":"Poland","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Poland","Year":2023,"Fuel":"Solar","Generation_TWh":11.11}
+{"Continent":"Europe","Country":"Poland","Year":2023,"Fuel":"Wind","Generation_TWh":24.18}
+{"Continent":"Europe","Country":"Portugal","Year":2023,"Fuel":"Bioenergy","Generation_TWh":3.8}
+{"Continent":"Europe","Country":"Portugal","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Portugal","Year":2023,"Fuel":"Gas","Generation_TWh":10.42}
+{"Continent":"Europe","Country":"Portugal","Year":2023,"Fuel":"Hydro","Generation_TWh":12.04}
+{"Continent":"Europe","Country":"Portugal","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Portugal","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.36}
+{"Continent":"Europe","Country":"Portugal","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.21}
+{"Continent":"Europe","Country":"Portugal","Year":2023,"Fuel":"Solar","Generation_TWh":5.16}
+{"Continent":"Europe","Country":"Portugal","Year":2023,"Fuel":"Wind","Generation_TWh":13.15}
+{"Continent":"North America","Country":"Puerto Rico","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"North America","Country":"Puerto Rico","Year":2023,"Fuel":"Coal","Generation_TWh":3.24}
+{"Continent":"North America","Country":"Puerto Rico","Year":2023,"Fuel":"Gas","Generation_TWh":5.39}
+{"Continent":"North America","Country":"Puerto Rico","Year":2023,"Fuel":"Hydro","Generation_TWh":0.05}
+{"Continent":"North America","Country":"Puerto Rico","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Puerto Rico","Year":2023,"Fuel":"Other Fossil","Generation_TWh":10.2}
+{"Continent":"North America","Country":"Puerto Rico","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Puerto Rico","Year":2023,"Fuel":"Solar","Generation_TWh":0.85}
+{"Continent":"North America","Country":"Puerto Rico","Year":2023,"Fuel":"Wind","Generation_TWh":0.16}
+{"Continent":"Asia","Country":"Qatar","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.13}
+{"Continent":"Asia","Country":"Qatar","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Qatar","Year":2023,"Fuel":"Gas","Generation_TWh":54.37}
+{"Continent":"Asia","Country":"Qatar","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Qatar","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Qatar","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Asia","Country":"Qatar","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Qatar","Year":2023,"Fuel":"Solar","Generation_TWh":1.88}
+{"Continent":"Asia","Country":"Qatar","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Reunion","Year":2023,"Fuel":"Bioenergy","Generation_TWh":1.04}
+{"Continent":"Africa","Country":"Reunion","Year":2023,"Fuel":"Coal","Generation_TWh":0.4}
+{"Continent":"Africa","Country":"Reunion","Year":2023,"Fuel":"Hydro","Generation_TWh":0.39}
+{"Continent":"Africa","Country":"Reunion","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.93}
+{"Continent":"Africa","Country":"Reunion","Year":2023,"Fuel":"Solar","Generation_TWh":0.29}
+{"Continent":"Africa","Country":"Reunion","Year":2023,"Fuel":"Wind","Generation_TWh":0.02}
+{"Continent":"Europe","Country":"Romania","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.44}
+{"Continent":"Europe","Country":"Romania","Year":2023,"Fuel":"Coal","Generation_TWh":8.06}
+{"Continent":"Europe","Country":"Romania","Year":2023,"Fuel":"Gas","Generation_TWh":9.15}
+{"Continent":"Europe","Country":"Romania","Year":2023,"Fuel":"Hydro","Generation_TWh":18.14}
+{"Continent":"Europe","Country":"Romania","Year":2023,"Fuel":"Nuclear","Generation_TWh":11.19}
+{"Continent":"Europe","Country":"Romania","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.19}
+{"Continent":"Europe","Country":"Romania","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Romania","Year":2023,"Fuel":"Solar","Generation_TWh":2.23}
+{"Continent":"Europe","Country":"Romania","Year":2023,"Fuel":"Wind","Generation_TWh":7.55}
+{"Continent":"Europe","Country":"Russian Federation (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.85}
+{"Continent":"Europe","Country":"Russian Federation (the)","Year":2023,"Fuel":"Coal","Generation_TWh":204.06}
+{"Continent":"Europe","Country":"Russian Federation (the)","Year":2023,"Fuel":"Gas","Generation_TWh":533.35}
+{"Continent":"Europe","Country":"Russian Federation (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":200.87}
+{"Continent":"Europe","Country":"Russian Federation (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":217.38}
+{"Continent":"Europe","Country":"Russian Federation (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":14.36}
+{"Continent":"Europe","Country":"Russian Federation (the)","Year":2023,"Fuel":"Solar","Generation_TWh":2.63}
+{"Continent":"Europe","Country":"Russian Federation (the)","Year":2023,"Fuel":"Wind","Generation_TWh":4.75}
+{"Continent":"Africa","Country":"Rwanda","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Rwanda","Year":2023,"Fuel":"Coal","Generation_TWh":0.17}
+{"Continent":"Africa","Country":"Rwanda","Year":2023,"Fuel":"Gas","Generation_TWh":0.3}
+{"Continent":"Africa","Country":"Rwanda","Year":2023,"Fuel":"Hydro","Generation_TWh":0.5}
+{"Continent":"Africa","Country":"Rwanda","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Rwanda","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.09}
+{"Continent":"Africa","Country":"Rwanda","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Rwanda","Year":2023,"Fuel":"Solar","Generation_TWh":0.04}
+{"Continent":"Africa","Country":"Rwanda","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Saint Helena, Ascension and Tristan da Cunha","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Saint Helena, Ascension and Tristan da Cunha","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Saint Helena, Ascension and Tristan da Cunha","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Saint Helena, Ascension and Tristan da Cunha","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Saint Helena, Ascension and Tristan da Cunha","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Saint Helena, Ascension and Tristan da Cunha","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Saint Helena, Ascension and Tristan da Cunha","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Saint Helena, Ascension and Tristan da Cunha","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Saint Helena, Ascension and Tristan da Cunha","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Kitts and Nevis","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Kitts and Nevis","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Kitts and Nevis","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Kitts and Nevis","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Kitts and Nevis","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Kitts and Nevis","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.21}
+{"Continent":"North America","Country":"Saint Kitts and Nevis","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Kitts and Nevis","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Kitts and Nevis","Year":2023,"Fuel":"Wind","Generation_TWh":0.01}
+{"Continent":"North America","Country":"Saint Lucia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Lucia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Lucia","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Lucia","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Lucia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Lucia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.39}
+{"Continent":"North America","Country":"Saint Lucia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Lucia","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"North America","Country":"Saint Lucia","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Pierre and Miquelon","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Pierre and Miquelon","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Pierre and Miquelon","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Pierre and Miquelon","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Pierre and Miquelon","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Pierre and Miquelon","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.05}
+{"Continent":"North America","Country":"Saint Pierre and Miquelon","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Pierre and Miquelon","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Pierre and Miquelon","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Vincent and the Grenadines","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Vincent and the Grenadines","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Vincent and the Grenadines","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Vincent and the Grenadines","Year":2023,"Fuel":"Hydro","Generation_TWh":0.02}
+{"Continent":"North America","Country":"Saint Vincent and the Grenadines","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Vincent and the Grenadines","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.13}
+{"Continent":"North America","Country":"Saint Vincent and the Grenadines","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Vincent and the Grenadines","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"North America","Country":"Saint Vincent and the Grenadines","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Samoa","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"Oceania","Country":"Samoa","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Samoa","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Samoa","Year":2023,"Fuel":"Hydro","Generation_TWh":0.03}
+{"Continent":"Oceania","Country":"Samoa","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Samoa","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.09}
+{"Continent":"Oceania","Country":"Samoa","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Samoa","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"Oceania","Country":"Samoa","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sao Tome and Principe","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sao Tome and Principe","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sao Tome and Principe","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sao Tome and Principe","Year":2023,"Fuel":"Hydro","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Sao Tome and Principe","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sao Tome and Principe","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.08}
+{"Continent":"Africa","Country":"Sao Tome and Principe","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sao Tome and Principe","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sao Tome and Principe","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Saudi Arabia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Saudi Arabia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Saudi Arabia","Year":2023,"Fuel":"Gas","Generation_TWh":265.5}
+{"Continent":"Asia","Country":"Saudi Arabia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":159.03}
+{"Continent":"Asia","Country":"Saudi Arabia","Year":2023,"Fuel":"Solar","Generation_TWh":3.13}
+{"Continent":"Asia","Country":"Saudi Arabia","Year":2023,"Fuel":"Wind","Generation_TWh":1.59}
+{"Continent":"Africa","Country":"Senegal","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.11}
+{"Continent":"Africa","Country":"Senegal","Year":2023,"Fuel":"Coal","Generation_TWh":0.09}
+{"Continent":"Africa","Country":"Senegal","Year":2023,"Fuel":"Gas","Generation_TWh":0.02}
+{"Continent":"Africa","Country":"Senegal","Year":2023,"Fuel":"Hydro","Generation_TWh":0.31}
+{"Continent":"Africa","Country":"Senegal","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Senegal","Year":2023,"Fuel":"Other Fossil","Generation_TWh":6.7}
+{"Continent":"Africa","Country":"Senegal","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Senegal","Year":2023,"Fuel":"Solar","Generation_TWh":0.59}
+{"Continent":"Africa","Country":"Senegal","Year":2023,"Fuel":"Wind","Generation_TWh":0.38}
+{"Continent":"Europe","Country":"Serbia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.25}
+{"Continent":"Europe","Country":"Serbia","Year":2023,"Fuel":"Coal","Generation_TWh":23.54}
+{"Continent":"Europe","Country":"Serbia","Year":2023,"Fuel":"Gas","Generation_TWh":1.97}
+{"Continent":"Europe","Country":"Serbia","Year":2023,"Fuel":"Hydro","Generation_TWh":12.38}
+{"Continent":"Europe","Country":"Serbia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Europe","Country":"Serbia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.07}
+{"Continent":"Europe","Country":"Serbia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Serbia","Year":2023,"Fuel":"Solar","Generation_TWh":0.05}
+{"Continent":"Europe","Country":"Serbia","Year":2023,"Fuel":"Wind","Generation_TWh":1.07}
+{"Continent":"Africa","Country":"Seychelles","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Seychelles","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Seychelles","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Seychelles","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Seychelles","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Seychelles","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.53}
+{"Continent":"Africa","Country":"Seychelles","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Seychelles","Year":2023,"Fuel":"Solar","Generation_TWh":0.08}
+{"Continent":"Africa","Country":"Seychelles","Year":2023,"Fuel":"Wind","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Sierra Leone","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sierra Leone","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sierra Leone","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sierra Leone","Year":2023,"Fuel":"Hydro","Generation_TWh":0.18}
+{"Continent":"Africa","Country":"Sierra Leone","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sierra Leone","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Sierra Leone","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sierra Leone","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"Africa","Country":"Sierra Leone","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Singapore","Year":2023,"Fuel":"Bioenergy","Generation_TWh":1.66}
+{"Continent":"Asia","Country":"Singapore","Year":2023,"Fuel":"Coal","Generation_TWh":0.57}
+{"Continent":"Asia","Country":"Singapore","Year":2023,"Fuel":"Gas","Generation_TWh":53.06}
+{"Continent":"Asia","Country":"Singapore","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.09}
+{"Continent":"Asia","Country":"Singapore","Year":2023,"Fuel":"Solar","Generation_TWh":0.94}
+{"Continent":"Europe","Country":"Slovakia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":1.41}
+{"Continent":"Europe","Country":"Slovakia","Year":2023,"Fuel":"Coal","Generation_TWh":1.22}
+{"Continent":"Europe","Country":"Slovakia","Year":2023,"Fuel":"Gas","Generation_TWh":2.28}
+{"Continent":"Europe","Country":"Slovakia","Year":2023,"Fuel":"Hydro","Generation_TWh":4.69}
+{"Continent":"Europe","Country":"Slovakia","Year":2023,"Fuel":"Nuclear","Generation_TWh":18.33}
+{"Continent":"Europe","Country":"Slovakia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.99}
+{"Continent":"Europe","Country":"Slovakia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Slovakia","Year":2023,"Fuel":"Solar","Generation_TWh":0.61}
+{"Continent":"Europe","Country":"Slovakia","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Slovenia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.29}
+{"Continent":"Europe","Country":"Slovenia","Year":2023,"Fuel":"Coal","Generation_TWh":3.14}
+{"Continent":"Europe","Country":"Slovenia","Year":2023,"Fuel":"Gas","Generation_TWh":0.5}
+{"Continent":"Europe","Country":"Slovenia","Year":2023,"Fuel":"Hydro","Generation_TWh":5.02}
+{"Continent":"Europe","Country":"Slovenia","Year":2023,"Fuel":"Nuclear","Generation_TWh":5.6}
+{"Continent":"Europe","Country":"Slovenia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.01}
+{"Continent":"Europe","Country":"Slovenia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Slovenia","Year":2023,"Fuel":"Solar","Generation_TWh":0.98}
+{"Continent":"Europe","Country":"Slovenia","Year":2023,"Fuel":"Wind","Generation_TWh":0.01}
+{"Continent":"Oceania","Country":"Solomon Islands","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Solomon Islands","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Solomon Islands","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Solomon Islands","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Solomon Islands","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Solomon Islands","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.1}
+{"Continent":"Oceania","Country":"Solomon Islands","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Solomon Islands","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Oceania","Country":"Solomon Islands","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Somalia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Somalia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Somalia","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Somalia","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"Somalia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Somalia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.34}
+{"Continent":"Africa","Country":"Somalia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Somalia","Year":2023,"Fuel":"Solar","Generation_TWh":0.07}
+{"Continent":"Africa","Country":"Somalia","Year":2023,"Fuel":"Wind","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"South Africa","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.47}
+{"Continent":"Africa","Country":"South Africa","Year":2023,"Fuel":"Coal","Generation_TWh":192.29}
+{"Continent":"Africa","Country":"South Africa","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"South Africa","Year":2023,"Fuel":"Hydro","Generation_TWh":2}
+{"Continent":"Africa","Country":"South Africa","Year":2023,"Fuel":"Nuclear","Generation_TWh":8.1}
+{"Continent":"Africa","Country":"South Africa","Year":2023,"Fuel":"Other Fossil","Generation_TWh":3.68}
+{"Continent":"Africa","Country":"South Africa","Year":2023,"Fuel":"Solar","Generation_TWh":14.81}
+{"Continent":"Africa","Country":"South Africa","Year":2023,"Fuel":"Wind","Generation_TWh":11.6}
+{"Continent":"Asia","Country":"South Korea","Year":2023,"Fuel":"Bioenergy","Generation_TWh":18.72}
+{"Continent":"Asia","Country":"South Korea","Year":2023,"Fuel":"Coal","Generation_TWh":201.34}
+{"Continent":"Asia","Country":"South Korea","Year":2023,"Fuel":"Gas","Generation_TWh":169.61}
+{"Continent":"Asia","Country":"South Korea","Year":2023,"Fuel":"Hydro","Generation_TWh":3.72}
+{"Continent":"Asia","Country":"South Korea","Year":2023,"Fuel":"Nuclear","Generation_TWh":180.49}
+{"Continent":"Asia","Country":"South Korea","Year":2023,"Fuel":"Other Fossil","Generation_TWh":6.98}
+{"Continent":"Asia","Country":"South Korea","Year":2023,"Fuel":"Solar","Generation_TWh":33.24}
+{"Continent":"Asia","Country":"South Korea","Year":2023,"Fuel":"Wind","Generation_TWh":3.39}
+{"Continent":"Africa","Country":"South Sudan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"South Sudan","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"South Sudan","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"South Sudan","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Africa","Country":"South Sudan","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"South Sudan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.55}
+{"Continent":"Africa","Country":"South Sudan","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"South Sudan","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"South Sudan","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Spain","Year":2023,"Fuel":"Bioenergy","Generation_TWh":5.9}
+{"Continent":"Europe","Country":"Spain","Year":2023,"Fuel":"Coal","Generation_TWh":3.62}
+{"Continent":"Europe","Country":"Spain","Year":2023,"Fuel":"Gas","Generation_TWh":64.36}
+{"Continent":"Europe","Country":"Spain","Year":2023,"Fuel":"Hydro","Generation_TWh":25}
+{"Continent":"Europe","Country":"Spain","Year":2023,"Fuel":"Nuclear","Generation_TWh":56.87}
+{"Continent":"Europe","Country":"Spain","Year":2023,"Fuel":"Other Fossil","Generation_TWh":10.48}
+{"Continent":"Europe","Country":"Spain","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.01}
+{"Continent":"Europe","Country":"Spain","Year":2023,"Fuel":"Solar","Generation_TWh":48.59}
+{"Continent":"Europe","Country":"Spain","Year":2023,"Fuel":"Wind","Generation_TWh":64.28}
+{"Continent":"Asia","Country":"Sri Lanka","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.12}
+{"Continent":"Asia","Country":"Sri Lanka","Year":2023,"Fuel":"Coal","Generation_TWh":5.15}
+{"Continent":"Asia","Country":"Sri Lanka","Year":2023,"Fuel":"Hydro","Generation_TWh":5.98}
+{"Continent":"Asia","Country":"Sri Lanka","Year":2023,"Fuel":"Other Fossil","Generation_TWh":3.28}
+{"Continent":"Asia","Country":"Sri Lanka","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0.04}
+{"Continent":"Asia","Country":"Sri Lanka","Year":2023,"Fuel":"Solar","Generation_TWh":1}
+{"Continent":"Asia","Country":"Sri Lanka","Year":2023,"Fuel":"Wind","Generation_TWh":0.82}
+{"Continent":"Africa","Country":"Sudan (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.11}
+{"Continent":"Africa","Country":"Sudan (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sudan (the)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sudan (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":11.5}
+{"Continent":"Africa","Country":"Sudan (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sudan (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":2.76}
+{"Continent":"Africa","Country":"Sudan (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Sudan (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0.14}
+{"Continent":"Africa","Country":"Sudan (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"South America","Country":"Suriname","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.01}
+{"Continent":"South America","Country":"Suriname","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"South America","Country":"Suriname","Year":2023,"Fuel":"Gas","Generation_TWh":0.02}
+{"Continent":"South America","Country":"Suriname","Year":2023,"Fuel":"Hydro","Generation_TWh":0.9}
+{"Continent":"South America","Country":"Suriname","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Suriname","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.79}
+{"Continent":"South America","Country":"Suriname","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"South America","Country":"Suriname","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"South America","Country":"Suriname","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Europe","Country":"Sweden","Year":2023,"Fuel":"Bioenergy","Generation_TWh":11.7}
+{"Continent":"Europe","Country":"Sweden","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Europe","Country":"Sweden","Year":2023,"Fuel":"Gas","Generation_TWh":0.16}
+{"Continent":"Europe","Country":"Sweden","Year":2023,"Fuel":"Hydro","Generation_TWh":66.19}
+{"Continent":"Europe","Country":"Sweden","Year":2023,"Fuel":"Nuclear","Generation_TWh":48.47}
+{"Continent":"Europe","Country":"Sweden","Year":2023,"Fuel":"Other Fossil","Generation_TWh":2.17}
+{"Continent":"Europe","Country":"Sweden","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Europe","Country":"Sweden","Year":2023,"Fuel":"Solar","Generation_TWh":3.11}
+{"Continent":"Europe","Country":"Sweden","Year":2023,"Fuel":"Wind","Generation_TWh":34.25}
+{"Continent":"Europe","Country":"Switzerland","Year":2023,"Fuel":"Bioenergy","Generation_TWh":1.04}
+{"Continent":"Europe","Country":"Switzerland","Year":2023,"Fuel":"Gas","Generation_TWh":0.27}
+{"Continent":"Europe","Country":"Switzerland","Year":2023,"Fuel":"Hydro","Generation_TWh":37.39}
+{"Continent":"Europe","Country":"Switzerland","Year":2023,"Fuel":"Nuclear","Generation_TWh":24.38}
+{"Continent":"Europe","Country":"Switzerland","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.16}
+{"Continent":"Europe","Country":"Switzerland","Year":2023,"Fuel":"Other Renewables","Generation_TWh":1.04}
+{"Continent":"Europe","Country":"Switzerland","Year":2023,"Fuel":"Solar","Generation_TWh":4.62}
+{"Continent":"Europe","Country":"Switzerland","Year":2023,"Fuel":"Wind","Generation_TWh":0.17}
+{"Continent":"Asia","Country":"Syrian Arab Republic (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.03}
+{"Continent":"Asia","Country":"Syrian Arab Republic (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Syrian Arab Republic (the)","Year":2023,"Fuel":"Gas","Generation_TWh":12.95}
+{"Continent":"Asia","Country":"Syrian Arab Republic (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":0.75}
+{"Continent":"Asia","Country":"Syrian Arab Republic (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Syrian Arab Republic (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":11.19}
+{"Continent":"Asia","Country":"Syrian Arab Republic (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Syrian Arab Republic (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0.1}
+{"Continent":"Asia","Country":"Syrian Arab Republic (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Taiwan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":2.01}
+{"Continent":"Asia","Country":"Taiwan","Year":2023,"Fuel":"Coal","Generation_TWh":121.6}
+{"Continent":"Asia","Country":"Taiwan","Year":2023,"Fuel":"Gas","Generation_TWh":113.91}
+{"Continent":"Asia","Country":"Taiwan","Year":2023,"Fuel":"Hydro","Generation_TWh":3.96}
+{"Continent":"Asia","Country":"Taiwan","Year":2023,"Fuel":"Nuclear","Generation_TWh":17.8}
+{"Continent":"Asia","Country":"Taiwan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":3.85}
+{"Continent":"Asia","Country":"Taiwan","Year":2023,"Fuel":"Solar","Generation_TWh":12.91}
+{"Continent":"Asia","Country":"Taiwan","Year":2023,"Fuel":"Wind","Generation_TWh":6.24}
+{"Continent":"Asia","Country":"Tajikistan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Tajikistan","Year":2023,"Fuel":"Coal","Generation_TWh":1.01}
+{"Continent":"Asia","Country":"Tajikistan","Year":2023,"Fuel":"Gas","Generation_TWh":0.22}
+{"Continent":"Asia","Country":"Tajikistan","Year":2023,"Fuel":"Hydro","Generation_TWh":20}
+{"Continent":"Asia","Country":"Tajikistan","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Tajikistan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Asia","Country":"Tajikistan","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Tajikistan","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Asia","Country":"Tajikistan","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Tanzania, the United Republic of","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.07}
+{"Continent":"Africa","Country":"Tanzania, the United Republic of","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Tanzania, the United Republic of","Year":2023,"Fuel":"Gas","Generation_TWh":7.38}
+{"Continent":"Africa","Country":"Tanzania, the United Republic of","Year":2023,"Fuel":"Hydro","Generation_TWh":2.7}
+{"Continent":"Africa","Country":"Tanzania, the United Republic of","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Tanzania, the United Republic of","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.39}
+{"Continent":"Africa","Country":"Tanzania, the United Republic of","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Tanzania, the United Republic of","Year":2023,"Fuel":"Solar","Generation_TWh":0.03}
+{"Continent":"Africa","Country":"Tanzania, the United Republic of","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Thailand","Year":2023,"Fuel":"Bioenergy","Generation_TWh":14.29}
+{"Continent":"Asia","Country":"Thailand","Year":2023,"Fuel":"Coal","Generation_TWh":30.43}
+{"Continent":"Asia","Country":"Thailand","Year":2023,"Fuel":"Gas","Generation_TWh":129.4}
+{"Continent":"Asia","Country":"Thailand","Year":2023,"Fuel":"Hydro","Generation_TWh":6.59}
+{"Continent":"Asia","Country":"Thailand","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.89}
+{"Continent":"Asia","Country":"Thailand","Year":2023,"Fuel":"Solar","Generation_TWh":5.14}
+{"Continent":"Asia","Country":"Thailand","Year":2023,"Fuel":"Wind","Generation_TWh":3.74}
+{"Continent":"Asia","Country":"Timor-Leste","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Timor-Leste","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Timor-Leste","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Asia","Country":"Timor-Leste","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Timor-Leste","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Timor-Leste","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.51}
+{"Continent":"Asia","Country":"Timor-Leste","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Timor-Leste","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Asia","Country":"Timor-Leste","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Togo","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Togo","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Togo","Year":2023,"Fuel":"Gas","Generation_TWh":0.52}
+{"Continent":"Africa","Country":"Togo","Year":2023,"Fuel":"Hydro","Generation_TWh":0.08}
+{"Continent":"Africa","Country":"Togo","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Togo","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Africa","Country":"Togo","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Togo","Year":2023,"Fuel":"Solar","Generation_TWh":0.11}
+{"Continent":"Africa","Country":"Togo","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Tonga","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Tonga","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Tonga","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Tonga","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Tonga","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Tonga","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.06}
+{"Continent":"Oceania","Country":"Tonga","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Tonga","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Oceania","Country":"Tonga","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Trinidad and Tobago","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Trinidad and Tobago","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Trinidad and Tobago","Year":2023,"Fuel":"Gas","Generation_TWh":9.47}
+{"Continent":"North America","Country":"Trinidad and Tobago","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Trinidad and Tobago","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Trinidad and Tobago","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.04}
+{"Continent":"North America","Country":"Trinidad and Tobago","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Trinidad and Tobago","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"North America","Country":"Trinidad and Tobago","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Tunisia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Africa","Country":"Tunisia","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Tunisia","Year":2023,"Fuel":"Gas","Generation_TWh":20.23}
+{"Continent":"Africa","Country":"Tunisia","Year":2023,"Fuel":"Hydro","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Tunisia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Tunisia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.21}
+{"Continent":"Africa","Country":"Tunisia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Tunisia","Year":2023,"Fuel":"Solar","Generation_TWh":0.49}
+{"Continent":"Africa","Country":"Tunisia","Year":2023,"Fuel":"Wind","Generation_TWh":0.34}
+{"Continent":"Asia","Country":"Turkey","Year":2023,"Fuel":"Bioenergy","Generation_TWh":8.21}
+{"Continent":"Asia","Country":"Turkey","Year":2023,"Fuel":"Coal","Generation_TWh":118.03}
+{"Continent":"Asia","Country":"Turkey","Year":2023,"Fuel":"Gas","Generation_TWh":66.48}
+{"Continent":"Asia","Country":"Turkey","Year":2023,"Fuel":"Hydro","Generation_TWh":63.72}
+{"Continent":"Asia","Country":"Turkey","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Turkey","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.94}
+{"Continent":"Asia","Country":"Turkey","Year":2023,"Fuel":"Other Renewables","Generation_TWh":10.13}
+{"Continent":"Asia","Country":"Turkey","Year":2023,"Fuel":"Solar","Generation_TWh":18.4}
+{"Continent":"Asia","Country":"Turkey","Year":2023,"Fuel":"Wind","Generation_TWh":33.88}
+{"Continent":"Asia","Country":"Turkmenistan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Turkmenistan","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Turkmenistan","Year":2023,"Fuel":"Gas","Generation_TWh":32.59}
+{"Continent":"Asia","Country":"Turkmenistan","Year":2023,"Fuel":"Hydro","Generation_TWh":0.01}
+{"Continent":"Asia","Country":"Turkmenistan","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Turkmenistan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Asia","Country":"Turkmenistan","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Turkmenistan","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"Asia","Country":"Turkmenistan","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Turks and Caicos Islands (the)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Turks and Caicos Islands (the)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Turks and Caicos Islands (the)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Turks and Caicos Islands (the)","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Turks and Caicos Islands (the)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Turks and Caicos Islands (the)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.26}
+{"Continent":"North America","Country":"Turks and Caicos Islands (the)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Turks and Caicos Islands (the)","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"North America","Country":"Turks and Caicos Islands (the)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Uganda","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.47}
+{"Continent":"Africa","Country":"Uganda","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Africa","Country":"Uganda","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Uganda","Year":2023,"Fuel":"Hydro","Generation_TWh":4.98}
+{"Continent":"Africa","Country":"Uganda","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Uganda","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.17}
+{"Continent":"Africa","Country":"Uganda","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Uganda","Year":2023,"Fuel":"Solar","Generation_TWh":0.15}
+{"Continent":"Africa","Country":"Uganda","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"United Arab Emirates","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.21}
+{"Continent":"Asia","Country":"United Arab Emirates","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"United Arab Emirates","Year":2023,"Fuel":"Gas","Generation_TWh":118.42}
+{"Continent":"Asia","Country":"United Arab Emirates","Year":2023,"Fuel":"Nuclear","Generation_TWh":34.44}
+{"Continent":"Asia","Country":"United Arab Emirates","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Asia","Country":"United Arab Emirates","Year":2023,"Fuel":"Solar","Generation_TWh":14.4}
+{"Continent":"Asia","Country":"United Arab Emirates","Year":2023,"Fuel":"Wind","Generation_TWh":0.06}
+{"Continent":"Europe","Country":"United Kingdom","Year":2023,"Fuel":"Bioenergy","Generation_TWh":34.1}
+{"Continent":"Europe","Country":"United Kingdom","Year":2023,"Fuel":"Coal","Generation_TWh":3.78}
+{"Continent":"Europe","Country":"United Kingdom","Year":2023,"Fuel":"Gas","Generation_TWh":101.66}
+{"Continent":"Europe","Country":"United Kingdom","Year":2023,"Fuel":"Hydro","Generation_TWh":5.54}
+{"Continent":"Europe","Country":"United Kingdom","Year":2023,"Fuel":"Nuclear","Generation_TWh":40.6}
+{"Continent":"Europe","Country":"United Kingdom","Year":2023,"Fuel":"Other Fossil","Generation_TWh":10.82}
+{"Continent":"Europe","Country":"United Kingdom","Year":2023,"Fuel":"Solar","Generation_TWh":13.88}
+{"Continent":"Europe","Country":"United Kingdom","Year":2023,"Fuel":"Wind","Generation_TWh":82.15}
+{"Continent":"North America","Country":"United States of America","Year":2023,"Fuel":"Bioenergy","Generation_TWh":47.2}
+{"Continent":"North America","Country":"United States of America","Year":2023,"Fuel":"Coal","Generation_TWh":675.11}
+{"Continent":"North America","Country":"United States of America","Year":2023,"Fuel":"Gas","Generation_TWh":1806.06}
+{"Continent":"North America","Country":"United States of America","Year":2023,"Fuel":"Hydro","Generation_TWh":239.01}
+{"Continent":"North America","Country":"United States of America","Year":2023,"Fuel":"Nuclear","Generation_TWh":774.87}
+{"Continent":"North America","Country":"United States of America","Year":2023,"Fuel":"Other Fossil","Generation_TWh":33.13}
+{"Continent":"North America","Country":"United States of America","Year":2023,"Fuel":"Other Renewables","Generation_TWh":18.45}
+{"Continent":"North America","Country":"United States of America","Year":2023,"Fuel":"Solar","Generation_TWh":238.94}
+{"Continent":"North America","Country":"United States of America","Year":2023,"Fuel":"Wind","Generation_TWh":421.14}
+{"Continent":"South America","Country":"Uruguay","Year":2023,"Fuel":"Bioenergy","Generation_TWh":3.08}
+{"Continent":"South America","Country":"Uruguay","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"South America","Country":"Uruguay","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"South America","Country":"Uruguay","Year":2023,"Fuel":"Hydro","Generation_TWh":3.52}
+{"Continent":"South America","Country":"Uruguay","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Uruguay","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.97}
+{"Continent":"South America","Country":"Uruguay","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"South America","Country":"Uruguay","Year":2023,"Fuel":"Solar","Generation_TWh":0.49}
+{"Continent":"South America","Country":"Uruguay","Year":2023,"Fuel":"Wind","Generation_TWh":4.76}
+{"Continent":"Asia","Country":"Uzbekistan","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Uzbekistan","Year":2023,"Fuel":"Coal","Generation_TWh":5.7}
+{"Continent":"Asia","Country":"Uzbekistan","Year":2023,"Fuel":"Gas","Generation_TWh":62}
+{"Continent":"Asia","Country":"Uzbekistan","Year":2023,"Fuel":"Hydro","Generation_TWh":6.6}
+{"Continent":"Asia","Country":"Uzbekistan","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Uzbekistan","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.5}
+{"Continent":"Asia","Country":"Uzbekistan","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Uzbekistan","Year":2023,"Fuel":"Solar","Generation_TWh":0.45}
+{"Continent":"Asia","Country":"Uzbekistan","Year":2023,"Fuel":"Wind","Generation_TWh":0.55}
+{"Continent":"Oceania","Country":"Vanuatu","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Vanuatu","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Vanuatu","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Vanuatu","Year":2023,"Fuel":"Hydro","Generation_TWh":0.01}
+{"Continent":"Oceania","Country":"Vanuatu","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Vanuatu","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.06}
+{"Continent":"Oceania","Country":"Vanuatu","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Oceania","Country":"Vanuatu","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"Oceania","Country":"Vanuatu","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"South America","Country":"Venezuela (Bolivarian Republic of)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"South America","Country":"Venezuela (Bolivarian Republic of)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"South America","Country":"Venezuela (Bolivarian Republic of)","Year":2023,"Fuel":"Gas","Generation_TWh":3.69}
+{"Continent":"South America","Country":"Venezuela (Bolivarian Republic of)","Year":2023,"Fuel":"Hydro","Generation_TWh":64.98}
+{"Continent":"South America","Country":"Venezuela (Bolivarian Republic of)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"South America","Country":"Venezuela (Bolivarian Republic of)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":3.26}
+{"Continent":"South America","Country":"Venezuela (Bolivarian Republic of)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"South America","Country":"Venezuela (Bolivarian Republic of)","Year":2023,"Fuel":"Solar","Generation_TWh":0.01}
+{"Continent":"South America","Country":"Venezuela (Bolivarian Republic of)","Year":2023,"Fuel":"Wind","Generation_TWh":0.02}
+{"Continent":"Asia","Country":"Viet Nam","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.87}
+{"Continent":"Asia","Country":"Viet Nam","Year":2023,"Fuel":"Coal","Generation_TWh":129.76}
+{"Continent":"Asia","Country":"Viet Nam","Year":2023,"Fuel":"Gas","Generation_TWh":26.36}
+{"Continent":"Asia","Country":"Viet Nam","Year":2023,"Fuel":"Hydro","Generation_TWh":80.62}
+{"Continent":"Asia","Country":"Viet Nam","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Viet Nam","Year":2023,"Fuel":"Other Fossil","Generation_TWh":1.7}
+{"Continent":"Asia","Country":"Viet Nam","Year":2023,"Fuel":"Solar","Generation_TWh":25.69}
+{"Continent":"Asia","Country":"Viet Nam","Year":2023,"Fuel":"Wind","Generation_TWh":11.59}
+{"Continent":"North America","Country":"Virgin Islands (British)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (British)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (British)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (British)","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (British)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (British)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.17}
+{"Continent":"North America","Country":"Virgin Islands (British)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (British)","Year":2023,"Fuel":"Solar","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (British)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (U.S.)","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (U.S.)","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (U.S.)","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (U.S.)","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (U.S.)","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (U.S.)","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.66}
+{"Continent":"North America","Country":"Virgin Islands (U.S.)","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"North America","Country":"Virgin Islands (U.S.)","Year":2023,"Fuel":"Solar","Generation_TWh":0.02}
+{"Continent":"North America","Country":"Virgin Islands (U.S.)","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Asia","Country":"Yemen","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0}
+{"Continent":"Asia","Country":"Yemen","Year":2023,"Fuel":"Coal","Generation_TWh":0}
+{"Continent":"Asia","Country":"Yemen","Year":2023,"Fuel":"Gas","Generation_TWh":0.06}
+{"Continent":"Asia","Country":"Yemen","Year":2023,"Fuel":"Hydro","Generation_TWh":0}
+{"Continent":"Asia","Country":"Yemen","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Asia","Country":"Yemen","Year":2023,"Fuel":"Other Fossil","Generation_TWh":4.54}
+{"Continent":"Asia","Country":"Yemen","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Asia","Country":"Yemen","Year":2023,"Fuel":"Solar","Generation_TWh":0.52}
+{"Continent":"Asia","Country":"Yemen","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Zambia","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.08}
+{"Continent":"Africa","Country":"Zambia","Year":2023,"Fuel":"Coal","Generation_TWh":2.13}
+{"Continent":"Africa","Country":"Zambia","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Zambia","Year":2023,"Fuel":"Hydro","Generation_TWh":17.09}
+{"Continent":"Africa","Country":"Zambia","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Zambia","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0.01}
+{"Continent":"Africa","Country":"Zambia","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Zambia","Year":2023,"Fuel":"Solar","Generation_TWh":0.15}
+{"Continent":"Africa","Country":"Zambia","Year":2023,"Fuel":"Wind","Generation_TWh":0}
+{"Continent":"Africa","Country":"Zimbabwe","Year":2023,"Fuel":"Bioenergy","Generation_TWh":0.12}
+{"Continent":"Africa","Country":"Zimbabwe","Year":2023,"Fuel":"Coal","Generation_TWh":4.38}
+{"Continent":"Africa","Country":"Zimbabwe","Year":2023,"Fuel":"Gas","Generation_TWh":0}
+{"Continent":"Africa","Country":"Zimbabwe","Year":2023,"Fuel":"Hydro","Generation_TWh":5.46}
+{"Continent":"Africa","Country":"Zimbabwe","Year":2023,"Fuel":"Nuclear","Generation_TWh":0}
+{"Continent":"Africa","Country":"Zimbabwe","Year":2023,"Fuel":"Other Fossil","Generation_TWh":0}
+{"Continent":"Africa","Country":"Zimbabwe","Year":2023,"Fuel":"Other Renewables","Generation_TWh":0}
+{"Continent":"Africa","Country":"Zimbabwe","Year":2023,"Fuel":"Solar","Generation_TWh":0.03}
+{"Continent":"Africa","Country":"Zimbabwe","Year":2023,"Fuel":"Wind","Generation_TWh":0}

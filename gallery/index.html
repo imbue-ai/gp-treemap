@@ -95,6 +95,182 @@
       <a href="gp-treemap-source-tree-disk-usage.html">Open full-page →</a>
     </div>
   </section>
+
+  <section class="entry">
+    <h2>Global electricity generation — path: continent → country → fuel</h2>
+    <p>
+      Ember's <a href="https://ember-energy.org/data/">Yearly Electricity Data</a>
+      (2023, TWh by country and fuel). Built with
+      <code>tools/table-treemap.js</code> from tabular JSONL: use the Size,
+      Color and Path controls in the header to re-group on the fly — drag the
+      Path chips to reorder the hierarchy. Colored by fuel, <b>Turbo</b>
+      categorical palette.
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-energy-fuel.html"
+        title="Global electricity generation 2023 — by fuel"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-energy-fuel.html">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://ember-energy.org/data/yearly-electricity-data/" target="_blank" rel="noopener">Ember — Yearly Electricity Data</a>
+    </div>
+  </section>
+
+  <section class="entry">
+    <h2>Global electricity generation — path: fuel → continent → country</h2>
+    <p>
+      Same dataset, re-rooted on fuel: each top-level cell is one fuel and
+      contains all countries generating it. Colored by continent, <b>Plasma</b>
+      categorical palette — shows how little of the world's coal generation
+      comes from outside Asia.
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-energy-by-fuel.html"
+        title="Global electricity generation 2023 — by fuel, colored by continent"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-energy-by-fuel.html">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://ember-energy.org/data/yearly-electricity-data/" target="_blank" rel="noopener">Ember — Yearly Electricity Data</a>
+    </div>
+  </section>
+
+  <section class="entry">
+    <h2>US federal outlays FY2024 — Treasury MTS Table 5</h2>
+    <p>
+      Gross fiscal-year-to-date outlays as of 2024-09-30, from the US
+      Treasury's <a href="https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/outlays">
+      Monthly Treasury Statement</a>. Path: Category → Agency → Bureau,
+      colored categorically by top-level category with the <b>Viridis</b>
+      palette. Click into a cell to zoom; change Color to
+      <code>YoY_Change_Pct</code> to see which areas grew or shrank.
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-us-outlays.html"
+        title="US federal outlays FY2024"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-us-outlays.html">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/outlays-of-the-u-s-government" target="_blank" rel="noopener">U.S. Treasury Fiscal Data — MTS Table 5</a>
+    </div>
+  </section>
+
+  <section class="entry">
+    <h2>US federal outlays FY2024 — colored by year-over-year % change</h2>
+    <p>
+      Same outlays data, now colored <em>quantitatively</em> with a diverging
+      <b>Cool–Warm</b> palette: blue = spent less than FY2023, red = spent
+      more. A crisp example of how swapping Color between a categorical and a
+      numeric column transforms the story the treemap tells.
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-us-outlays-yoy.html"
+        title="US federal outlays FY2024 — YoY % change"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-us-outlays-yoy.html">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/outlays-of-the-u-s-government" target="_blank" rel="noopener">U.S. Treasury Fiscal Data — MTS Table 5</a>
+    </div>
+  </section>
+
+  <section class="entry">
+    <h2>University of California employee wages 2024 — by campus</h2>
+    <p>
+      Public-record compensation for every UC employee paid at least $1,000
+      in 2024 (~334k rows), from California's
+      <a href="https://gcc.sco.ca.gov/">Government Compensation in
+      California</a> dataset. Path: campus → department. Colored
+      categorically by campus with the <b>Turbo</b> palette. Click a campus
+      to zoom into its departments.
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-ca-uc.html"
+        title="UC employee wages 2024 — by campus"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-ca-uc.html">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_UniversityOfCalifornia.zip</a>
+    </div>
+  </section>
+
+  <section class="entry">
+    <h2>UC wages — department → position → individual (<b>Nord</b> theme)</h2>
+    <p>
+      Same dataset, regrouped to show the fine structure. Path:
+      department → position → <code>_row</code>. Each leaf sliver is one
+      employee; wider bands are more populous titles within a department.
+      The synthetic <code>_row</code> column is injected by
+      <code>table-treemap.js</code> into every dataset so you can always
+      drill down to individual source rows.
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-ca-uc.html#size=TotalWages&amp;color=DepartmentOrSubdivision&amp;path=DepartmentOrSubdivision,Position,_row&amp;theme=nord"
+        title="UC wages — by department → position"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-ca-uc.html#size=TotalWages&amp;color=DepartmentOrSubdivision&amp;path=DepartmentOrSubdivision,Position,_row&amp;theme=nord">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_UniversityOfCalifornia.zip</a>
+    </div>
+  </section>
+
+  <section class="entry">
+    <h2>UC wages — position → campus → individual (<b>Nord</b> theme)</h2>
+    <p>
+      One more rearrangement of the same file: group by position first, then
+      by campus, then by individual. Makes it easy to compare who pays more
+      for the same title — e.g. clinical nurses at UCSD vs UCLA vs UCSF.
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-ca-uc.html#size=TotalWages&amp;color=Position&amp;path=Position,EmployerName,_row&amp;theme=nord"
+        title="UC wages — by position → campus"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-ca-uc.html#size=TotalWages&amp;color=Position&amp;path=Position,EmployerName,_row&amp;theme=nord">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_UniversityOfCalifornia.zip</a>
+    </div>
+  </section>
+
+  <section class="entry">
+    <h2>California city government wages 2024</h2>
+    <p>
+      Every California city employee with reported wages in 2024 (~334k
+      rows). Path: county → city → department. Colored categorically by
+      county with the <b>Viridis</b> palette. LA County and the Bay Area
+      dominate — use the Path chips to re-group by department first to see
+      which functions drive the biggest payrolls statewide.
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-ca-city.html"
+        title="California city government wages 2024"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-ca-city.html">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_City.zip</a>
+    </div>
+  </section>
 </main>
 </body>
 </html>

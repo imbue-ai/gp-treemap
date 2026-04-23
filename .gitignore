@@ -10,3 +10,7 @@ test-results/
 
 # Scan-tool outputs that sometimes land in the working tree
 /gp-treemap-*.html
+
+# Large regenerable sample JSONLs (see scripts/build_table_gallery.sh)
+/samples/data/table/ca-city-salaries-2024.jsonl
+/samples/data/table/ca-uc-salaries-2024.jsonl
