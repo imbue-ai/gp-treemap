@@ -16,6 +16,16 @@ And see this visualization:
 TODO: Screenshot.  Or even better -- embed from gallery in an iframe if that's possible?
 
 
+But it's not just for disk usage. gp-treemap is a general web component,
+great for any time you have hierarchical counts to wrap your head around!
+
+* Spending reports (they never looked so beautiful!)
+* Budgets
+* Profiling
+* Resource usage (Disk, RAM, electricity)
+
+Don't forget that lots of tabular data can be made hierarchical with GROUP BY on a list of columns.
+
 Check out the [gallery of more examples](TODO: Link to our gallery web page).
 
 ## A hat tip to GrandPerspective
