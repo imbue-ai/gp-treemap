@@ -1503,7 +1503,8 @@ const STYLE = `
 .overlay .lbl { position:absolute; font-size:11px; font-weight:500; line-height:1; padding:1px 3px;
   color: var(--gp-fg, #111);
   text-shadow: 0 0 2px var(--gp-bg, #ffffffcc), 0 0 2px var(--gp-bg, #ffffffcc);
-  white-space:nowrap; pointer-events:none; transform: translate(-50%, -50%); }
+  white-space:nowrap; pointer-events:none; transform: translate(-50%, -50%);
+  overflow:hidden; text-overflow:ellipsis; }
 .tooltip { position:fixed; pointer-events:none; padding:6px 10px;
   background: var(--gp-surface, #111d); color: var(--gp-fg, #fff);
   border:1px solid var(--gp-border, transparent);
@@ -2136,8 +2137,14 @@ class GpTreemap extends HTMLElement {
         if (l.w < 48 * dpr || l.h < 16 * dpr) continue;
         const el = document.createElement('div');
         el.className = 'lbl';
+        const cssW = l.w / dpr;
+        const cssH = l.h / dpr;
         el.style.left = (l.x + l.w / 2) / dpr + 'px';
         el.style.top = (l.y + l.h / 2) / dpr + 'px';
+        // Bound the label to the cell so long paths ellipsize instead of
+        // spilling over neighbours. Subtract a couple of px for padding.
+        el.style.maxWidth = Math.max(0, cssW - 4) + 'px';
+        el.style.maxHeight = Math.max(0, cssH - 2) + 'px';
         el.textContent = this._pathFromVisibleRoot(l.id, visRoot);
         this._overlay.appendChild(el);
       }
@@ -2764,7 +2771,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
 <script>
 (function () {
   'use strict';
-  var DEFAULTS = {"size":"Gross_Outlays","color":"Category","path":["Category","Agency","Bureau"],"theme":"tokyo-night","palette":"viridis","colorScale":"linear"};
+  var DEFAULTS = {"size":"Gross_Outlays","color":"Category","path":["Category","Agency","Bureau"],"theme":"tokyo-night","palette":"viridis","colorScale":"linear","showLabels":false};
   var THEMES = {"nord":{"label":"Nord","bg":"#2e3440","surface":"#3b4252","border":"#4c566a","fg":"#d8dee9","fgMuted":"#81a1c1","accent":"#88c0d0"},"solarized":{"label":"Solarized Dark","bg":"#002b36","surface":"#073642","border":"#586e75","fg":"#839496","fgMuted":"#657b83","accent":"#268bd2"},"dracula":{"label":"Dracula","bg":"#282a36","surface":"#44475a","border":"#6272a4","fg":"#f8f8f2","fgMuted":"#6272a4","accent":"#bd93f9"},"catppuccin":{"label":"Catppuccin Mocha","bg":"#1e1e2e","surface":"#313244","border":"#45475a","fg":"#cdd6f4","fgMuted":"#a6adc8","accent":"#cba6f7"},"gruvbox":{"label":"Gruvbox Dark","bg":"#282828","surface":"#3c3836","border":"#504945","fg":"#ebdbb2","fgMuted":"#a89984","accent":"#fabd2f"},"tokyo-night":{"label":"Tokyo Night","bg":"#1a1b26","surface":"#16161e","border":"#0f0f14","fg":"#c0caf5","fgMuted":"#787c99","accent":"#7aa2f7"},"rose-pine":{"label":"Rosé Pine","bg":"#191724","surface":"#1f1d2e","border":"#26233a","fg":"#e0def4","fgMuted":"#908caa","accent":"#c4a7e7"},"one-dark":{"label":"One Dark","bg":"#282c34","surface":"#2c313a","border":"#3e4452","fg":"#abb2bf","fgMuted":"#828997","accent":"#61afef"}};
   var ALL_COLS = ["Category","Agency","Bureau","Program","Gross_Outlays","Net_Outlays","Prior_Year_Outlays","YoY_Change_Pct","Fiscal_Year","_row"];
   var NUMERIC_NONNEG = ["Gross_Outlays","Net_Outlays","Prior_Year_Outlays","Fiscal_Year","_row"];
@@ -3151,6 +3158,11 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
 
     rebuild();
 
+    // If the URL had no hash, seed the component slice with the baked
+    // defaults (e.g. --show-labels sets showLabels=true at build time).
+    if (!hadHash && !('showLabels' in state.viewer) && DEFAULTS.showLabels) {
+      state.viewer.showLabels = true;
+    }
     // Hand the component's slice of state back to it in one shot.
     tm.viewerState = state.viewer;
 

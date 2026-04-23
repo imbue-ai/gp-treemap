@@ -225,12 +225,12 @@ test('scan HTML: numeric IDs round-trip through URL hash', async ({ page }) => {
     const targetId = await page.locator('gp-treemap').evaluate((el) => el._targetId);
     expect(typeof targetId).toBe('number');
 
-    // Read the hash — it should be the URL-encoded JSON blob containing a
-    // numeric target inside viewer: { target: N }.
+    // Read the hash — it should be the URL-encoded JSON blob containing
+    // the target as a path array (labels from root to node).
     const hash = await page.evaluate(() => window.location.hash);
     expect(hash).toMatch(/^#s=/);
     const parsed = JSON.parse(decodeURIComponent(hash.replace(/^#s=/, '')));
-    expect(parsed.viewer && typeof parsed.viewer.target).toBe('number');
+    expect(parsed.viewer && Array.isArray(parsed.viewer.target)).toBe(true);
 
     // Reload with the same hash and verify the target is restored as a number.
     await page.goto('file://' + out + hash);
@@ -278,17 +278,30 @@ test('scan HTML: direct navigation with zoom+target+focus hash params', async ({
     await page.waitForTimeout(400);
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
-    // Find a leaf, its parent, and a zoom-worthy ancestor.
+    // Find a leaf, its parent, and a zoom-worthy ancestor. Hash params
+    // use path arrays now (array of labels from tree root downwards),
+    // so we collect those rather than integer ids.
     const ids = await page.locator('gp-treemap').evaluate((el) => {
       const leaves = el._leaves;
       if (!leaves.length) return null;
-      // Pick the first leaf that has a grandparent.
+      const rootId = el._tree.roots[0];
+      const pathOf = (id) => {
+        const parts = [];
+        let cur = el._tree.nodes.get(id);
+        while (cur && cur.id !== rootId) { parts.unshift(cur.label); cur = el._tree.nodes.get(cur.parentId); }
+        return parts;
+      };
       for (const l of leaves) {
         const n = el._tree.nodes.get(l.id);
         if (!n || n.parentId == null) continue;
         const parent = el._tree.nodes.get(n.parentId);
         if (!parent || parent.parentId == null) continue;
-        return { leaf: l.id, parent: n.parentId, grandparent: parent.parentId };
+        return {
+          leaf: l.id, parent: n.parentId, grandparent: parent.parentId,
+          leafPath: pathOf(l.id),
+          parentPath: pathOf(n.parentId),
+          grandparentPath: pathOf(parent.parentId),
+        };
       }
       return null;
     });
@@ -298,7 +311,7 @@ test('scan HTML: direct navigation with zoom+target+focus hash params', async ({
     await page.goto('about:blank');
     // Now load DIRECTLY with all three params in the hash (the user's scenario).
     const hash = '#s=' + encodeURIComponent(JSON.stringify({
-      viewer: { zoom: ids.grandparent, target: ids.leaf, focus: ids.parent },
+      viewer: { zoom: ids.grandparentPath, target: ids.leafPath, focus: ids.parentPath },
     }));
     await page.goto('file://' + out + hash);
     await page.waitForTimeout(500);

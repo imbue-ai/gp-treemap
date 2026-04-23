@@ -83,7 +83,8 @@ const STYLE = `
 .overlay .lbl { position:absolute; font-size:11px; font-weight:500; line-height:1; padding:1px 3px;
   color: var(--gp-fg, #111);
   text-shadow: 0 0 2px var(--gp-bg, #ffffffcc), 0 0 2px var(--gp-bg, #ffffffcc);
-  white-space:nowrap; pointer-events:none; transform: translate(-50%, -50%); }
+  white-space:nowrap; pointer-events:none; transform: translate(-50%, -50%);
+  overflow:hidden; text-overflow:ellipsis; }
 .tooltip { position:fixed; pointer-events:none; padding:6px 10px;
   background: var(--gp-surface, #111d); color: var(--gp-fg, #fff);
   border:1px solid var(--gp-border, transparent);
@@ -717,8 +718,14 @@ export class GpTreemap extends HTMLElement {
         if (l.w < 48 * dpr || l.h < 16 * dpr) continue;
         const el = document.createElement('div');
         el.className = 'lbl';
+        const cssW = l.w / dpr;
+        const cssH = l.h / dpr;
         el.style.left = (l.x + l.w / 2) / dpr + 'px';
         el.style.top = (l.y + l.h / 2) / dpr + 'px';
+        // Bound the label to the cell so long paths ellipsize instead of
+        // spilling over neighbours. Subtract a couple of px for padding.
+        el.style.maxWidth = Math.max(0, cssW - 4) + 'px';
+        el.style.maxHeight = Math.max(0, cssH - 2) + 'px';
         el.textContent = this._pathFromVisibleRoot(l.id, visRoot);
         this._overlay.appendChild(el);
       }

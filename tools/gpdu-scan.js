@@ -625,9 +625,15 @@ ${bundle}
         }
         continue;
       }
+      // parentId is the global row of this node's parent, or null for the
+      // block root (whose parent lives in another block — we look it up by
+      // the stub's localRow==0 record; block 0's node 0 is the tree root).
+      var gp = null;
+      if (pi[k] >= 0) gp = gr[pi[k]];
       var nd = {
         label: blk.labels[k],
         value: blk.values[k],
+        parentId: gp,
         childIds: localChildren[k] ? localChildren[k].map(function(li) { return gr[li]; }) : null,
         colorExt: rawExtArr[k],
         colorKind: extArr[k],
@@ -729,6 +735,7 @@ ${bundle}
   envelope.blocks[0] = null; // free compressed data
   var rootId = new Int32Array(_buf(block0.grB64))[0];
   tm.root = rootId;
+  window._rootId = rootId;
   tm.getId = getId;
   tm.getChildren = getChildren;
   tm.getValue = getValue;
@@ -921,7 +928,43 @@ window._bootReady.then(function () {
   paletteSel.addEventListener('change', function () { applyPalette(paletteSel.value); writeHash(); });
   colorSel.addEventListener('change', function () { applyColor(colorSel.value); writeHash(); });
 
-  function coerceId(s) { return /^\\d+$/.test(s) ? Number(s) : s; }
+  // Node IDs inside the component are integer row indices — stable and
+  // compact for Map keys. For the URL hash, though, we want something a
+  // human can read, so we convert to path arrays (array of labels from
+  // the tree root down to the node, exclusive of the root).
+  function idToPath(id) {
+    if (id == null) return undefined;
+    var rootId = window._rootId;
+    var nd = window._store && window._store.get(id);
+    if (!nd) return undefined;
+    if (id === rootId) return [];
+    var parts = [];
+    var cur = nd;
+    while (cur && cur.parentId != null) {
+      parts.unshift(cur.label);
+      cur = window._store.get(cur.parentId);
+    }
+    return parts;
+  }
+  function pathToId(path) {
+    if (path == null) return undefined;
+    if (!Array.isArray(path)) return undefined;
+    var rootId = window._rootId;
+    if (path.length === 0) return rootId;
+    var cur = rootId;
+    for (var i = 0; i < path.length; i++) {
+      var nd = window._store.get(cur);
+      if (!nd || !nd.childIds) return undefined;
+      var found = null;
+      for (var j = 0; j < nd.childIds.length; j++) {
+        var child = window._store.get(nd.childIds[j]);
+        if (child && child.label === path[i]) { found = nd.childIds[j]; break; }
+      }
+      if (found == null) return undefined;
+      cur = found;
+    }
+    return cur;
+  }
   function readHash() {
     try {
       if (location.hash.length <= 1) return;
@@ -932,24 +975,44 @@ window._bootReady.then(function () {
       applyPalette('palette' in obj ? (obj.palette || '') : '');
       applyColor(obj.color || DEFAULT_COLOR);
       var v = obj.viewer || {};
-      tm.viewerState = {
-        zoom: v.zoom != null ? coerceId(v.zoom) : undefined,
-        zoomPath: Array.isArray(v.zoomPath) ? v.zoomPath.map(coerceId) : undefined,
-        depth: v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : undefined),
-        target: v.target != null ? coerceId(v.target) : undefined,
-        focus: v.focus != null ? coerceId(v.focus) : undefined,
-      };
+      // All blocks are inflated in parallel after first render, so we may
+      // not yet be able to resolve every path; resolve what we can now,
+      // then re-try after _allBlocksReady to pick up deeper paths.
+      applyViewer(v);
+      if (window._allBlocksReady) {
+        window._allBlocksReady.then(function () { applyViewer(v); });
+      }
     } catch (_) {}
+  }
+  function applyViewer(v) {
+    tm.viewerState = {
+      zoom: 'zoom' in v ? pathToId(v.zoom) : undefined,
+      zoomPath: Array.isArray(v.zoomPath)
+        ? v.zoomPath.map(function (p) { return pathToId(p); }).filter(function (id) { return id != null; })
+        : undefined,
+      depth: v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : undefined),
+      target: 'target' in v ? pathToId(v.target) : undefined,
+      focus: 'focus' in v ? pathToId(v.focus) : undefined,
+      showLabels: 'showLabels' in v ? !!v.showLabels : undefined,
+    };
   }
   function writeHash() {
     try {
       var v = tm.viewerState || {};
+      // Rewrite integer IDs into readable path arrays.
+      var vOut = {};
+      if (v.zoom != null) vOut.zoom = idToPath(v.zoom);
+      if (v.zoomPath) vOut.zoomPath = v.zoomPath.map(idToPath).filter(function (p) { return p != null; });
+      if (v.target != null) vOut.target = idToPath(v.target);
+      if (v.focus != null) vOut.focus = idToPath(v.focus);
+      if (v.depth != null) vOut.depth = v.depth === Infinity ? 'Infinity' : v.depth;
+      if ('showLabels' in v) vOut.showLabels = v.showLabels;
+
       var out = {};
       if (currentColor !== DEFAULT_COLOR) out.color = currentColor;
       if (currentTheme !== DEFAULT_THEME) out.theme = currentTheme;
       if (currentPalette !== DEFAULT_PALETTE) out.palette = currentPalette;
-      // Component-level state (zoom/target/focus/depth/etc.)
-      if (Object.keys(v).length) out.viewer = v;
+      if (Object.keys(vOut).length) out.viewer = vOut;
       var s = Object.keys(out).length ? 's=' + encodeURIComponent(JSON.stringify(out)) : '';
       history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
     } catch (_) {}

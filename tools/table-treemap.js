@@ -14,6 +14,8 @@
 //   --theme=NAME        initial page theme (e.g. tokyo-night)
 //   --palette=NAME      palette override (viridis, plasma, …)
 //   --title=STR         header title
+//   --show-labels       render labels on leaf cells by default (off by default)
+//   --keep-cols=A,B,C   keep only these columns from the input (plus _row)
 //   --no-open           don't auto-open the result
 //   --max-rows=N        truncate input to N rows (default: unlimited)
 
@@ -33,6 +35,7 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--no-open') { out.flags.noOpen = true; continue; }
+    if (a === '--show-labels') { out.flags['show-labels'] = true; continue; }
     if (a.startsWith('--')) {
       const eq = a.indexOf('=');
       if (eq > 0) out.flags[a.slice(2, eq)] = a.slice(eq + 1);
@@ -267,6 +270,7 @@ function buildHtml(outPath, title, columns, info, rows, defaults, flags) {
     theme: flags.theme || 'tokyo-night',
     palette: flags.palette || '',
     colorScale: flags['color-scale'] || 'linear',
+    showLabels: !!flags['show-labels'],
   });
 
   const html = `<!doctype html>
@@ -749,6 +753,11 @@ ${bundle}
 
     rebuild();
 
+    // If the URL had no hash, seed the component slice with the baked
+    // defaults (e.g. --show-labels sets showLabels=true at build time).
+    if (!hadHash && !('showLabels' in state.viewer) && DEFAULTS.showLabels) {
+      state.viewer.showLabels = true;
+    }
     // Hand the component's slice of state back to it in one shot.
     tm.viewerState = state.viewer;
 
@@ -804,10 +813,23 @@ function main() {
     : path.join(os.tmpdir(), 'table-treemap-' + path.basename(input).replace(/[^a-zA-Z0-9._-]/g, '_') + '-' + Date.now() + '.html');
 
   const maxRows = flags['max-rows'] ? Number(flags['max-rows']) : 0;
-  const { columns, rows } = loadTable(input, maxRows);
+  let { columns, rows } = loadTable(input, maxRows);
   if (columns.length === 0 || rows.length === 0) {
     console.error('no data loaded from ' + input);
     process.exit(1);
+  }
+  // --keep-cols narrows the column set (the synthetic _row is always kept).
+  if (flags['keep-cols']) {
+    const keep = new Set(flags['keep-cols'].split(',').map((s) => s.trim()).filter(Boolean));
+    keep.add('_row');
+    const missing = [...keep].filter((c) => !columns.includes(c));
+    if (missing.length) {
+      console.error('--keep-cols: unknown column(s): ' + missing.join(', '));
+      process.exit(2);
+    }
+    const kept = columns.filter((c) => keep.has(c));
+    columns = kept;
+    rows = rows.map((r) => { const o = {}; for (const c of kept) o[c] = r[c]; return o; });
   }
   const info = profileColumns(columns, rows);
   const defaults = pickDefaults(columns, info, flags);

@@ -26,7 +26,7 @@ node tools/gpdu-scan.js --no-open --color=extension "$ROOT" "$ROOT/gallery/gp-tr
 # baked into its viewer HTML.
 node tools/table-treemap.js --no-open \
   --size=Generation_TWh --color=Fuel --path=Fuel,Continent,Country \
-  --theme=catppuccin \
+  --theme=catppuccin --show-labels \
   --title="Global electricity generation (2023, TWh) — colored by fuel" \
   "$DATA/energy-2023.jsonl" \
   "$ROOT/gallery/table-treemap-energy-fuel.html"
@@ -45,23 +45,31 @@ node tools/table-treemap.js --no-open \
   "$DATA/us-outlays-fy2024.jsonl" \
   "$ROOT/gallery/table-treemap-us-outlays-yoy.html"
 
-# UC + city wages need the large JSONLs that are gitignored — regenerate
-# from samples/data/table/ca-{uc,city}-salaries-2024.jsonl if present.
-if [ -f "$DATA/ca-uc-salaries-2024.jsonl" ]; then
+# UC + city wages come from the public GCC raw-export zips we keep under
+# samples/data/table/ca-raw/ (the website is Cloudflare-gated so checking
+# the zips in makes the pipeline reproducible). Unzip to a temp dir and
+# point table-treemap.js at the CSVs directly.
+CA_TMP=$(mktemp -d -t gp-treemap-ca-XXXXXX)
+trap 'rm -rf "$CA_TMP"' EXIT
+KEEP_COLS=EmployerType,EmployerName,DepartmentOrSubdivision,Position,TotalWages,RegularPay,OvertimePay,OtherPay,TotalRetirementAndHealthContribution,EmployerCounty,PensionFormula
+
+if [ -f "$DATA/ca-raw/2024_UniversityOfCalifornia.zip" ]; then
+  unzip -o -q "$DATA/ca-raw/2024_UniversityOfCalifornia.zip" -d "$CA_TMP"
   node tools/table-treemap.js --no-open \
     --size=TotalWages --color=EmployerName --path=EmployerName,DepartmentOrSubdivision \
-    --palette=turbo \
+    --palette=turbo --keep-cols="$KEEP_COLS" \
     --title="UC employee wages 2024 (California)" \
-    "$DATA/ca-uc-salaries-2024.jsonl" \
+    "$CA_TMP/2024_UniversityOfCalifornia.csv" \
     "$ROOT/gallery/table-treemap-ca-uc.html"
 fi
-if [ -f "$DATA/ca-city-salaries-2024.jsonl" ]; then
+if [ -f "$DATA/ca-raw/2024_City.zip" ]; then
+  unzip -o -q "$DATA/ca-raw/2024_City.zip" -d "$CA_TMP"
   node tools/table-treemap.js --no-open \
     --size=TotalWages --color=DepartmentOrSubdivision \
     --path=DepartmentOrSubdivision,EmployerCounty,EmployerName,Position,_row \
-    --theme=one-dark \
+    --theme=one-dark --keep-cols="$KEEP_COLS" \
     --title="California city government wages 2024" \
-    "$DATA/ca-city-salaries-2024.jsonl" \
+    "$CA_TMP/2024_City.csv" \
     "$ROOT/gallery/table-treemap-ca-city.html"
 fi
 
