@@ -64,7 +64,7 @@ async function main() {
   // Sampling interval in microseconds (smaller = more samples = more detail + overhead).
   await client.send('Profiler.setSamplingInterval', { interval: args.samplingUs });
 
-  // Default "ready" gate — tuned for our scan.js output but falls back to load.
+  // Default "ready" gate — tuned for our gpdu-scan.js output but falls back to load.
   const defaultReady = `
     (function(){
       if (typeof window === 'undefined') return false;

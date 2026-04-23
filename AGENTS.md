@@ -6,7 +6,7 @@ After editing any file in `src/`, rebuild the bundle:
 
     node tools/build.js
 
-The scan viewer (`tools/scan.js`) and the unit-fixture test page both load
+The scan viewer (`tools/gpdu-scan.js`) and the unit-fixture test page both load
 `dist/gp-treemap.bundle.js`, not the ES modules directly. If you forget
 to rebuild, your changes won't appear in scanned HTML output.
 
@@ -32,7 +32,7 @@ The component events that trigger hash writes:
 
 When adding new UI state to the URL:
 1. Add the event to the component (`_dispatch` or `dispatchEvent`).
-2. Add read/write in the page-level hash script (scan.js template +
+2. Add read/write in the page-level hash script (gpdu-scan.js template +
    samples/interactions.html).
 3. Add a test in `tests/url-hash.spec.js`.
 

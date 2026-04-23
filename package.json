@@ -1,25 +1,61 @@
 {
-  "name": "gp-treemap",
+  "name": "@imbue-ai/gp-treemap",
   "version": "0.1.0",
-  "private": true,
+  "description": "GrandPerspective-lineage <gp-treemap> Web Component, plus CLI tools for scanning directories and profiling HTML page loads into treemap visualizations.",
+  "type": "module",
+  "license": "GPL-2.0-only",
+  "author": "Imbue <hello@imbue.com>",
+  "homepage": "https://github.com/imbue-ai/gp-treemap#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imbue-ai/gp-treemap.git"
+  },
+  "bugs": {
+    "url": "https://github.com/imbue-ai/gp-treemap/issues"
+  },
+  "keywords": [
+    "treemap",
+    "grandperspective",
+    "visualization",
+    "disk-usage",
+    "web-component",
+    "custom-element",
+    "canvas",
+    "cpuprofile"
+  ],
   "bin": {
-    "gp-treemap": "./tools/scan.js",
+    "gpdu": "./tools/gpdu-scan.js",
     "gp-treemap-profile-load": "./tools/profile-load.js",
     "gp-treemap-profile-to-html": "./tools/profile-to-html.js"
   },
-  "description": "GrandPerspective-lineage <gp-treemap> Web Component",
-  "type": "module",
+  "files": [
+    "dist/gp-treemap.bundle.js",
+    "src/",
+    "tools/gpdu-scan.js",
+    "tools/profile-load.js",
+    "tools/profile-to-html.js",
+    "tools/build.js",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "serve": "node tools/server.js",
     "build": "node tools/build.js",
-    "scan": "node tools/scan.js",
+    "scan": "node tools/gpdu-scan.js",
     "test": "playwright test",
     "test:install": "playwright install chromium",
     "test:update": "playwright test --update-snapshots",
-    "bench": "node tools/bench.js"
+    "bench": "node tools/bench.js",
+    "prepublishOnly": "node tools/build.js"
+  },
+  "optionalDependencies": {
+    "playwright": "^1.47.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.47.0",
     "tinybench": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
