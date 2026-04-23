@@ -24,10 +24,10 @@
     "cpuprofile"
   ],
   "bin": {
-    "gpdu": "./tools/gpdu-scan.js",
-    "gp-treemap-profile-load": "./tools/profile-load.js",
-    "gp-treemap-profile-to-html": "./tools/profile-to-html.js",
-    "gp-treemap-table": "./tools/table-treemap.js"
+    "gpdu": "tools/gpdu-scan.js",
+    "gp-treemap-profile-load": "tools/profile-load.js",
+    "gp-treemap-profile-to-html": "tools/profile-to-html.js",
+    "gp-treemap-table": "tools/table-treemap.js"
   },
   "files": [
     "dist/gp-treemap.bundle.js",
