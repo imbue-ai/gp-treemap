@@ -1,11 +1,33 @@
-# gp-treemap — a Web Component port of GrandPerspective's treemap
+# gp-treemap: Beautiful, interactive, large-scale treemaps for the web
+
+Treemaps are often the best way to quickly hone in on the "mass" in large,
+hierarchical datasets.  You can think of them as "hierarchical pie charts".
+
+For example, they're great for interactive visualizions of disk usage.
+
+With this package, you can run:
+
+```sh
+# TODO: sample npx command line to generate disk-usage report of CWD.
+```
+
+And see this visualization:
+
+TODO: Screenshot.  Or even better -- embed from gallery in an iframe if that's possible?
+
+
+Check out the [gallery of more examples](TODO: Link to our gallery web page).
+
+## A hat tip to GrandPerspective
+
+Most treemap implementations we've seen are boring and don't scale well
+to millions of nodes, with [GrandPerspective](https://grandperspectiv.sourceforge.net/)
+being a wonderful exception.
 
 `<gp-treemap>` is a standards-compliant Custom Element that renders interactive
 treemaps with GrandPerspective's signature "raised tile" pixel shading — bright
 upper-left, dark lower-right, with a crisp diagonal seam between the two halves
 of every cell.
-
-## Lineage
 
 This project is a JavaScript/Canvas port of the treemap view from
 [GrandPerspective](https://grandperspectiv.sourceforge.net/), the macOS disk
@@ -20,44 +42,21 @@ or want to see where these algorithms came from, go support that project.
 
 If you use `gp-treemap`, please keep the attribution to Erwin Bonsma visible.
 
-## License
-
-GNU General Public License, version 2. See [`LICENSE`](LICENSE).
-
 ## Quick start
 
 No install required — run directly from GitHub:
 
 ```sh
+# TODO: Update to run from npm package with gpdu
 npx github:imbue-ai/gp-treemap ~/Downloads
 ```
 
 Scans `~/Downloads`, writes a self-contained HTML file, and opens it in your
 default browser. Pass a second argument to choose the output path:
 
-```sh
-npx github:imbue-ai/gp-treemap ~/Pictures /tmp/pictures.html
-```
-
-## Viewing the samples
-
-```sh
-node tools/build.js     # (re)generate dist/gp-treemap.bundle.js
-open samples/index.html # or just double-click it in Finder
-```
-
-Each sample is a plain HTML file loading the bundle with a sibling
-`<script src="../dist/gp-treemap.bundle.js">` tag — no ES modules, no CORS,
-no server required. `file://` works.
-
-If you prefer to serve over HTTP:
-
-```sh
-npm run serve
-# → http://localhost:4173/samples/index.html
-```
 
 ## Scanning a real directory
+TODO: Move this section into the relevant code.
 
 `tools/scan.js` walks any local folder and writes a single self-contained
 HTML file that renders its size treemap — the bundle and dataset are inlined
@@ -90,6 +89,7 @@ wrote /tmp/gp-treemap-Pictures-1776569124346.html  (5.1 MB)
 Symlinks are not followed and unreadable entries are counted and skipped.
 
 ## Profiling an HTML file's load
+TODO: Move this section into the relevant code.
 
 Large `gp-treemap` outputs (or any local HTML page) can be profiled
 headlessly using Chromium's V8 CPU profiler, then visualized as a treemap
@@ -212,3 +212,8 @@ npm test                 # run units + visual snapshots
   150 ms debounce.
 - Toolbar, palettes, color scales, keyboard / wheel / double-click behavior,
   and FNV-1a categorical hashing are all new to this port.
+
+## License
+
+GNU General Public License, version 2. See [`LICENSE`](LICENSE).
+
