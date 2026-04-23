@@ -1,0 +1,417 @@
+/* Enumeration of two items */
+"%@ and %@" = "%1$@ e %2$@";
+
+/* Enumeration of two items */
+"%@ or %@" = "%1$@ ou %2$@";
+
+/* Enumeration of three or more items with 1: an item, 2: two or more items */
+"%@, %@" = "%1$@, %2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, and %@" = "%1$@, and %2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, or %@" = "%1$@, or %2$@";
+
+/* Legend for Time-based mapping schemes. */
+"%d - %d days ago" = "%1$d - %2$d dia(s) atrás";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago" = "%d dia(s) atrás";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago or more" = "%1d dia(s) atrás ou mais";
+
+/* Message in progress panel while filtering */
+"%d folders filtered" = "%d pasta(s) filtrada(s) ";
+
+/* Message in progress panel while executing refresh-based scan */
+"%d folders processed" = "%d pastas processadas";
+
+/* Message in progress panel while loading data */
+"%d folders read" = "%d pasta(s) lida(s) ";
+
+/* Message in progress panel while saving data */
+"%d folders saved" = "%d pasta(s) salva(s) ";
+
+/* Message in progress panel while executing a full scan */
+"%d folders scanned" = "%d pasta(s) examinada(s) ";
+
+/* Exact file size (in bytes) */
+"%qu bytes" = "%qu bytes";
+
+/* Tally folder size (in number of files) */
+"%qu files" = "%qu files";
+
+/* Alert message */
+"A filter named \"%@\" already exists" = "Um filtro com o nome \"%@\" já existe";
+
+/* Alert message (Note: 'it' can refer to a file or a folder) */
+"A possible reason is that it does not exist anymore" = "Uma possível razão é que isto não existe mais";
+
+/* Alert message */
+"A test named \"%@\" already exists" = "Um teste com o nome \"%@\" já existe";
+
+/* Alert message (with filename arg) */
+"Aborted saving the scan data to \"%@\"" = "Abortado o salvamento dos dados do escaneamento em \"%@\"";
+
+/* Header in exported text file */
+"Accessed" = "Acessado";
+
+/* Label in Focus panel */
+"Area in view:" = "Area visualizada:";
+
+/* Parse error */
+"Attribute not found" = "Atributo não encontrado";
+
+/* File size unit for bytes. */
+"B" = "B";
+
+/* Alert panel button */
+"Cancel" = "Cancelar";
+
+/* Part of tool tip for uniform types */
+"Conforms to:" = "Coincide com:";
+
+/* Header in exported text file */
+"Created" = "Criado";
+
+/* Alert panel button */
+"Delete" = "Apagar";
+
+/* Menu item */
+"Delete File" = "Apagar arquivo";
+
+/* Menu item */
+"Delete Folder" = "Deletar Pasta";
+
+/* Status update message */
+"Display focus changed to %@" = "Foco da tela mudou para %@";
+
+/* Alert message */
+"Do you want to delete the file \"%@\"?" = "Você quer apagar o arquivo \"%@\"?";
+
+/* Alert message */
+"Do you want to delete the folder \"%@\"?" = "Você quer apagar a pasta \"%@\"?";
+
+/* Alert message */
+"Do you want to delete the package \"%@\"?" = "Você quer apagar o pacote \"%@\"?";
+
+/* Parse error */
+"Encountered filter after folder" = "Encontrados filtros além de uma pasta";
+
+/* Parse error */
+"Encountered more than one root element" = "Encontrado mais que um elemento na raiz";
+
+/* Parse error */
+"Encountered more than one root folder" = "Encontrada mais que uma pasta na raiz";
+
+/* Parse error */
+"Encountered multiple %@ elements" = "Encontrados múltiplos %@ elementos";
+
+/* Parse error */
+"Error parsing \"%@\" attribute: %@" = "Erro de avaliação \"%1$@\" atributo: %2$@";
+
+/* Parse error */
+"Expected %@ element" = "Esperado %@ elemento";
+
+/* Error message */
+"Expected a folder" = "Esperada uma pasta";
+
+/* Parse error */
+"Expected boolean value" = "Esperado um valor lógico";
+
+/* Parse error */
+"Expected date value" = "Esperado um valor de data";
+
+/* Parse error */
+"Expected integer value" = "Esperado um valor inteiro";
+
+/* Error message */
+"Expected scandata file" = "Esperado um arquivo de dados escaneados";
+
+/* Parse error */
+"Expected time value" = "Esperado um valor de tempo";
+
+/* Parse error */
+"Expected unsigned integer value" = "Esperado valor inteiro sem sinal";
+
+/* Title of save panel */
+"Export image" = "Exportar imagem";
+
+/* Title of save panel */
+"Export scan data as text" = "Exportar dados escaneados como texto";
+
+/* Alert message */
+"Failed to bind one or more filter tests:\n%@" = "Falha em associar um ou mais dos filtros de teste:\n%@";
+
+/* Alert message */
+"Failed to delete the file \"%@\"" = "Falha em apagar o arquivo \"%@\"";
+
+/* Alert message */
+"Failed to delete the folder \"%@\"" = "Falha em apagar a pasta \"%@\"";
+
+/* Error message */
+"Failed to get path from pasteboard" = "Falha em obter o caminho da área de colagem";
+
+/* Alert message (with filename arg) */
+"Failed to load the scan data from \"%@\"" = "Falha em carregar os dados do escaneamento de \"%@\"";
+
+/* Alert message */
+"Failed to open the file \"%@\"" = "Falha em abrir o arquivo \"%@\"";
+
+/* Alert message */
+"Failed to open the folder \"%@\"" = "Falha em abrir a pasta \"%@\"";
+
+/* Alert message */
+"Failed to open the package \"%@\"" = "Falha em em abrir o pacote \"%@\"";
+
+/* Alert message */
+"Failed to reveal the file \"%@\"" = "Falha em mostrar o arquivo \"%@\"";
+
+/* Alert message */
+"Failed to reveal the folder \"%@\"" = "Falha em mostrar a pasta \"%@\"";
+
+/* Alert message */
+"Failed to reveal the package \"%@\"" = "Falha em mostrar o pacote \"%@\"";
+
+/* Alert message */
+"Failed to save the image" = "Falha em salvar a imagem";
+
+/* Alert message (with filename arg) */
+"Failed to save the scan data to \"%@\"" = "Falhou em salvar os dados escaneados para \"%@\"";
+
+/* Alert message */
+"Failed to update one or more filters:\n%@" = "Falha em atualizar um ou mais filtros:\n%@";
+
+/* Label in Focus panel */
+"File in view:" = "Mostrando arquivo";
+
+/* Header in exported text file */
+"Filename" = "Nome do arquivo";
+
+/* Window title */
+"Filter - %@" = "Filtro - %@";
+
+/* Window title */
+"Filter test - %@" = "Teste do filtro - %@";
+
+/* Message in progress panel while filtering */
+"Filtering %@" = "Filtragem %@";
+
+/* Title of progress panel. */
+"Filtering in progress" = "Filtragem em progresso";
+
+/* Label in Focus panel */
+"Folder in view:" = "Mostrando pasta:";
+
+/* Alert message */
+"For %d files the reported (logical) size is larger than their actual (physical) size. Consider rescanning using the Physical file size measure" = "Para %d arquivos o tamanho lógico relatado é maior que seu tamanho real (físico). Considere reexaminar usando a medida física de arquivos";
+
+/* File size unit for gigabytes. */
+"GB" = "GB";
+
+/* Menu item */
+"Hide Control Panel" = "Esconder Painel de Controle";
+
+/* Alert message */
+"Inaccuracies in hard-linked folder contents" = "Imprecisões no conteúdo da pasta com link físico";
+
+/* File size unit for kilobytes. */
+"kB" = "kB";
+
+/* Legend for Level mapping scheme. */
+"Level %d" = "Nível %d";
+
+/* Title of load panel */
+"Load scan data" = "Carregar dados escaneados";
+
+/* Title of progress panel. */
+"Loading in progress" = "Carregamento em progresso";
+
+/* Misc. description for Level mapping scheme. */
+"Lower levels" = "Níveis inferiores";
+
+/* File size unit for megabytes. */
+"MB" = "MB";
+
+/* Header in exported text file */
+"Modified" = "Modificado";
+
+/* Legend for Time-based mapping schemes. */
+"More recent" = "Mais recente";
+
+/* Initial match value in FilterTestWindow */
+"New match" = "Novo padrão";
+
+/* The filter name when there is no filter. */
+"None" = "Nenhum";
+
+/* Alert additional informative text */
+"Note: The file is hard-linked. It will take up space until all links to it are deleted" = "Nota: O arquivo está hard-linked . Ele irá ocupar espaço até que todos os links sejam apagados";
+
+/* Alert additional informative text */
+"Note: The folder is hard-linked. It will take up space until all links to it are deleted" = "Nota: A pasta está hard-linked. Ela irá ocupar espaço até que todos os links sejam apagados";
+
+/* Alert additional informative text */
+"Note: The package is hard-linked. It will take up space until all links to it are deleted" = "Nota: O pacote está hard-linked. Ele irá ocupar espaço até que todos os links sejam apagados";
+
+/* Alert panel button */
+"OK" = "OK";
+
+/* Misc. description for File type mapping scheme. */
+"other file types" = "outros tipos de arquivo";
+
+/* Legend for Level mapping scheme. */
+"Outermost level" = "Nível mais externo";
+
+/* Label in Focus panel */
+"Package in view:" = "Pacote mostrado";
+
+/* Parse error */
+"Parse error (line %d): %@" = "Erro de análise (linha %1$d): %2$@";
+
+/* Parse error */
+"Parsing aborted" = "Análise interrompida";
+
+/* Header in exported text file */
+"Path" = "Caminho";
+
+/* Message in progress panel while loading data */
+"Reading %@" = "Lendo %@";
+
+/* Title of progress panel. */
+"Refresh in progress" = "Atualização em andamento";
+
+/* Alert panel button */
+"Remove" = "Remover";
+
+/* Alert message */
+"Remove the filter named \"%@\"?" = "Remover o filtro de nome \"%@\"?";
+
+/* Alert message */
+"Remove the test named \"%@\"?" = "Remover o teste de nome ";
+
+/* Title of save panel */
+"Save scan data" = "Salvar dados escaneeados";
+
+/* Message in progress panel while saving data */
+"Saving %@" = "Salvando %@";
+
+/* Title of progress panel. */
+"Saving in progress" = "Salvamento em progresso";
+
+/* Prompt in open panel */
+"Scan" = "Examinar";
+
+/* Title of open panel */
+"Scan folder" = "Examinar pasta";
+
+/* Solitairy entry in Start window */
+"Scan Folder" = "Selecionar pasta";
+
+/* Entry in Start window, alongside other options */
+"Scan Other Folder" = "Analisar outra pasta";
+
+/* Message in progress panel while scanning */
+"Scanning %@" = "Examinando %@";
+
+/* Alert message */
+"Scanning failed" = "Falha no escaneamento";
+
+/* Title of progress panel. */
+"Scanning in progress" = "Escaneamento em progresso";
+
+/* Label in Focus panel */
+"Selected area:" = "Área selecionada:";
+
+/* Label in Focus panel */
+"Selected file:" = "Arquivo selecionado:";
+
+/* Label in Focus panel */
+"Selected folder:" = "Pasta selecionada:";
+
+/* Label in Focus panel */
+"Selected package:" = "Pacote selecionado:";
+
+/* Menu item */
+"Show Control Panel" = "Mostrar Painel de Controle";
+
+/* Header in exported text file */
+"Size" = "Tamanho";
+
+/* Alert message (with filename arg) */
+"Successfully saved the scan data to \"%@\"" = "Dados escaneados salvos com sucesso para \"%@\"";
+
+/* File size unit for terabytes. */
+"TB" = "TB";
+
+/* Alert message */
+"The actual (physical) size is %.1f%% of the reported (logical) size. Consider rescanning using the Physical file size measure" = "O tamaho (físico) real é %.1f%% do tamanho relatado (lógico). Considere reexaminar usando a medida de arquivo por tamanho físico";
+
+/* Alert message */
+"The filter must have a name" = "O filtro deverá ter um nome";
+
+/* Alert informative text */
+"The filter will be irrevocably removed from the filter repository" = "O filtro será definitivamente removido do repositório de testes";
+
+/* Alert informative text */
+"The filter will be replaced by the default filter with this name" = "O filtro será trocado pelo filtro padrão com esse nome";
+
+/* Alert message */
+"The path %@ does not exist or is not a folder" = "O Caminho %@ não existe ou não é uma pasta";
+
+/* Alert message */
+"The refreshed content may not be fully accurate. Hard-linked items may occur more than once or could be missing. Perform a rescan to ensure that each hard-linked item occurs only once" = "O conteúdo atualizado pode não ser totalmente preciso. Itens com link físico podem ocorrer mais de uma vez ou podem estar ausentes. Execute uma nova varredura para garantir que cada item com link físico ocorra apenas uma vez";
+
+/* Alert message */
+"The reported size of some files is larger than their actual size on disk" = "O tamanho relatado de alguns arquivos é maior que seu tamanho real em disco";
+
+/* Alert message */
+"The reported total size is larger than the actual size on disk" = "O tamanho total relatado é maior que seu tamanho real em disco ";
+
+/* Alert informative text */
+"The resulting file is valid but incomplete" = "O arquivo resultante é válido mas incompleto";
+
+/* Alert informative text */
+"The selected file will be moved to Trash" = "O arquivo selecionado será movido para a Lixeira";
+
+/* Alert informative text */
+"The selected folder, with all its contents, will be moved to Trash. Beware, any files in the folder that are not shown in the view will also be deleted" = "A pasta selecionada, com todo o seu conteúdo, será movida para a Lixeira. Cuidado pois qualquer arquivo na pasta  e que não seja mostrado será apagado também";
+
+/* Alert informative text */
+"The selected package will be moved to Trash" = "O pacote selecionado será movido para a Lixeira";
+
+/* Alert message */
+"The test must have a name" = "O teste deve ter um nome";
+
+/* Alert informative text */
+"The test will be irrevocably removed from the test repository" = "O teste será definitivamente removido do repositório de testes";
+
+/* Alert informative text */
+"The test will be replaced by the default test with this name" = "O teste será trocado pelo teste padrão com este nome";
+
+/* Alert informative text */
+"The unbound tests have been omitted from the filter" = "Os testes desvinculados foram omitidos do filtro";
+
+/* Alert informative text */
+"These filters do not exist anymore. Their old definition is used instead" = "Esses filtros não existem mais. Será usada a antiga definição";
+
+/* Part of tool tip for uniform types */
+"Top-level type" = "Tipo de Alto Nível";
+
+/* Header in exported text file */
+"Type" = "Tipo";
+
+/* Description for 'unknown' UTI. */
+"unknown file type" = "tipo de arquivo desconhecido";
+
+/* Window title */
+"Unnamed filter" = "Filtro sem nome";
+
+/* Window title */
+"Unnamed filter test" = "Filtro de teste sem nome";
+
+/* Parse error */
+"Unrecognized value" = "Valor não reconhecido";
+

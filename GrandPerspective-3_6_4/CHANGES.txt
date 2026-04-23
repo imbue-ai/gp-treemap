@@ -1,0 +1,1709 @@
+======================================================================
+  GrandPerspective Change Log
+======================================================================
+
+----------------------------------------------------------------------
+  Version 3.6.4, 21-03-2026
+----------------------------------------------------------------------
+
+Minor improvements:
+- Minor UI updates to start window [#124]
+- Add tooltip to view truncated progress panel path [#116]
+
+Updated localizations:
+- Chinese, overhaul and update by Whyto
+
+
+----------------------------------------------------------------------
+  Version 3.6.3, 24-01-2026
+----------------------------------------------------------------------
+
+Fix:
+- Fixed regression introduced as part of retain-release code clean-up
+
+Updated localizations:
+- Finnish
+- French
+- German
+- Italian
+- Spanish
+- Turkish
+
+
+----------------------------------------------------------------------
+  Version 3.6.2, 16-01-2026
+----------------------------------------------------------------------
+
+Fixes:
+- Improve check for Full Disk Access [#113]
+  - Ensure user has access to root volume
+
+Code clean-up:
+- Improve adherence to strict retain-release patterns
+
+
+----------------------------------------------------------------------
+  Version 3.6.1 (localized v1), 02-01-2026
+----------------------------------------------------------------------
+
+Updated localizations:
+- Finnish
+- French
+- Italian
+- Spanish
+- Turkish
+
+
+----------------------------------------------------------------------
+  Version 3.6.1, 22-12-2025
+----------------------------------------------------------------------
+
+Minor improvements:
+- Show message on start-up when Full Disk Access is not granted
+
+Fixes:
+- Fixed: Application exits on rescan [#122]
+
+Updated localizations:
+- Finnish
+
+
+----------------------------------------------------------------------
+  Version 3.6 (localized v1), 20-09-2025
+----------------------------------------------------------------------
+
+Updated localizations:
+- French
+- Italian
+- Spanish
+- Turkish
+
+
+----------------------------------------------------------------------
+  Version 3.6, 27-08-2025
+----------------------------------------------------------------------
+
+Minor improvements:
+- Add coloring by size
+- Add howto help documentation on resolving hangs while scanning
+
+Refactoring:
+- Improved color mapping code
+
+Fixes:
+- Fixed: Scan selection window pops up when a scan is already in
+  progress [#119]
+
+
+----------------------------------------------------------------------
+  Version 3.5.3 (localized v1), 13-05-2025
+----------------------------------------------------------------------
+
+Updated localizations:
+- Finnish
+- French
+- Italian
+- Spanish
+- Turkish
+
+
+----------------------------------------------------------------------
+  Version 3.5.3, 05-05-2025
+----------------------------------------------------------------------
+
+New functionality:
+- Add display option to show only folders (instead of the files they
+  contain) [#108]
+  - This new setting replaces the old display setting that could be
+    used to show or hide package contents
+
+Minor improvements:
+- By default do not log rescanFlag updates
+
+Fixes:
+- Fixed: Volume identified incorrectly [#117]
+
+
+----------------------------------------------------------------------
+  Version 3.5.2, 21-04-2025
+----------------------------------------------------------------------
+
+Fixes:
+- Fixed: Do not scan contents of dataless cloud folders [#115]
+
+Updated localizations:
+- Greek
+
+
+----------------------------------------------------------------------
+  Version 3.5.1, 15-12-2024
+----------------------------------------------------------------------
+
+Fixes:
+- Fixed: Crash when reading corrupt (empty) scan file
+
+Minor improvements:
+- Minor style updates to text in user interface
+- Disable verbose logging when reading/writing scan data files
+
+Updated localizations:
+- Dutch
+- Finnish
+- French
+- Italian
+- Simplified Chinese
+- Turkish
+
+
+----------------------------------------------------------------------
+  Version 3.5, 23-11-2024
+----------------------------------------------------------------------
+
+Improvements:
+- Reduce size of scan data files by using ZLIB compression
+  - Size is reduced by roughly a factor ten
+  - Note: Old (uncompressed) scan data files can still be read
+- Speed up reading of scan date files
+  - Time is reduced by roughly a factor ten
+
+
+----------------------------------------------------------------------
+  Version 3.4.2 (localized v1), 22-10-2023
+----------------------------------------------------------------------
+
+Updated localization:
+- Portuguese, by Mauricio Panata
+
+
+----------------------------------------------------------------------
+  Version 3.4.2, 24-07-2023
+----------------------------------------------------------------------
+
+Minor improvements:
+- Update help
+  - Revise index page
+  - Add example view image
+  - Remove use of character gifs by unicode symbols
+- Add privacy explanation for photo library access
+- By default do not apply a scan filter
+
+Updated localization:
+- Finnish
+
+Fixes:
+- Fixed: (German) Control panel moves when being resized
+
+
+----------------------------------------------------------------------
+  Version 3.4.1, 16-07-2023
+----------------------------------------------------------------------
+
+Minor improvements:
+- Show new display focus value in status bar after each change
+- Append trailing slash to directory paths in status bar
+- Improve default preference settings
+  - Increase default window size
+  - Revise ranking of uniform types
+  - Do not scan cloud files
+- Sort palettes in Display panel pop-up by palette size
+
+Fixes:
+- Fixed: Preference panel incorrectly shows unlimited display focus
+  value
+- Fixed: Should not highlight files inside packages when package
+  contents are not shown
+
+Updated localizations:
+- Finnish
+- French
+- German
+- Greek
+- Italian
+- Simplified Chinese
+- Spanish
+- Turkish
+
+
+----------------------------------------------------------------------
+  Version 3.4, 10-07-2023
+----------------------------------------------------------------------
+
+Improvements:
+- Update toolbar icons
+  - Replace custom images by system symbols
+- Make all toolbar actions also available from main menu:
+  - Add Zoom, Selection Focus, and Display Focus to View menu
+  - Add Open, Quick Look, Reveal, and Delete to Selection menu
+- Minor updates to view pop-up menu to improve consistency
+
+Refactoring:
+- Switch to deployment target macOS 11.0 (this is required for toolbar
+  icon changes)
+  - Remove usage of deprecated APIs
+
+Updated localizations:
+- Greek
+- Italian
+- Turkish
+
+
+----------------------------------------------------------------------
+  Version 3.3, 02-07-2023
+----------------------------------------------------------------------
+
+New functionality:
+- Add display focus to control the amount of detail shown
+  - Add preference setting for default display focus
+  - Enable changing via existing Focus controls of view when selection
+    is unlocked
+
+Changes:
+- Rename newly introduced package check preference option.
+
+Refactoring:
+- Where appropriate, replace defines by typed constants
+
+Fixes:
+- Fixed: CFBundleName inadvertently changed in Version 3.2
+- Fixed: Should not highlight files inside packages when package
+  contents are not shown
+- Fixed: Refreshed trees contain invalid parent pointers
+- Fixed: Tree monitor cannot update flags during save of scan data
+- Fixed: Tree refresh adds empty directories to tree
+- Fixed: Icon for refresh button in toolbar is clipped
+- Fixed: Do not animate zoom when showing entire volume
+
+
+----------------------------------------------------------------------
+  Version 3.2, 18-06-2023
+----------------------------------------------------------------------
+
+Improvements:
+- Speed up scanning:
+  - Switch from NSDirectoryEnumerator to FTS API
+  - Refactor memory management during scanning
+  - Skip hard-link check for directories on APFS
+  - Optionally perform package check only on directories with a file
+    extension
+
+Refactoring:
+- Remove support for deprecated allocWithZone
+
+Fixes:
+- Fixed: Can select default filter when none is configured, leading
+  to crash
+
+
+----------------------------------------------------------------------
+  Version 3.1.1 (localized v1), 28-04-2023
+----------------------------------------------------------------------
+
+New localizations:
+- Greek, by Dimitris Pergelidis
+
+
+----------------------------------------------------------------------
+  Version 3.1.1, 26-03-2023
+----------------------------------------------------------------------
+
+Fixes:
+- Fixed: Crash while scanning hard-linked item with long name [#107]
+- Fixed; Column in Start Window table unnecesarily truncated [#108]
+
+Refactoring:
+- Fixed spelling/typos in source code (thanks to Coeur)
+
+Updated localizations:
+- German
+- Finnish
+- French
+- Italian
+- Spanish
+- Turkish
+
+
+----------------------------------------------------------------------
+  Version 3.1.0, 12-03-2023
+----------------------------------------------------------------------
+
+New functionality:
+- Add preference option to apply a filter by default
+
+Minor improvements:
+- Add "no cloud files" filter
+- Update help documentation:
+  - Extend help to describe how to scan cloud storage, including use
+    of new filter
+  - Update help on scanning Time Machine back-ups to indicate which
+    parts only apply to HFS+ back-up volumes
+
+Refactoring:
+- Switch to recommended deployment target (10.14.6)
+  - Remove use of deprecated API
+
+New localizations:
+- Spanish, by Jorge Ruiz Calpe
+
+
+----------------------------------------------------------------------
+  Version 3.0.1, 14-01-2023
+----------------------------------------------------------------------
+
+Fixes:
+- Fixed: App hangs when scanning 4 GB+ scan data files [#102]
+
+
+----------------------------------------------------------------------
+  Version 3.0.0, 10-07-2022
+----------------------------------------------------------------------
+
+New functionality:
+- Add refresh command to quickly rescan contents of changed views
+  - Use FSEvent API to monitor for changes
+  - Replace Rescan actions in toolbar by Refresh action
+  - Move all Rescan actions to main menu
+  - Show alert when hard-linked contents may be inaccurate after
+    refresh
+
+Minor improvements:
+- Extend permissions to allow scanning contents of photos library
+- Improve logging of errors during scanning
+- Improve consistency of filter when applied to packages:
+  - For rescan and initial filter use current package display setting
+  - For refresh and stacked filters use original package setting
+- Update help documentation:
+  - Explain new refresh functionality
+  - Add howto on toggling show entire volume setting
+  - Remove outdated guidance on adding color palettes
+  - Explain how filters work in combination with packages
+  - Minor editing improvements
+
+Refactoring:
+- Extend, unify and generalize item tree traversal
+- Explicitly separate DirectoryItem children by file type
+- Mark unavailable designated initializers using NS_UNAVAILABLE
+- Use dispatch_once for all singleton and default instances
+- Apply property syntax to entire codebase
+
+
+----------------------------------------------------------------------
+  Version 2.6.3, 07-04-2022
+----------------------------------------------------------------------
+
+Minor improvement:
+- Let progress panel show paths where significant time is spent [#105]
+
+Fixes:
+- Fixed: Crash when using search
+- Fixed: Crash when previewing very small items
+- Fixed: Selected item rectangle does not always update
+
+
+----------------------------------------------------------------------
+  Version 2.6.2 (localized v1), 20-02-2022
+----------------------------------------------------------------------
+
+New localizations:
+- Finnish, by Mikko Oksalahti
+
+
+----------------------------------------------------------------------
+  Version 2.6.2, 03-02-2022
+----------------------------------------------------------------------
+
+Fixes:
+- Fixed: Black pixel artefacts during zoom-in animation [#94]
+
+
+----------------------------------------------------------------------
+  Version 2.6.1, 29-01-2022
+----------------------------------------------------------------------
+
+Improvements:
+- Animate view change when zooming in or out
+- Animate selection change when changing focus
+- Animate selection change when using keyboard navigation
+
+Minor improvements:
+- Update help on how to scan hidden folders
+
+Fixes:
+- Fixed: Various minor memory leaks
+
+Known issue:
+- Black pixel artefacts during zoom-in animation [#94]
+
+
+----------------------------------------------------------------------
+  Version 2.6.0, 16-01-2022
+----------------------------------------------------------------------
+
+New functionality:
+- Enable keyboard navigation [#103]
+
+Improvements:
+- Improve progress dialog (by Aaron Madlon-Kay)
+  - Use mono-spaced font for summary in progress window
+  - Show delimiters in progress count
+- Improve visibility of selected item
+
+Fixes:
+- Fixed: Character encoding issues in Dutch help
+- Fixed: "Column selection is not supported" warning
+
+
+----------------------------------------------------------------------
+  Version 2.5.4 (localized v1), 13-12-2020
+----------------------------------------------------------------------
+
+New localizations:
+- French, by Marc Croteau
+
+
+----------------------------------------------------------------------
+  Version 2.5.4, 21-11-2020
+----------------------------------------------------------------------
+
+Improvement:
+- Update icon to comply with Big Sur guidelines [#100]
+
+
+----------------------------------------------------------------------
+  Version 2.5.3, 15-11-2020
+----------------------------------------------------------------------
+
+Improvements:
+- Add support for Apple Silicon by releasing app as Universal
+- Update UI for macOS Big Sur (most notably, updated toolbar)
+
+Minor improvements:
+- Address toolbarItem size deprecation warnings
+- Improve "reset" toolbar item (by flipping it horizontally)
+
+Bug fixes:
+- Fixed: Error when building published source files [#87]
+- Fixed: First character incorrectly marked as invisible in status bar
+  when the entire drive is scanned
+
+
+----------------------------------------------------------------------
+  Version 2.5.2 (localized v1), 04-07-2020
+----------------------------------------------------------------------
+
+Updated localizations:
+- Chinese (Simplified)
+- German
+- Italian
+- Turkish
+
+
+----------------------------------------------------------------------
+  Version 2.5.2, 28-06-2020
+----------------------------------------------------------------------
+
+New functionality:
+- Add option to Rescan with Mask as Filter
+
+Improved functionality:
+- Improve logic for filters with multiple tests:
+  - For inverted tests, none should match
+  - For normal tests, any should match
+- Increased text size in status bar
+
+Updated localizations:
+- Chinese (Simplified)
+- German
+- Italian
+- Turkish
+
+
+----------------------------------------------------------------------
+  Version 2.5.1, 21-06-2020
+----------------------------------------------------------------------
+
+New functionality:
+- Search for files by name via the toolbar [#91]
+- Clear history of recent scans from Start window [#95]
+
+Bug fixes:
+- Fixed: Crash when scanning an empty folder [#85]
+- Fixed: Crash when cancelling first scan
+- Fixed: Let Start window re-appear when user cancelled scan from the
+  folder selection dialog
+
+
+----------------------------------------------------------------------
+  Version 2.5.0, 13-06-2020
+----------------------------------------------------------------------
+
+New functionality:
+- Report actual size for iCloud files when logical file size measure
+  is used [#92]
+
+Minor improvements:
+- Removed usage of deprecated NSAlert method
+- Set deployment target to macOS 10.9
+
+Bug fixes:
+- Fixed: Missing secondaryLabelColor on macOS 10.9 [#81]
+- Fixed: Crash due to assertion when loading filter [#82]
+- Fixed: Crash when re-scanning deleted folder [#84]
+
+
+----------------------------------------------------------------------
+  Version 2.4.3, 16-04-2020
+----------------------------------------------------------------------
+
+Minor fix:
+- Fix compiler warnings in FileItemTests
+- Specify read-only entitlements for Movies, Music, Pictures and
+  Downloads
+
+New localization:
+- Italian, by Mattia Mazzucchelli
+
+
+----------------------------------------------------------------------
+  Version 2.4.2, 24-01-2020
+----------------------------------------------------------------------
+
+Updated localizations:
+- Chinese (Simplified)
+- German, updates provided by new contributor Carsten Bracke
+
+
+----------------------------------------------------------------------
+  Version 2.4.1, 21-01-2020
+----------------------------------------------------------------------
+
+New functionality:
+- Initiate scan by dropping folder on Welcome panel [#90]
+
+Updated localizations:
+- Turkish, updates provided by new contributor Emir Sarı
+
+Bug fix:
+- Fixed: Crash when scanning folder on Data volume [#80]
+- Fixed: NSColorList could not parse color list file, macOS 10.9 [#81]
+
+
+----------------------------------------------------------------------
+  Version 2.4.0, 10-01-2020
+----------------------------------------------------------------------
+
+Improved:
+- Replaced drawer of view window by Control Panel. Benefits:
+  - Improved adherence to Apple design guidelines
+  - Reduced screen clutter (as the panel is shared by all views)
+  - Increased flexibility in placement on screen
+  - Improved look in Dark mode
+- Replaced drawer in Uniform Type Ranking panel by tool tips
+
+Bug fix:
+- Fixed: Text of comments in Info tab is wrong color in Dark mode
+
+
+----------------------------------------------------------------------
+  Version 2.3.2, 22-12-2019
+----------------------------------------------------------------------
+
+Minor improvement:
+- Added usage descriptions when requesting privileges required to scan
+  privacy-related files
+
+
+----------------------------------------------------------------------
+  Version 2.3.1, 22-12-2019
+----------------------------------------------------------------------
+
+Minor improvements:
+- Added extra constraints to UI to resolve several layout warnings
+
+Updated localizations:
+- Chinese (Simplified)
+- Portuguese
+
+Bug fix:
+- Fixed: Color by Creation causes crash in Turkish localization
+
+
+----------------------------------------------------------------------
+  Version 2.3.0, 08-12-2019
+----------------------------------------------------------------------
+
+New functionality:
+- Added ability to export scan data as text
+  - Configurable column selection. Options: Path, Filename, Size,
+    Type, Creation time, Modification Time, and Last access time
+  - You can optionally add a header
+
+Minor improvements:
+- Updated help on how to identify miscellaneous used space
+
+Bug fixes:
+- Fixed: Incorrect times stored in saved Scan Data [#78]
+- Fixed: Starting a scan via Start Window scans wrong folder after a
+  scan has been performed [#79]
+
+
+----------------------------------------------------------------------
+  Version 2.2.3, 15-08-2019
+----------------------------------------------------------------------
+
+Minor improvement:
+- Simplified way of selecting folder to scan in the Start Window
+
+New localization:
+- Portuguese, by Aristóteles Soares Benicio
+
+
+----------------------------------------------------------------------
+  Version 2.2.2, 04-08-2019
+----------------------------------------------------------------------
+
+Bug fixes:
+- Fixed: Crash when scanning certain folders in macOS 10.15 (Catalina
+  beta) [#76]
+- Fixed: Crash when determining delete permission (Catalina beta)
+- Fixed: Do not scan contents of Data volume twice (Catalina beta)
+
+
+----------------------------------------------------------------------
+  Version 2.2.1, 05-05-2019
+----------------------------------------------------------------------
+
+Minor improvements:
+- Extended help with Tally file size measure
+- Extended help to document how to grant Full Disk Access
+
+Bug fix:
+- Minor fix to highlighting of path in status bar
+
+
+----------------------------------------------------------------------
+  Version 2.2.0, 21-03-2019
+----------------------------------------------------------------------
+
+New functionality:
+- Added "Tally" file size measure [#43]
+
+Minor improvements:
+- Improved look of toolbar in Dark Mode
+- Re-enabled Services for initiating Scan and loading Scan Dumps
+- Minor improvements to auto-layout
+
+Bug fixes:
+- Fixed: Status bar does not have correct Dark Mode [#73]
+- Fixed: Crash due to assertion failure in ScanProgressTracker [#72]
+
+
+----------------------------------------------------------------------
+  Version 2.1.2, 18-12-2018
+----------------------------------------------------------------------
+
+Minor fix:
+- Defined LSMinimumSystemVersion (to pass App Store validation)
+
+
+----------------------------------------------------------------------
+  Version 2.1.1, 10-12-2018
+----------------------------------------------------------------------
+
+Minor improvements:
+- Also show Welcome window after aborting a scan or load task
+- Enabled symbol generation (to facilitate analysing crash reports)
+- Re-enabled optional verbose logging when scanning
+- Changed default file size measure to physical
+
+Bug fixes:
+- Fixed: Cancelling a scan can cause a crash [#68]
+- Fixed: Crash when showing alert after scanning [#69]
+
+
+----------------------------------------------------------------------
+  Version 2.1.0, 07-12-2018
+----------------------------------------------------------------------
+
+Minor improvements:
+- After scan show warning when the logical file size was larger than
+  the actual (physical) file size
+- Extended help on file sizes to cover sparse files [#88] and
+  online-only Dropbox files [#80]
+- Added configuration setting for specifying behaviour after the last
+  view window closes. Options are:
+  - Do nothing
+  - Quit [#84]
+  - Show Welcome window [#82]
+- Auto-close welcome window after an external action [#83]
+- Notarized the application for additional assurance
+
+Bug fixes:
+- Fixed: Can't quit/about from welcome dialog [#60]
+- Fixed: View-dependent menu items sometimes wrongly enabled [#64]
+- Fixed: "Failed to initialize color list unarchiver" on macOS Mojave
+  [#66]
+- Fixed: Exception when moving focus up [#67]
+
+
+----------------------------------------------------------------------
+  Version 2.0.0 (localized v1), 22-10-2018
+----------------------------------------------------------------------
+
+New localization:
+- German, by Klaus Rade
+
+Other localizations:
+- Chinese (Simplified), by Albert Leng
+- Turkish, by Alp Tunc
+- Dutch, by Erwin Bonsma
+
+
+----------------------------------------------------------------------
+  Version 2.0.0, 04-02-2018
+----------------------------------------------------------------------
+
+Improvements:
+- Significantly reduced scan-time on macOS 10.13 (and up). It is about
+  eight times faster now
+  - Note: On earlier versions of macOS scanning is about 60% slower
+- Significantly reduced memory usage when writing scan data
+- Significantly reduced memory usage when reading scan data
+
+Refactoring:
+- Changed scanning to use NSDirectoryEnumerator instead of deprecated
+  FSGetCatalogInfoBulk API
+- Changed source code layout to switch to 100 character line limit
+- Changed internal component representation for FileItems
+- Removed use of deprecated tableView:writeRows:toPasteboard API
+
+Bug fixes:
+- Fixed: Slow scan macOS 10.13 [#53]
+- Fixed: Cannot correctly close windows/pop-ups [#54]
+- Fixed: Remove button does not work in Filter Test Window
+- Fixed: The Save Image dialog can add a decimal separator to the
+  width and height fields, which can result in images being stored
+  with incorrect dimensions.
+- Fixed: Cancelling read of scan data occasionally triggers a crash
+
+
+----------------------------------------------------------------------
+  Version 1.9.1 (localized v2), 19-11-2017
+----------------------------------------------------------------------
+
+New localization:
+- Turkish, by Alp Tunc
+
+Other localizations:
+- Chinese (Simplified), by Albert Leng
+- Dutch, by Erwin Bonsma
+
+
+----------------------------------------------------------------------
+  Version 1.9.1 (localized v1), 08-11-2017
+----------------------------------------------------------------------
+
+New localization:
+- Chinese (Simplified), by Albert Leng
+
+Other localizations:
+- Dutch, by Erwin Bonsma
+
+
+----------------------------------------------------------------------
+  Version 1.9.1, 05—03-2017
+----------------------------------------------------------------------
+
+Minor improvements:
+- Extended Help with section on "How to determine what is taking up
+  miscellaneous used space"
+
+Bug fix:
+- Fixed: Quick Look panel does not close after selection change. [#78]
+
+
+----------------------------------------------------------------------
+  Version 1.9.0, 26—02-2017
+----------------------------------------------------------------------
+
+New functionality:
+- Added ability to preview selected items using Quick Look. [#58]
+- Added controls to toolbar to reset zoom and focus. [#60]
+
+Minor improvements:
+- Extended Help on file size measures to describe how GrandPerspective
+  reports the size of HFS+ compressed files.
+- Extended Help with howto on scanning packages.
+
+Minor refactoring:
+- Cleaned up code to resolve compiler warnings generated by XCode 8.0.
+
+Bug fixes:
+- Fixed: Dock icon does not accept drag and drop. [#49]
+- Fixed: Assertion failure when load of scan tree was cancelled.
+
+
+----------------------------------------------------------------------
+  Version 1.8.1, 31—08-2016
+----------------------------------------------------------------------
+
+Bug fixes:
+- Fixed: The previous version was published incorrectly, which caused
+  the following error "GrandPerspective is damaged and can’t be
+  opened"
+- Fixed: Including actual help documentation (instead of place-holder
+  help)
+- Minor fixes to app to be compatible with App Store requirements:
+  changed install path, set application category type, and updated
+  CFBundleDocumentTypes.
+
+
+----------------------------------------------------------------------
+  Version 1.8.0, 30—08-2016
+----------------------------------------------------------------------
+
+Improvements:
+- Updated the application to support Base Internationalization. This
+  makes it easier for other contributors to provide translations for
+  other locales.
+- Updated the progress panels to replace details of folder being
+  scanned by a determinate progress bar.
+
+Minor improvements:
+- Extended Help with section "How To Handle Crashes when Scanning" to
+  document the -logAll commandline argument.
+- Extended Help with section "How to explain differences in reported
+  sizes" which covers the various intricacies in this area.
+
+Bug fixes:
+- Fixed: The Uniform Type Ranking window did not always open again
+  after it had been closed. [#39]
+- Fixed: Let Escape key close Filter Selection Panel, Welcome
+  Window, and Filters Window. [#40]
+- Fixed: When the free size reported by the system was not fully
+  accurate, the miscellaneous used space was incorrectly set to a
+  huge value. [#41]
+- Fixed: Using the same filter more than once failed because of an
+  assert failure. [#43]
+- Fixed: Rescan did not work on views created by filtering an existing
+  view. [#44]
+- Fixed: The filter description in the Filter window was not always
+  updated when the selected filter view changed.
+
+
+----------------------------------------------------------------------
+  Version 1.7.0, 05-05-2016
+----------------------------------------------------------------------
+
+New functionality:
+- Added "Recent Scans" menu item to easily repeat common scans across
+  invocations of the app.
+- Added Welcome window on start-up (instead of popping up Scan
+  Dialog).
+  - The new window shows the application icon to clearly associate it
+    with the app, as well as a random tagline describing the app.
+  - The new window still lets you start a new scan.
+  - The new window also offers the ability to repeat a recent scan or
+    to go to the help documentation, which may help new users.
+- Prepared app for distribution in Mac App Store by enabling sandbox
+  - Delete options will be disabled when the app does not have the
+    necessary write permissions.
+
+Minor improvements:
+- Extended Help with "Quick Start" section.
+
+Bug fixes:
+- Fixed three minor memory leaks.
+
+
+----------------------------------------------------------------------
+  Version 1.5.3, 24-04-2016
+----------------------------------------------------------------------
+
+Minor improvements:
+- Digitally signed application to avoid Gatekeeper security warning,
+  at least, as long as you allow apps downloaded from "Mac App Store
+  and identified developers"
+- Updated app icons to add Retina resolutions
+
+
+----------------------------------------------------------------------
+  Version 1.5.2, 17-04-2016
+----------------------------------------------------------------------
+
+Minor improvements:
+- Extended "No Version control" filter to also exclude Mercurial, git
+  and Bazaar admin folders
+
+Refactoring:
+- Moved source code from svn to git
+
+Bug fixes:
+- Fixed reading/writing of datetime values when loading/saving scan
+  date to reflect changes in default date format introduced in OS X
+  10.11 [#37]
+- Updated source code for XCode 7.2. Fixed various warnings [#38]
+
+
+----------------------------------------------------------------------
+  Version 1.5.1, 25-08-2012
+----------------------------------------------------------------------
+
+Minor improvements:
+- Added support for reporting file sizes with decimal-based units
+  (where 1 kB is 1000 bytes instead of 1024 bytes). [#3556570]
+- Added ability to copy path of selected item to paste board.
+  [#3537974]
+
+Bug fixes:
+- Fixed bug: Rescanning a deleted directory could crash the app
+  [#3552571]
+
+
+----------------------------------------------------------------------
+  Version 1.5.0, 30-04-2012
+----------------------------------------------------------------------
+
+New functionality:
+- Added color mappings based on creation, modification and access
+  time:
+  - Added heatmap palettes optimized for usage in time-based mappings.
+  - Extended the focus panel to also show the creation, modification
+    and last access time for the selected file.
+
+Minor improvements:
+- Sorting items in pop-ups alphabetically.
+- Removed dependencies on deprecated methods.
+
+Bug fixes:
+- Fixed bug: Revealing of files did not work on loaded scan data.
+- Fixed bug: Scan data could not be loaded when file names contained
+  strange characters (e.g. linebreaks and non-printing characters)
+- Fixed bug: Application could crash because disposed views were still
+  observing events.
+
+
+----------------------------------------------------------------------
+  Version 1.3.4, 27-03-2012
+----------------------------------------------------------------------
+
+Minor improvements:
+- Automatically show Scan dialog when opening application.
+- Added preference for showing entire volume.
+- Improved labels and layout of preferences dialog.
+- Changed keyboard short-cuts for File commands to match standard
+  look & feel.
+- Made source code compatible with XCode 4.3.
+
+Bug fixes:
+- Fixed bug #3498256 by removing check introduced to track bug
+  #2989277.
+- Fixed bug: Using path-based tests in filters or masks in combination
+  with zero sized directories could prematuraly free memory.
+- Fixed bug: Mask settings were not carried over when twinning or
+  duplicating windows.
+
+
+----------------------------------------------------------------------
+  Version 1.3.3, 24-05-2010
+----------------------------------------------------------------------
+
+Minor improvements:
+- Made usage of memory zones for scan tree configurable (default,
+  dedicated shared, or dedicated private). Now defaulting to default
+  memory zone.
+- Added checks and verbose logging in TreeBuilder to help trace bug
+  #2989277: Crashes on Scan of Boot Volume.
+- Minor fix to TmpDirInfo-dealloc (may fix bug #2989277?)
+
+Bug fixes:
+- Plugged a big memory leak: The scan tree was never released.
+- Plugged a small memory leak in UniformTypeInventory.
+
+
+----------------------------------------------------------------------
+  Version 1.3.2, 17-04-2010
+----------------------------------------------------------------------
+
+Minor improvements:
+- Added two more rescan commands: "Rescan folder in view" and "Rescan
+  selected".
+  - Both commands are available from the toolbar by way of a pop-up
+    menu. Thanks to Keith Blount for sharing the delayed pop-up code
+    that enables this.
+  - "Rescan selected" is also available from the context menu.
+  - In the Preferences you can specify the default rescan action.
+- The selection does not have to be locked anymore for the context
+  menu to be available.
+- Added optional detailed logging when scanning (useful for
+  troubleshooting).
+
+Bug fix:
+- Fixed bug: After a rescan the focus can move down when it should.
+
+
+----------------------------------------------------------------------
+  Version 1.3.1, 13-03-2010
+----------------------------------------------------------------------
+
+Minor improvement:
+- Application now also accepts drops of folders and volumes (Feature
+  request #2789715)
+- Exported Scan Folder and Load Scan Data as a service.
+  - Added Services menu item to application menu (it wouldn't be fair
+    otherwise now, would it? ;-)
+
+Bug fix:
+- Fixed bug #2935266: Cannot open or reveal files with slashes in
+  their names.
+
+
+----------------------------------------------------------------------
+  Version 1.3.0, 17-01-2010
+----------------------------------------------------------------------
+
+New functionality:
+- Improvements to filters (and masks):
+  - All filters now have names that can be used to select them:
+    - Select filters from the new filter selection panel.
+    - Select masks using a pop-up button in the Display panel.
+  - The application comes with a couple of filters out of the box.
+  - User-created filters are automatically stored in the preferences
+    so you can use them again later.
+  - Scan dumps now include information about filters that were used,
+    both their names as well as the filter tests they contain.
+  - Enabled individual inversion of tests in a filter.
+
+Refactoring:
+- Converted all NIBs to XIBs.
+- Renamed several windows and their control classes.
+
+Bug fix:
+- Fixed bug #1947382: Typing return in Rule Name field can cause rule
+  completion.
+
+
+----------------------------------------------------------------------
+  Version 1.1.0, 26-09-2009
+----------------------------------------------------------------------
+
+Minor improvements:
+- Added number of scanned and deleted files to Info panel.
+- Added Rescan button to toolbar.
+- Rescan can now optionally close the old window.
+- Added context menu to views to let you Reveal, Open and Delete
+  selected files.
+- Added ability to store user-editable comments with saved scan data.
+- Scan data is now stored in files with a .gpscan extension.
+  - These files have their own icon and filetype, and are associated
+    with the application.
+- You can now invoke the application from the command line with:
+  - a path of a folder to scan, or
+  - a path of a scan data file to load.
+
+Bug fixes:
+- Fixed bug #2562846: Failure to load scan data
+  - Incorrect saving of scan data in OS X 10.4 should be fixed now.
+- Freed space did not correctly reflect deletion of hard-linked files.
+
+Documentation:
+- Added various advanced "How To" sections to the help documentation.
+
+
+----------------------------------------------------------------------
+  Version 1.0 (localized), 22-12-2008
+----------------------------------------------------------------------
+
+Updated localizations:
+- Japanese, by Chris Li
+- French, by Maxime Hadjinlian
+- Dutch, by Erwin Bonsma
+
+
+----------------------------------------------------------------------
+  Version 1.0, 22-12-2008
+----------------------------------------------------------------------
+
+New functionality:
+- Added a customizable toolbar, including new controls:
+  - Added control for changing the focus (which previously could only
+    be done using the keyboard or scrollwheel).
+  - Added new "Open with Finder" action (not to be confused with
+    existing "Reveal in Finder" action).
+
+Minor improvements:
+- Improvements to the appearance of the view window:
+  - Moved info about selected item to statusbar.
+  - Removed borders around view.
+  - Not showing rectangle around outermost item in the selected path
+    unless necessary.
+- Positioning newly opened view windows so they cascade.
+- When creating a derived view window its size matches that of the
+  original window.
+- Sorted the available tests in the "Edit Filter" window by name.
+- Sibling directories are scanned depending on their creation date
+  (oldest first). This deterministic ordering is particularly helpful
+  when scanning an entire TimeMachine backup as hard-linked files
+  will be included in the backup where they first appeared.
+- Made selection automatically stick to end-point when reaching a
+  file after moving selection down a level.
+- When resizing the window the view is still being shown.
+- Added keyboard shortcuts for zooming.
+- Added menu item for visiting the GrandPerspective website.
+- The selection only follows the mouse when the view window has main
+  status.
+- Now also setting hardlink and package status for root of scan tree.
+- Showing an alert when an invalid date value is encountered when
+  loading scan data.
+- Alerts created by a view window are now all shown as sheets of that
+  window.
+- Moved horizontal drawers away from the window's left edge.
+- The initial size of windows and the color gradient for drawing
+  rectangles in the view are now taken from the user defaults.
+- Moved description of file type in Focus panel from separate text
+  field to tooltip of the file type identifier.
+
+Bug fixes:
+- Included workaround for bug #2243134 (crash while scanning NTFS
+  mounted filesystem).
+- Coloring by Level would end up in endless loop for packages at
+  level zero when package contents were hidden. Not anymore.
+- Aborting a drawing task that was just about to complete could
+  result in premature aborting of next task. Not anymore.
+- Closed Edit Mask windows would reappear when the application
+  got activated again after reactivation. They now remain hidden.
+
+Code clean-up:
+- Renamed FileItem -isSpecial to -isPhysical (and inverted meaning)
+- Simplified abortion of background tasks (removed enabled state
+  from TaskExecutor).
+- Moved zoom and focus functionality to DirectoryView.
+
+
+----------------------------------------------------------------------
+  Version 0.9.13.1 (localized), 01-10-2008
+----------------------------------------------------------------------
+
+Updated localizations:
+- Japanese, by Chris Li
+- Spanish, by Javier Alfonso
+- French, by Maxime Hadjinlian
+- Dutch, by Erwin Bonsma
+
+
+----------------------------------------------------------------------
+  Version 0.9.13.1, 29-08-2008
+----------------------------------------------------------------------
+
+Bug fixes:
+- Fixed "silly typo" bug that caused crashes when scanning.
+- Failures of FSRefMakePath do not abort scanning anymore, but are
+  handled gracefully instead.
+
+
+----------------------------------------------------------------------
+  Version 0.9.13, 26-08-2008
+----------------------------------------------------------------------
+
+New functionality:
+- Scan data can now be saved to an XML file and loaded again at a
+  later time.
+- Progress of ongoing scan, filter, save, and load tasks is now
+  reported.
+
+Minor improvements:
+- All text fields in the view's drawer are now selectable.
+- Views are immediately cleared when they are resized.
+- Reduced the amount of memory needed when scanning and filtering.
+- The trees used to store scan results are now stored in a dedicated
+  memory zone to minimise fragmentation and optimise memory usage.
+
+Bug fixes:
+- Plugged a big memory leak. The image was not released when the view
+  was resized. This has been fixed.
+- The drawer of the Edit Filter window could be detached from its
+  window. This cannot happen anymore.
+- Aborting a filter task would create a view anyway. Not anymore.
+- Now obtaining readlock on the tree before filtering.
+
+Code clean-up:
+- Replaced all remaining NSBrowsers by NSTableViews.
+- Moved TaskExecutor protocol from "util" folder to "task".
+- Placed ProgressPanelControl and its new subclasses into the
+  "control/progress" subfolder.
+- Renamed various classes and methods.
+
+
+----------------------------------------------------------------------
+  Version 0.9.12.1, 14-06-2008
+----------------------------------------------------------------------
+
+Bug fix:
+- [1990250] Applying a Path test on folders in a filter could crash
+  the application. This has been fixed.
+
+Minor improvements:
+- Extended help documentation to better explain how tests on folders
+  function.
+
+
+----------------------------------------------------------------------
+  Version 0.9.12, 10-06-2008
+----------------------------------------------------------------------
+
+New functionality:
+- Hard-linked files and folders are recognized and handled
+  appropriately.
+- Mask and filter rules can now optionally be applied to folders.
+- Added Filtered Scan command, which lets you apply a filter while
+  scanning.
+- Optionally showing package contents.
+- Added several new tests for mask and filter rules (on file type,
+  package status, and hard link status)
+
+Minor improvements:
+- Improved application-default ranking of uniform types.
+- Added new application-provided tests (Packages and Hard-linked
+  items) and updated existing ones.
+- Improved GUI of "Edit Filter Rule" window.
+- Made progress panel resizable.
+- Case-sensitivity of string tests is now reflected in their
+  description.
+
+Bug fixes:
+- Files inside a package can now be revealed (unless the package is
+  itself in a package).
+- Filtering produced corrupt trees (PlainFileItems were replaced by
+  FileItems), which could trigger various exceptions. This has been
+  fixed.
+- Fixed synchronisation in TreeContext.
+- AsynchronousTaskManager now unlocks its locks before releasing them.
+
+Code clean-up:
+- Introduced ItemPathModelView for managing view-specific selection
+  path state.
+- Introduced FilteredTreeGuide for applying masks and filters.
+- FileItems are now duplicated using factory methods.
+- Refactored TreeBuilder.
+- Removed several warnings when compiling using XCode 3.0.
+- Renamed "filter" folder to "test".
+- Renamed various classes, methods and member variables.
+- Removed some unnecessary nesting.
+
+
+----------------------------------------------------------------------
+  Version 0.9.11 (localized), 22-04-2008
+----------------------------------------------------------------------
+
+Updated localizations:
+- Japanese, by Chris Li
+- Dutch, by Erwin Bonsma
+
+
+----------------------------------------------------------------------
+  Version 0.9.11, 18-03-2008
+----------------------------------------------------------------------
+
+New functionality:
+- Files and folders can now be deleted from the view window:
+  - Deletion can be enabled and disabled from the Preferences, with
+    optional required confirmation.
+  - The view updates itself to show freed space.
+  - The total amount of freed space is shown in the Info panel.
+- Added coloring by file type:
+  - The hierarchical Uniform Type system of OS X is used as a basis.
+  - A color legend in the Display panel shows the file type that
+    corresponds to each color.
+  - The types that are assigned a different color can be controlled
+    in the Preferences by changing the order of the uniform types.
+  - The list of new uniform types is dynamically extended as new
+    types are encountered during scanning.
+
+Minor improvements:
+- Improved drawer of the view window:
+  - The Focus panel now shows the file type of the selected item.
+  - The width of the drawer can be increased.
+  - Improved wrapping/scrolling of text fields in the Info panel.
+- Renamed "Depth" color mapping scheme to "Level". The newly added
+  color legend shows the level that is associated with each color.
+
+Bug fixes:
+- Removed race condition in view redrawing code that could trigger
+  a near endless cycle of view redrawings.
+- It was possible to show multiple preference panels at once. Not
+  anymore.
+- Made it impossible to change the names of application-provided
+  rules. Furthermore, now correctly showing the localized namee.
+
+Code clean-up:
+- Using constants for all event strings and user default keys.
+- Application defaults are now set in the Info.plist file.
+- Improved reverse look-up of localized keys.
+- Moved all Item classes to the "tree" folder.
+- Moved all file item hashing related classes to a separate folder.
+
+
+----------------------------------------------------------------------
+  Version 0.9.10 (localized), 20-01-2008
+----------------------------------------------------------------------
+
+New localizations:
+- Spanish, by Javier Alfonso
+- French, by Maxime Hadjinlian
+
+Updated localizations:
+- Japanese, by Chris Li
+- German, by Helge Baumann
+- Dutch, by Erwin Bonsma
+
+
+----------------------------------------------------------------------
+  Version 0.9.10, 12-12-2007
+----------------------------------------------------------------------
+
+New functionality:
+- Added ability to show the entire volume on which the scanned folder
+  resides, including free space.
+- Added ability to select folders in the view window. By default,
+  files are still selected, but you can select folders using the
+  scrollwheel of the mouse or the "[" and "]" keys.
+
+Minor improvements:
+- The "Info" panel has been pimped:
+  - It more elegantly shows the folder that has been scanned,
+    together with the volume it is on.
+  - It now also shows the size of volume and the amount of
+    miscellaneous used space.
+- Added more color palettes, each with at least eight colors. Removed
+  several old palettes that had relatively few colors.
+- Made the path to the selected file more clearly visible in the view.
+- Improved drawing of the view so that it does not unnecessarily
+  "flash" when it is updated.
+
+Minor meta changes:
+- Changed version numbering scheme to allow this release before
+  releasing Version 1.00. (Just insert a dot in the version numbers
+  of all earlier releases for the new numbering to make sense)
+
+Code clean-up:
+- Drastically refactored the code in order to cleanly add the new
+  functionality.
+
+
+----------------------------------------------------------------------
+  Version 0.99 (localized), 28-03-2007
+----------------------------------------------------------------------
+
+Updated localizations:
+- Japanese, by Chris Li
+- German, by Helge Baumann
+- Dutch, by Erwin Bonsma
+
+
+----------------------------------------------------------------------
+  Version 0.99, 24-02-2007
+----------------------------------------------------------------------
+
+New functionality:
+- Added choice of file size measure. You can choose between logical
+  file size (the default), and physical file size.
+- Added help. Hopefully rarely needed, but at least it exists.
+
+Changes to the release files:
+- The application has been released as a Universal Binary.
+- The source release has been extended, and now includes everything
+  needed to build the application. Newly included:
+  - The (cleaned up) project file.
+  - The help documentation.
+  - All Dutch resources (as an example for other localizers).
+
+Tiny changes:
+- Made titles of various panels and their default buttons more
+  specific.
+- Moved all localizable names into new Names.strings file.
+- Moved all color palettes into "Palettes" subfolder.
+- Enlarged bounding box of text fields where there was room (to
+  facilitate localization).
+
+Bug fixes:
+- Enabling a filename or path test without specifying any strings
+  does not give an error anymore.
+- It was possible to specify a negative file size bound, which
+  resulted in a very large size. Not any more.
+- It was possible (to attempt) to save an image with a dimension that
+  was zero or negative. This resulted in an exception. Not anymore.
+- When a "void" test was returned after adding or editing a mask or
+  filter rule an exception occurred. This has been fixed.
+
+
+----------------------------------------------------------------------
+  Version 0.98 (localized), 09-01-2007
+----------------------------------------------------------------------
+
+Updated localizations:
+- Japanese, by Chris Li
+- German, by Helge Baumann
+- Dutch, by Erwin Bonsma
+
+
+----------------------------------------------------------------------
+  Version 0.98, 15-12-2006
+----------------------------------------------------------------------
+
+New functionality:
+- Masking and filtering rules that are created (or modified) by the
+  user are now stored in the user preferences so that they are
+  available next time the application is run.
+- The default file item tests are now read from the information
+  properties file, instead of being hardcoded in the application.
+- String tests support case-insensitive matching.
+- Now also showing human-friendly file sizes in the Info and Focus
+  panels.
+- Added button for removing all tests from the filter in the
+  "Edit Filter" window.
+
+Minor improvements:
+- The path test now applies to path of the folder where the file item
+  resides (excluding the name of the file itself). This way it better
+  complements the name test.
+- Path strings are cached during filtering or drawing of the file
+  item tree for improved performance.
+- Changed size of main window to 640x480.
+- Internationalized the OK and Cancel buttons of alert panels.
+
+Bug fix:
+- When an image was saved, the "Clown Barf" palette was always used,
+  irrespective of the palette used by the view. This has been fixed.
+- The CFBundleSignature, CFBundleIdentifier, and CFBundleVersion
+  properties in Info.plist were not set correctly. This, for instance,
+  meant that preferences were incorrectly associated with the
+  example com.apple.myCocoaApp application. This has been fixed.
+
+
+----------------------------------------------------------------------
+  Version 0.97 (localized), 10-12-2006
+----------------------------------------------------------------------
+
+New localizations:
+- Japanese, by Chris Li
+- German, by Helge Baumann
+- Dutch, by Erwin Bonsma
+
+
+----------------------------------------------------------------------
+  Version 0.97, 14-11-2006
+----------------------------------------------------------------------
+
+New functionality:
+- There is now a choice of color palettes.
+  - The palettes that can be chosen have been taken from the
+    ColorSchemer gallery at http://www.colorschemer.com/schemes/.
+    Thanks to the following users for providing one or more color
+    schemes: copperblue, tumuchtime, Jalle, Nemoflow, and rageforst.
+- Preferences can now be changed and stored. This means that you
+  can change the default color mapping and default color palette.
+- The application has been fully internationalized. This means that
+  localized versions can now be generated.
+  - See LOCALIZATION.TXT for details on how you can help to make
+    GrandPerspective available in your language.
+
+Minor improvements:
+- Zero-sized items are not included in the tree anymore. This
+  reduces the memory footprint and stops tree paths from being
+  drawn when the tree has a total size of zero.
+
+Code clean-up:
+- Renamed FileItemHashingOptions to FileItemHashingCollection and
+  more generally made it match the new ColorListCollection class.
+  Also renamed instances of FileItemHashing to colorMapping.
+
+Bug fixes:
+- Closing Filter Window would freeze application (see 1562627)
+- Selecting an empty filter would throw an assertion (see 1562627).
+- It used to be possible for a test that was not available to be
+  selected anyway, which could cause various anomalous behaviours.
+
+
+----------------------------------------------------------------------
+  Version 0.96, 12-08-2006
+----------------------------------------------------------------------
+
+New functionality:
+- Added ability to filter a directory view window, which generates a
+  new window with a "filtered view". The filter determines which
+  files are shown in the new window.
+  - If a filter has been applied this is reflected in the window
+    title.
+- Added a drawer to directory view windows. It has three panels:
+  - An "Info" panel with details about the files that are shown in
+    the view, including:
+    - the time of scan,
+    - the folder that was scanned, and
+    - details of the filter that has been applied (if any).
+  - A "Display" panel for configuring the way the view is drawn.
+    Here you can specify:
+    - how files are colored, and
+    - the mask that is used (if any).
+  - A "Focus" panel with details about:
+    - the folder that is currently shown in the view, and
+    - the file that is currently selected.
+
+- Tiny changes:
+  - The button for revealing a file in Finder has been renamed to
+    "Reveal" (it used to be "Show").
+  - The file coloring options "directory" and "top directory" have
+    been renamed to "folder" and "top folder" respectively.
+  - Cosmetic changes to the "Edit Filter" window.
+
+Code cleanup:
+- The progress panel has been refactored. It is now also used when
+  filtering takes place.
+- All tasks and executors have been moved to a new "task" folder.
+- Simplified the code that creates the attributed string for the
+  selected file.
+- The contents of PopUpButtons are now set in their nib file instead
+  of programmatically.
+
+Bug fix:
+- Plugged a memory leak in the image drawing code.
+
+
+----------------------------------------------------------------------
+  Version 0.95, 05-07-2006
+----------------------------------------------------------------------
+
+New functionality:
+- Added ability to mask files. When a file is masked it is not drawn,
+  but still takes up space in the view. Masking files is handy for
+  quickly spotting certain types of file.
+  - A mask can be quickly enabled or disabled.
+  - A test for masking can be created quickly by selecting one or
+    more existing rules.
+  - Existing rules can be edited and new ones can be created.
+  - Rules can take the name of the file into account, its size, and
+    its path.
+  - Rules can be identified by their friendly name, but a full
+    description can optionally also be shown.
+
+Tiny changes:
+- Added coloring by "top directory" option as suggested by Adrian
+  Sampson (ID 1501479).
+- Made color-mapping choice in directory view a pop-up button.
+- Added keyboard shortcuts for Re-scan and Filter commands.
+- The SaveImageDialog is now centered.
+
+Code cleanup:
+- The code is now spread across various folders.
+- Made implementation of TreeLayoutTraverser protocol explicit.
+- Split BalancingTreeBuilder in two: TreeBuilder and TreeBalancer.
+
+
+----------------------------------------------------------------------
+  Version 0.94, 09-05-2006
+----------------------------------------------------------------------
+
+New functionality:
+- There is now a "rescan" command which generates an up-to-date
+  window given an existing one. You can use this command after you
+  have moved or deleted several files and folders.
+
+Tiny changes:
+- Window titles now include the time of the scan and, if needed, an
+  additional number, to make each title unique.
+- The scan progress panel now shows the name of the folder that is
+  being scanned.
+- Renamed the "Open" button of the directory view window to "Show".
+- Renamed the "Scan directory..." command to "Scan Folder...".
+
+Code clean up:
+- Generalised the execution of background threads in the new
+  AsynchronousTaskManager class, which is now used for both drawing
+  and rescanning in a background thread.
+- The scan progress panel has been moved into a nib of its own, and
+  now has a dedicated control: ScanProgressPanelControl.
+
+Bug fix:
+- Fixed the drawing code so that it also runs properly when
+  compiled for Intel Macs. Many thanks to Craig Hughes for his help
+  with this.
+
+
+----------------------------------------------------------------------
+  Version 0.93, 22-01-2006
+----------------------------------------------------------------------
+
+New functionality:
+- Selected files can now be opened in Finder. This can be used to
+  examine files and folders in more detail, and to optionally remove,
+  move or edit files.
+- An image of the directory view can now be generated and saved (as a
+  TIFF image).
+
+Code clean up:
+- Refactored ItemTreeDrawer into two classes. ItemTreeDrawer now does
+  the basic drawing, and AsynchronousItemTreeDrawer manages drawing
+  in a separate thread.
+
+Bug fix:
+- The thread used for drawing in the background is now properly
+  terminated and disposed of when it is not needed anymore.
+
+
+----------------------------------------------------------------------
+  Version 0.92, 10-01-2006
+----------------------------------------------------------------------
+
+New functionality:
+- Added a "twin window" command. This is like the "duplicate window"
+  command, except that navigation of the directory tree in the new
+  window is synchronized with its parent window.
+
+Improved functionality:
+- When duplicating a window, the file colouring scheme and the path
+  in the tree are now also copied.
+
+Code clean up:
+- Refactored code so that it adheres much better to the MVC pattern.
+
+Bug fixes:
+- Fixed bug that would occassionally prevent redrawing of the
+  directory view. (ID 1309819)
+- Plugged a big memory leak. The directory tree is now actually freed
+  when all windows that refer to it are closed.
+
+
+----------------------------------------------------------------------
+  Version 0.91, 30-09-2005
+----------------------------------------------------------------------
+
+- Now building with ZeroLink disabled, so that the application should
+  actually run on machines other than my own. :-)
+
+- Optimised view drawing. Drawing the tree map of my entire hard drive
+  contents at 1280x1024 resolution on my Mac Mini now takes only half
+  a second.
+
+
+----------------------------------------------------------------------
+  Version 0.90, 20-09-2005
+----------------------------------------------------------------------
+
+First release of GrandPerspective.
+
+Features:
+- A view showing directory trees graphically:
+  - Layout of files using a basic balanced tree building algorithm.
+  - Drawing of files using basic gradient filling.
+
+- Support for different file colouring schemes. Colouring by:
+  - Directory name (i.e. a hash of the name)
+  - File name (i.e. a hash of the name)
+  - File type (i.e. hash of file extension)
+  - Nothing (all files same colour)
+
+- Selection of a file in the view:
+  - To descend into the directory tree.
+  - To enable copying of file path.
+
+- Support for multiple windows:
+  - Scan different folder and show in new window.
+  - Duplication of an existing window (to view data differently).

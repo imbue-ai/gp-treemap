@@ -1,0 +1,18 @@
+/* (No Comment) */
+"GrandPerspective scan results" = "Αποτελέσματα σάρωσης GrandPerspective";
+
+/* Privacy - Desktop Folder Usage Description */
+"NSDesktopFolderUsageDescription" = "Η εφαρμογή ελέγχει πόσο χώρο στο δίσκο χρησιμοποιεί η επιφάνεια εργασίας σας";
+
+/* Privacy - Documents Folder Usage Description */
+"NSDocumentsFolderUsageDescription" = "Η εφαρμογή ελέγχει πόσο χώρο στο δίσκο χρησιμοποιούν τα έγγραφά σας";
+
+/* Privacy - Downloads Folder Usage Description */
+"NSDownloadsFolderUsageDescription" = "Η εφαρμογή ελέγχει πόσο χώρο στο δίσκο χρησιμοποιούν οι λήψεις σας";
+
+/* Privacy - Photo Library Usage Description */
+"NSPhotoLibraryUsageDescription" = "Η εφαρμογή ελέγχει πόσο χώρο στο δίσκο χρησιμοποιούν οι φωτογραφίες σας";
+
+/* Privacy - Reminders Usage Description */
+"NSRemindersUsageDescription" = "Η εφαρμογή ελέγχει πόσο χώρο στο δίσκο χρησιμοποιούν οι υπομνήσεις σας (Reminders)";
+

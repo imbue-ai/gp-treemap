@@ -1,0 +1,75 @@
+/* Toolbar action */
+"Delete" = "Verwijder";
+
+/* Label for focus controls */
+"Focus" = "Focus in/uit";
+
+/* Menu item */
+"Hide Toolbar" = "Verberg knoppenbalk";
+
+/* Toolbar action */
+"Info" = "Info";
+
+/* Toolbar action */
+"Move focus down" = "Verplaats focus omlaag";
+
+/* Toolbar action */
+"Move focus up" = "Verplaats focus omhoog";
+
+/* Tooltip */
+"Move to trash" = "Verplaats naar de Prullenbak";
+
+/* Toolbar action */
+"Open" = "Open";
+
+/* Tooltip */
+"Open with Finder" = "Open via Finder";
+
+/* Tooltip */
+"Preview item in Quick Look panel" = "Snelle weergave van bestand of map";
+
+/* Toolbar action */
+"Quick Look" = "Geef snel weer";
+
+/* Toolbar action */
+"Refresh" = "Verversen";
+
+/* Tooltip */
+"Refresh view data" = "Ingelezen data verversen";
+
+/* Toolbar action */
+"Rescan" = "Herlezen";
+
+/* Tooltip */
+"Rescan view data" = "Ingelezen data herlezen";
+
+/* Toolbar action */
+"Reset focus" = "Herstel standaard focus";
+
+/* Toolbar action */
+"Reset zoom" = "Herstel standaard zoom";
+
+/* Toolbar action */
+"Reveal" = "Toon";
+
+/* Tooltip */
+"Reveal in Finder" = "Toon in Finder";
+
+/* Tooltip */
+"Search files by name" = "Zoek bestanden op naam";
+
+/* Tooltip */
+"Show info" = "Toon info";
+
+/* Menu item */
+"Show Toolbar" = "Toon knoppenbalk";
+
+/* Label for zooming controls */
+"Zoom" = "Zoom in/uit";
+
+/* Toolbar action */
+"Zoom in" = "Zoom in";
+
+/* Toolbar action */
+"Zoom out" = "Zoom out";
+

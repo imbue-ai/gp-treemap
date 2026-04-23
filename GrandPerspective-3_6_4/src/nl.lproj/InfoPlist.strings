@@ -1,0 +1,18 @@
+/* (No Comment) */
+"GrandPerspective scan results" = "GrandPerspective data";
+
+/* Privacy - Desktop Folder Usage Description */
+"NSDesktopFolderUsageDescription" = "Hiermee kan de app visualiseren hoeveel diskruimte uw buroblad inneemt";
+
+/* Privacy - Documents Folder Usage Description */
+"NSDocumentsFolderUsageDescription" = "Hiermee kan de app visualiseren hoeveel diskruimte uw documenten innemen";
+
+/* Privacy - Downloads Folder Usage Description */
+"NSDownloadsFolderUsageDescription" = "Hiermee kan de app visualiseren hoeveel diskruimte uw gedownloade bestanden innemen";
+
+/* Privacy - Photo Library Usage Description */
+"NSPhotoLibraryUsageDescription" = "Hiermee kan de app visualiseren hoeveel diskruimte uw foto's innemen";
+
+/* Privacy - Reminders Usage Description */
+"NSRemindersUsageDescription" = "Hiermee kan de app visualiseren hoeveel diskruimte uw reminders innemen";
+

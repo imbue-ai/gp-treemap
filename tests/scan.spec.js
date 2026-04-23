@@ -168,10 +168,10 @@ function buildTree(root, seed) {
 
 test('scan.js produces a self-contained HTML that renders', async ({ page }) => {
   // Create a hermetic, repeatable temp directory tree.
-  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-scan-test-'));
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'gp-scan-test-'));
   buildTree(target, 42);
 
-  const out = path.join(os.tmpdir(), 'raised-treemap-scan-' + Date.now() + '.html');
+  const out = path.join(os.tmpdir(), 'gp-treemap-scan-' + Date.now() + '.html');
   const res = spawnSync(process.execPath, [
     path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
   ], { encoding: 'utf8' });
@@ -187,7 +187,7 @@ test('scan.js produces a self-contained HTML that renders', async ({ page }) => 
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
   expect(errs, 'no errors').toEqual([]);
-  const cells = await page.locator('raised-treemap').evaluate((el) => el._leaves.length);
+  const cells = await page.locator('gp-treemap').evaluate((el) => el._leaves.length);
   expect(cells).toBeGreaterThan(100);
 
   await page.screenshot({
@@ -201,10 +201,10 @@ test('scan.js produces a self-contained HTML that renders', async ({ page }) => 
 });
 
 test('color-by dropdown switches between all modes without errors', async ({ page }) => {
-  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-colorby-'));
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'gp-colorby-'));
   buildTree(target, 99);
 
-  const out = path.join(os.tmpdir(), 'rt-colorby-' + Date.now() + '.html');
+  const out = path.join(os.tmpdir(), 'gp-colorby-' + Date.now() + '.html');
   const res = spawnSync(process.execPath, [
     path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
   ], { encoding: 'utf8' });
@@ -218,7 +218,7 @@ test('color-by dropdown switches between all modes without errors', async ({ pag
   await page.waitForTimeout(400);
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
-  const tm = page.locator('raised-treemap');
+  const tm = page.locator('gp-treemap');
   const colorSel = page.locator('#color-sel');
 
   // Default should be extension (raw extension, categorical).
@@ -274,7 +274,7 @@ test('color-by dropdown switches between all modes without errors', async ({ pag
   expect(hash2).toContain('color=folder');
 
   // Click a cell to focus a leaf node and verify the status bar shows metadata.
-  const tmEl = page.locator('raised-treemap');
+  const tmEl = page.locator('gp-treemap');
   const box = await tmEl.boundingBox();
   // Click near center — likely to hit a leaf cell.
   await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
@@ -296,10 +296,10 @@ test('color-by dropdown switches between all modes without errors', async ({ pag
 // 2. Stub directories expand after their blocks inflate (progressive loading)
 // 3. No JS errors during the entire process
 test('multi-block scan: stubs expand progressively after async inflate', async ({ page }) => {
-  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-multiblock-'));
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'gp-multiblock-'));
   buildTree(target, 77);  // ~8 dirs, ~120 files
 
-  const out = path.join(os.tmpdir(), 'rt-multiblock-' + Date.now() + '.html');
+  const out = path.join(os.tmpdir(), 'gp-multiblock-' + Date.now() + '.html');
   // Use a tiny block size to force multiple blocks from a small fixture.
   const res = spawnSync(process.execPath, [
     path.join(ROOT, 'tools', 'scan.js'), '--no-open', '--block-size=20', target, out,
@@ -324,7 +324,7 @@ test('multi-block scan: stubs expand progressively after async inflate', async (
     await page.waitForTimeout(100);
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
   }
-  const cells = await page.locator('raised-treemap').evaluate((el) => el._leaves.length);
+  const cells = await page.locator('gp-treemap').evaluate((el) => el._leaves.length);
   expect(cells, 'all files should render after block inflation').toBeGreaterThan(100);
 
   expect(errs, 'no errors during block inflation').toEqual([]);
@@ -334,10 +334,10 @@ test('multi-block scan: stubs expand progressively after async inflate', async (
 });
 
 test('zoom restores from URL hash in lazy tree', async ({ page }) => {
-  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-zoomhash-'));
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'gp-zoomhash-'));
   buildTree(target, 55);
 
-  const out = path.join(os.tmpdir(), 'rt-zoomhash-' + Date.now() + '.html');
+  const out = path.join(os.tmpdir(), 'gp-zoomhash-' + Date.now() + '.html');
   const res = spawnSync(process.execPath, [
     path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
   ], { encoding: 'utf8' });
@@ -351,7 +351,7 @@ test('zoom restores from URL hash in lazy tree', async ({ page }) => {
   await page.waitForTimeout(400);
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
-  const box = await page.locator('raised-treemap').boundingBox();
+  const box = await page.locator('gp-treemap').boundingBox();
   await page.mouse.click(box.x + box.width * 0.3, box.y + box.height * 0.3);
   await page.waitForTimeout(100);
 
@@ -366,7 +366,7 @@ test('zoom restores from URL hash in lazy tree', async ({ page }) => {
   await page.waitForTimeout(100);
 
   const info = await page.evaluate(() => {
-    const el = document.querySelector('raised-treemap');
+    const el = document.querySelector('gp-treemap');
     return {
       activeRoot: el._activeVisibleRootId(),
       treeRoot: el._tree.roots[0],
@@ -388,7 +388,7 @@ test('zoom restores from URL hash in lazy tree', async ({ page }) => {
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
   const restored = await page.evaluate(() => {
-    const el = document.querySelector('raised-treemap');
+    const el = document.querySelector('gp-treemap');
     return {
       activeRoot: el._activeVisibleRootId(),
       treeRoot: el._tree.roots[0],
@@ -407,10 +407,10 @@ test('zoom restores from URL hash in lazy tree', async ({ page }) => {
 test('zoom path expansion works when root node ID is 0 (falsy)', async ({ page }) => {
   // Regression: the path expansion skipped the root node because _item was 0
   // and the check `!nd._item` treated 0 as falsy, preventing child expansion.
-  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-falsy-root-'));
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'gp-falsy-root-'));
   buildTree(target, 42);
 
-  const out = path.join(os.tmpdir(), 'rt-falsy-root-' + Date.now() + '.html');
+  const out = path.join(os.tmpdir(), 'gp-falsy-root-' + Date.now() + '.html');
   const res = spawnSync(process.execPath, [
     path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
   ], { encoding: 'utf8' });
@@ -419,19 +419,19 @@ test('zoom path expansion works when root node ID is 0 (falsy)', async ({ page }
   // First: load normally, zoom into a child of root, capture zoomPath.
   await page.goto('file://' + out);
   await page.waitForFunction(() => {
-    const el = document.querySelector('raised-treemap');
+    const el = document.querySelector('gp-treemap');
     return el && el._leaves && el._leaves.length > 0;
   }, { timeout: 10000 });
   await page.waitForTimeout(300);
 
-  const box = await page.locator('raised-treemap').boundingBox();
+  const box = await page.locator('gp-treemap').boundingBox();
   await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
   await page.waitForTimeout(100);
   await page.keyboard.press('+');
   await page.waitForTimeout(200);
 
   const zoomed = await page.evaluate(() => {
-    const el = document.querySelector('raised-treemap');
+    const el = document.querySelector('gp-treemap');
     return {
       activeRoot: el._activeVisibleRootId(),
       treeRoot: el._tree.roots[0],
@@ -447,13 +447,13 @@ test('zoom path expansion works when root node ID is 0 (falsy)', async ({ page }
   // Reload with hash — the path expansion must handle root ID 0 correctly.
   await page.goto('file://' + out + zoomed.hash);
   await page.waitForFunction(() => {
-    const el = document.querySelector('raised-treemap');
+    const el = document.querySelector('gp-treemap');
     return el && el._leaves && el._leaves.length > 0;
   }, { timeout: 10000 });
   await page.waitForTimeout(300);
 
   const restored = await page.evaluate(() => {
-    const el = document.querySelector('raised-treemap');
+    const el = document.querySelector('gp-treemap');
     // Verify all rendered leaves are under the zoom root.
     const zoomRoot = el._activeVisibleRootId();
     let wrong = 0;
@@ -479,10 +479,10 @@ test('zoom path expansion works when root node ID is 0 (falsy)', async ({ page }
 
 test('zoom survives async block inflation in multi-block scan', async ({ page }) => {
   // Build a tree, scan with tiny block size to force stubs on the zoom path.
-  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-zoomstub-'));
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'gp-zoomstub-'));
   buildTree(target, 88);
 
-  const out = path.join(os.tmpdir(), 'rt-zoomstub-' + Date.now() + '.html');
+  const out = path.join(os.tmpdir(), 'gp-zoomstub-' + Date.now() + '.html');
   const res = spawnSync(process.execPath, [
     path.join(ROOT, 'tools', 'scan.js'), '--no-open', '--block-size=20', target, out,
   ], { encoding: 'utf8' });
@@ -496,7 +496,7 @@ test('zoom survives async block inflation in multi-block scan', async ({ page })
   // First load: zoom into a non-root node and capture the hash.
   await page.goto('file://' + out);
   await page.waitForFunction(() => {
-    const el = document.querySelector('raised-treemap');
+    const el = document.querySelector('gp-treemap');
     return el && el._leaves && el._leaves.length > 0;
   }, { timeout: 10000 });
   // Let blocks inflate so the full tree is available for interaction.
@@ -506,7 +506,7 @@ test('zoom survives async block inflation in multi-block scan', async ({ page })
   }
 
   // Click a cell, navigate up, zoom in via +
-  const box = await page.locator('raised-treemap').boundingBox();
+  const box = await page.locator('gp-treemap').boundingBox();
   await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
   await page.waitForTimeout(100);
   await page.mouse.wheel(0, -100);
@@ -515,7 +515,7 @@ test('zoom survives async block inflation in multi-block scan', async ({ page })
   await page.waitForTimeout(200);
 
   const zoomed = await page.evaluate(() => {
-    const el = document.querySelector('raised-treemap');
+    const el = document.querySelector('gp-treemap');
     return {
       activeRoot: el._activeVisibleRootId(),
       treeRoot: el._tree.roots[0],
@@ -534,7 +534,7 @@ test('zoom survives async block inflation in multi-block scan', async ({ page })
   // (triggered by block inflation) can retry and eventually succeed.
   await page.goto('file://' + out + zoomed.hash);
   await page.waitForFunction(() => {
-    const el = document.querySelector('raised-treemap');
+    const el = document.querySelector('gp-treemap');
     return el && el._leaves && el._leaves.length > 0;
   }, { timeout: 10000 });
 
@@ -543,7 +543,7 @@ test('zoom survives async block inflation in multi-block scan', async ({ page })
   // _internalVisibleRootId must still be set so that once the stub
   // inflates and triggers a re-render, the zoom will take effect.
   const early = await page.evaluate(() => {
-    const el = document.querySelector('raised-treemap');
+    const el = document.querySelector('gp-treemap');
     return { internal: el._internalVisibleRootId, path: el._visibleRootPath };
   });
   expect(early.internal, 'zoom ID must persist even before stubs inflate').toBe(zoomed.activeRoot);
@@ -556,7 +556,7 @@ test('zoom survives async block inflation in multi-block scan', async ({ page })
   }
 
   const restored = await page.evaluate(() => {
-    const el = document.querySelector('raised-treemap');
+    const el = document.querySelector('gp-treemap');
     return {
       activeRoot: el._activeVisibleRootId(),
       treeRoot: el._tree.roots[0],

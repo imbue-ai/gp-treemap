@@ -1,0 +1,84 @@
+/* Class = "NSTabViewItem"; label = "Info"; ObjectID = "92"; */
+"92.label" = "Πληροφορίες";
+
+/* Class = "NSTabViewItem"; label = "Display"; ObjectID = "93"; */
+"93.label" = "Προβολή";
+
+/* Class = "NSTabViewItem"; label = "Focus"; ObjectID = "97"; */
+"97.label" = "Εστίαση";
+
+/* Class = "NSTextFieldCell"; title = "Time of scan:"; ObjectID = "909"; */
+"909.title" = "Ώρα σάρωσης:";
+
+/* Class = "NSTextFieldCell"; title = "Size of scanned files:"; ObjectID = "910"; */
+"910.title" = "Μέγεθος σαρωμένων αρχείων:";
+
+/* Class = "NSTextFieldCell"; title = "File sizes:"; ObjectID = "911"; */
+"911.title" = "Μέγεθος αρχείων:";
+
+/* Class = "NSTextFieldCell"; title = "Initial free space:"; ObjectID = "912"; */
+"912.title" = "Αρχικός ελεύθερος χώρος:";
+
+/* Class = "NSTextFieldCell"; title = "Physical"; ObjectID = "915"; */
+"915.title" = "Φυσικό";
+
+/* Class = "NSTextFieldCell"; title = "Filter1"; ObjectID = "916"; */
+"916.title" = "Φίλτρο1";
+
+/* Class = "NSTextFieldCell"; title = "Volume size:"; ObjectID = "918"; */
+"918.title" = "Μέγεθος τόμου:";
+
+/* Class = "NSTextFieldCell"; title = "Miscellaneous used space:"; ObjectID = "921"; */
+"921.title" = "Διάφορος χρησιμοποιούμενος χώρος:";
+
+/* Class = "NSTextFieldCell"; title = "Freed space:"; ObjectID = "923"; */
+"923.title" = "Απελευθερωμένος χώρος:";
+
+/* Class = "NSTextFieldCell"; title = "Volume name"; ObjectID = "925"; */
+"925.title" = "Όνομα τόμου";
+
+/* Class = "NSTextFieldCell"; title = "Filter:"; ObjectID = "926"; */
+"926.title" = "Φίλτρο:";
+
+/* Class = "NSTextFieldCell"; title = "Number of scanned files:"; ObjectID = "927"; */
+"927.title" = "Αριθμός σαρωμένων αρχείων:";
+
+/* Class = "NSTextFieldCell"; title = "Number of deleted files:"; ObjectID = "930"; */
+"930.title" = "Αριθμός διαγραμμένων αρχείων:";
+
+/* Class = "NSTextFieldCell"; title = "Mask:"; ObjectID = "931"; */
+"931.title" = "Μάσκα:";
+
+/* Class = "NSButtonCell"; title = "Enable mask"; ObjectID = "933"; */
+"933.title" = "Ενεργοποίηση μάσκας";
+
+/* Class = "NSTextFieldCell"; title = "Color by:"; ObjectID = "935"; */
+"935.title" = "Χρώμα ανά:";
+
+/* Class = "NSTextFieldCell"; title = "Palette:"; ObjectID = "937"; */
+"937.title" = "Συνδυασμός χρωμάτων:";
+
+/* Class = "NSButtonCell"; title = "Show entire volume"; ObjectID = "938"; */
+"938.title" = "Εμφάνιση όλοκληρου τόμου";
+
+/* Class = "NSButtonCell"; title = "Show package contents"; ObjectID = "939"; */
+"939.title" = "Εμφάνιση περιεχομένων πακέτου";
+
+/* Class = "NSTextFieldCell"; title = "File type:"; ObjectID = "946"; */
+"946.title" = "Τύπος αρχείου:";
+
+/* Class = "NSTextFieldCell"; title = "File type identifier"; ObjectID = "947"; */
+"947.title" = "Αναγνωριστικό τύπου αρχείου";
+
+/* Class = "NSTextFieldCell"; title = "Created:"; ObjectID = "974"; */
+"974.title" = "Δημιουργήθηκε:";
+
+/* Class = "NSTextFieldCell"; title = "Modified:"; ObjectID = "976"; */
+"976.title" = "Τροποποιήθηκε:";
+
+/* Class = "NSTextFieldCell"; title = "Accessed:"; ObjectID = "984"; */
+"984.title" = "Προσπελάστηκε:";
+
+/* Class = "NSWindow"; title = "Control"; ObjectID = "GHT-tk-zeb"; */
+"GHT-tk-zeb.title" = "Έλεγχος";
+

@@ -34,7 +34,7 @@ test.describe('stretch zoom', () => {
     await waitForRender(page);
 
     // Get a parent node and its children's relative layout
-    const before = await page.locator('raised-treemap').evaluate((el) => {
+    const before = await page.locator('gp-treemap').evaluate((el) => {
       // Find a parent node that has multiple children with a non-trivial rect
       const nodes = el._tree.nodes;
       let target = null;
@@ -87,14 +87,14 @@ test.describe('stretch zoom', () => {
     expect(before.children.length).toBeGreaterThan(0);
 
     // Now stretch-zoom into that node
-    await page.locator('raised-treemap').evaluate((el, targetId) => {
+    await page.locator('gp-treemap').evaluate((el, targetId) => {
       el._targetId = targetId;
       el.stretchZoomIn(targetId);
     }, before.targetId);
     await waitForZoomAnimation(page);
 
     // Get the new layout and verify relative positions match
-    const after = await page.locator('raised-treemap').evaluate((el, data) => {
+    const after = await page.locator('gp-treemap').evaluate((el, data) => {
       const canvasW = el._canvas.width;
       const canvasH = el._canvas.height;
       const children = [];
@@ -132,7 +132,7 @@ test.describe('stretch zoom', () => {
     await waitForRender(page);
 
     // Find a node whose rect has a very different aspect ratio from the window
-    const info = await page.locator('raised-treemap').evaluate((el) => {
+    const info = await page.locator('gp-treemap').evaluate((el) => {
       const stageRect = el._stage.getBoundingClientRect();
       const windowAspect = stageRect.width / stageRect.height;
       let best = null;
@@ -154,18 +154,18 @@ test.describe('stretch zoom', () => {
     }
 
     // Stretch-zoom into the node
-    await page.locator('raised-treemap').evaluate((el, id) => {
+    await page.locator('gp-treemap').evaluate((el, id) => {
       el._targetId = id;
       el.stretchZoomIn(id);
     }, info.id);
     await waitForZoomAnimation(page);
 
     // Record the stretch-zoom leaf positions
-    const stretchLeaves = await page.locator('raised-treemap').evaluate((el) =>
+    const stretchLeaves = await page.locator('gp-treemap').evaluate((el) =>
       el._leaves.map(l => ({ id: l.id, x: l.x, y: l.y, w: l.w, h: l.h })));
 
     // Now do a regular zoom (non-stretch) into the same node
-    await page.locator('raised-treemap').evaluate((el, id) => {
+    await page.locator('gp-treemap').evaluate((el, id) => {
       el._stretchZoomId = null;
       el._stretchZoomAspect = 0;
       el._internalVisibleRootId = id;
@@ -173,7 +173,7 @@ test.describe('stretch zoom', () => {
     }, info.id);
     await waitForRender(page);
 
-    const regularLeaves = await page.locator('raised-treemap').evaluate((el) =>
+    const regularLeaves = await page.locator('gp-treemap').evaluate((el) =>
       el._leaves.map(l => ({ id: l.id, x: l.x, y: l.y, w: l.w, h: l.h })));
 
     // The layouts should differ (at least some positions should be different)
@@ -196,10 +196,10 @@ test.describe('stretch zoom', () => {
     // Set displayDepth=1 so only one level of children renders from the root.
     // Then zoom into a depth-1 node — the depth cap shifts, revealing its
     // children (previously hidden because they were at depth 2, beyond the cap).
-    await page.locator('raised-treemap').evaluate((el) => { el.displayDepth = 1; });
+    await page.locator('gp-treemap').evaluate((el) => { el.displayDepth = 1; });
     await waitForRender(page);
 
-    const nodeInfo = await page.locator('raised-treemap').evaluate((el) => {
+    const nodeInfo = await page.locator('gp-treemap').evaluate((el) => {
       const leafCountBefore = el._leaves.length;
       for (const n of el._tree.nodes.values()) {
         if (n.depth === 1 && n.childIds && n.childIds.length > 0) {
@@ -216,13 +216,13 @@ test.describe('stretch zoom', () => {
 
     if (!nodeInfo) { test.skip(); return; }
 
-    await page.locator('raised-treemap').evaluate((el, id) => {
+    await page.locator('gp-treemap').evaluate((el, id) => {
       el._targetId = id;
       el.stretchZoomIn(id);
     }, nodeInfo.id);
     await waitForZoomAnimation(page);
 
-    const after = await page.locator('raised-treemap').evaluate((el, beforeCount) => {
+    const after = await page.locator('gp-treemap').evaluate((el, beforeCount) => {
       return { leafCount: el._leaves.length, beforeCount };
     }, nodeInfo.leafCountBefore);
 
@@ -239,7 +239,7 @@ test.describe('stretch zoom', () => {
     // Find a parent node that occupies a small rect — some of its children
     // may be tiny (near sub-pixel). After zooming in, that parent's rect
     // fills the canvas, so those children get real pixel area.
-    const target = await page.locator('raised-treemap').evaluate((el) => {
+    const target = await page.locator('gp-treemap').evaluate((el) => {
       const canvasArea = el._canvas.width * el._canvas.height;
       // Find a rendered node whose rect is small relative to the canvas
       // and that has children in the tree (so zooming reveals structure).
@@ -274,13 +274,13 @@ test.describe('stretch zoom', () => {
     if (!target) { test.skip(); return; }
 
     // Stretch-zoom into the small node
-    await page.locator('raised-treemap').evaluate((el, id) => {
+    await page.locator('gp-treemap').evaluate((el, id) => {
       el._targetId = id;
       el.stretchZoomIn(id);
     }, target.id);
     await waitForZoomAnimation(page);
 
-    const afterLeafCount = await page.locator('raised-treemap').evaluate((el) => el._leaves.length);
+    const afterLeafCount = await page.locator('gp-treemap').evaluate((el) => el._leaves.length);
 
     // After zoom, the node fills the canvas. Its children now have much more
     // pixel area, so we should see at least as many leaves — often more,
@@ -288,7 +288,7 @@ test.describe('stretch zoom', () => {
     expect(afterLeafCount).toBeGreaterThanOrEqual(target.leafCountBefore);
 
     // Verify every rendered leaf has a non-trivial size (at least 1×1 pixel)
-    const allVisible = await page.locator('raised-treemap').evaluate((el) =>
+    const allVisible = await page.locator('gp-treemap').evaluate((el) =>
       el._leaves.every((l) => l.w >= 1 && l.h >= 1));
     expect(allVisible).toBe(true);
   });
@@ -298,13 +298,13 @@ test.describe('stretch zoom', () => {
     await waitForRender(page);
 
     // Record original leaf count
-    const originalLeafCount = await page.locator('raised-treemap').evaluate((el) => el._leaves.length);
+    const originalLeafCount = await page.locator('gp-treemap').evaluate((el) => el._leaves.length);
 
     // Click a cell and navigate up to find a parent
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.3, box.y + box.height * 0.3);
     await waitForRender(page);
-    await page.locator('raised-treemap').evaluate((el) => {
+    await page.locator('gp-treemap').evaluate((el) => {
       // Navigate up to a parent
       el._focusUp();
       el._focusUp();
@@ -312,7 +312,7 @@ test.describe('stretch zoom', () => {
     await waitForRender(page);
 
     // Stretch-zoom in
-    const zoomedId = await page.locator('raised-treemap').evaluate((el) => {
+    const zoomedId = await page.locator('gp-treemap').evaluate((el) => {
       { var id = el._focusId || el._targetId; if (id) el.stretchZoomIn(id); }
       return el._stretchZoomId;
     });
@@ -322,11 +322,11 @@ test.describe('stretch zoom', () => {
     expect(zoomedId).not.toBeNull();
 
     // Reset zoom via the public API (same as clicking the root icon)
-    await page.locator('raised-treemap').evaluate((el) => el.zoomReset());
+    await page.locator('gp-treemap').evaluate((el) => el.zoomReset());
     await waitForZoomAnimation(page);
 
     // Verify we're back to the original state
-    const state = await page.locator('raised-treemap').evaluate((el) => ({
+    const state = await page.locator('gp-treemap').evaluate((el) => ({
       stretchZoomId: el._stretchZoomId,
       leafCount: el._leaves.length,
       visibleRootId: el._internalVisibleRootId,
@@ -341,13 +341,13 @@ test.describe('stretch zoom', () => {
     await waitForRender(page);
 
     // Click a cell, navigate to parent, then stretch zoom
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await waitForRender(page);
-    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
+    await page.locator('gp-treemap').evaluate((el) => el._focusUp());
     await waitForRender(page);
 
-    const didZoom = await page.locator('raised-treemap').evaluate((el) => {
+    const didZoom = await page.locator('gp-treemap').evaluate((el) => {
       { var id = el._focusId || el._targetId; if (id) el.stretchZoomIn(id); }
       return !!el._stretchZoomId;
     });
@@ -355,28 +355,28 @@ test.describe('stretch zoom', () => {
     await waitForZoomAnimation(page);
 
     // Click zoom out
-    await page.locator('raised-treemap').evaluate((el) => el.zoomOut());
+    await page.locator('gp-treemap').evaluate((el) => el.zoomOut());
     await waitForZoomAnimation(page);
 
-    const after = await page.locator('raised-treemap').evaluate((el) => el._stretchZoomId);
+    const after = await page.locator('gp-treemap').evaluate((el) => el._stretchZoomId);
     expect(after).toBeNull();
   });
 
-  test('stretch zoom fires rt-zoom-change event', async ({ page }) => {
+  test('stretch zoom fires gp-zoom-change event', async ({ page }) => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);
 
     // Click and navigate to parent
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await waitForRender(page);
-    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
+    await page.locator('gp-treemap').evaluate((el) => el._focusUp());
     await waitForRender(page);
 
     // Listen for zoom-change events
-    const events = await page.locator('raised-treemap').evaluate((el) => {
+    const events = await page.locator('gp-treemap').evaluate((el) => {
       const evts = [];
-      el.addEventListener('rt-zoom-change', (e) => evts.push(e.detail));
+      el.addEventListener('gp-zoom-change', (e) => evts.push(e.detail));
 
       { var id = el._focusId || el._targetId; if (id) el.stretchZoomIn(id); }
       return evts;
@@ -391,21 +391,21 @@ test.describe('stretch zoom', () => {
     await waitForRender(page);
 
     // Click a prominent cell and zoom in
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.4, box.y + box.height * 0.4);
     await waitForRender(page);
     // Navigate up to a visible parent
-    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
+    await page.locator('gp-treemap').evaluate((el) => el._focusUp());
     await waitForRender(page);
 
-    await page.locator('raised-treemap').evaluate((el) => {
+    await page.locator('gp-treemap').evaluate((el) => {
       { var id = el._focusId || el._targetId; if (id) el.stretchZoomIn(id); }
     });
     await waitForZoomAnimation(page);
     await snap(page, '13-stretch-zoom-in');
 
     // Reset and snap
-    await page.locator('raised-treemap').evaluate((el) => el.stretchZoomReset());
+    await page.locator('gp-treemap').evaluate((el) => el.stretchZoomReset());
     await waitForZoomAnimation(page);
     await snap(page, '14-stretch-zoom-reset');
   });
@@ -428,7 +428,7 @@ test.describe('stretch zoom', () => {
 
     // Find the "narrow" node by label. With parentIndices (scan-like fast
     // path), node IDs are integers — row indices, not string labels.
-    const setup = await page.locator('raised-treemap').evaluate((el) => {
+    const setup = await page.locator('gp-treemap').evaluate((el) => {
       let narrowId = null;
       for (const [id, n] of el._tree.nodes) {
         if (n.label === 'narrow') { narrowId = id; break; }
@@ -465,13 +465,13 @@ test.describe('stretch zoom', () => {
     expect(setup.treeChildCount).toBeGreaterThan(20);
 
     // --- Stretch-zoom into "narrow" ---
-    await page.locator('raised-treemap').evaluate((el, nid) => {
+    await page.locator('gp-treemap').evaluate((el, nid) => {
       el._targetId = nid;
       el.stretchZoomIn(nid);
     }, setup.narrowId);
     await waitForZoomAnimation(page);
 
-    const stretchResult = await page.locator('raised-treemap').evaluate((el) => {
+    const stretchResult = await page.locator('gp-treemap').evaluate((el) => {
       return {
         leafCount: el._leaves.length,
         leafIds: el._leaves.map((l) => l.id),
@@ -481,7 +481,7 @@ test.describe('stretch zoom', () => {
     expect(stretchResult.stretchZoomId).toBe(setup.narrowId);
 
     // --- Regular zoom into same node (for comparison) ---
-    await page.locator('raised-treemap').evaluate((el, nid) => {
+    await page.locator('gp-treemap').evaluate((el, nid) => {
       // Clear stretch-zoom state and do a regular zoom.
       el._stretchZoomId = null;
       el._stretchZoomAspect = 0;
@@ -492,7 +492,7 @@ test.describe('stretch zoom', () => {
     await page.evaluate(() =>
       new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
-    const regularResult = await page.locator('raised-treemap').evaluate((el) => {
+    const regularResult = await page.locator('gp-treemap').evaluate((el) => {
       return {
         leafCount: el._leaves.length,
         leafIds: el._leaves.map((l) => l.id),
@@ -529,7 +529,7 @@ test.describe('stretch zoom', () => {
 
     // Find a node at depth >= 2 that has children, so we can zoom into it
     // and then try to zoom to its grandparent.
-    const setup = await page.locator('raised-treemap').evaluate((el) => {
+    const setup = await page.locator('gp-treemap').evaluate((el) => {
       const nodes = el._tree.nodes;
       for (const n of nodes.values()) {
         if (n.depth >= 2 && n.childIds && n.childIds.length >= 2) {
@@ -551,13 +551,13 @@ test.describe('stretch zoom', () => {
     if (!setup) { test.skip(); return; }
 
     // Stretch-zoom into the deep node.
-    await page.locator('raised-treemap').evaluate((el, id) => {
+    await page.locator('gp-treemap').evaluate((el, id) => {
       el._targetId = id;
       el.stretchZoomIn(id);
     }, setup.deepId);
     await waitForZoomAnimation(page);
 
-    const zoomedIn = await page.locator('raised-treemap').evaluate((el) => ({
+    const zoomedIn = await page.locator('gp-treemap').evaluate((el) => ({
       stretchZoomId: el._stretchZoomId,
       activeRoot: el._activeVisibleRootId(),
     }));
@@ -567,12 +567,12 @@ test.describe('stretch zoom', () => {
     // a breadcrumb entry does. The bug: stretchZoomIn can't find the
     // grandparent in _nodeRects (it's above the current zoom root), so
     // nothing happens.
-    await page.locator('raised-treemap').evaluate((el, id) => {
+    await page.locator('gp-treemap').evaluate((el, id) => {
       el.stretchZoomIn(id);
     }, setup.grandparentId);
     await waitForZoomAnimation(page);
 
-    const afterZoomOut = await page.locator('raised-treemap').evaluate((el) => ({
+    const afterZoomOut = await page.locator('gp-treemap').evaluate((el) => ({
       stretchZoomId: el._stretchZoomId,
       activeRoot: el._activeVisibleRootId(),
     }));
@@ -595,13 +595,13 @@ test.describe('stretch zoom', () => {
     await waitForRender(page);
 
     // Click a cell and navigate to a parent with children, then zoom in.
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.3, box.y + box.height * 0.3);
     await waitForRender(page);
-    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
+    await page.locator('gp-treemap').evaluate((el) => el._focusUp());
     await waitForRender(page);
 
-    const didZoom = await page.locator('raised-treemap').evaluate((el) => {
+    const didZoom = await page.locator('gp-treemap').evaluate((el) => {
       const id = el._focusId || el._targetId;
       if (id) el.stretchZoomIn(id);
       return !!el._stretchZoomId;
@@ -610,14 +610,14 @@ test.describe('stretch zoom', () => {
     await waitForZoomAnimation(page);
 
     // Focus root (what clicking the home icon does).
-    await page.locator('raised-treemap').evaluate((el) => {
+    await page.locator('gp-treemap').evaluate((el) => {
       const rootId = el._tree.roots[0];
       el._setFocus(rootId);
     });
     await page.evaluate(() =>
       new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
-    const state = await page.locator('raised-treemap').evaluate((el) => {
+    const state = await page.locator('gp-treemap').evaluate((el) => {
       const rootId = el._tree.roots[0];
       return {
         focusId: el._focusId,
@@ -640,13 +640,13 @@ test.describe('stretch zoom', () => {
     await waitForRender(page);
 
     // Click a cell, go to parent, stretch zoom
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.3, box.y + box.height * 0.3);
     await waitForRender(page);
-    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
+    await page.locator('gp-treemap').evaluate((el) => el._focusUp());
     await waitForRender(page);
 
-    const didZoom = await page.locator('raised-treemap').evaluate((el) => {
+    const didZoom = await page.locator('gp-treemap').evaluate((el) => {
       { var id = el._focusId || el._targetId; if (id) el.stretchZoomIn(id); }
       return !!el._stretchZoomId;
     });
@@ -654,11 +654,11 @@ test.describe('stretch zoom', () => {
     await waitForZoomAnimation(page);
 
     // Move mouse over cells — we should get hover events
-    const tmBox = await page.locator('raised-treemap').boundingBox();
+    const tmBox = await page.locator('gp-treemap').boundingBox();
     await page.mouse.move(tmBox.x + tmBox.width * 0.25, tmBox.y + tmBox.height * 0.25);
     await page.waitForTimeout(100);
 
-    const hoverId = await page.locator('raised-treemap').evaluate((el) => el._hoverId);
+    const hoverId = await page.locator('gp-treemap').evaluate((el) => el._hoverId);
     expect(hoverId).not.toBeNull();
   });
 

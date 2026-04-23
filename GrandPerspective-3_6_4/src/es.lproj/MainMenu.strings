@@ -1,0 +1,231 @@
+/* Class = "NSMenuItem"; title = "Item"; ObjectID = "3LR-fJ-0Ck"; */
+"3LR-fJ-0Ck.title" = "Elemento";
+
+/* Class = "NSMenu"; title = "Selection"; ObjectID = "4K2-IU-hcw"; */
+"4K2-IU-hcw.title" = "Selección";
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "5"; */
+"5.title" = "Traer Todo al Frente";
+
+/* Class = "NSMenu"; title = "Display Focus"; ObjectID = "6AB-sL-t6U"; */
+"6AB-sL-t6U.title" = "Ver Enfoque";
+
+/* Class = "NSMenuItem"; title = "Selection"; ObjectID = "8Lj-RY-z1e"; */
+"8Lj-RY-z1e.title" = "Selección";
+
+/* Class = "NSMenuItem"; title = "Refresh"; ObjectID = "9aB-S3-Sb7"; */
+"9aB-S3-Sb7.title" = "Refrescar";
+
+/* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "9gG-CK-G0v"; */
+"9gG-CK-G0v.title" = "Vista Rápida";
+
+/* Class = "NSMenuItem"; title = "Show/Hide Control Panel"; ObjectID = "9Ho-ON-BCj"; */
+"9Ho-ON-BCj.title" = "Ocultar/Mostrar el Panel de Control";
+
+/* Class = "NSMenuItem"; title = "Reset Focus"; ObjectID = "15W-vC-r8v"; */
+"15W-vC-r8v.title" = "Reinicializar Enfoque";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "19"; */
+"19.title" = "Ventana";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "23"; */
+"23.title" = "Minimizar";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "24"; */
+"24.title" = "Ventana";
+
+/* Class = "NSMenu"; title = "MainMenu"; ObjectID = "29"; */
+"29.title" = "Menú Principal";
+
+/* Class = "NSMenuItem"; title = "Open"; ObjectID = "33Q-IV-RrZ"; */
+"33Q-IV-RrZ.title" = "Abrir";
+
+/* Class = "NSMenuItem"; title = "GrandPerspective"; ObjectID = "56"; */
+"56.title" = "GrandPerspective";
+
+/* Class = "NSMenu"; title = "GrandPerspective"; ObjectID = "57"; */
+"57.title" = "GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "About GrandPerspective"; ObjectID = "58"; */
+"58.title" = "Acerca de GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "Scan Folder..."; ObjectID = "72"; */
+"72.title" = "Escanear Carpeta...";
+
+/* Class = "NSMenu"; title = "File"; ObjectID = "81"; */
+"81.title" = "Archivo";
+
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "83"; */
+"83.title" = "Archivo";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "103"; */
+"103.title" = "Ayuda";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "106"; */
+"106.title" = "Ayuda";
+
+/* Class = "NSMenuItem"; title = "GrandPerspective Help"; ObjectID = "111"; */
+"111.title" = "Ayuda de GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "129"; */
+"129.title" = "Preferencias...";
+
+/* Class = "NSMenuItem"; title = "Hide GrandPerspective"; ObjectID = "134"; */
+"134.title" = "Ocultar GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "Quit GrandPerspective"; ObjectID = "136"; */
+"136.title" = "Salir de GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
+"145.title" = "Ocultar Otros";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "150"; */
+"150.title" = "Mostrar Todo";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "197"; */
+"197.title" = "Zum";
+
+/* Class = "NSMenuItem"; title = "Duplicate"; ObjectID = "272"; */
+"272.title" = "Duplicar";
+
+/* Class = "NSMenuItem"; title = "Close"; ObjectID = "319"; */
+"319.title" = "Cerrar";
+
+/* Class = "NSMenuItem"; title = "Twin"; ObjectID = "321"; */
+"321.title" = "Idéntico";
+
+/* Class = "NSMenuItem"; title = "Export As Image..."; ObjectID = "324"; */
+"324.title" = "Exportar Como Imagen...";
+
+/* Class = "NSMenuItem"; title = "Filter..."; ObjectID = "331"; */
+"331.title" = "Filtrar...";
+
+/* Class = "NSMenuItem"; title = "Filtered Scan..."; ObjectID = "335"; */
+"335.title" = "Escaneo Filtrado...";
+
+/* Class = "NSMenuItem"; title = "Save Scan Data..."; ObjectID = "339"; */
+"339.title" = "Guardar Datos Escaneados...";
+
+/* Class = "NSMenuItem"; title = "Load Scan Data..."; ObjectID = "340"; */
+"340.title" = "Cargar Datos Escaneados...";
+
+/* Class = "NSMenuItem"; title = "GrandPerspective Website"; ObjectID = "345"; */
+"345.title" = "Sitio web de GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "View"; ObjectID = "348"; */
+"348.title" = "Ver";
+
+/* Class = "NSMenu"; title = "View"; ObjectID = "349"; */
+"349.title" = "Ver";
+
+/* Class = "NSMenuItem"; title = "Show/Hide Toolbar"; ObjectID = "350"; */
+"350.title" = "Ocultar/Mostrar Barra de Herrmientas";
+
+/* Class = "NSMenuItem"; title = "Customize Toolbar..."; ObjectID = "351"; */
+"351.title" = "Personalizar Barra de Herramientas...";
+
+/* Class = "NSMenuItem"; title = "Filters..."; ObjectID = "357"; */
+"357.title" = "Filtros...";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "388"; */
+"388.title" = "Editar";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "389"; */
+"389.title" = "Editar";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "393"; */
+"393.title" = "Cortar";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "394"; */
+"394.title" = "Copiar";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "395"; */
+"395.title" = "Pegar";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "397"; */
+"397.title" = "Borrar";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "398"; */
+"398.title" = "Seleccionar Todo";
+
+/* Class = "NSMenuItem"; title = "Uniform type ranking..."; ObjectID = "421"; */
+"421.title" = "Clasificación de tipos uniformes...";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "425"; */
+"425.title" = "Servicios";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "426"; */
+"426.title" = "Servicios";
+
+/* Class = "NSMenuItem"; title = "Zoom Out"; ObjectID = "bKM-Ec-4Gi"; */
+"bKM-Ec-4Gi.title" = "Disminuir Zum";
+
+/* Class = "NSMenuItem"; title = "Rescan with mask as filter"; ObjectID = "BMK-MQ-DB3"; */
+"BMK-MQ-DB3.title" = "Reescanear con la máscara como filtro";
+
+/* Class = "NSMenuItem"; title = "Rescan folder in view"; ObjectID = "CV5-Fw-5D7"; */
+"CV5-Fw-5D7.title" = "Reescanear carpeta mostrada";
+
+/* Class = "NSMenuItem"; title = "Move Focus Down"; ObjectID = "dJ2-6K-v9P"; */
+"dJ2-6K-v9P.title" = "Mover el Foco Abajo";
+
+/* Class = "NSMenuItem"; title = "Selection Focus"; ObjectID = "frA-lr-FOa"; */
+"frA-lr-FOa.title" = "Seleccionar Enfoque";
+
+/* Class = "NSMenuItem"; title = "Rescan"; ObjectID = "gUG-Nh-FTx"; */
+"gUG-Nh-FTx.title" = "Reescanear";
+
+/* Class = "NSMenuItem"; title = "Move Focus Up"; ObjectID = "gZj-8W-T7o"; */
+"gZj-8W-T7o.title" = "Mover el Foco Arriba";
+
+/* Class = "NSMenuItem"; title = "Export As Text..."; ObjectID = "hJw-Fc-daG"; */
+"hJw-Fc-daG.title" = "Exportar Como Texto...";
+
+/* Class = "NSMenuItem"; title = "Scan Recent"; ObjectID = "hUr-J9-FbH"; */
+"hUr-J9-FbH.title" = "Escaneo Reciente";
+
+/* Class = "NSMenu"; title = "Scan Recent"; ObjectID = "HXb-90-KwJ"; */
+"HXb-90-KwJ.title" = "Escaneo reciente";
+
+/* Class = "NSMenuItem"; title = "Zoom In"; ObjectID = "Iyw-2V-esC"; */
+"Iyw-2V-esC.title" = "Aumentar zum";
+
+/* Class = "NSMenuItem"; title = "Move Focus Up"; ObjectID = "K6z-Zt-rLu"; */
+"K6z-Zt-rLu.title" = "Mover el Foco Arriba";
+
+/* Class = "NSMenuItem"; title = "Reset Focus"; ObjectID = "l4V-Wf-FCv"; */
+"l4V-Wf-FCv.title" = "Reinicializar Foco";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "lnG-FS-oUL"; */
+"lnG-FS-oUL.title" = "Borrar";
+
+/* Class = "NSMenuItem"; title = "Rescan selected"; ObjectID = "Lsx-9H-7TJ"; */
+"Lsx-9H-7TJ.title" = "Reescanear selección";
+
+/* Class = "NSMenuItem"; title = "Rescan all"; ObjectID = "nFT-y9-xF4"; */
+"nFT-y9-xF4.title" = "Reescanear todo";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "oY0-9q-f9z"; */
+"oY0-9q-f9z.title" = "Zum";
+
+/* Class = "NSMenuItem"; title = "Move Focus Down"; ObjectID = "QCC-Gl-y9i"; */
+"QCC-Gl-y9i.title" = "Mover el Foco Abajo";
+
+/* Class = "NSMenu"; title = "Zoom"; ObjectID = "qtI-xz-v9u"; */
+"qtI-xz-v9u.title" = "Zum";
+
+/* Class = "NSMenu"; title = "Rescan"; ObjectID = "rfs-HZ-ODE"; */
+"rfs-HZ-ODE.title" = "Reescanear";
+
+/* Class = "NSMenuItem"; title = "Display Focus"; ObjectID = "wd7-sh-TkA"; */
+"wd7-sh-TkA.title" = "Ver Enfoque";
+
+/* Class = "NSMenu"; title = "Selection Focus"; ObjectID = "wHh-Gg-e7R"; */
+"wHh-Gg-e7R.title" = "Seleccionar Enfoque";
+
+/* Class = "NSMenuItem"; title = "Reveal"; ObjectID = "wVF-ys-3UQ"; */
+"wVF-ys-3UQ.title" = "Revelar";
+
+/* Class = "NSMenuItem"; title = "Reset Zoom"; ObjectID = "y2y-vX-zhd"; */
+"y2y-vX-zhd.title" = "Reinicializar Zum";
+

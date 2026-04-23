@@ -1,0 +1,144 @@
+/* Class = "NSWindow"; title = "Filter test"; ObjectID = "5"; */
+"5.title" = "Suodatinehto";
+
+/* Class = "NSBox"; title = "Subtests"; ObjectID = "10"; */
+"10.title" = "Aliehdot";
+
+/* Class = "NSMenuItem"; title = "contains"; ObjectID = "18"; */
+"18.title" = "sisältää";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "21"; */
+"21.title" = "on";
+
+/* Class = "NSMenuItem"; title = "starts with"; ObjectID = "22"; */
+"22.title" = "alkaa";
+
+/* Class = "NSMenuItem"; title = "starts with"; ObjectID = "39"; */
+"39.title" = "alkaa";
+
+/* Class = "NSMenuItem"; title = "contains"; ObjectID = "40"; */
+"40.title" = "sisältää";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "42"; */
+"42.title" = "on";
+
+/* Class = "NSMenuItem"; title = "bytes"; ObjectID = "45"; */
+"45.title" = "tavua";
+
+/* Class = "NSMenuItem"; title = "MB"; ObjectID = "46"; */
+"46.title" = "Mt";
+
+/* Class = "NSMenuItem"; title = "kB"; ObjectID = "47"; */
+"47.title" = "Kt";
+
+/* Class = "NSMenuItem"; title = "MB"; ObjectID = "51"; */
+"51.title" = "Mt";
+
+/* Class = "NSMenuItem"; title = "bytes"; ObjectID = "53"; */
+"53.title" = "tavua";
+
+/* Class = "NSMenuItem"; title = "kB"; ObjectID = "56"; */
+"56.title" = "Kt";
+
+/* Class = "NSMenuItem"; title = "ends with"; ObjectID = "93"; */
+"93.title" = "päättyy";
+
+/* Class = "NSMenuItem"; title = "ends with"; ObjectID = "94"; */
+"94.title" = "päättyy";
+
+/* Class = "NSMenuItem"; title = "GB"; ObjectID = "95"; */
+"95.title" = "Gt";
+
+/* Class = "NSMenuItem"; title = "GB"; ObjectID = "96"; */
+"96.title" = "Gt";
+
+/* Class = "NSMenuItem"; title = "files and folders"; ObjectID = "151"; */
+"151.title" = "tiedostot ja hakemistot";
+
+/* Class = "NSMenuItem"; title = "folders"; ObjectID = "152"; */
+"152.title" = "hakemistot";
+
+/* Class = "NSMenuItem"; title = "files"; ObjectID = "153"; */
+"153.title" = "tiedostot";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "173"; */
+"173.title" = "on";
+
+/* Class = "NSMenuItem"; title = "is not"; ObjectID = "174"; */
+"174.title" = "ei ole";
+
+/* Class = "NSMenuItem"; title = "is not"; ObjectID = "183"; */
+"183.title" = "ei ole";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "184"; */
+"184.title" = "on";
+
+/* Class = "NSMenuItem"; title = "conforms to"; ObjectID = "387"; */
+"387.title" = "noudattaa";
+
+/* Class = "NSMenuItem"; title = "equals"; ObjectID = "388"; */
+"388.title" = "on sama kuin";
+
+/* Class = "NSMenuItem"; title = "Add"; ObjectID = "396"; */
+"396.title" = "Lisää";
+
+/* Class = "NSButtonCell"; title = "name"; ObjectID = "489"; */
+"489.title" = "nimi";
+
+/* Class = "NSButtonCell"; title = "path"; ObjectID = "490"; */
+"490.title" = "polku";
+
+/* Class = "NSButtonCell"; title = "size is larger than"; ObjectID = "492"; */
+"492.title" = "koko on isompi kuin";
+
+/* Class = "NSButtonCell"; title = "size is smaller than"; ObjectID = "495"; */
+"495.title" = "koko on pienempi kuin";
+
+/* Class = "NSButtonCell"; title = "Ignore case"; ObjectID = "498"; */
+"498.title" = "Älä välitä kirjainkoosta";
+
+/* Class = "NSButtonCell"; title = "Ignore case"; ObjectID = "499"; */
+"499.title" = "Älä välitä kirjainkoosta";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "500"; */
+"500.title" = "Poista";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "501"; */
+"501.title" = "Lisää";
+
+/* Class = "NSButtonCell"; title = "item"; ObjectID = "502"; */
+"502.title" = "kohde";
+
+/* Class = "NSTextFieldCell"; title = "hard-linked"; ObjectID = "504"; */
+"504.title" = "linkki (hard)";
+
+/* Class = "NSButtonCell"; title = "item"; ObjectID = "505"; */
+"505.title" = "kohde";
+
+/* Class = "NSTextFieldCell"; title = "a package"; ObjectID = "506"; */
+"506.title" = "paketti";
+
+/* Class = "NSButtonCell"; title = "type"; ObjectID = "508"; */
+"508.title" = "tyyppi";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "509"; */
+"509.title" = "Poista";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "510"; */
+"510.title" = "Poista";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "511"; */
+"511.title" = "Lisää";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "514"; */
+"514.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "515"; */
+"515.title" = "Kumoa";
+
+/* Class = "NSTextFieldCell"; title = "Apply to:"; ObjectID = "517"; */
+"517.title" = "Kohde:";
+
+/* Class = "NSTextFieldCell"; title = "Name:"; ObjectID = "M2Z-4Q-CYi"; */
+"M2Z-4Q-CYi.title" = "Nimi:";
+

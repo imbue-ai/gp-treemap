@@ -1,0 +1,174 @@
+/* Color mapping scheme */
+"access" = "Último acesso";
+
+/* Filter test */
+"Audio" = "Audio";
+
+/* File size base type */
+"base-2" = "Binário";
+
+/* File size base type */
+"base-10" = "Decimal";
+
+/* Color palette */
+"BlueSkyTulips" = "Tulipas azuis-celeste";
+
+/* Color palette */
+"Bujumbura" = "Bujumbura";
+
+/* Rescan preference behaviour */
+"close old window" = "Fechar janela anterior";
+
+/* Color palette */
+"CoffeeBeans" = "Grãos de café";
+
+/* Color mapping scheme */
+"creation" = "Criação";
+
+/* Color palette */
+"Daytona" = "Praia de Daytona";
+
+/* File deletion preference option */
+"delete files and folders" = "Arquivos e pastas";
+
+/* File deletion preference option */
+"delete nothing" = "Nada";
+
+/* Preference option for what to do after last view is closed */
+"do nothing" = "Ignorar";
+
+/* Color mapping scheme */
+"extension" = "Extensão";
+
+/* Color palette */
+"FengShui" = "Feng Shui";
+
+/* Color palette */
+"FlyingGeese" = "Magenta mágico";
+
+/* Color mapping scheme */
+"folder" = "Pasta";
+
+/* Name of "special" file in the viewer */
+"free" = "Espaço livre";
+
+/* Name of "special" file in the viewer */
+"freed" = "Espaço liberado";
+
+/* Color palette */
+"GreenEggs" = "Ovos Verdes";
+
+/* Filter test */
+"Hard-linked items" = "Itens hard-linkeds";
+
+/* Color palette */
+"Heatmap-12" = "Mapa de calor 12";
+
+/* Color palette */
+"Heatmap-23" = "Mapa de calor 23";
+
+/* Filter test */
+"Huge files" = "Arquivos gigantes";
+
+/* Filter test */
+"Images" = "Imagens";
+
+/* Rescan preference behaviour */
+"keep old window" = "Manter a janela anterior ";
+
+/* Color palette */
+"LagoonNebula" = "Lagoa nebulosa";
+
+/* Filter test */
+"Large files" = "Arquivos grandes";
+
+/* Color mapping scheme */
+"level" = "Nível";
+
+/* File size type */
+"logical" = "Lógico";
+
+/* Filter test */
+"Medium files" = "Arquivos médios";
+
+/* Name of "special" file in the viewer */
+"misc used" = "Espaço usado - miscelânea";
+
+/* Color mapping scheme */
+"modification" = "Última mudança";
+
+/* Color palette */
+"Monaco" = "Mônaco";
+
+/* Color palette */
+"MossAndLichen" = "Moss e lichen";
+
+/* Color mapping scheme */
+"name" = "Nome";
+
+/* Filter name */
+"No cloud files" = "Sem arquivos da nuvem";
+
+/* Filter name */
+"No hard-links" = "Sem hard-links";
+
+/* Filter name */
+"No version control" = "Sem controle de versão";
+
+/* Filter name */
+"None" = "Nenhum";
+
+/* Color mapping scheme */
+"nothing" = "Nada";
+
+/* Color palette */
+"OliveSunset" = "Pôr-do-sol oliva";
+
+/* File deletion preference option */
+"only delete files" = "Arquivos";
+
+/* Color palette */
+"OrigamiMice" = "Origami Mice";
+
+/* Filter test */
+"Packages" = "Pacotes";
+
+/* File size type */
+"physical" = "Físico";
+
+/* Preference option for what to do after last view is closed */
+"quit" = "Finalizar a aplicação";
+
+/* Color palette */
+"Rainbow" = "Arco-íris";
+
+/* Rescan preference option */
+"rescan all" = "Reexaminar tudo";
+
+/* Rescan preference option */
+"rescan visible" = "Reexaminar a pasta mostrada";
+
+/* Preference option for what to do after last view is closed */
+"show welcome" = "Mostra janela de boas vindas";
+
+/* Filter test */
+"Small files" = "Arquivos pequenos";
+
+/* File size type */
+"tally" = "Cálculo";
+
+/* Filter test */
+"Tiny files" = "Arquivos bem pequenos";
+
+/* Color mapping scheme */
+"top folder" = "Pasta superior";
+
+/* Color mapping scheme */
+"uniform type" = "Tipo de arquivo";
+
+/* Preference option for display focus */
+"unlimited" = "Ilimitado";
+
+/* Filter test */
+"Version control" = "Controle de versão";
+

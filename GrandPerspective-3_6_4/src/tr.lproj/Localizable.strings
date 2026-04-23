@@ -1,0 +1,477 @@
+/* Legend for Size-based mapping scheme. */
+"%@ - %@" = "%1$@ - %2$@";
+
+/* Enumeration of two items */
+"%@ and %@" = "%1$@ ve %2$@";
+
+/* Enumeration of two items */
+"%@ or %@" = "%1$@ veya %2$@";
+
+/* Enumeration of three or more items with 1: an item, 2: two or more items */
+"%@, %@" = "%1$@, %2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, and %@" = "%1$@ ve %2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, or %@" = "%1$@ veya %2$@";
+
+/* Legend for Time-based mapping schemes. */
+"%d - %d days ago" = "%1$d — %2$d gün önce";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago" = "%d gün önce";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago or more" = "%d gün veya daha önce";
+
+/* Message in progress panel while filtering */
+"%d folders filtered" = "%d klasör süzüldü";
+
+/* Message in progress panel while executing refresh-based scan */
+"%d folders processed" = "%d klasör işlendi";
+
+/* Message in progress panel while loading data */
+"%d folders read" = "%d klasör okundu";
+
+/* Message in progress panel while saving data */
+"%d folders saved" = "%d klasör kaydedildi";
+
+/* Message in progress panel while executing a full scan */
+"%d folders scanned" = "%d klasör tarandı";
+
+/* Exact file size (in bytes) */
+"%qu bytes" = "%qu bayt";
+
+/* Tally folder size (in number of files) */
+"%qu files" = "%qu dosya";
+
+/* Alert message */
+"A filter named \"%@\" already exists" = "“%@” adlı bir süzgeç zaten var";
+
+/* Alert message (Note: 'it' can refer to a file or a folder) */
+"A possible reason is that it does not exist anymore" = "Olası bir neden artık var olmaması olabilir";
+
+/* Alert message */
+"A test named \"%@\" already exists" = "“%@” adlı bir sınama zaten var";
+
+/* Alert message (with filename arg) */
+"Aborted saving the scan data to \"%@\"" = "Tarama verilerinin “%@” adıyla kaydedilmesi durduruldu";
+
+/* Header in exported text file */
+"Accessed" = "Erişildi";
+
+/* Label in Focus panel */
+"Area in view:" = "Görünümdeki alan:";
+
+/* Parse error */
+"Attribute not found" = "Öznitelik bulunamadı";
+
+/* File size unit for bytes. */
+"B" = "B";
+
+/* Alert panel button */
+"Cancel" = "Vazgeç";
+
+/* Part of tool tip for uniform types */
+"Conforms to:" = "İle uyumludur:";
+
+/* Alert panel button */
+"Continue" = "Sürdür";
+
+/* Header in exported text file */
+"Created" = "Oluşturulma";
+
+/* Alert panel button */
+"Delete" = "Sil";
+
+/* Menu item */
+"Delete File" = "Dosyayı Sil";
+
+/* Menu item */
+"Delete Folder" = "Dosyayı Klasör";
+
+/* FDA warning sheet */
+"Disk access required" = "Disk erişimi gerekiyor";
+
+/* Status update message */
+"Display focus changed to %@" = "Görüntüleme odağı %@ olarak değişti";
+
+/* FDA warning alert */
+"Do not show again" = "Bir Daha Gösterme";
+
+/* Alert message */
+"Do you want to delete the file \"%@\"?" = "“%@” dosyasını silmek istiyor musunuz?";
+
+/* Alert message */
+"Do you want to delete the folder \"%@\"?" = "“%@” klasörünü silmek istiyor musunuz?";
+
+/* Alert message */
+"Do you want to delete the package \"%@\"?" = "“%@” paketini silmek istiyor musunuz?";
+
+/* FDA warning alert */
+"Edit System Preferences" = "Sistem Ayarları'nı Aç";
+
+/* Parse error */
+"Encountered filter after folder" = "Klasörden sonra süzgeç bulundu";
+
+/* Parse error */
+"Encountered more than one root element" = "Birden fazla kök öğe bulundu";
+
+/* Parse error */
+"Encountered more than one root folder" = "Birden fazla kök klasör bulundu";
+
+/* Parse error */
+"Encountered multiple %@ elements" = "Birden çok %@ öğe bulundu";
+
+/* Parse error */
+"Error parsing \"%@\" attribute: %@" = "“%1$@” özniteliği ayrıştırılırken hata: %2$@";
+
+/* Parse error */
+"Expected %@ element" = "%@ öğesi bekleniyordu";
+
+/* Error message */
+"Expected a folder" = "Bir klasör bekleniyordu";
+
+/* Parse error */
+"Expected boolean value" = "Mantıksal (doğru/yanlış) bir değer bekleniyordu";
+
+/* Parse error */
+"Expected date value" = "Tarih değeri bekleniyordu";
+
+/* Parse error */
+"Expected integer value" = "Tamsayı değeri bekleniyordu";
+
+/* Error message */
+"Expected scandata file" = "Tarama verisi dosyası bekleniyordu";
+
+/* Parse error */
+"Expected time value" = "Zaman değeri bekleniyordu";
+
+/* Parse error */
+"Expected unsigned integer value" = "İmzalanmamış tamsayı değeri bekleniyordu";
+
+/* Title of save panel */
+"Export image" = "Görseli dışa aktar";
+
+/* Title of save panel */
+"Export scan data as text" = "Tarama verisini metin olarak dışa aktar";
+
+/* Alert message */
+"Failed to bind one or more filter tests:\n%@" = "Bir veya birden fazla süzgeç sınaması bağlanamadı:\n%@";
+
+/* Error message */
+"Failed to close file" = "Dosya kapatılamadı";
+
+/* Error message */
+"Failed to create file" = "Dosya oluşturulamadı";
+
+/* Alert message */
+"Failed to delete the file \"%@\"" = "“%@” dosyası silinemedi";
+
+/* Alert message */
+"Failed to delete the folder \"%@\"" = "“%@” klasörü silinemedi";
+
+/* Alert message */
+"Failed to determine volume root" = "Bölüm kökü algılanamadı";
+
+/* Error message */
+"Failed to get path from pasteboard" = "Yolu panodan alırken hata oluştu";
+
+/* Alert message (with filename arg) */
+"Failed to load the scan data from \"%@\"" = "Tarama verisini “%@” konumundan yüklerken hata oluştu";
+
+/* Alert message */
+"Failed to open the file \"%@\"" = "“%@” dosyası açılamadı";
+
+/* Alert message */
+"Failed to open the folder \"%@\"" = "“%@” klasörü açılamadı";
+
+/* Alert message */
+"Failed to open the package \"%@\"" = "“%@” paketi açılamadı";
+
+/* Parse error */
+"Failed to read any tree data" = "Herhangi bir ağaç verisi okunamadı";
+
+/* Alert message */
+"Failed to reveal the file \"%@\"" = "“%@” dosyası ortaya çıkarılamadı";
+
+/* Alert message */
+"Failed to reveal the folder \"%@\"" = "“%@” klasörü ortaya çıkarılamadı";
+
+/* Alert message */
+"Failed to reveal the package \"%@\"" = "“%@” paketi ortaya çıkarılamadı";
+
+/* Alert message */
+"Failed to save the image" = "Görsel kaydedilemedi";
+
+/* Alert message (with filename arg) */
+"Failed to save the scan data to \"%@\"" = "Tarama verisi “%@” konumuna kaydedilemedi";
+
+/* Alert message */
+"Failed to update one or more filters:\n%@" = "Bir veya birden fazla süzgeç güncellenemedi:\n%@";
+
+/* Error message */
+"Failed to write to file" = "Dosyaya yazılamadı";
+
+/* Label in Focus panel */
+"File in view:" = "Görünümdeki dosya:";
+
+/* Header in exported text file */
+"Filename" = "Dosya adı";
+
+/* Window title */
+"Filter - %@" = "Süzgeç — %@";
+
+/* Window title */
+"Filter test - %@" = "Süzgeç sınaması — %@";
+
+/* Message in progress panel while filtering */
+"Filtering %@" = "%@ süzülüyor";
+
+/* Title of progress panel. */
+"Filtering in progress" = "Süzme işlemi sürüyor";
+
+/* Label in Focus panel */
+"Folder in view:" = "Görüntüdeki klasör:";
+
+/* Alert message */
+"For %d files the reported (logical) size is larger than their actual (physical) size. Consider rescanning using the Physical file size measure" = "%d dosyaları için raporlanan (mantıksal) boyut onların gerçek (fiziksel) boyutlarından daha büyüktür. Fiziksel dosya boyutu seçeneğini kullanarak yeniden taramayı deneyin";
+
+/* FDA success alert */
+"Full Disk Access is verified." = "Tam Disk Erişimi doğrulandı.";
+
+/* File size unit for gigabytes. */
+"GB" = "GB";
+
+/* FDA warning sheet */
+"GrandPerspective needs full access to your disk for optimal scan performance. Please select your main volume (e.g. Macintosh HD) in the following prompt." = "En iyi tarama performansı için GrandPerspective’in diskinize tam erişimi gerekiyor. Lütfen, aşağıdaki istemden ana disk bölümünüzü (örn. Macintosh HD) seçin.";
+
+/* FDA warning alert */
+"GrandPerspective seems to lack Full Disk Access permissions" = "GrandPerspective’in Tam Disk Erişimi izni yok gibi görünüyor";
+
+/* Menu item */
+"Hide Control Panel" = "Denetim Panelini Gizle";
+
+/* Alert message */
+"Inaccuracies in hard-linked folder contents" = "Sabit bağlantılı klasör içeriğinde tutarsızlıklar";
+
+/* File size unit for kilobytes. */
+"kB" = "kB";
+
+/* Legend for Size-based mapping scheme. */
+"Larger than %@" = "Şundan daha büyük: %@";
+
+/* Legend for Level mapping scheme. */
+"Level %d" = "Düzey %d";
+
+/* Title of load panel */
+"Load scan data" = "Tarama verisini yükle";
+
+/* Title of progress panel. */
+"Loading in progress" = "Yükleniyor";
+
+/* Misc. description for Level mapping scheme. */
+"Lower levels" = "Daha alt düzeyler";
+
+/* File size unit for megabytes. */
+"MB" = "MB";
+
+/* Header in exported text file */
+"Modified" = "Değiştirildi";
+
+/* Legend for Time-based mapping schemes. */
+"More recent" = "Daha yeni";
+
+/* Initial match value in FilterTestWindow */
+"New match" = "Yeni eşleşme";
+
+/* The filter name when there is no filter. */
+"None" = "Yok";
+
+/* Alert additional informative text */
+"Note: The file is hard-linked. It will take up space until all links to it are deleted" = "Not: Dosya sabit bağlantılı. Buna olan tüm bağlantılar silinene kadar yer işgal etmeyi sürdürecektir";
+
+/* Alert additional informative text */
+"Note: The folder is hard-linked. It will take up space until all links to it are deleted" = "Not: Klasör sabit bağlantılı. Buna olan tüm bağlantılar silinene kadar yer işgal etmeyi sürdürecektir";
+
+/* Alert additional informative text */
+"Note: The package is hard-linked. It will take up space until all links to it are deleted" = "Not: Paket sabit bağlantılı. Buna olan tüm bağlantılar silinene kadar yer işgal etmeyi sürdürecektir";
+
+/* Alert panel button */
+"OK" = "Tamam";
+
+/* Misc. description for File type mapping scheme. */
+"other file types" = "diğer dosya türleri";
+
+/* Legend for Level mapping scheme. */
+"Outermost level" = "En dış düzey";
+
+/* Label in Focus panel */
+"Package in view:" = "Görüntüdeki paket:";
+
+/* Parse error */
+"Parse error (line %d): %@" = "Ayrıştırma hatası (%1$d. satır): %2$@";
+
+/* Parse error */
+"Parsing aborted" = "Ayrıştırma durduruldu";
+
+/* Header in exported text file */
+"Path" = "Yol";
+
+/* FDA success alert */
+"Permission setup complete" = "İzin ayarı tamamlandı.";
+
+/* Message in progress panel while loading data */
+"Reading %@" = "%@ okunuyor";
+
+/* Title of progress panel. */
+"Refresh in progress" = "Yenileme sürüyor";
+
+/* Alert panel button */
+"Remove" = "Kaldır";
+
+/* Alert message */
+"Remove the filter named \"%@\"?" = "“%@” adlı süzgeci kaldırmak istiyor musunuz?";
+
+/* Alert message */
+"Remove the test named \"%@\"?" = "“%@” adlı süzgeci kaldırmak istiyor musunuz?";
+
+/* Title of save panel */
+"Save scan data" = "Tarama verisini kaydet";
+
+/* Message in progress panel while saving data */
+"Saving %@" = "%@ kaydediliyor";
+
+/* Title of progress panel. */
+"Saving in progress" = "Kaydediliyor";
+
+/* Prompt in open panel */
+"Scan" = "Tara";
+
+/* Title of open panel */
+"Scan folder" = "Klasörü tara";
+
+/* Solitairy entry in Start window */
+"Scan Folder" = "Klasör Seç";
+
+/* Entry in Start window, alongside other options */
+"Scan Other Folder" = "Başka Klasör Seç";
+
+/* Message in progress panel while scanning */
+"Scanning %@" = "%@ taranıyor";
+
+/* Alert message */
+"Scanning failed" = "Tarama başarısız oldu";
+
+/* Title of progress panel. */
+"Scanning in progress" = "Tarama sürüyor";
+
+/* Button of Open panel */
+"Select Drive" = "Sürücü Seç";
+
+/* Open panel message */
+"Select your main drive (e.g. Macintosh HD)" = "Ana disk bölümünüzü (örn. Macintosh HD) seçin.";
+
+/* Label in Focus panel */
+"Selected area:" = "Seçilen alan:";
+
+/* Label in Focus panel */
+"Selected file:" = "Seçilen dosya:";
+
+/* Label in Focus panel */
+"Selected folder:" = "Seçilen klasör:";
+
+/* Label in Focus panel */
+"Selected package:" = "Seçilen paket:";
+
+/* Menu item */
+"Show Control Panel" = "Denetim Panelini Göster";
+
+/* Header in exported text file */
+"Size" = "Boyut";
+
+/* Legend for Size-based mapping scheme. */
+"Smaller than %@" = "Şundan daha küçük: %@";
+
+/* Legend for Size-based mapping scheme. */
+"Smallest" = "En küçük";
+
+/* Alert message (with filename arg) */
+"Successfully saved the scan data to \"%@\"" = "Tarama verisi “%@” konumuna başarıyla kaydedildi";
+
+/* File size unit for terabytes. */
+"TB" = "TB";
+
+/* Alert message */
+"The actual (physical) size is %.1f%% of the reported (logical) size. Consider rescanning using the Physical file size measure" = "Gerçek (fiziksel) boyut, raporlanan (mantıksal) boyutun %%%.1f kadarıdır. Fiziksel dosya boyutu seçeneğini kullanarak yeniden taramayı deneyin.";
+
+/* Alert message */
+"The filter must have a name" = "Süzgecin bir adı olmalı";
+
+/* Alert informative text */
+"The filter will be irrevocably removed from the filter repository" = "Süzgeç, süzgeç deposundan geri alınamaz bir biçimde silinecektir";
+
+/* Alert informative text */
+"The filter will be replaced by the default filter with this name" = "Süzgeç bu ada sahip varsayılan süzgeç ile değiştirilecektir";
+
+/* Alert message */
+"The path %@ does not exist or is not a folder" = "%@ yolu yok veya bir klasör değil";
+
+/* Alert message */
+"The refreshed content may not be fully accurate. Hard-linked items may occur more than once or could be missing. Perform a rescan to ensure that each hard-linked item occurs only once" = "Yenilenmiş içerik tümüyle doğru olmayabilir. Sabit bağlantılı öğeler birden çok veya kaybolmuş olabilir. Her bir sabit bağlantılı öğenin yalnızca bir kez göründüğünden emin olmak için bir yeniden tarama gerçekleştirin.";
+
+/* Alert message */
+"The reported size of some files is larger than their actual size on disk" = "Bazı dosyaların raporlanan boyutu, onların kendi gerçek boyutlarından daha büyüktür";
+
+/* Alert message */
+"The reported total size is larger than the actual size on disk" = "Raporlanan toplam boyut, diskteki gerçek boyuttan daha büyük";
+
+/* Alert informative text */
+"The resulting file is valid but incomplete" = "Ortaya çıkan dosya geçerli; ancak tam değil";
+
+/* Alert informative text */
+"The selected file will be moved to Trash" = "Seçilen dosya Çöp Sepeti’ne taşınacaktır";
+
+/* Alert informative text */
+"The selected folder, with all its contents, will be moved to Trash. Beware, any files in the folder that are not shown in the view will also be deleted" = "Seçilen klasör, tüm içeriği ile birlikte Çöp Sepeti’ne taşınacaktır. Dikkat! Bu klasörde olan ve görüntülenmeyen tüm dosyalar da silinecektir.";
+
+/* Alert informative text */
+"The selected package will be moved to Trash" = "Seçili paket Çöp Sepeti’ne taşınacaktır";
+
+/* Alert message */
+"The test must have a name" = "Sınamanın bir adı olmalı";
+
+/* Alert informative text */
+"The test will be irrevocably removed from the test repository" = "Sınama geri dönüşü olmayacak bir biçimde sınama deposundan silinecektir";
+
+/* Alert informative text */
+"The test will be replaced by the default test with this name" = "Sınama bu ada sahip varsayılan sınama ile değiştirilecektir";
+
+/* Alert informative text */
+"The unbound tests have been omitted from the filter" = "Bağlanmamış sınamalar süzgeçten çıkarılmıştır";
+
+/* Alert informative text */
+"These filters do not exist anymore. Their old definition is used instead" = "Süzgeçler artık yok. Bunun yerine eski tanımlar kullanılacak";
+
+/* FDA warning alert */
+"This may limit the disk content it can see. To remedy this, you can grant the permissions via the System Preferences." = "Bu, onun görebileceği disk alanını sınırlayabilir. Bu sorunu çözmek için Sistem Ayarları'ndan gerekli izinleri sağlayabilirsiniz";
+
+/* Part of tool tip for uniform types */
+"Top-level type" = "Üst düzey tür";
+
+/* Header in exported text file */
+"Type" = "Tür";
+
+/* Description for 'unknown' UTI. */
+"unknown file type" = "bilinmeyen dosya türü";
+
+/* Window title */
+"Unnamed filter" = "Adsız süzgeç";
+
+/* Window title */
+"Unnamed filter test" = "Adsız süzgeç sınaması";
+
+/* Parse error */
+"Unrecognized value" = "Tanımlanamayan değer";
+

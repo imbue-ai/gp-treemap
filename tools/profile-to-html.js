@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Convert a Chrome DevTools .cpuprofile into a self-contained HTML treemap
-// visualization using <raised-treemap>.
+// visualization using <gp-treemap>.
 //
 // Hierarchy:
 //   root
@@ -22,7 +22,7 @@ import os from 'node:os';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const BUNDLE_PATH = path.join(ROOT, 'dist', 'raised-treemap.bundle.js');
+const BUNDLE_PATH = path.join(ROOT, 'dist', 'gp-treemap.bundle.js');
 
 function parseArgs() {
   const argv = process.argv.slice(2);
@@ -298,7 +298,7 @@ async function main() {
     color: var(--page-fg, #222); }
   header .stat { color: var(--page-fg-muted, #555); font-size:13px; font-variant-numeric: tabular-nums; }
   header .stat b { color: var(--page-fg, #000); font-weight:600; }
-  raised-treemap { display:flex; flex: 1; min-height: 0; }
+  gp-treemap { display:flex; flex: 1; min-height: 0; }
   #stats-bar { padding: 3px 14px; font-size: 12px; font-variant-numeric: tabular-nums; min-height: 18px;
     color: var(--page-fg-muted, #888); background: var(--page-surface, #fff);
     border-top: 1px solid var(--page-border, #0002); transition: background .15s, color .15s;
@@ -330,12 +330,12 @@ async function main() {
     </select>
   </span>
 </header>
-<raised-treemap id="tm"
+<gp-treemap id="tm"
   color-mode="categorical"
   palette="tokyo-night"
   theme="tokyo-night"
   gradient-intensity="0.6"
-  min-cell-area="30"></raised-treemap>
+  min-cell-area="30"></gp-treemap>
 <div id="stats-bar"></div>
 
 <script type="application/json" id="tmdata">${JSON.stringify(payload).replace(/</g, '\\u003c')}</script>
@@ -422,8 +422,8 @@ ${bundle}
     if (urlStr) parts.push(urlStr);
     bar.textContent = parts.join('  |  ');
   }
-  tm.addEventListener('rt-focus', updateBar);
-  tm.addEventListener('rt-target', updateBar);
+  tm.addEventListener('gp-focus', updateBar);
+  tm.addEventListener('gp-target', updateBar);
   requestAnimationFrame(function () { setTimeout(updateBar, 0); });
 })();
 </script>

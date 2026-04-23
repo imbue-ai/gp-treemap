@@ -1,0 +1,186 @@
+/* Color mapping scheme */
+"access" = "Viimeisin käyttö";
+
+/* Filter test */
+"Audio" = "Audio";
+
+/* File size base type */
+"base-2" = "Binäärinen";
+
+/* File size base type */
+"base-10" = "Desimaalinen";
+
+/* Color palette */
+"BlueSkyTulips" = "Sinitaivastulppaanit";
+
+/* Color palette */
+"Bujumbura" = "Bujumbura";
+
+/* Rescan preference behaviour */
+"close old window" = "Sulje vanha ikkuna";
+
+/* Color palette */
+"CoffeeBeans" = "Kahvipavut";
+
+/* Color mapping scheme */
+"creation" = "Luonti";
+
+/* Color palette */
+"Daytona" = "Daytona ranta";
+
+/* File deletion preference option */
+"delete files and folders" = "Tiedostot ja hakemistot";
+
+/* File deletion preference option */
+"delete nothing" = "Ei mitään";
+
+/* Preference option for what to do after last view is closed */
+"do nothing" = "Älä tee mitään";
+
+/* Color mapping scheme */
+"extension" = "Tiedostopääte";
+
+/* Color palette */
+"FengShui" = "Feng Shui";
+
+/* Draw setting */
+"files" = "Tiedostot";
+
+/* Color palette */
+"FlyingGeese" = "Aniliininpunainen taika";
+
+/* Color mapping scheme */
+"folder" = "Hakemisto";
+
+/* Draw setting */
+"folders" = "Paketit & Hakemistot";
+
+/* Name of "special" file in the viewer */
+"free" = "Vapaa tila";
+
+/* Name of "special" file in the viewer */
+"freed" = "Vapautettu tila";
+
+/* Color palette */
+"GreenEggs" = "Vihreät kananmunat";
+
+/* Filter test */
+"Hard-linked items" = "Linkitetyt (hard)";
+
+/* Color palette */
+"Heatmap-12" = "Kuumuuskartta 12";
+
+/* Color palette */
+"Heatmap-23" = "Kuumuuskartta 23";
+
+/* Filter test */
+"Huge files" = "Valtavat tiedostot";
+
+/* Filter test */
+"Images" = "Kuvat";
+
+/* Rescan preference behaviour */
+"keep old window" = "Pidä vanha ikkuna";
+
+/* Color palette */
+"LagoonNebula" = "Laguunitähtisumu";
+
+/* Filter test */
+"Large files" = "Isot tiedostot";
+
+/* Color mapping scheme */
+"level" = "Taso";
+
+/* File size type */
+"logical" = "Looginen";
+
+/* Filter test */
+"Medium files" = "Keskikokoiset tiedostot";
+
+/* Name of "special" file in the viewer */
+"misc used" = "Sekalainen käytetty tila";
+
+/* Color mapping scheme */
+"modification" = "Viimeisin muutos";
+
+/* Color palette */
+"Monaco" = "Monaco";
+
+/* Color palette */
+"MossAndLichen" = "Sammal ja jäkälä";
+
+/* Color mapping scheme */
+"name" = "Nimi";
+
+/* Filter name */
+"No cloud files" = "Ei pilvitiedostoja";
+
+/* Filter name */
+"No hard-links" = "Ei linkitettyjä (hard)";
+
+/* Filter name */
+"No version control" = "Ei versiohallintaa";
+
+/* Filter name */
+"None" = "Ei mitään";
+
+/* Color mapping scheme */
+"nothing" = "Ei mitään";
+
+/* Color palette */
+"OliveSunset" = "Oliiviauringonlasku";
+
+/* File deletion preference option */
+"only delete files" = "Tiedostot";
+
+/* Color palette */
+"OrigamiMice" = "Origami hiiri";
+
+/* Filter test */
+"Packages" = "Paketit";
+
+/* Draw setting */
+"packages and files" = "Paketit & Tiedostot";
+
+/* File size type */
+"physical" = "Fyysinen";
+
+/* Preference option for what to do after last view is closed */
+"quit" = "Sulje ohjelma";
+
+/* Color palette */
+"Rainbow" = "Sateenkaari";
+
+/* Rescan preference option */
+"rescan all" = "Skannaa kokonaan uudelleen";
+
+/* Rescan preference option */
+"rescan visible" = "Uudelleenskannaa näkyvissä oleva hakemisto";
+
+/* Preference option for what to do after last view is closed */
+"show welcome" = "Näytä tervetuloa-ikkuna";
+
+/* Color mapping scheme */
+"size" = "Koko";
+
+/* Filter test */
+"Small files" = "Pienet tiedostot";
+
+/* File size type */
+"tally" = "Laskettu";
+
+/* Filter test */
+"Tiny files" = "Tosi pienet tiedostot";
+
+/* Color mapping scheme */
+"top folder" = "Ylin hakemisto";
+
+/* Color mapping scheme */
+"uniform type" = "Tiedostotyyppi";
+
+/* Preference option for display focus */
+"unlimited" = "Rajoittamaton";
+
+/* Filter test */
+"Version control" = "Versiohallinta";
+

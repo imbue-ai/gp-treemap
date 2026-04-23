@@ -1,0 +1,18 @@
+/* (No Comment) */
+"GrandPerspective scan results" = "GrandPerspective skannin tulokset";
+
+/* Privacy - Desktop Folder Usage Description */
+"NSDesktopFolderUsageDescription" = "Ohjelma tarkistaa miten paljon levytilaa Työpöytä käyttää";
+
+/* Privacy - Documents Folder Usage Description */
+"NSDocumentsFolderUsageDescription" = "Ohjelma tarkistaa miten paljon levytilaa Tiedostot käyttää";
+
+/* Privacy - Downloads Folder Usage Description */
+"NSDownloadsFolderUsageDescription" = "Ohjelma tarkistaa miten paljon levytilaa Lataukset käyttää";
+
+/* Privacy - Photo Library Usage Description */
+"NSPhotoLibraryUsageDescription" = "Ohjelma tarkistaa, kuinka paljon levytilaa valokuvat käyttävät";
+
+/* Privacy - Reminders Usage Description */
+"NSRemindersUsageDescription" = "Ohjelma tarkistaa miten paljon levytilaa Muistutukset käyttää";
+

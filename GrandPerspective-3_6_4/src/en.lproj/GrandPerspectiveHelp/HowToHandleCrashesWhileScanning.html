@@ -1,0 +1,60 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>How to handle crashes while scanning</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="How to handle crashes while scanning.">
+<meta name="keywords" content="how to, crash">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>How to handle crashes while scanning</h1>
+</div>
+
+<p>
+GrandPerspective is very stable.
+Crashes while it is scanning are fortunately very rare, but have been known to happen.
+If it happens to you, follow these steps:
+</p>
+
+<ol>
+<li>Enable full logging when starting the application.
+To do so, start the application from Terminal with <tt>-logAll YES</tt> as commandline argument.<br><br>
+For example, when you installed it in your Applications folder type:<br>
+<tt>/Applications/GrandPerspective.app/Contents/MacOS/GrandPerspective -logAll YES</tt>
+</li>
+
+<li>Try to reproduce the crash. Did you manage?
+
+  <ul>
+  <li>No, keep trying.
+Go back to Step 1.</li>
+
+  <li>Yes, then inspect the logging in the Terminal to determine which folder it is trying to scan when the crash happens.
+Continue to Step 3.</li>
+  </ul></li>
+
+<li>Try to find the root cause by answering the following questions:
+
+  <ul>
+  <li>Is it repeatable?
+Does it always crash while scanning the same folder?</li>
+  <li>Is there anything special about this folder?
+For example, does it contain files with unusual characters in their names?</li>
+  </ul></li>
+
+<li>Once you manage to reproduce a repeatable crash, <a href="https://sourceforge.net/p/grandperspectiv/bugs/">submit a bug report for it</a>.
+Provide as much details as you can.
+This should include the steps to reproduce, but also the version of GrandPerspective and your version of macOS.<br><br>
+
+Note: You can also submit a report when you did not manage to reproduce a repeatable crash.
+However, the chance that the problem can then be fixed is much smaller.
+</li>
+</ol>
+
+</body>
+</html>

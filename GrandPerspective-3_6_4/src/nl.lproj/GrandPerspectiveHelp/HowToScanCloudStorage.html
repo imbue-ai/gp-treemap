@@ -1,0 +1,86 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Het analyseren van opslag in de cloud</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Het analyseren van opslag in de cloud">
+<meta name="keywords" content="hoe, Cloud opslag, online only, iCloud, Google Drive, Dropbox, One Drive">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+
+<div id="pagetitle">
+<h1>Het analyseren van opslag in de cloud</h1>
+</div>
+
+<p>
+macOS maakt het mogelijk om via Finder bestanden te bekijken die opgeslagen zijn in de cloud.
+Dit geldt voor bestanden die beheert worden met behulp van Apple's iCloud, maar ook voor cloud opslag oplossingen van derden zoals Dropbox, Google Drive en Microsoft's One Drive.
+Standaard zijn deze bestanden enkel opgeslagen in de cloud en wordt de inhoud opgehaald zodra dat nodig is.
+</p>
+
+<p>
+Hoe dit werkt in combinatie met GrandPerspective wordt hieronder toegelicht.
+</p>
+
+<h2>Hoe beheert macOS de toegang tot "online only" cloud bestanden?</h2>
+
+<p>
+macOS definieert een "File Provider" extensie die applicaties kunnen gebruiken om toegang te geven tot bestanden die in de cloud zijn opgeslagen.
+Vanaf macOS 12.3 is dit de enige "on demand" oplossing voor het beheer van cloud data.
+Het wordt door alle populaire cloud opslag oplossing op macOS ondersteunt, waaronder iCloud, Google Drive, Dropbox, en One Drive.
+</p>
+
+<p>
+Bestanden zijn standaard opgeslagen als "online only".
+Dit betekent dat ze geen ruimte innemen op de lokale schijf.
+Om de inhoud van zo'n bestand te bekijken wordt het bestand ge-download door macOS zodra dit nodig is.
+De inhoud kan vervolgens lokaal gecached worden zodat het een volgende keer snel beschikbaar is.
+Wanneer er te weinig schijfruimte is, kan macOS deze bestanden automatisch verwijderen om ruimte beschikbaar te maken.
+</p>
+
+<h2>Hoe bepaalt U hoeveel schijfruimte de cloud bestanden innemen?</h2>
+
+<p>
+Lees de "CloudStorage" map in met de <a href="FileSizes.html">fysieke bestandsgrootte</a> maat.
+Omdat "online only" bestanden geen ruimte in nemen, zijn deze niet zichtbaar in het resulterende <a href="Views.html">GrandPerspective overzicht</a>.
+Het is daarom goed mogelijk dat dit overzicht enkel een kleine subset van alle bestanden laat zien.
+</p>
+
+<h2>Hoe bepaalt U hoeveel opslagruimte de cloud bestanden in de cloud innemen?</h2>
+
+<p>
+Lees de "CloudStorage" map in met de <a href="FileSizes.html">intrinsieke bestandsgrootte</a> maat.
+Dit zal over het algemeen resulteren in een waarschuwing dat de weergegeven grootte groter is dan de werkelijke benodigde ruimte op de lokale schijf.
+</p>
+
+<h2>Kan het inlezen van een map door GrandPerspective resulteren in het downloaden van cloud bestanden?</h2>
+
+<p>
+Nee, GrandPerspective vraagt enkel bestandsmetadata (bestandsgrootte, tijd van laatste wijziging, enz) op van macOS.
+macOS hoeft de "online only" bestanden niet te downloaden om deze data te retourneren.
+</p>
+
+<p>
+Echter, als de map nog niet eerder bekeken was in Finder of ingelezen door GrandPerspective, dan zal macOS de mappen structuur aanmaken tijdens het inlezen.
+Dit kan enige tijd in beslag nemen maar resulteert niet in het downloaden van cloud bestanden in de map.
+</p>
+
+<h2>Hoe kan ik ervoor zorgen dat GrandPerspective de mappen met cloud bestanden overslaat bij het inlezen?</h2>
+
+<p>
+U kunt hiertoe het <a href="MasksAndFilters.html">filter</a> "Geen cloud bestanden" gebruiken.
+Wanneer dit filter actief is worden de mappen met cloud bestanden tijdens het inlezen in hun geheel overgeslagen.
+</p>
+
+<p>
+Dit filter kan het inlezen versnellen en is vooral handig als u veel cloud bestanden heeft en deze voornamelijk online staan.
+In dat geval kunt u zelfs overwegen het filter standaard aan te zetten.
+Dit kan u doen door het aanpassen van uw <a href="Preferences.html">Voorkeuren</a>.
+</p>
+
+</body>
+</html>

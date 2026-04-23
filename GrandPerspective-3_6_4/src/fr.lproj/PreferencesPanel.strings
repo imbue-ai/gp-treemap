@@ -1,0 +1,60 @@
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "6"; */
+"6.title" = "Préférences";
+
+/* Class = "NSBox"; title = "Display"; ObjectID = "29"; */
+"29.title" = "Afficher";
+
+/* Class = "NSBox"; title = "Scanning"; ObjectID = "57"; */
+"57.title" = "Info";
+
+/* Class = "NSBox"; title = "Actions"; ObjectID = "72"; */
+"72.title" = "Actions";
+
+/* Class = "NSMenuItem"; title = "Files and folders"; ObjectID = "78"; */
+"78.title" = "Fichiers et dossiers";
+
+/* Class = "NSMenuItem"; title = "Close old window"; ObjectID = "153"; */
+"153.title" = "Fermer l'ancienne fenêtre";
+
+/* Class = "NSTextFieldCell"; title = "Palette:"; ObjectID = "167"; */
+"167.title" = "Palette:";
+
+/* Class = "NSTextFieldCell"; title = "Color by:"; ObjectID = "172"; */
+"172.title" = "Colorier par:";
+
+/* Class = "NSTextFieldCell"; title = "File size measure:"; ObjectID = "174"; */
+"174.title" = "Mesure de la taille du fichier:";
+
+/* Class = "NSButtonCell"; title = "Always require confirmation"; ObjectID = "176"; */
+"176.title" = "Toujours demander une confirmation";
+
+/* Class = "NSTextFieldCell"; title = "Enable deletion of:"; ObjectID = "177"; */
+"177.title" = "Activer la suppression de:";
+
+/* Class = "NSTextFieldCell"; title = "After full rescan:"; ObjectID = "178"; */
+"178.title" = "Après réanalyse complète:";
+
+/* Class = "NSTextFieldCell"; title = "Mask:"; ObjectID = "181"; */
+"181.title" = "Masque:";
+
+/* Class = "NSButtonCell"; title = "Show entire volume"; ObjectID = "199"; */
+"199.title" = "Afficher le volume entier";
+
+/* Class = "NSTextFieldCell"; title = "File size unit system:"; ObjectID = "214"; */
+"214.title" = "Système de taille de fichier:";
+
+/* Class = "NSTextFieldCell"; title = "Default filter:"; ObjectID = "bAf-Lb-Hos"; */
+"bAf-Lb-Hos.title" = "Filtre par défaut:";
+
+/* Class = "NSTextFieldCell"; title = "Show:"; ObjectID = "fpR-JL-BuW"; */
+"fpR-JL-BuW.title" = "Afficher:";
+
+/* Class = "NSTextFieldCell"; title = "After closing last view:"; ObjectID = "KFu-2k-t7Z"; */
+"KFu-2k-t7Z.title" = "Après clôture de la dernière vue:";
+
+/* Class = "NSMenuItem"; title = "Terminate application"; ObjectID = "Rrr-CG-7lo"; */
+"Rrr-CG-7lo.title" = "Mettre fin à l'application";
+
+/* Class = "NSTextFieldCell"; title = "Display focus:"; ObjectID = "tci-ro-rrH"; */
+"tci-ro-rrH.title" = "Mise au point de l’affichage:";
+

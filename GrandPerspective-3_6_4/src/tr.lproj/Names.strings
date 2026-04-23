@@ -1,0 +1,186 @@
+/* Color mapping scheme */
+"access" = "Son erişim";
+
+/* Filter test */
+"Audio" = "Ses";
+
+/* File size base type */
+"base-2" = "İkili";
+
+/* File size base type */
+"base-10" = "Ondalık";
+
+/* Color palette */
+"BlueSkyTulips" = "Mavi gökyüzü laleleri";
+
+/* Color palette */
+"Bujumbura" = "Bujumbura";
+
+/* Rescan preference behaviour */
+"close old window" = "Eski pencereyi kapat";
+
+/* Color palette */
+"CoffeeBeans" = "Kahve çekirdekleri";
+
+/* Color mapping scheme */
+"creation" = "Oluşturma";
+
+/* Color palette */
+"Daytona" = "Daytona Sahili";
+
+/* File deletion preference option */
+"delete files and folders" = "Dosyalar ve klasörler";
+
+/* File deletion preference option */
+"delete nothing" = "Hiçbir şey";
+
+/* Preference option for what to do after last view is closed */
+"do nothing" = "Hiçbir şey yapma";
+
+/* Color mapping scheme */
+"extension" = "Genişletme";
+
+/* Color palette */
+"FengShui" = "Feng Shui";
+
+/* Draw setting */
+"files" = "Dosyalar";
+
+/* Color palette */
+"FlyingGeese" = "Fuşya sihiri";
+
+/* Color mapping scheme */
+"folder" = "Klasör";
+
+/* Draw setting */
+"folders" = "Paketler ve klasörler";
+
+/* Name of "special" file in the viewer */
+"free" = "Boş alan";
+
+/* Name of "special" file in the viewer */
+"freed" = "Boşaltılan alan";
+
+/* Color palette */
+"GreenEggs" = "Yeşil yumurtalar";
+
+/* Filter test */
+"Hard-linked items" = "Sabit bağlantılılar";
+
+/* Color palette */
+"Heatmap-12" = "Sıcaklık haritası 12";
+
+/* Color palette */
+"Heatmap-23" = "Sıcaklık haritası 23";
+
+/* Filter test */
+"Huge files" = "Çok büyük dosyalar";
+
+/* Filter test */
+"Images" = "Görseller";
+
+/* Rescan preference behaviour */
+"keep old window" = "Eski pencereyi koru";
+
+/* Color palette */
+"LagoonNebula" = "Deniz kulağı nebula";
+
+/* Filter test */
+"Large files" = "Büyük dosyalar";
+
+/* Color mapping scheme */
+"level" = "Düzey";
+
+/* File size type */
+"logical" = "Mantıksal";
+
+/* Filter test */
+"Medium files" = "Orta büyüklükteki dosyalar";
+
+/* Name of "special" file in the viewer */
+"misc used" = "Diğer kullanılan alan";
+
+/* Color mapping scheme */
+"modification" = "Son değişiklik";
+
+/* Color palette */
+"Monaco" = "Monako";
+
+/* Color palette */
+"MossAndLichen" = "Yosun ve liken";
+
+/* Color mapping scheme */
+"name" = "Ad";
+
+/* Filter name */
+"No cloud files" = "Bulutta dosya yok";
+
+/* Filter name */
+"No hard-links" = "Sabit bağlantı yok";
+
+/* Filter name */
+"No version control" = "Sürüm denetimi yok ";
+
+/* Filter name */
+"None" = "Hiçbiri";
+
+/* Color mapping scheme */
+"nothing" = "Hiçbir şey";
+
+/* Color palette */
+"OliveSunset" = "Akdeniz günbatımı";
+
+/* File deletion preference option */
+"only delete files" = "Dosyalar";
+
+/* Color palette */
+"OrigamiMice" = "Origami faresi";
+
+/* Filter test */
+"Packages" = "Paketler";
+
+/* Draw setting */
+"packages and files" = "Paketler ve dosyalar";
+
+/* File size type */
+"physical" = "Fiziksel";
+
+/* Preference option for what to do after last view is closed */
+"quit" = "Uygulamayı sonlandır";
+
+/* Color palette */
+"Rainbow" = "Gökkuşağı";
+
+/* Rescan preference option */
+"rescan all" = "Tam yeniden tarama";
+
+/* Rescan preference option */
+"rescan visible" = "Görünümdeki klasörü yeniden tara";
+
+/* Preference option for what to do after last view is closed */
+"show welcome" = "Hoş Geldiniz penceresini göster";
+
+/* Color mapping scheme */
+"size" = "Büyüklük";
+
+/* Filter test */
+"Small files" = "Küçük dosyalar";
+
+/* File size type */
+"tally" = "Çetele";
+
+/* Filter test */
+"Tiny files" = "Çok küçük dosyalar";
+
+/* Color mapping scheme */
+"top folder" = "En üst klasör";
+
+/* Color mapping scheme */
+"uniform type" = "Dosya türü";
+
+/* Preference option for display focus */
+"unlimited" = "Sınırsız";
+
+/* Filter test */
+"Version control" = "Sürüm denetimi";
+

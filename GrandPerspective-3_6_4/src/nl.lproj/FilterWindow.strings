@@ -1,0 +1,42 @@
+/* Class = "NSWindow"; title = "Filter"; ObjectID = "5"; */
+"5.title" = "Filter";
+
+/* Class = "NSBox"; title = "Selected tests"; ObjectID = "18"; */
+"18.title" = "Geselecteerde testen";
+
+/* Class = "NSBox"; title = "Available tests"; ObjectID = "24"; */
+"24.title" = "Beschikbare testen";
+
+/* Class = "NSButtonCell"; title = "<"; ObjectID = "173"; */
+"173.title" = "<";
+
+/* Class = "NSButtonCell"; title = ">"; ObjectID = "174"; */
+"174.title" = ">";
+
+/* Class = "NSButtonCell"; title = "Edit"; ObjectID = "175"; */
+"175.title" = "Wijzig";
+
+/* Class = "NSButtonCell"; title = "New"; ObjectID = "176"; */
+"176.title" = "Nieuw";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "177"; */
+"177.title" = "Verwijder";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "178"; */
+"178.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "179"; */
+"179.title" = "Annuleer";
+
+/* Class = "NSButtonCell"; title = ">>"; ObjectID = "182"; */
+"182.title" = ">>";
+
+/* Class = "NSTextFieldCell"; title = "Name:"; ObjectID = "183"; */
+"183.title" = "Naam:";
+
+/* Class = "NSTextFieldCell"; title = "Match none"; ObjectID = "IC9-7o-Jmg"; */
+"IC9-7o-Jmg.title" = "Voldoe niet aan (allen)";
+
+/* Class = "NSTextFieldCell"; title = "Match any"; ObjectID = "K2j-w8-a6Z"; */
+"K2j-w8-a6Z.title" = "Voldoe aan (één of meer)";
+

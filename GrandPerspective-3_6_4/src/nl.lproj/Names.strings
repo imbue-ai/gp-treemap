@@ -1,0 +1,186 @@
+/* Color mapping scheme */
+"access" = "Laatste gebruik";
+
+/* Filter test */
+"Audio" = "Geluid";
+
+/* File size base type */
+"base-2" = "Binair";
+
+/* File size base type */
+"base-10" = "Decimaal";
+
+/* Color palette */
+"BlueSkyTulips" = "Tulpen veld";
+
+/* Color palette */
+"Bujumbura" = "Bujumbura";
+
+/* Rescan preference behaviour */
+"close old window" = "Oude venster sluiten";
+
+/* Color palette */
+"CoffeeBeans" = "Koffie bonen";
+
+/* Color mapping scheme */
+"creation" = "Aanmaak";
+
+/* Color palette */
+"Daytona" = "Daytona Beach";
+
+/* File deletion preference option */
+"delete files and folders" = "Bestanden en mappen";
+
+/* File deletion preference option */
+"delete nothing" = "Niets";
+
+/* Preference option for what to do after last view is closed */
+"do nothing" = "Doe niets";
+
+/* Color mapping scheme */
+"extension" = "Extensie";
+
+/* Color palette */
+"FengShui" = "Feng Shui";
+
+/* Draw setting */
+"files" = "Bestanden";
+
+/* Color palette */
+"FlyingGeese" = "Magenta magie";
+
+/* Color mapping scheme */
+"folder" = "Map";
+
+/* Draw setting */
+"folders" = "Pakketten & Mappen";
+
+/* Name of "special" file in the viewer */
+"free" = "Beschikbare ruimte";
+
+/* Name of "special" file in the viewer */
+"freed" = "Vrijgekomen ruimte";
+
+/* Color palette */
+"GreenEggs" = "Groene eieren";
+
+/* Filter test */
+"Hard-linked items" = "Harde links";
+
+/* Color palette */
+"Heatmap-12" = "Temperatuur 12";
+
+/* Color palette */
+"Heatmap-23" = "Temperatuur 23";
+
+/* Filter test */
+"Huge files" = "Kolossale bestanden";
+
+/* Filter test */
+"Images" = "Plaatjes";
+
+/* Rescan preference behaviour */
+"keep old window" = "Oude venster bewaren";
+
+/* Color palette */
+"LagoonNebula" = "Lagune nevel";
+
+/* Filter test */
+"Large files" = "Grote bestanden";
+
+/* Color mapping scheme */
+"level" = "Nivo";
+
+/* File size type */
+"logical" = "Intrinsiek";
+
+/* Filter test */
+"Medium files" = "Middelgrote bestanden";
+
+/* Name of "special" file in the viewer */
+"misc used" = "Overige gebruikte ruimte";
+
+/* Color mapping scheme */
+"modification" = "Laatste wijziging";
+
+/* Color palette */
+"Monaco" = "Monaco";
+
+/* Color palette */
+"MossAndLichen" = "Mos en korstmos";
+
+/* Color mapping scheme */
+"name" = "Naam";
+
+/* Filter name */
+"No cloud files" = "Geen cloud bestanden";
+
+/* Filter name */
+"No hard-links" = "Geen harde links";
+
+/* Filter name */
+"No version control" = "Geen versie beheer";
+
+/* Filter name */
+"None" = "Geen";
+
+/* Color mapping scheme */
+"nothing" = "Niets";
+
+/* Color palette */
+"OliveSunset" = "Olijven in de zon";
+
+/* File deletion preference option */
+"only delete files" = "Bestanden";
+
+/* Color palette */
+"OrigamiMice" = "Origami muizen";
+
+/* Filter test */
+"Packages" = "Pakketten";
+
+/* Draw setting */
+"packages and files" = "Pakketten & Bestanden";
+
+/* File size type */
+"physical" = "Fysisch";
+
+/* Preference option for what to do after last view is closed */
+"quit" = "Sluit programma";
+
+/* Color palette */
+"Rainbow" = "Regenboog";
+
+/* Rescan preference option */
+"rescan all" = "Alles herlezen";
+
+/* Rescan preference option */
+"rescan visible" = "Map in venster herlezen";
+
+/* Preference option for what to do after last view is closed */
+"show welcome" = "Toon Welkom venster";
+
+/* Color mapping scheme */
+"size" = "Grootte";
+
+/* Filter test */
+"Small files" = "Kleine bestanden";
+
+/* File size type */
+"tally" = "Aantal";
+
+/* Filter test */
+"Tiny files" = "Minuscule bestanden";
+
+/* Color mapping scheme */
+"top folder" = "Buitenste map";
+
+/* Color mapping scheme */
+"uniform type" = "Bestandstype";
+
+/* Preference option for display focus */
+"unlimited" = "Onbeperkt";
+
+/* Filter test */
+"Version control" = "Versie beheer";
+

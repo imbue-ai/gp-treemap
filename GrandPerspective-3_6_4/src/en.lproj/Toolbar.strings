@@ -1,0 +1,75 @@
+/* Toolbar action */
+"Delete" = "Delete";
+
+/* Label for focus controls */
+"Focus" = "Focus";
+
+/* Menu item */
+"Hide Toolbar" = "Hide Toolbar";
+
+/* Toolbar action */
+"Info" = "Info";
+
+/* Toolbar action */
+"Move focus down" = "Move focus down";
+
+/* Toolbar action */
+"Move focus up" = "Move focus up";
+
+/* Tooltip */
+"Move to trash" = "Move to trash";
+
+/* Toolbar action */
+"Open" = "Open";
+
+/* Tooltip */
+"Open with Finder" = "Open with Finder";
+
+/* Tooltip */
+"Preview item in Quick Look panel" = "Preview item in Quick Look panel";
+
+/* Toolbar action */
+"Quick Look" = "Quick Look";
+
+/* Toolbar action */
+"Refresh" = "Refresh";
+
+/* Tooltip */
+"Refresh view data" = "Refresh view data";
+
+/* Toolbar action */
+"Rescan" = "Rescan";
+
+/* Tooltip */
+"Rescan view data" = "Rescan view data";
+
+/* Toolbar action */
+"Reset focus" = "Reset focus";
+
+/* Toolbar action */
+"Reset zoom" = "Reset zoom";
+
+/* Toolbar action */
+"Reveal" = "Reveal";
+
+/* Tooltip */
+"Reveal in Finder" = "Reveal in Finder";
+
+/* Tooltip */
+"Search files by name" = "Search files by name";
+
+/* Tooltip */
+"Show info" = "Show info";
+
+/* Menu item */
+"Show Toolbar" = "Show Toolbar";
+
+/* Label for zooming controls */
+"Zoom" = "Zoom";
+
+/* Toolbar action */
+"Zoom in" = "Zoom in";
+
+/* Toolbar action */
+"Zoom out" = "Zoom out";
+

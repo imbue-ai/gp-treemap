@@ -1,0 +1,174 @@
+/* Color mapping scheme */
+"access" = "Τελευταία πρόσβαση";
+
+/* Filter test */
+"Audio" = "Ήχος (Audio)";
+
+/* File size base type */
+"base-2" = "Δυαδικό";
+
+/* File size base type */
+"base-10" = "Δεκαδικό";
+
+/* Color palette */
+"BlueSkyTulips" = "Blue sky tulips";
+
+/* Color palette */
+"Bujumbura" = "Bujumbura";
+
+/* Rescan preference behaviour */
+"close old window" = "Κλείσιμο παλιού παραθύρου";
+
+/* Color palette */
+"CoffeeBeans" = "Coffee beans";
+
+/* Color mapping scheme */
+"creation" = "Δημιουργία";
+
+/* Color palette */
+"Daytona" = "Daytona Beach";
+
+/* File deletion preference option */
+"delete files and folders" = "Αρχεία και φάκελοι";
+
+/* File deletion preference option */
+"delete nothing" = "Τίποτα";
+
+/* Preference option for what to do after last view is closed */
+"do nothing" = "Καμία ενέργεια";
+
+/* Color mapping scheme */
+"extension" = "Επέκταση";
+
+/* Color palette */
+"FengShui" = "Feng Shui";
+
+/* Color palette */
+"FlyingGeese" = "Magenta magic";
+
+/* Color mapping scheme */
+"folder" = "Φάκελος";
+
+/* Name of "special" file in the viewer */
+"free" = "Ελεύθερος χώρος";
+
+/* Name of "special" file in the viewer */
+"freed" = "Απελευθερωμένος χώρος";
+
+/* Color palette */
+"GreenEggs" = "Green eggs";
+
+/* Filter test */
+"Hard-linked items" = "Σκληρά συνδεδεμένα (hard-linked) στοιχεία";
+
+/* Color palette */
+"Heatmap-12" = "Heatmap 12";
+
+/* Color palette */
+"Heatmap-23" = "Heatmap 23";
+
+/* Filter test */
+"Huge files" = "Τεράστια αρχεία";
+
+/* Filter test */
+"Images" = "Εικόνες";
+
+/* Rescan preference behaviour */
+"keep old window" = "Διατήρηση παλιού παραθύρου";
+
+/* Color palette */
+"LagoonNebula" = "Lagoon nebula";
+
+/* Filter test */
+"Large files" = "Μεγάλα αρχεία";
+
+/* Color mapping scheme */
+"level" = "Επίπεδο";
+
+/* File size type */
+"logical" = "Λογικό";
+
+/* Filter test */
+"Medium files" = "Μεσαίου μεγέθους αρχεία";
+
+/* Name of "special" file in the viewer */
+"misc used" = "Διάφορος χρησιμοποιούμενος χώρος:";
+
+/* Color mapping scheme */
+"modification" = "Τελευταία αλλαγή";
+
+/* Color palette */
+"Monaco" = "Monaco";
+
+/* Color palette */
+"MossAndLichen" = "Moss and lichen";
+
+/* Color mapping scheme */
+"name" = "Όνομα";
+
+/* Filter name */
+"No cloud files" = "Χωρίς αρχεία σε νέφος";
+
+/* Filter name */
+"No hard-links" = "Χωρίς σκληρούς συνδέσμους";
+
+/* Filter name */
+"No version control" = "Χωρίς έλεγχο έκδοσης";
+
+/* Filter name */
+"None" = "Κανένα";
+
+/* Color mapping scheme */
+"nothing" = "Τίποτα";
+
+/* Color palette */
+"OliveSunset" = "Olive sunset";
+
+/* File deletion preference option */
+"only delete files" = "Αρχεία";
+
+/* Color palette */
+"OrigamiMice" = "Origami mice";
+
+/* Filter test */
+"Packages" = "Πακέτα";
+
+/* File size type */
+"physical" = "Φυσικό";
+
+/* Preference option for what to do after last view is closed */
+"quit" = "Τερματισμός εφαρμογής";
+
+/* Color palette */
+"Rainbow" = "Rainbow";
+
+/* Rescan preference option */
+"rescan all" = "Πλήρης επανασάρωση";
+
+/* Rescan preference option */
+"rescan visible" = "Επανασάρωση φακέλου σε προβολή";
+
+/* Preference option for what to do after last view is closed */
+"show welcome" = "Εμφάνιση μηνύματος καλωσορίσματος";
+
+/* Filter test */
+"Small files" = "Μικρά αρχεία";
+
+/* File size type */
+"tally" = "Tally";
+
+/* Filter test */
+"Tiny files" = "Μικροσκοπικά αρχεία";
+
+/* Color mapping scheme */
+"top folder" = "Κορυφαίος φάκελος";
+
+/* Color mapping scheme */
+"uniform type" = "Τύπος αρχείου";
+
+/* Preference option for display focus */
+"unlimited" = "Χωρίς περιορισμό";
+
+/* Filter test */
+"Version control" = "Έλεγχος έκδοσης";
+

@@ -1,0 +1,60 @@
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "6"; */
+"6.title" = "Asetukset";
+
+/* Class = "NSBox"; title = "Display"; ObjectID = "29"; */
+"29.title" = "Ulkoasu";
+
+/* Class = "NSBox"; title = "Scanning"; ObjectID = "57"; */
+"57.title" = "Skannaus";
+
+/* Class = "NSBox"; title = "Actions"; ObjectID = "72"; */
+"72.title" = "Toiminnot";
+
+/* Class = "NSMenuItem"; title = "Files and folders"; ObjectID = "78"; */
+"78.title" = "Tiedostot ja hakemistot";
+
+/* Class = "NSMenuItem"; title = "Close old window"; ObjectID = "153"; */
+"153.title" = "Sulje vanha ikkuna";
+
+/* Class = "NSTextFieldCell"; title = "Palette:"; ObjectID = "167"; */
+"167.title" = "Paletti:";
+
+/* Class = "NSTextFieldCell"; title = "Color by:"; ObjectID = "172"; */
+"172.title" = "Väritä:";
+
+/* Class = "NSTextFieldCell"; title = "File size measure:"; ObjectID = "174"; */
+"174.title" = "Tiedostokoon mitta:";
+
+/* Class = "NSButtonCell"; title = "Always require confirmation"; ObjectID = "176"; */
+"176.title" = "Vaadi aina varmistusta";
+
+/* Class = "NSTextFieldCell"; title = "Enable deletion of:"; ObjectID = "177"; */
+"177.title" = "Salli poisto:";
+
+/* Class = "NSTextFieldCell"; title = "After full rescan:"; ObjectID = "178"; */
+"178.title" = "Täyden skannin jälkeen:";
+
+/* Class = "NSTextFieldCell"; title = "Mask:"; ObjectID = "181"; */
+"181.title" = "Maski:";
+
+/* Class = "NSButtonCell"; title = "Show entire volume"; ObjectID = "199"; */
+"199.title" = "Näytä koko levy";
+
+/* Class = "NSTextFieldCell"; title = "File size unit system:"; ObjectID = "214"; */
+"214.title" = "Tiedostokoon yksikkö:";
+
+/* Class = "NSTextFieldCell"; title = "Default filter:"; ObjectID = "bAf-Lb-Hos"; */
+"bAf-Lb-Hos.title" = "Oletussuodatin:";
+
+/* Class = "NSTextFieldCell"; title = "Show:"; ObjectID = "fpR-JL-BuW"; */
+"fpR-JL-BuW.title" = "Näytä:";
+
+/* Class = "NSTextFieldCell"; title = "After closing last view:"; ObjectID = "KFu-2k-t7Z"; */
+"KFu-2k-t7Z.title" = "Viimeisen näkymän suljettua:";
+
+/* Class = "NSMenuItem"; title = "Terminate application"; ObjectID = "Rrr-CG-7lo"; */
+"Rrr-CG-7lo.title" = "Lopeta ohjelma";
+
+/* Class = "NSTextFieldCell"; title = "Display focus:"; ObjectID = "tci-ro-rrH"; */
+"tci-ro-rrH.title" = "Kohdistus:";
+

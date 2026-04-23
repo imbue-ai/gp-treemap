@@ -1,0 +1,60 @@
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "6"; */
+"6.title" = "偏好设置";
+
+/* Class = "NSBox"; title = "Display"; ObjectID = "29"; */
+"29.title" = "显示";
+
+/* Class = "NSBox"; title = "Scanning"; ObjectID = "57"; */
+"57.title" = "扫描";
+
+/* Class = "NSBox"; title = "Actions"; ObjectID = "72"; */
+"72.title" = "行为";
+
+/* Class = "NSMenuItem"; title = "Files and folders"; ObjectID = "78"; */
+"78.title" = "文件与文件夹";
+
+/* Class = "NSMenuItem"; title = "Close old window"; ObjectID = "153"; */
+"153.title" = "关闭旧窗口";
+
+/* Class = "NSTextFieldCell"; title = "Palette:"; ObjectID = "167"; */
+"167.title" = "调色盘：";
+
+/* Class = "NSTextFieldCell"; title = "Color by:"; ObjectID = "172"; */
+"172.title" = "选色依据：";
+
+/* Class = "NSTextFieldCell"; title = "File size measure:"; ObjectID = "174"; */
+"174.title" = "文件大小测量方式：";
+
+/* Class = "NSButtonCell"; title = "Always require confirmation"; ObjectID = "176"; */
+"176.title" = "总是需要确认";
+
+/* Class = "NSTextFieldCell"; title = "Enable deletion of:"; ObjectID = "177"; */
+"177.title" = "启用这些内容的删除";
+
+/* Class = "NSTextFieldCell"; title = "After full rescan:"; ObjectID = "178"; */
+"178.title" = "重新扫描所有内容后：";
+
+/* Class = "NSTextFieldCell"; title = "Mask:"; ObjectID = "181"; */
+"181.title" = "文件遮罩：";
+
+/* Class = "NSButtonCell"; title = "Show entire volume"; ObjectID = "199"; */
+"199.title" = "显示整个宗卷";
+
+/* Class = "NSTextFieldCell"; title = "File size unit system:"; ObjectID = "214"; */
+"214.title" = "文件大小单位系统：";
+
+/* Class = "NSTextFieldCell"; title = "Default filter:"; ObjectID = "bAf-Lb-Hos"; */
+"bAf-Lb-Hos.title" = "默认过滤条件：";
+
+/* Class = "NSTextFieldCell"; title = "Show:"; ObjectID = "fpR-JL-BuW"; */
+"fpR-JL-BuW.title" = "显示：";
+
+/* Class = "NSTextFieldCell"; title = "After closing last view:"; ObjectID = "KFu-2k-t7Z"; */
+"KFu-2k-t7Z.title" = "关闭最后一个视图后：";
+
+/* Class = "NSMenuItem"; title = "Terminate application"; ObjectID = "Rrr-CG-7lo"; */
+"Rrr-CG-7lo.title" = "终止应用程序";
+
+/* Class = "NSTextFieldCell"; title = "Display focus:"; ObjectID = "tci-ro-rrH"; */
+"tci-ro-rrH.title" = "显示焦点：";
+

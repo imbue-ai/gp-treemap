@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="ProgressPanelControl">
+            <connections>
+                <outlet property="progressDetails" destination="be8-tb-BAc" id="sCg-XN-17X"/>
+                <outlet property="progressIndicator" destination="V9L-65-XVy" id="fBj-5G-tl2"/>
+                <outlet property="progressSummary" destination="22" id="32"/>
+                <outlet property="window" destination="6" id="18"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Task in progress" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="6" userLabel="Panel" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="81" y="557" width="440" height="143"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <value key="minSize" type="size" width="250" height="89"/>
+            <view key="contentView" id="8">
+                <rect key="frame" x="0.0" y="0.0" width="440" height="143"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7">
+                        <rect key="frame" x="351" y="13" width="76" height="32"/>
+                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="29">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="abort:" target="-2" id="34"/>
+                        </connections>
+                    </button>
+                    <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="749" translatesAutoresizingMaskIntoConstraints="NO" id="22">
+                        <rect key="frame" x="18" y="22" width="334" height="16"/>
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" placeholderString="Progress summary (NO_LOC)" id="30">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="be8-tb-BAc">
+                        <rect key="frame" x="18" y="107" width="404" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="400" id="7Ly-Cx-q7k"/>
+                        </constraints>
+                        <textFieldCell key="cell" lineBreakMode="truncatingMiddle" placeholderString="Progress details (NO_LOC)" id="bUh-pg-NlQ">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <progressIndicator wantsLayer="YES" maxValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="V9L-65-XVy">
+                        <rect key="frame" x="20" y="55" width="400" height="38"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="400" id="fP8-gx-lqO"/>
+                        </constraints>
+                    </progressIndicator>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="be8-tb-BAc" firstAttribute="top" secondItem="8" secondAttribute="top" constant="20" symbolic="YES" id="6k6-hV-e7F"/>
+                    <constraint firstItem="V9L-65-XVy" firstAttribute="leading" secondItem="8" secondAttribute="leading" constant="20" id="IlV-bN-b2C"/>
+                    <constraint firstItem="7" firstAttribute="centerY" secondItem="22" secondAttribute="centerY" id="Vb5-vt-yTa"/>
+                    <constraint firstItem="7" firstAttribute="leading" secondItem="22" secondAttribute="trailing" constant="8" symbolic="YES" id="btT-uD-KOU"/>
+                    <constraint firstItem="7" firstAttribute="top" secondItem="V9L-65-XVy" secondAttribute="bottom" constant="16" id="e1u-2f-2YM"/>
+                    <constraint firstAttribute="trailing" secondItem="7" secondAttribute="trailing" constant="20" symbolic="YES" id="nK2-SN-SgX"/>
+                    <constraint firstItem="V9L-65-XVy" firstAttribute="top" secondItem="be8-tb-BAc" secondAttribute="bottom" constant="15" id="pSw-dG-21c"/>
+                    <constraint firstAttribute="bottom" secondItem="7" secondAttribute="bottom" constant="20" symbolic="YES" id="r4t-7A-CD0"/>
+                    <constraint firstItem="be8-tb-BAc" firstAttribute="leading" secondItem="8" secondAttribute="leading" constant="20" symbolic="YES" id="vPj-gF-d8y"/>
+                    <constraint firstItem="22" firstAttribute="leading" secondItem="8" secondAttribute="leading" constant="20" id="vk4-Aq-Oha"/>
+                    <constraint firstAttribute="trailing" secondItem="be8-tb-BAc" secondAttribute="trailing" constant="20" symbolic="YES" id="zaH-gK-B3O"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="-130" y="177.5"/>
+        </window>
+    </objects>
+</document>

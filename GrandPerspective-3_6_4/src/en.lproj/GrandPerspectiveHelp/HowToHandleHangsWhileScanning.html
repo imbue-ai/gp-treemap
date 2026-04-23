@@ -1,0 +1,75 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>How to handle hangs while scanning</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="How to handle hangs while scanning.">
+<meta name="keywords" content="how to, hangs">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>How to handle hangs while scanning</h1>
+</div>
+
+<p>
+GrandPerspective is very stable.
+Occassionally, however, users report hangs while scanning.
+If you think the app hangs while scanning, follow these steps:
+</p>
+
+<ol>
+<li><a href="FullDiskAccess.html">Enable Full Disk Access</a>.
+Some users have reported that doing so resolved the hangs that they experienced.
+It anyway is good to have this enabled, as it lets GrandPerspective scan more of your disk contents.
+</li>
+
+<li>Check that there is not a dialog asking for permission to access certain data.
+The first time you scan using (a new version of) GrandPerspective, the app needs permission to access certain content.
+Scanning is paused until you grant or decline the request.
+</li>
+
+<li>Check that you have version 3.5.2 or higher.
+Earlier versions could have issues scanning folders with cloud content.
+Scanning these folders could trigger downloads of dataless files.
+This could take so long that the app appeared to hang.
+This has been fixed in version 3.5.2.</li>
+
+<li>Enable full logging when starting the application.
+To do so, start the application from Terminal with <tt>-logAll YES</tt> as commandline argument.<br><br>
+For example, when you installed it in your Applications folder type:<br>
+<tt>/Applications/GrandPerspective.app/Contents/MacOS/GrandPerspective -logAll YES</tt>
+</li>
+
+<li>Try to reproduce the hang. Did you manage?
+
+  <ul>
+  <li>No, keep trying.
+Go back to Step 4.</li>
+
+  <li>Yes, then inspect the logging in the Terminal to determine which folder it is trying to scan when the hang happens.
+Continue to Step 6.</li>
+  </ul></li>
+
+<li>Try to find the root cause by answering the following questions:
+
+  <ul>
+  <li>Is it repeatable?
+Does it always hang while scanning the same folder?</li>
+  <li>Is there anything special about this folder?</li>
+  </ul></li>
+
+<li>Once you manage to reproduce a repeatable hang, <a href="https://sourceforge.net/p/grandperspectiv/bugs/">submit a bug report for it</a>.
+Provide as much details as you can.
+This should include the steps to reproduce, but also the version of GrandPerspective and your version of macOS.<br><br>
+
+Note: You can also submit a report when you did not manage to reproduce a repeatable hang.
+However, the chance that the problem can then be fixed is much smaller.
+</li>
+</ol>
+
+</body>
+</html>

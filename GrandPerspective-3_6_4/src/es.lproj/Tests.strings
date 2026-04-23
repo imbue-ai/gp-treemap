@@ -1,0 +1,90 @@
+/* AND-test with 1: sub test, and 2: another sub test */
+"(%@) and (%@)" = "(%1$@) y (%2$@)";
+
+/* AND-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) and %@" = "(%1$@) y %2$@";
+
+/* OR-test with 1: sub test, and 2: another sub test */
+"(%@) or (%@)" = "(%1$@) o (%2$@)";
+
+/* OR-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) or %@" = "(%1$@) o %2$@";
+
+/* AND-test for flags sub tests with 1: subtest, 2: one or more sub tests */
+"%@ and %@" = "%1$@ y %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ contains %@" = "%1$@ contiene %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ conTains %@" = "%1$@ conTiene %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ ends with %@" = "%1$@ termina con %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ enDs with %@" = "%1$@ terMina con %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ equals %@" = "%1$@ igual a %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ eQuals %@" = "%1$@ igUal a %2$@";
+
+/* Pair of match targets with 1: a target match, and 2: another target match */
+"%@ or %@" = "%1$@ o %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ starts with %@" = "%1$@ comienza con %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ starTs with %@" = "%1$@ coMienza con %2$@";
+
+/* Three or more match targets with 1: a target match, and 2: two or more other target matches */
+"%@, %@" = "%1$@, %2$@";
+
+/* Size test without any bounds */
+"any size" = "cualquier tamaño";
+
+/* Selective test with 1: sub test */
+"files: %@" = "archivos: %@";
+
+/* Selective test with 1: sub test */
+"folders: %@" = "carpetas: %@";
+
+/* File/folder flags sub test */
+"item is a package" = "el elemento es un contenedor";
+
+/* File/folder flags sub test */
+"item is hard-linked" = "el elemento está vinculado";
+
+/* File/folder flags sub test */
+"item is not a package" = "el elemento no es un contenedor";
+
+/* File/folder flags sub test */
+"item is not hard-linked" = "el elemento no está vinculado";
+
+/* A filename as the subject of a string test */
+"name" = "nombre";
+
+/* NOT-test with 1: sub test */
+"not (%@)" = "no (%@)";
+
+/* A pathname as the subject of a string test */
+"path" = "ruta";
+
+/* Size test with 1: lower bound, and 2: upper bound */
+"size is between %@ and %@" = "tamaño entre %1$@ y %2$@";
+
+/* Size test with 1: lower bound */
+"size is larger than %@" = "tamaño mayor que %@";
+
+/* Size test with 1: upper bound */
+"size is smaller than %@" = "tamaño menor que %@";
+
+/* Filetype test with 1: match targets */
+"type conforms to %@" = "tipo se adecua a %@";
+
+/* Filetype test with 1: match targets */
+"type equals %@" = "tipo igual a %@";
+

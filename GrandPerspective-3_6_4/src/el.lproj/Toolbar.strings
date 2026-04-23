@@ -1,0 +1,75 @@
+/* Toolbar action */
+"Delete" = "Διαγραφή";
+
+/* Label for focus controls */
+"Focus" = "Εστίαση";
+
+/* Menu item */
+"Hide Toolbar" = "Απόκρυψη γραμμής εργαλειών";
+
+/* Toolbar action */
+"Info" = "Πληροφορίες";
+
+/* Toolbar action */
+"Move focus down" = "Μεταφορά εστίασης προς τα μέσα";
+
+/* Toolbar action */
+"Move focus up" = "Μεταφορά εστίασης προς τα έξω";
+
+/* Tooltip */
+"Move to trash" = "Μεταφορά στον Κάδο απορριμμάτων";
+
+/* Toolbar action */
+"Open" = "Άνοιγμα";
+
+/* Tooltip */
+"Open with Finder" = "Άνοιγμα με Finder";
+
+/* Tooltip */
+"Preview item in Quick Look panel" = "Προεπισκόπηση στοιχείου στον πάνελ Γρήγορη ματιά";
+
+/* Toolbar action */
+"Quick Look" = "Γρήγορη ματιά";
+
+/* Toolbar action */
+"Refresh" = "Ανανέωση";
+
+/* Tooltip */
+"Refresh view data" = "Ανανέωση δεδομένων προβολής";
+
+/* Toolbar action */
+"Rescan" = "Επανασάρωση";
+
+/* Tooltip */
+"Rescan view data" = "Επανασάρωση δεδομένων\tπροβολής";
+
+/* Toolbar action */
+"Reset focus" = "Επαναφορά εστίασης";
+
+/* Toolbar action */
+"Reset zoom" = "Επαναφορά μεγέθυνσης";
+
+/* Toolbar action */
+"Reveal" = "Εμφάνιση";
+
+/* Tooltip */
+"Reveal in Finder" = "Εμφάνιση στο Finder";
+
+/* Tooltip */
+"Search files by name" = "Αναζήτηση αρχείων ονομαστικά";
+
+/* Tooltip */
+"Show info" = "Εμφάνιση πληροφοριών";
+
+/* Menu item */
+"Show Toolbar" = "Εμφάνιση Γραμμής εργαλειών";
+
+/* Label for zooming controls */
+"Zoom" = "Μεγέθυνση";
+
+/* Toolbar action */
+"Zoom in" = "Μεγέθυνση";
+
+/* Toolbar action */
+"Zoom out" = "Σμίκρυνση";
+

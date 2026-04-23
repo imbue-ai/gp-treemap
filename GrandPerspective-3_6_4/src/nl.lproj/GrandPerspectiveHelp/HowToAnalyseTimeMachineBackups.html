@@ -1,0 +1,141 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Het analyseren van Time Machine reservekopie&euml;n</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Het analyseren van Time Machine reservekopie&euml;n.">
+<meta name="keywords" content="hoe, Time Machine, back-up, back up, reservekopie, analyse, harde link">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+
+<div id="pagetitle">
+<h1>Het analyseren van Time Machine reservekopie&euml;n</h1>
+</div>
+
+<p>
+GrandPerspective kan gebruikt worden om Time Machine reservekopie&euml;n te analyseren.
+Dit kan u helpen om de Time Machine instellingen te optimaliseren, bijvoorbeeld doordat u bestanden en mappen ontdekt die Time Machine buiten beschouwing kan laten.
+</p>
+
+<p>
+Het is belangerijk om te begrijpen hoe Time Machine reservekopie&euml;n opgeslagen zijn.
+Elke reservekopie lijkt een volledig kopie te zijn van uw schijf op een bepaald moment.
+Echter, de benodigde schijfruimte is beperkt tot de bestanden die veranderd zijn sinds de vorige reservekopie.
+Binnen HFS+ volumes maakt Time Machine hiertoe gebruik van <a href="HardLinks.html">harde links</a>.
+Binnen AFPS volumes Time Machine wordt de inhoud van bestanden gedeeld door hergebruik van bestandblokken op een lager nivo.
+Hergebruik door middel van harde links is zichtbaar voor GrandPerspective, maar hergebruik van bestandblokken daarentegen niet.
+Sommige suggesties op deze pagina zijn derhalve enkel van toepassing op HFS+ volumes.
+</p>
+
+<p>
+Hieronder vindt u een aantal manieren waarop u GrandPerspective kan gebruiken om uw Time Machine reservekopie&euml;n te analyseren.
+Dit zal een idee geven van wat er mogelijk is.
+U bent natuurlijk vrij om andere aanpakken uit te proberen.
+</p>
+
+<h2>Vergelijken van reservekopie&euml;n</h2>
+
+<p>
+U kunt twee reservekopie&euml;n vergelijken om te zien wat er verandert is op uw harde schijf.
+Dit is eenvoudig om te doen.
+Als eerste voert u <b>Map inlezen</b> uit op een oude reservekopie, bijvoorbeeld "<em>Backup Volume</em>/Backups.backupdb/<em>Mijn Computer</em>/<em>2008-08-08-888888</em>".
+Vervolgens leest u de inhoud van de meest recente reservekopie in, d.w.z.  "<em>Backup Volume</em>/Backups.backupdb/<em>Mijn Computer</em>/Latest".
+Wanneer u beide venster naast elkaar open heeft ziet u hopelijk snel waar de grootste verschillen in schijfgebruik zijn.
+</p>
+
+<p>
+Merk op: In plaats van het inlezen van de meeste recente reservekopie kunt u ook uw harde schijf zelf inlezen.
+Het nadeel hiervan is echter dat het resulterende venster ook de bestanden bevat die genegeerd worden door Time Machine, wat het lastiger maakt om te zien wat de eigenlijke veranderingen zijn.
+</p>
+
+<h2>Het inlezen van alle reservekopie&euml;n</h2>
+
+<p>
+Voer <b>Map inlezen</b> uit op de map "<em>Backup Volume</em>/Backups.backupdb/<em>Mijn Computer</em>".
+Let op, dit kan behoorlijk lang duren.
+Wanneer het inlezen volbracht is zal een <a href="Views.html">overzicht venster</a> getoond worden met alle reservekopie&euml;n.
+Kies vervolgens kleuren naar "Buitenste map" in het <a href="ViewDisplayPanel.html">Weergave tabblad</a>.
+Alle bestanden die bij dezelfde reservekopie horen hebben nu dezelfde kleur.
+Een andere optie is om de bestanden te kleuren aan de hand van hun aanmaak datum, gecombineerd met een Temperatuur palet.
+Nieuwe bestanden zijn dan rood gekleurd en oude blauw.
+</p>
+
+<center>
+<img src="images/TimeMachineScan.jpg" width=640 height=360>
+<p><b>Meerdere jaren aan reservekopie&euml;n</b>. Deze bevatten bij elkaar vier miljoen bestanden verspreid over een miljoen mappen. De kleur van een bestand geeft aan wanneer deze aangemaakt is.</p>
+</center>
+
+<h2>Het analyseren van alle reservekopie&euml;n (op een HFS+ volume)</h2>
+<p>
+Na het inlezen van alle reservekopie&euml;n ziet U waarschijnlijk dat &eacute;&eacute;n reservekopie aanzienlijk groter is dan de rest.
+Dit is naar alle waarschijnlijkheid de oudste reservekopie.
+De reservekopie&euml;n worden namelijk ingelezen in de volgorde waarin ze gemaakt zijn <a href="#footnote1">[voetnoot 1]</a>.
+Dit betekent dus dat the oudste reservekopie het eerst ingelezen wordt.
+Alle bestanden in deze map zijn daarom nog niet eerder gezien, en worden daarom in beschouwing genomen.
+Tijdens het inlezen van de overige reservekopie&euml;n zijn de meeste harde links al eens gezien (in eerdere reservekopie&euml;n), waardoor ze vervolgens buiten beschouwing worden gelaten.
+</p>
+
+<p>
+De map die als eerste is ingelezen is daarom het minst interessant.
+Deze toont "slechts" de inhoud van de harde schijf op een bepaald moment.
+Daarom kan het nuttig zijn deze map niet te tonen in het overzicht venster.
+Begin door een nieuw <a href="MasksAndFilters.html">filter</a> aan te maken.
+Hiervoor is het nodig dat u een nieuwe <a href="EditingFilterTests.html">filtertest</a> maakt.
+Noem de test "Hoofd kopie", pas deze toe op "bestanden en mappen", en laat deze de Padnaam deeltest bevatten, waarbij padnamen moeten beginnen met "/Volumes/<em>Backup Volume</em>/Backups.backupdb/<em>Mijn Computer</em>/<em>2008-08-08-888888</em>".
+De cursieve gedeeltes zullen anders zijn in uw geval.
+U kunt de string met de padnaam verkrijgen in het <a href="ViewFocusPanel.html">Focus tabblad</a>.
+Selecteer eerst een willekeurig bestand in de grootste reservekopie,
+<a href="NavigatingViews.html">zoom een niveau in</a>, kopieer de padnaam onder het kopje "Getoonde map", en zoom vervolgens weer uit.
+</p>
+
+<p>
+Voeg de nieuwe "Hoofd kopie" test toe aan uw nieuwe filter.
+De test zal automatisch ge&iuml;nverteerd worden.
+Nadat u het filter aangemaakt heeft kunt u het als masker selecteren vanuit het <a href="ViewDisplayPanel.html">Weergave tabblad</a>.
+U zult nu zien dat de hoofd kopie gemaskeerd is in het venster.
+Indien dit niet het geval is heeft u het filter niet juist ingesteld.
+Wijzig het filter totdat het werkt.
+</p>
+
+<p>
+Wanneer het masker werkt moet u een filter toepassen op het venster.
+Gebruik hiervoor de <b>Filter</b> opdracht.
+Deze neemt standaard de instelling van het masker over, dus u kunt gelijk op "OK" drukken.
+Een nieuw overzicht venster wordt gemaakt, zonder de grootste reservekopie.
+Dit nieuwe venster geeft een veel beter idee van de ruimte die nodig is voor iedere nieuwe reservekopie.
+<a href="NavigatingViews.html">Verken</a> dit venster om een goed idee te krijgen van de bestanden die telkens weer opnieuw gekopieerd worden.
+Als u bestanden tegenkomt die niet in de reservekopie&euml;n thuis horen kunt u uw Time Machine instellingen hierop aanpassen.
+</p>
+
+<p>
+<a id="footnote1" class="nostyle">Voetnoot 1:</a>
+Vanaf GrandPerspective 2.0 specificeert de applicatie niet meer in welke volgorde de mappen ingelezen worden.
+De volgorde wordt nu bepaald door de inlees functionaliteit geleverd door het Cocoa Raamwerk.
+Op mijn systeem leest dit nog steeds de oudste reservekopie&euml;n eerst in.
+Echter, er is geen garantie dat dit zo gebeurt op elk systeem, noch dat dit gedrag na een update van macOS niet verandert.
+Wanneer de inlees volgorde verandert dan kan de reservekopie waarin een hard-gelinkt bestand getoond wordt veranderen.
+</p
+
+<h2>Bekijk welke bestanden tijdens het maken van de meest recente reservekopie gekopieerd zijn (op een HFS+ volume)</h2>
+
+<p>
+Start het <b>Inlezen map met filter</b>.
+Voor de in te lezen map kies "<em>Backup Volume</em>/Backups.backupdb/<em>Mijn Computer</em>/Latest".
+Pas het "Geen harde links" filter toe.
+Het resultaat is een venster dat alle bestanden toont die nieuw zijn in de meest recente reservekopie.
+Alle bestanden die al voorkwamen in eerdere reservekopie&euml;n worden niet getoond.
+</p>
+
+<p>
+Let op: U kunt dit filter ook toepassen op eerdere reservekopie&euml;n.
+Echter, de juiste interpretatie van het venster is dan iets anders.
+In dit geval worden een bestand alleen getoond wanneer het niet in een eerdere reservekopie voorkomt <em>en de inhoud van de map waarin het zich bevindt niet gewijzigd is in een latere reservekopie zolang het bestand bestaat (in ongewijzigde vorm)</em>.
+Inderdaad, dat is wat ingewikkeld, en daarom minder bruikbaar.
+<p>
+
+</body>
+</html>

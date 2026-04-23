@@ -1,0 +1,60 @@
+/* Class = "NSWindow"; title = "Preferences"; ObjectID = "6"; */
+"6.title" = "Tercihler";
+
+/* Class = "NSBox"; title = "Display"; ObjectID = "29"; */
+"29.title" = "Görüntü";
+
+/* Class = "NSBox"; title = "Scanning"; ObjectID = "57"; */
+"57.title" = "Tarama";
+
+/* Class = "NSBox"; title = "Actions"; ObjectID = "72"; */
+"72.title" = "Eylemler";
+
+/* Class = "NSMenuItem"; title = "Files and folders"; ObjectID = "78"; */
+"78.title" = "Dosyalar ve klasörler";
+
+/* Class = "NSMenuItem"; title = "Close old window"; ObjectID = "153"; */
+"153.title" = "Eski pencereyi kapat";
+
+/* Class = "NSTextFieldCell"; title = "Palette:"; ObjectID = "167"; */
+"167.title" = "Palet:";
+
+/* Class = "NSTextFieldCell"; title = "Color by:"; ObjectID = "172"; */
+"172.title" = "Renklendirme ölçütü:";
+
+/* Class = "NSTextFieldCell"; title = "File size measure:"; ObjectID = "174"; */
+"174.title" = "Dosya büyüklüğü ölçüsü:";
+
+/* Class = "NSButtonCell"; title = "Always require confirmation"; ObjectID = "176"; */
+"176.title" = "Her zaman onay gereksin";
+
+/* Class = "NSTextFieldCell"; title = "Enable deletion of:"; ObjectID = "177"; */
+"177.title" = "Silmeyi etkinleştir:";
+
+/* Class = "NSTextFieldCell"; title = "After full rescan:"; ObjectID = "178"; */
+"178.title" = "Tam yeniden tarama ardından:";
+
+/* Class = "NSTextFieldCell"; title = "Mask:"; ObjectID = "181"; */
+"181.title" = "Maske:";
+
+/* Class = "NSButtonCell"; title = "Show entire volume"; ObjectID = "199"; */
+"199.title" = "Tüm bölümü göster";
+
+/* Class = "NSTextFieldCell"; title = "File size unit system:"; ObjectID = "214"; */
+"214.title" = "Dosya büyüklüğü birim sistemi:";
+
+/* Class = "NSTextFieldCell"; title = "Default filter:"; ObjectID = "bAf-Lb-Hos"; */
+"bAf-Lb-Hos.title" = "Saptanmış süzgeç:";
+
+/* Class = "NSTextFieldCell"; title = "Show:"; ObjectID = "fpR-JL-BuW"; */
+"fpR-JL-BuW.title" = "Göster:";
+
+/* Class = "NSTextFieldCell"; title = "After closing last view:"; ObjectID = "KFu-2k-t7Z"; */
+"KFu-2k-t7Z.title" = "Son görünümü kapattıktan sonra:";
+
+/* Class = "NSMenuItem"; title = "Terminate application"; ObjectID = "Rrr-CG-7lo"; */
+"Rrr-CG-7lo.title" = "Uygulamayı sonlandır";
+
+/* Class = "NSTextFieldCell"; title = "Display focus:"; ObjectID = "tci-ro-rrH"; */
+"tci-ro-rrH.title" = "Görüntü odağı:";
+

@@ -1,0 +1,75 @@
+/* Toolbar action */
+"Delete" = "Poista";
+
+/* Label for focus controls */
+"Focus" = "Kohdistus";
+
+/* Menu item */
+"Hide Toolbar" = "Piilota työkalupalkki";
+
+/* Toolbar action */
+"Info" = "Info";
+
+/* Toolbar action */
+"Move focus down" = "Vie kohdistusta alaspäin";
+
+/* Toolbar action */
+"Move focus up" = "Vie kohdistusta ylöspäin";
+
+/* Tooltip */
+"Move to trash" = "Vie roskakoriin";
+
+/* Toolbar action */
+"Open" = "Avaa";
+
+/* Tooltip */
+"Open with Finder" = "Avaa Finderissa";
+
+/* Tooltip */
+"Preview item in Quick Look panel" = "Esikatsele pikakurkistus paneelissa";
+
+/* Toolbar action */
+"Quick Look" = "Pikakurkistus";
+
+/* Toolbar action */
+"Refresh" = "Virkistä";
+
+/* Tooltip */
+"Refresh view data" = "Virkistä näkymän tiedot";
+
+/* Toolbar action */
+"Rescan" = "Skannaa uudelleen";
+
+/* Tooltip */
+"Rescan view data" = "Skannaa näkyvissä oleva data uudelleen";
+
+/* Toolbar action */
+"Reset focus" = "Nollaa kohdistus";
+
+/* Toolbar action */
+"Reset zoom" = "Nollaa suurennus";
+
+/* Toolbar action */
+"Reveal" = "Paljasta";
+
+/* Tooltip */
+"Reveal in Finder" = "Paljasta Finderissa";
+
+/* Tooltip */
+"Search files by name" = "Hae tiedostoja nimen perusteella";
+
+/* Tooltip */
+"Show info" = "Näytä info";
+
+/* Menu item */
+"Show Toolbar" = "Näytä työkalupalkki";
+
+/* Label for zooming controls */
+"Zoom" = "Suurennus";
+
+/* Toolbar action */
+"Zoom in" = "Lähennä";
+
+/* Toolbar action */
+"Zoom out" = "Loitonna";
+

@@ -1,0 +1,74 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Verklaringen voor verschillen in gerapporteerde groottes</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Verklaringen voor grootte verschillen.">
+<meta name="keywords" content="hoe, verklaren, verklaring, grootte, verschillen, bestandsgrootte, bestandsgrootte maten, bestandsgrootte eenheid, harde links, beschikbare ruimte">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>Verklaringen voor verschillen in gerapporteerde groottes</h1>
+</div>
+
+<p>Deze help sectie verklaart waarom groottes gerapporteerd door GrandPerspective soms verschillen van die gerapporteerd door andere applicaties, waaronder bijvoorbeeld Finder.</p>
+
+<h2>Verschillen in de gerapporteerde grootte voor een bepaalde map of opslagmedium</h2>
+
+<p>Soms verschilt de totale grootte van een map of de totale gebruikte ruimte van een opslagmedium gerapporteerd door GrandPerspective van die zoals die elders gerapporteerd is, bijvoorbeeld in Finder's Info paneel.
+Er zijn verschillende verklaringen mogelijk voor deze verschillen:</p>
+
+<ul>
+<li><b>Verschil van de gebruikte bestandsgrootte maat.</b>
+Er zijn twee verschillende manieren hoe een <a href="FileSizes.html">bestandsgrootte</a> gemeten kan worden.
+De intrinsieke grootte is gebaseerd op de inhoud van een bestand.
+De fysische grootte daarentegen meet de ruimte die het bestand inneemt op schijf, en is over het algemeen iets groter.
+Finder rapporteert intrinsieke bestandsgroottes, terwijl GrandPerspective beide kan gebruiken afhankelijk van de ingestelde <a href="Preferences.html">Voorkeuren</a>.
+Dus wanneer GrandPerspective de fysische grootte maat gebruikt dan zullen de gerapporteerde groottes over het algemeen iets groter zijn.
+</li>
+
+<li><b>Verschil van het gebruikte bestandsgrootte eenheidssysteem.</b>
+Er bestaan twee vaak gebruikte eenheidssystemen voor <a href="FileSizes.html">bestandsgroottes</a>.
+Wanneer het Binair systeem gebruikt wordt komt 1 KB overeen met 1024 bytes.
+Wanneer daarentegen het Decimaal systeem gebruikt wordt komt 1 KB overeen met 1000 bytes.
+Finder gebruikt het Decimaal eenheidssysteem, terwijl GrandPerspective beide kan gebruiken afhankelijk van de ingestelde <a href="Preferences.html">Voorkeuren</a>.
+Dus wanneer GrandPerspective het Binair eenheidssysteem gebruikt dan zullen de gerapporteerde groottes iets kleiner zijn.
+</li>
+
+<li><b>Verschillen door het gebruik van hard-gelinkte bestanden.</b>
+<a href="HardLinks.html">Harde links</a> maken het mogelijk meerdere kopie&euml;n van een bestand te hebben zonder de inhoud te dupliceren op het opslagmedium.
+Het bestand is slechts &eacute;&eacute;n keer opgeslagen.
+Bijvoorbeeld, als u een bestand van 1 MB heeft met twee hard-gelinkte kopie&euml;n, dan is slechts 1 MB opslagruimte nodig in plaats van 3 MB.
+GrandPerspective houdt hier rekening mee en rapporteert hoeveel ruimte nodig is op het opslagmedium.
+Finder daarentegen telt elke kopie mee en overschat dus de totale opslagruimte die nodig is.
+Dus wanneer GrandPerspective een folder inleest die meerdere hard-gelinkte kopie&euml;n van hetzelfde bestand bevat, dan zal de gerapporteerde totale grootte kleiner zijn.
+</li>
+
+<li><b>Verschillen door genegeerde bestanden en mappen.</b>
+Wanneer u ervoor kiest een <a href="MasksAndFilters">filter</a> te gebruiken, dan kan GrandPerspective bepaalde bestanden en mappen overslaan tijdens het inlezen.
+Hun groottes zullen dan ook niet meegenomen zijn in de totale grootte van de ingelezen map.
+Insgelijks, wanneer GrandPerspective de benodigde rechten niet heeft om bepaalde bestanden en mappen te lezen zullen deze ook niet meegenomen worden.
+Wanneer dit gebeurt dan zal de grootte gerapporteerd door GrandPerspective derhalve ook kleiner zijn dan de werkelijk benodigde opslagruimte.
+</li>
+</ul>
+
+<h2>Verschillen in de gerapporteerde beschikbare ruimte</h2>
+
+<p>De beschikbare ruimte van een opslagmedium die door GrandPerspective wordt getoond in een <a href="Views.html">overzicht venster</a> wanneer het volledige opslagmedium getoond wordt, kan minder zijn dan de (initieel) beschikbare ruimte getoond in het <a href="ViewInfoPanel.html">Info tabblad</a>.
+De beschikbare ruimte getoond in het Info tabblad is de beschikbare ruimte zoals deze door het opslagmedium gerapporteerd wordt.
+Laten we deze X noemen.
+GrandPerspective berekent ook hoeveel ruimte er is wanneer de grootte van de ingelezen bestanden afgetrokken wordt van de totale grootte van het opslagmedium.
+Laten we dit Y noemen.
+De totale grootte van een ingelezen map kan de benodigde opslagruimte onderschatten maar deze nooit overschatten.
+Daaruit volgt dat Y &ge; X.
+Echter, het is mogelijk dat Y &lt; X, blijkbaar doordat of de totale grootte van het opslagmedium of de beschikbare ruimte niet nauwkeurig gerapporteerd is.
+In dit geval zal GrandPerspective Y gebruiken voor de grootte van het blok dat de beschikbare ruimte weergeeft.
+Dit minimaliseert namelijk het verschil tussen het volume grootte zoals getoond in het overzicht venster ten opzichte van dat gerapporteerd door het opslagmedium.
+</p>
+
+</body>
+</html>

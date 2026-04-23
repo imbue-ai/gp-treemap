@@ -1,0 +1,113 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>File size measures</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Describes the file size measures that are supported and explains how these can be chosen.">
+<meta name="keywords" content="file size, file size measure, logical size, physical size, tally size, file size units, binary, decimal">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>File sizes</h1>
+</div>
+
+<p>
+The area of each rectangle in a <a href="Views.html">view window</a> is proportional to the size of the file it represents.
+There are different ways to measure a file's size.
+The measure that GrandPerspective uses when scanning a folder is determined by its <a href="Preferences.html">Preferences</a>.
+</p>
+
+<h2>File size measures</h2>
+
+<p>
+GrandPerspective supports the following file size measures:
+</p>
+
+<ul>
+<li><b>Logical size</b> corresponds to the size of the information in the file.
+For example, the logical size of a simple ASCII text file is the number of characters (including spaces and linebreaks) it contains.</li>
+
+<li><b>Physical size</b> represents the space that a file takes up on disk.
+A file's physical size is typically slightly larger than its logical size due to the way files are stored.
+For example, a file with a logical size of ten bytes can have a physical size of 4096 bytes.
+</li>
+
+<li><b>Tally size</b> simply counts the number of files.
+Each file has size "one" irrespective of its actual size on disk.
+The size of a folder therefore equals the number of files it contains.
+</li>
+</ul>
+
+<p>
+Which file size measure to use is partially a matter of taste but also depends on the situation.
+Physical size best shows how much space is freed up when you delete a file but exposes more details of the underlying file system.
+Logical size best represents the intrinsic size of the file content but can occasionally severely over-estimate the disk usage.
+In particular, the logical size can be larger than the actual required storage for:
+</p>
+
+<ul>
+<li>
+Files stored using HFS+ compression.
+In fact, very small files can even have a physical size of <em>zero bytes</em>.
+This happens when their content can be stored entirely as part of the file's metadata.
+Such a file is then invisible in the <a href="Views.html">view window</a>.
+</li>
+
+<li>
+Sparse files in the APFS file system.
+Sparse files are used to efficiently store data that may contain many empty blocks.
+A typical use case is a data volume used by a Virtual Machine or Docker container.
+The logical size of such files can be very large, yet they require relatively little storage space when these volumes are largely empty.
+</li>
+
+<li>
+Cloud files that are not (yet) downloaded.
+These have an <img src="images/icloud.png" height="12" width="12" alt="iCloud"> icon in Finder.
+The size on disk for these files is minimal.
+The reported logical space is typically much larger, as it corresponds to the content.
+The logical size does not help you free space on your hard-drive but can help you to reduce your cloud storage.
+</li>
+
+<li>
+Online-only Dropbox files.
+These files are part of Dropbox Smart Synch feature.
+They appear in the Dropbox folder on your computer, but their content is stored remotely.
+These files therefore similarly take up less space on your drive than the actual content.
+</li>
+</ul>
+
+<p>
+Tally size should only be used for exceptional circumstances.
+For example when you want to find folders that contain many (possibly small) files.
+</p>
+
+<h2>File size unit systems</h2>
+
+<p>
+When reporting file sizes, GrandPerspective uses one of the following unit systems:
+
+<ul>
+<li><b>Binary</b>,
+in this case one kilobyte contains 2<sup>10</sup>=1024 bytes.
+Similarly, a megabyte contains 2<sup>20</sup> bytes, and so on.</li>
+
+<li><b>Decimal</b>,
+in this case one kilobyte contains 10<sup>3</sup>=1000 bytes.
+Similarly, a megabyte contains a million bytes, and so on.</li>
+</ul>
+</p>
+
+<h2>See also</h2>
+
+<p>
+<ul>
+<li><a href="HowToExplainSizeDifferences.html">How to explain differences in sizes reported by GrandPerspective compared to that reported by other tools</a></li>
+</ul>
+</p>
+
+</body>
+</html>

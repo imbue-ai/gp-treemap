@@ -1,0 +1,30 @@
+/* Class = "NSButtonCell"; title = "Clear History"; ObjectID = "9nG-ap-dHC"; */
+"9nG-ap-dHC.title" = "Limpiar historial";
+
+/* Class = "NSButtonCell"; title = "Scan"; ObjectID = "Cd8-ae-UVZ"; */
+"Cd8-ae-UVZ.title" = "Escanear";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Foldername"; ObjectID = "duM-ug-7fu"; */
+"duM-ug-7fu.placeholderString" = "Nombre de carpeta";
+
+/* Class = "NSTextFieldCell"; title = "Folder"; ObjectID = "duM-ug-7fu"; */
+"duM-ug-7fu.title" = "Carpeta";
+
+/* Class = "NSButtonCell"; title = "Help"; ObjectID = "JEp-c0-ZgQ"; */
+"JEp-c0-ZgQ.title" = "Ayuda";
+
+/* Class = "NSTextFieldCell"; title = "graphically shows your disk usage"; ObjectID = "lT6-9A-q8Z"; */
+"lT6-9A-q8Z.title" = "Mostrar gráficamente el uso de su disco";
+
+/* Class = "NSWindow"; title = "Welcome"; ObjectID = "QvC-M9-y7g"; */
+"QvC-M9-y7g.title" = "Bienvenido";
+
+/* Class = "NSTextFieldCell"; title = "Path"; ObjectID = "UhX-F8-bW1"; */
+"UhX-F8-bW1.title" = "Ruta";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "xvh-L4-J3V"; */
+"xvh-L4-J3V.title" = "Celda de texto";
+
+/* Class = "NSTextFieldCell"; title = "GrandPerspective"; ObjectID = "zcR-VQ-ffQ"; */
+"zcR-VQ-ffQ.title" = "GrandPerspective";
+

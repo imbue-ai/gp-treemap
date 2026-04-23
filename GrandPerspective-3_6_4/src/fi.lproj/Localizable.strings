@@ -1,0 +1,477 @@
+/* Legend for Size-based mapping scheme. */
+"%@ - %@" = "%1$@ - %2$@";
+
+/* Enumeration of two items */
+"%@ and %@" = "%1$@ ja %2$@";
+
+/* Enumeration of two items */
+"%@ or %@" = "%1$@ tai %2$@";
+
+/* Enumeration of three or more items with 1: an item, 2: two or more items */
+"%@, %@" = "%1$@, %2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, and %@" = "%1$@ ja %2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, or %@" = "%1$@ tai %2$@";
+
+/* Legend for Time-based mapping schemes. */
+"%d - %d days ago" = "%1$d - %2$d päivää sitten";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago" = "%d päivää sitten";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago or more" = "%d päivää sitten tai aiemmin";
+
+/* Message in progress panel while filtering */
+"%d folders filtered" = "%d hakemistoa suodatettu";
+
+/* Message in progress panel while executing refresh-based scan */
+"%d folders processed" = "%d hakemistoa käsitelty";
+
+/* Message in progress panel while loading data */
+"%d folders read" = "%d hakemistoa luettu";
+
+/* Message in progress panel while saving data */
+"%d folders saved" = "%d hakemistoa talletettu";
+
+/* Message in progress panel while executing a full scan */
+"%d folders scanned" = "%d hakemistoa skannattu";
+
+/* Exact file size (in bytes) */
+"%qu bytes" = "%qu tavua";
+
+/* Tally folder size (in number of files) */
+"%qu files" = "%qu tiedostoa";
+
+/* Alert message */
+"A filter named \"%@\" already exists" = "Suodatin nimeltä \"%@\" on jo olemassa";
+
+/* Alert message (Note: 'it' can refer to a file or a folder) */
+"A possible reason is that it does not exist anymore" = "Se ei ehkä ole enää olemassa";
+
+/* Alert message */
+"A test named \"%@\" already exists" = "Ehto nimeltä \"%@\" on jo olemassa";
+
+/* Alert message (with filename arg) */
+"Aborted saving the scan data to \"%@\"" = "Skannin tulosten talletus kohteeseen \"%@\" keskeytettiin";
+
+/* Header in exported text file */
+"Accessed" = "Käytetty";
+
+/* Label in Focus panel */
+"Area in view:" = "Alue näkymässä:";
+
+/* Parse error */
+"Attribute not found" = "Ominaisuutta ei löytynyt";
+
+/* File size unit for bytes. */
+"B" = "t";
+
+/* Alert panel button */
+"Cancel" = "Kumoa";
+
+/* Part of tool tip for uniform types */
+"Conforms to:" = "Noudattaa:";
+
+/* Alert panel button */
+"Continue" = "Jatka";
+
+/* Header in exported text file */
+"Created" = "Luotu";
+
+/* Alert panel button */
+"Delete" = "Poista";
+
+/* Menu item */
+"Delete File" = "Poista Tiedosto";
+
+/* Menu item */
+"Delete Folder" = "Poista Hakemisto";
+
+/* FDA warning sheet */
+"Disk access required" = "Levyn käyttöoikeus vaaditaan";
+
+/* Status update message */
+"Display focus changed to %@" = "Kohdistus on nyt %@";
+
+/* FDA warning alert */
+"Do not show again" = "Älä näytä uudelleen";
+
+/* Alert message */
+"Do you want to delete the file \"%@\"?" = "Haluatko poistaa tiedoston \"%@\"?";
+
+/* Alert message */
+"Do you want to delete the folder \"%@\"?" = "Haluatko poistaa hakemiston \"%@\"?";
+
+/* Alert message */
+"Do you want to delete the package \"%@\"?" = "Haluatko poistaa paketin \"%@\"?";
+
+/* FDA warning alert */
+"Edit System Preferences" = "Muokkaa Järjestelmäasetuksia";
+
+/* Parse error */
+"Encountered filter after folder" = "Suodatin kohdattiin hakemiston jälkeen";
+
+/* Parse error */
+"Encountered more than one root element" = "Enemmän kuin yksi juurielementti";
+
+/* Parse error */
+"Encountered more than one root folder" = "Enemmän kuin yksi juurielementti";
+
+/* Parse error */
+"Encountered multiple %@ elements" = "Kohdattiin useita %@ elementtejä";
+
+/* Parse error */
+"Error parsing \"%@\" attribute: %@" = "Virhe käsitellessä \"%1$@\" ominaisuutta: %2$@";
+
+/* Parse error */
+"Expected %@ element" = "Odotettiin %@ elementtiä";
+
+/* Error message */
+"Expected a folder" = "Odotettiin hakemistoa";
+
+/* Parse error */
+"Expected boolean value" = "Odotettiin boolean arvoa";
+
+/* Parse error */
+"Expected date value" = "Odotettiin päivämääräarvoa";
+
+/* Parse error */
+"Expected integer value" = "Odotettiin kokonaislukua";
+
+/* Error message */
+"Expected scandata file" = "Odotettiin skannitieto tiedostoa";
+
+/* Parse error */
+"Expected time value" = "Odotettiin aika-arvoa";
+
+/* Parse error */
+"Expected unsigned integer value" = "Odotettiin etumerkitöntä kokonaislukuarvoa";
+
+/* Title of save panel */
+"Export image" = "Vie kuva";
+
+/* Title of save panel */
+"Export scan data as text" = "Vie skannitulokset tekstinä";
+
+/* Alert message */
+"Failed to bind one or more filter tests:\n%@" = "Yhden tai useamman suodatinehdon asettaminen epäonnistui:\n            %@";
+
+/* Error message */
+"Failed to close file" = "Tiedoston sulkeminen epäonnistui";
+
+/* Error message */
+"Failed to create file" = "Tiedoston luominen epäonnistui";
+
+/* Alert message */
+"Failed to delete the file \"%@\"" = "Tiedoston \"%@\" poisto epäonnistui";
+
+/* Alert message */
+"Failed to delete the folder \"%@\"" = "Hakemiston \"%@\" poisto epäonnistui";
+
+/* Alert message */
+"Failed to determine volume root" = "Levyn juuren määrittäminen epäonnistui";
+
+/* Error message */
+"Failed to get path from pasteboard" = "Polun hakeminen leikepöydältä epäonnistui";
+
+/* Alert message (with filename arg) */
+"Failed to load the scan data from \"%@\"" = "Skannitulosten lataaminen kohteesta \"%@\" epäonnistui";
+
+/* Alert message */
+"Failed to open the file \"%@\"" = "Tiedoston \"%@\" avaaminen epäonnistui";
+
+/* Alert message */
+"Failed to open the folder \"%@\"" = "Hakemiston \"%@\" avaaminen epäonnistui";
+
+/* Alert message */
+"Failed to open the package \"%@\"" = "Paketin \"%@\" avaaminen epäonnistui";
+
+/* Parse error */
+"Failed to read any tree data" = "Hierarkiatiedostojen lukeminen epäonnistui";
+
+/* Alert message */
+"Failed to reveal the file \"%@\"" = "Tiedoston \"%@\" näyttäminen epäonnistui";
+
+/* Alert message */
+"Failed to reveal the folder \"%@\"" = "Hakemiston \"%@\" näyttäminen epäonnistui";
+
+/* Alert message */
+"Failed to reveal the package \"%@\"" = "Paketin \"%@\" näyttäminen epäonnistui";
+
+/* Alert message */
+"Failed to save the image" = "Kuvan tallettaminen epäonnistui";
+
+/* Alert message (with filename arg) */
+"Failed to save the scan data to \"%@\"" = "Skannitulosten tallettaminen kohteeseen \"%@\" epäonnistui";
+
+/* Alert message */
+"Failed to update one or more filters:\n%@" = "Yhden tai useamman suotimen päivitys epäonnistui:\n            %@";
+
+/* Error message */
+"Failed to write to file" = "Tiedostoon kirjoittaminen epäonnistui";
+
+/* Label in Focus panel */
+"File in view:" = "Tiedosto näkymässä:";
+
+/* Header in exported text file */
+"Filename" = "Tiedostonimi";
+
+/* Window title */
+"Filter - %@" = "Suodatin - %@";
+
+/* Window title */
+"Filter test - %@" = "Suodatinehto - %@";
+
+/* Message in progress panel while filtering */
+"Filtering %@" = "Suodattaa %@";
+
+/* Title of progress panel. */
+"Filtering in progress" = "Suodatus käynnissä";
+
+/* Label in Focus panel */
+"Folder in view:" = "Hakemisto näkymässä:";
+
+/* Alert message */
+"For %d files the reported (logical) size is larger than their actual (physical) size. Consider rescanning using the Physical file size measure" = "%d:n tiedoston looginen koko on isompi kuin niiden varsinainen fyysinen koko. Harkitse uudelleenskannausta käyttäen fyysistä mittaa tiedostokokona";
+
+/* FDA success alert */
+"Full Disk Access is verified." = "Täysi levyn käyttö -oikeus on varmistettu.";
+
+/* File size unit for gigabytes. */
+"GB" = "Gt";
+
+/* FDA warning sheet */
+"GrandPerspective needs full access to your disk for optimal scan performance. Please select your main volume (e.g. Macintosh HD) in the following prompt." = "GrandPerspective tarvitsee täyden pääsyn levyllesi optimaalisen skannaussuorituskyvyn saavuttamiseksi. Valitse seuraavassa kehotteessa päälevysi (esim. Macintosh HD).";
+
+/* FDA warning alert */
+"GrandPerspective seems to lack Full Disk Access permissions" = "Vaikuttaa siltä, että GrandPerspectivella ei ole Täysi levyn käyttö -oikeutta";
+
+/* Menu item */
+"Hide Control Panel" = "Piilota hallintapaneeli";
+
+/* Alert message */
+"Inaccuracies in hard-linked folder contents" = "Linkitettyjen (hard) hakemistojen sisällössä on epätarkkuutta";
+
+/* File size unit for kilobytes. */
+"kB" = "Kt";
+
+/* Legend for Size-based mapping scheme. */
+"Larger than %@" = "Suurempi kuin %@";
+
+/* Legend for Level mapping scheme. */
+"Level %d" = "Taso %d";
+
+/* Title of load panel */
+"Load scan data" = "Skannitulosten lataaminen";
+
+/* Title of progress panel. */
+"Loading in progress" = "Lataus käynnissä";
+
+/* Misc. description for Level mapping scheme. */
+"Lower levels" = "Alemmat tasot";
+
+/* File size unit for megabytes. */
+"MB" = "Mt";
+
+/* Header in exported text file */
+"Modified" = "Muokattu";
+
+/* Legend for Time-based mapping schemes. */
+"More recent" = "Viimeisempi";
+
+/* Initial match value in FilterTestWindow */
+"New match" = "Uusi osuma";
+
+/* The filter name when there is no filter. */
+"None" = "Ei mitään";
+
+/* Alert additional informative text */
+"Note: The file is hard-linked. It will take up space until all links to it are deleted" = "Huom: Tiedosto on linkitetty (hard). Se vie tilaa niin kauan kuin siihen on linkkejä";
+
+/* Alert additional informative text */
+"Note: The folder is hard-linked. It will take up space until all links to it are deleted" = "Huom: Hakemisto on linkitetty (hard). Se vie tilaa niin kauan kuin siihen on linkkejä";
+
+/* Alert additional informative text */
+"Note: The package is hard-linked. It will take up space until all links to it are deleted" = "Huom: Paketti on linkitetty (hard). Se vie tilaa niin kauan kuin siihen on linkkejä";
+
+/* Alert panel button */
+"OK" = "OK";
+
+/* Misc. description for File type mapping scheme. */
+"other file types" = "muut tiedostotyypit";
+
+/* Legend for Level mapping scheme. */
+"Outermost level" = "Ulkoisin taso";
+
+/* Label in Focus panel */
+"Package in view:" = "Paketti näkymässä:";
+
+/* Parse error */
+"Parse error (line %d): %@" = "Jäsennysvirhe (rivi %1$d): %2$@";
+
+/* Parse error */
+"Parsing aborted" = "Jäsennys keskeytetty";
+
+/* Header in exported text file */
+"Path" = "Polku";
+
+/* FDA success alert */
+"Permission setup complete" = "Käyttöoikeuksien määritys valmis";
+
+/* Message in progress panel while loading data */
+"Reading %@" = "Luetaan %@";
+
+/* Title of progress panel. */
+"Refresh in progress" = "Virkistys käynnissä";
+
+/* Alert panel button */
+"Remove" = "Poista";
+
+/* Alert message */
+"Remove the filter named \"%@\"?" = "Poistetaanko suodatin nimeltä \"%@\"?";
+
+/* Alert message */
+"Remove the test named \"%@\"?" = "Poistetaanko ehto nimeltä \"%@\"?";
+
+/* Title of save panel */
+"Save scan data" = "Tallenna skannitulokset";
+
+/* Message in progress panel while saving data */
+"Saving %@" = "Tallennetaan %@";
+
+/* Title of progress panel. */
+"Saving in progress" = "Tallennus käynnissä";
+
+/* Prompt in open panel */
+"Scan" = "Skannaa";
+
+/* Title of open panel */
+"Scan folder" = "Skannaa hakemisto";
+
+/* Solitairy entry in Start window */
+"Scan Folder" = "Valitse hakemisto";
+
+/* Entry in Start window, alongside other options */
+"Scan Other Folder" = "Valitse toinen hakemisto";
+
+/* Message in progress panel while scanning */
+"Scanning %@" = "Skannataan %@";
+
+/* Alert message */
+"Scanning failed" = "Skannaus epäonnistui";
+
+/* Title of progress panel. */
+"Scanning in progress" = "Skannaus käynnissä";
+
+/* Button of Open panel */
+"Select Drive" = "Valitse levy";
+
+/* Open panel message */
+"Select your main drive (e.g. Macintosh HD)" = "Valitse päälevysi (esim. Macintosh HD)";
+
+/* Label in Focus panel */
+"Selected area:" = "Valittu alue:";
+
+/* Label in Focus panel */
+"Selected file:" = "Valittu tiedosto:";
+
+/* Label in Focus panel */
+"Selected folder:" = "Valittu hakemisto:";
+
+/* Label in Focus panel */
+"Selected package:" = "Valittu paketti:";
+
+/* Menu item */
+"Show Control Panel" = "Näytä hallintapaneeli";
+
+/* Header in exported text file */
+"Size" = "Koko";
+
+/* Legend for Size-based mapping scheme. */
+"Smaller than %@" = "Pienempi kuin %@";
+
+/* Legend for Size-based mapping scheme. */
+"Smallest" = "Pienin";
+
+/* Alert message (with filename arg) */
+"Successfully saved the scan data to \"%@\"" = "Skannitulokset tallennettiin kohteeseen \"%@\"";
+
+/* File size unit for terabytes. */
+"TB" = "Tt";
+
+/* Alert message */
+"The actual (physical) size is %.1f%% of the reported (logical) size. Consider rescanning using the Physical file size measure" = "Varsinainen fyysinen koko on %.1f%% loogisesta koosta. Harkitse uudelleenskannausta käyttäen fyysistä tiedostokokomittaa";
+
+/* Alert message */
+"The filter must have a name" = "Anna suotimelle nimi";
+
+/* Alert informative text */
+"The filter will be irrevocably removed from the filter repository" = "Suodatin poistetaan lopullisesti suodatinkirjastosta";
+
+/* Alert informative text */
+"The filter will be replaced by the default filter with this name" = "Suodatin korvataan oletussuodattimella käyttäen tätä nimeä";
+
+/* Alert message */
+"The path %@ does not exist or is not a folder" = "Polkua %@ ei ole tai se ei ole hakemisto";
+
+/* Alert message */
+"The refreshed content may not be fully accurate. Hard-linked items may occur more than once or could be missing. Perform a rescan to ensure that each hard-linked item occurs only once" = "Virkistetty sisältö ei ehkä ole täysin tarkka. Linkit (hard) saattavat puuttua tai esiintyä useamman kerran. Suorita uudelleenskannaus varmistuaksesi että jokainen linkki (hard) esiintyy vain yhden kerran";
+
+/* Alert message */
+"The reported size of some files is larger than their actual size on disk" = "Joidenkin tiedostojen koko on suurempi kuin niiden varsinainen koko levyllä";
+
+/* Alert message */
+"The reported total size is larger than the actual size on disk" = "Yhteiskoko on suurempi kuin varsinainen koko levyllä";
+
+/* Alert informative text */
+"The resulting file is valid but incomplete" = "Kohdetiedosto on ok mutta epätäydellinen";
+
+/* Alert informative text */
+"The selected file will be moved to Trash" = "Valittu tiedosto siirretään Roskakoriin";
+
+/* Alert informative text */
+"The selected folder, with all its contents, will be moved to Trash. Beware, any files in the folder that are not shown in the view will also be deleted" = "Valittu hakemisto sisältöineen siirretään Roskakoriin. Varoitus: myös tiedostot mitkä ovat hakemistossa mutta eivät ole nyt näkyvissä poistetaan myös";
+
+/* Alert informative text */
+"The selected package will be moved to Trash" = "Valittu paketti siirretään roskakoriin";
+
+/* Alert message */
+"The test must have a name" = "Ehdolla pitää olla nimi";
+
+/* Alert informative text */
+"The test will be irrevocably removed from the test repository" = "Ehto poistetaan lopullisesti ehtovarastosta";
+
+/* Alert informative text */
+"The test will be replaced by the default test with this name" = "Ehto korvataan samannimisellä oletusehdolla";
+
+/* Alert informative text */
+"The unbound tests have been omitted from the filter" = "Rajoittamattomat ehdot on jätetty huomioimatta suotimessa";
+
+/* Alert informative text */
+"These filters do not exist anymore. Their old definition is used instead" = "Näitä suotimia ei ole enää olemassa. Sen sijaan käytössä on niiden vanha määritelmä";
+
+/* FDA warning alert */
+"This may limit the disk content it can see. To remedy this, you can grant the permissions via the System Preferences." = "Tämä saattaa rajoittaa, mitä levyn sisältöä se voi nähdä. Ongelman voi korjata myöntämällä oikeuden Järjestelmäasetuksissa";
+
+/* Part of tool tip for uniform types */
+"Top-level type" = "Ylätason tyyppi";
+
+/* Header in exported text file */
+"Type" = "Tyyppi";
+
+/* Description for 'unknown' UTI. */
+"unknown file type" = "tuntematon tiedostotyyppi";
+
+/* Window title */
+"Unnamed filter" = "Nimetön suodatin";
+
+/* Window title */
+"Unnamed filter test" = "Nimetön suodatinehto";
+
+/* Parse error */
+"Unrecognized value" = "Tunnistamaton arvo";
+

@@ -1,0 +1,225 @@
+/* Class = "NSMenuItem"; title = "Item"; ObjectID = "3LR-fJ-0Ck"; */
+"3LR-fJ-0Ck.title" = "Kohde";
+
+/* Class = "NSMenu"; title = "Selection"; ObjectID = "4K2-IU-hcw"; */
+"4K2-IU-hcw.title" = "Valinta";
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "5"; */
+"5.title" = "Tuo kaikki eteen";
+
+/* Class = "NSMenu"; title = "Display Focus"; ObjectID = "6AB-sL-t6U"; */
+"6AB-sL-t6U.title" = "Kohdistus";
+
+/* Class = "NSMenuItem"; title = "Selection"; ObjectID = "8Lj-RY-z1e"; */
+"8Lj-RY-z1e.title" = "Valinta";
+
+/* Class = "NSMenuItem"; title = "Refresh"; ObjectID = "9aB-S3-Sb7"; */
+"9aB-S3-Sb7.title" = "Virkistä";
+
+/* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "9gG-CK-G0v"; */
+"9gG-CK-G0v.title" = "Pikakurkistus";
+
+/* Class = "NSMenuItem"; title = "Show/Hide Control Panel"; ObjectID = "9Ho-ON-BCj"; */
+"9Ho-ON-BCj.title" = "Näytä/Kätke hallintapaneeli";
+
+/* Class = "NSMenuItem"; title = "Reset Focus"; ObjectID = "15W-vC-r8v"; */
+"15W-vC-r8v.title" = "Nollaa Kohdistus";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "19"; */
+"19.title" = "Ikkuna";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "23"; */
+"23.title" = "Pienennä";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "24"; */
+"24.title" = "Ikkuna";
+
+/* Class = "NSMenu"; title = "MainMenu"; ObjectID = "29"; */
+"29.title" = "Päävalikko";
+
+/* Class = "NSMenuItem"; title = "Open"; ObjectID = "33Q-IV-RrZ"; */
+"33Q-IV-RrZ.title" = "Avaa";
+
+/* Class = "NSMenuItem"; title = "About GrandPerspective"; ObjectID = "58"; */
+"58.title" = "Tietoja: GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "Scan Folder..."; ObjectID = "72"; */
+"72.title" = "Skannaa hakemisto...";
+
+/* Class = "NSMenu"; title = "File"; ObjectID = "81"; */
+"81.title" = "Tiedosto";
+
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "83"; */
+"83.title" = "Tiedosto";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "103"; */
+"103.title" = "Ohje";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "106"; */
+"106.title" = "Ohje";
+
+/* Class = "NSMenuItem"; title = "GrandPerspective Help"; ObjectID = "111"; */
+"111.title" = "GrandPerspective ohje";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "129"; */
+"129.title" = "Asetukset…";
+
+/* Class = "NSMenuItem"; title = "Hide GrandPerspective"; ObjectID = "134"; */
+"134.title" = "Kätke GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "Quit GrandPerspective"; ObjectID = "136"; */
+"136.title" = "Lopeta GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
+"145.title" = "Kätke muut";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "150"; */
+"150.title" = "Näytä kaikki";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "197"; */
+"197.title" = "Zoomaus";
+
+/* Class = "NSMenuItem"; title = "Duplicate"; ObjectID = "272"; */
+"272.title" = "Tuplaa";
+
+/* Class = "NSMenuItem"; title = "Close"; ObjectID = "319"; */
+"319.title" = "Sulje";
+
+/* Class = "NSMenuItem"; title = "Twin"; ObjectID = "321"; */
+"321.title" = "Kaksonen";
+
+/* Class = "NSMenuItem"; title = "Export As Image..."; ObjectID = "324"; */
+"324.title" = "Vie kuvana...";
+
+/* Class = "NSMenuItem"; title = "Filter..."; ObjectID = "331"; */
+"331.title" = "Suodata...";
+
+/* Class = "NSMenuItem"; title = "Filtered Scan..."; ObjectID = "335"; */
+"335.title" = "Suodatettu skanni...";
+
+/* Class = "NSMenuItem"; title = "Save Scan Data..."; ObjectID = "339"; */
+"339.title" = "Tallenna skannin tiedot...";
+
+/* Class = "NSMenuItem"; title = "Load Scan Data..."; ObjectID = "340"; */
+"340.title" = "Lataa skannin tiedot...";
+
+/* Class = "NSMenuItem"; title = "GrandPerspective Website"; ObjectID = "345"; */
+"345.title" = "GrandPerspective webbisivu";
+
+/* Class = "NSMenuItem"; title = "View"; ObjectID = "348"; */
+"348.title" = "Näytä";
+
+/* Class = "NSMenu"; title = "View"; ObjectID = "349"; */
+"349.title" = "Näytä";
+
+/* Class = "NSMenuItem"; title = "Show/Hide Toolbar"; ObjectID = "350"; */
+"350.title" = "Näytä/Kätke työkalupalkki";
+
+/* Class = "NSMenuItem"; title = "Customize Toolbar..."; ObjectID = "351"; */
+"351.title" = "Mukauta työkalupalkkia...";
+
+/* Class = "NSMenuItem"; title = "Filters..."; ObjectID = "357"; */
+"357.title" = "Suodata...";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "388"; */
+"388.title" = "Muokkaa";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "389"; */
+"389.title" = "Muokkaa";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "393"; */
+"393.title" = "Leikkaa";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "394"; */
+"394.title" = "Kopioi";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "395"; */
+"395.title" = "Sijoita";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "397"; */
+"397.title" = "Poista";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "398"; */
+"398.title" = "Valitse kaikki";
+
+/* Class = "NSMenuItem"; title = "Uniform type ranking..."; ObjectID = "421"; */
+"421.title" = "Tyyppien järjestys...";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "425"; */
+"425.title" = "Palvelut";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "426"; */
+"426.title" = "Palvelut";
+
+/* Class = "NSMenuItem"; title = "Zoom Out"; ObjectID = "bKM-Ec-4Gi"; */
+"bKM-Ec-4Gi.title" = "Loitonna";
+
+/* Class = "NSMenuItem"; title = "Rescan with mask as filter"; ObjectID = "BMK-MQ-DB3"; */
+"BMK-MQ-DB3.title" = "Skannaa uudelleen käyttäen maskia suotimena";
+
+/* Class = "NSMenuItem"; title = "Rescan folder in view"; ObjectID = "CV5-Fw-5D7"; */
+"CV5-Fw-5D7.title" = "Skannaa näkyvä hakemisto uudelleen";
+
+/* Class = "NSMenuItem"; title = "Move Focus Down"; ObjectID = "dJ2-6K-v9P"; */
+"dJ2-6K-v9P.title" = "Vie Kohdistusta Alaspäin";
+
+/* Class = "NSMenuItem"; title = "Selection Focus"; ObjectID = "frA-lr-FOa"; */
+"frA-lr-FOa.title" = "Valinnan Kohdistus";
+
+/* Class = "NSMenuItem"; title = "Rescan"; ObjectID = "gUG-Nh-FTx"; */
+"gUG-Nh-FTx.title" = "Skannaa uudelleen";
+
+/* Class = "NSMenuItem"; title = "Move Focus Up"; ObjectID = "gZj-8W-T7o"; */
+"gZj-8W-T7o.title" = "Vie Kohdistusta Ylöspäin";
+
+/* Class = "NSMenuItem"; title = "Export As Text..."; ObjectID = "hJw-Fc-daG"; */
+"hJw-Fc-daG.title" = "Vie tekstinä";
+
+/* Class = "NSMenuItem"; title = "Scan Recent"; ObjectID = "hUr-J9-FbH"; */
+"hUr-J9-FbH.title" = "Hae viimeisin";
+
+/* Class = "NSMenu"; title = "Scan Recent"; ObjectID = "HXb-90-KwJ"; */
+"HXb-90-KwJ.title" = "Hae viimeisin";
+
+/* Class = "NSMenuItem"; title = "Zoom In"; ObjectID = "Iyw-2V-esC"; */
+"Iyw-2V-esC.title" = "Lähennä";
+
+/* Class = "NSMenuItem"; title = "Move Focus Up"; ObjectID = "K6z-Zt-rLu"; */
+"K6z-Zt-rLu.title" = "Vie kohdistusta ylöspäin";
+
+/* Class = "NSMenuItem"; title = "Reset Focus"; ObjectID = "l4V-Wf-FCv"; */
+"l4V-Wf-FCv.title" = "Nollaa Kohdistus";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "lnG-FS-oUL"; */
+"lnG-FS-oUL.title" = "Poista";
+
+/* Class = "NSMenuItem"; title = "Rescan selected"; ObjectID = "Lsx-9H-7TJ"; */
+"Lsx-9H-7TJ.title" = "Skannaa valittu uudelleen";
+
+/* Class = "NSMenuItem"; title = "Rescan all"; ObjectID = "nFT-y9-xF4"; */
+"nFT-y9-xF4.title" = "Skannaa kaikki uudelleen";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "oY0-9q-f9z"; */
+"oY0-9q-f9z.title" = "Suurennus";
+
+/* Class = "NSMenuItem"; title = "Move Focus Down"; ObjectID = "QCC-Gl-y9i"; */
+"QCC-Gl-y9i.title" = "Vie Kohdistusta Alaspäin";
+
+/* Class = "NSMenu"; title = "Zoom"; ObjectID = "qtI-xz-v9u"; */
+"qtI-xz-v9u.title" = "Suurennus";
+
+/* Class = "NSMenu"; title = "Rescan"; ObjectID = "rfs-HZ-ODE"; */
+"rfs-HZ-ODE.title" = "Skannaa uudelleen";
+
+/* Class = "NSMenuItem"; title = "Display Focus"; ObjectID = "wd7-sh-TkA"; */
+"wd7-sh-TkA.title" = "Kohdistus";
+
+/* Class = "NSMenu"; title = "Selection Focus"; ObjectID = "wHh-Gg-e7R"; */
+"wHh-Gg-e7R.title" = "Valinnan Kohdistus";
+
+/* Class = "NSMenuItem"; title = "Reveal"; ObjectID = "wVF-ys-3UQ"; */
+"wVF-ys-3UQ.title" = "Paljasta";
+
+/* Class = "NSMenuItem"; title = "Reset Zoom"; ObjectID = "y2y-vX-zhd"; */
+"y2y-vX-zhd.title" = "Nollaa Suurennus";
+

@@ -1,0 +1,91 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Saving view data</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Describes how to save or export scanned data.">
+<meta name="keywords" content="save scan results, export scan results, save, load, export, image, text">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>Saving and exporting scan results</h1>
+</div>
+
+<p>
+The "File" menu lets you save and export the contents of <a href="Views.html">views</a>.
+As a guide, you should save results if you want to load them again in GrandPerspective at a later moment.
+You should export scan results if you want to use them elsewhere.
+</p>
+
+<h2>Saving scan results</h2>
+
+<p>
+The <b>Save Scan Data</b> command lets you save all data in the view.
+Data is saved as XML (and compressed using the gzip format).
+It does not matter which folder is currently displayed in the view.
+All files &#151;also those not currently shown in the view&#151; are stored.
+However, if a <a href="MasksAndFilters.html">filter</a> has been used to create the view then files that have been excluded by the filter will not be stored.
+Comments that you enter in the text view in the <a href="ViewInfoPanel.html">Info tab</a> are stored as well.
+You can use this to associate useful information with the scan.
+</p>
+
+<p>
+The saved data can be loaded into <a href="CreatingViews.html">a new view</a> at a later moment using the <b>Load Scan Data</b> command.
+Saving and loading data be useful for various reasons, amongst which the following:
+</p>
+
+<ul>
+<li>
+You can <a href="NavigatingViews.html">view and navigate</a> old contents of folders, even when these contents have now changed.
+Comparing the old contents of a folder with the current contents can be useful to determine why your disk has suddenly filled up.
+Note: If you are using Time Machine, you can also view the old contents of folders by <a href="HowToAnalyseTimeMachineBackups.html">scanning old Time Machine back-ups</a>,
+</li>
+<li>
+You can visualise your hard drive using GrandPerspective at another machine.
+</li>
+<li>
+Loading saved scan data is quicker than obtaining the same data by scanning the folder again.
+</li>
+</ul>
+
+<p>
+<em>Beware: When viewing loaded scan data, you have to be extra careful using the <b>Delete</b> command.
+Files or folders that you select for deletion may have different contents than the view suggests;
+folders may contain more files and files may have changed (in size) as well.
+</em>
+</p>
+
+<h2>Exporting scan results</h2>
+
+<p>
+Scan results can be exported in two ways:
+</p>
+
+<ul>
+<li>
+<p>
+<b>Export As Image</b> can be used to save a TIFF image of the view.
+The image will be drawn using the <a href="ViewDisplayPanel.html">Display</a> settings of the view and will show the same folder.
+The image is a static representation of the data in the view;
+it cannot be loaded into GrandPerspective again for further exploration.
+You can, however, upload the image to your blog, email it to friends, or frame it and hang it on your wall :-).
+</p>
+</li>
+
+<li>
+<p>
+<b>Export As Text</b> lets you export the data in a text file.
+Each line in the file corresponds to one file.
+You can select which properties of the file should be exported.
+The properties are separated by tabs in the exported file.
+Experienced users can process, analyse, and manipulate the exported data using shell scripts or other tools.
+</p>
+</li>
+</ul>
+
+</body>
+</html>

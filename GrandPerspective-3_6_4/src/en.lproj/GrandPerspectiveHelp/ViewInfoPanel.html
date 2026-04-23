@@ -1,0 +1,64 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>The Info tab of the Control panel</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Describes the Info tab of the Control panel.">
+<meta name="keywords" content="GrandPerspective, control panel, info tab, info, volume, size of scanned files, miscellaneous used space, initial free space, freed space" >
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>The Info tab</h1>
+</div>
+
+<p>
+The Info tab in the <a href="ControlPanel.html">Control Panel</a> gives information about the folder that was scanned for the active <a href="Views.html">view window</a>.
+It shows the volume on which the folder resides, the name of the folder, and the time when it was scanned.
+The <a href="FileSizes.html">file size measure</a> that has been used is also shown, together with the active <a href="FileSizes.html">file size unit system</a>.
+When a <a href="MasksAndFilters.html">filter</a> has been applied, it will also show details of this.
+You can edit the text in this text view, which will be stored when you <a href="SavingViewContents.html">save the scan data</a>.
+You can use this to associate useful information with the scan.
+</p>
+
+<p>
+The tab shows the following five sizes:
+
+<ul>
+<li><b>Volume size</b>: The total size of the volume.
+</li>
+<li><b>Size of scanned files</b>: The total size of the scanned files, using the specified file size measure and after having applied the filter (if any).
+</li>
+<li><b>Miscellaneous used space</b>: All used space that is not accounted for by the size of the scanned files. This includes the following:
+  <ul>
+  <li>Files that were not scanned, either because the scanned folder was not at the root of the volume, or the user did not have permissions to access all subfolders.
+  </li>
+  <li>Files that are excluded by the filter (if any).
+  </li>
+  <li>Disk space that is not accounted for because the Logical <a href="FileSizes.html">file size measure</a> is used, which underestimates the space that files actually take up.
+  </li>
+  <li>Low-level file system data, needed to store amongst others the folder hierarchy.
+  </li>
+  </ul>
+</li>
+<li><b>Initial free space</b>: The available space on the volume, as reported by the Operating System at the time of the scan.
+</li>
+<li><b>Freed space</b>: The total size of files that have been deleted from the scanned folder since the scan was made.
+It includes only files that have been deleted using the view's <b>Delete</b> button (or the Delete button of a <a href="CreatingViews.html">twinned or duplicated</a> view).
+</li>
+</ul>
+</p>
+
+<p>
+The tab also shows:
+<ul>
+<li>the number of files found during the scan, and</li>
+<li>the number of files that have been deleted since then using the <b>Delete</b> command.</li>
+</ul>
+</p>
+
+</body>
+</html>

@@ -1,40 +1,53 @@
-# raised-treemap — treemap Web Component with raised-tile shading
+# gp-treemap — a Web Component port of GrandPerspective's treemap
 
-A standards-compliant Custom Element that renders interactive treemaps with a
-"raised tile" pixel-shading look — bright upper-left corner, dark lower-right,
-with a crisp diagonal seam between the two halves of every cell. Implements
-[`spec/grandperspective-treemap-component/spec.md`](spec/grandperspective-treemap-component/spec.md).
+`<gp-treemap>` is a standards-compliant Custom Element that renders interactive
+treemaps with GrandPerspective's signature "raised tile" pixel shading — bright
+upper-left, dark lower-right, with a crisp diagonal seam between the two halves
+of every cell.
 
-The rendering is **pixel-level on a single `<canvas>`**: for each cell, each
-pixel's shade is chosen by comparing its normalized in-cell coordinates
-(`i/w` vs `j/h`) to decide which triangle it falls in, then indexing a
-256-entry brightness-ramp LUT for the cell's base color. LUTs are built by
-linear-RGB interpolation between the base color and black/white targets.
+## Lineage
+
+This project is a JavaScript/Canvas port of the treemap view from
+[GrandPerspective](https://grandperspectiv.sourceforge.net/), the macOS disk
+visualizer by Erwin Bonsma (and contributors). GrandPerspective is released
+under the GNU General Public License, version 2, and so is `gp-treemap`.
+
+The upstream 3.6.4 source is bundled under `GrandPerspective-3_6_4/` for
+reference. The treemap layout, the raised-tile shader, and the HSV brightness
+ramp were all translated from that source — this is a derivative work in the
+GPL sense, not a clean-room reimplementation. If you want the original tool,
+or want to see where these algorithms came from, go support that project.
+
+If you use `gp-treemap`, please keep the attribution to Erwin Bonsma visible.
+
+## License
+
+GNU General Public License, version 2. See [`LICENSE`](LICENSE).
 
 ## Quick start
 
 No install required — run directly from GitHub:
 
 ```sh
-npx github:imbue-ai/raised-treemap ~/Downloads
+npx github:imbue-ai/gp-treemap ~/Downloads
 ```
 
 Scans `~/Downloads`, writes a self-contained HTML file, and opens it in your
 default browser. Pass a second argument to choose the output path:
 
 ```sh
-npx github:imbue-ai/raised-treemap ~/Pictures /tmp/pictures.html
+npx github:imbue-ai/gp-treemap ~/Pictures /tmp/pictures.html
 ```
 
 ## Viewing the samples
 
 ```sh
-node tools/build.js     # (re)generate dist/raised-treemap.bundle.js
+node tools/build.js     # (re)generate dist/gp-treemap.bundle.js
 open samples/index.html # or just double-click it in Finder
 ```
 
 Each sample is a plain HTML file loading the bundle with a sibling
-`<script src="../dist/raised-treemap.bundle.js">` tag — no ES modules, no CORS,
+`<script src="../dist/gp-treemap.bundle.js">` tag — no ES modules, no CORS,
 no server required. `file://` works.
 
 If you prefer to serve over HTTP:
@@ -51,7 +64,7 @@ HTML file that renders its size treemap — the bundle and dataset are inlined
 so the output works under `file://`.
 
 ```sh
-# Produce /tmp/raised-treemap-<name>-<ts>.html for ~/Downloads:
+# Produce /tmp/gp-treemap-<name>-<ts>.html for ~/Downloads:
 node tools/scan.js ~/Downloads
 
 # Or pick your own output path:
@@ -71,14 +84,14 @@ scanned /Users/you/Pictures
   total size   38.6 GB  (41,434,812,100 B)
   scan took    612 ms
 
-wrote /tmp/raised-treemap-Pictures-1776569124346.html  (5.1 MB)
+wrote /tmp/gp-treemap-Pictures-1776569124346.html  (5.1 MB)
 ```
 
 Symlinks are not followed and unreadable entries are counted and skipped.
 
 ## Profiling an HTML file's load
 
-Large `raised-treemap` outputs (or any local HTML page) can be profiled
+Large `gp-treemap` outputs (or any local HTML page) can be profiled
 headlessly using Chromium's V8 CPU profiler, then visualized as a treemap
 of CPU time bucketed by thread and call stack.
 
@@ -86,11 +99,11 @@ Two tools, both runnable via `npx`:
 
 ```sh
 # 1. Capture a standard Chrome DevTools .cpuprofile for the page load.
-npx -p github:imbue-ai/raised-treemap raised-treemap-profile-load \
+npx -p github:imbue-ai/gp-treemap gp-treemap-profile-load \
     ~/big-scan.html  ~/big-scan.cpuprofile
 
 # 2. Convert that .cpuprofile into a self-contained treemap HTML.
-npx -p github:imbue-ai/raised-treemap raised-treemap-profile-to-html \
+npx -p github:imbue-ai/gp-treemap gp-treemap-profile-to-html \
     ~/big-scan.cpuprofile  ~/big-scan.profile.html
 ```
 
@@ -128,16 +141,16 @@ node tools/profile-to-html.js  ~/big-scan.cpuprofile
 
 Playwright with Chromium must be installed for `profile-load.js`
 (`npm install && npx playwright install chromium`). `profile-to-html.js`
-has no runtime dependencies and just needs `dist/raised-treemap.bundle.js`
+has no runtime dependencies and just needs `dist/gp-treemap.bundle.js`
 from `node tools/build.js`.
 
 ## Repo layout
 
 ```
 src/                    component source (ES modules)
-  raised-treemap.js           custom element: canvas render + hit-testing + toolbar
-  painter.js              per-pixel raised-tile painter (clean-room)
-  lut.js                  brightness-ramp LUT (clean-room)
+  gp-treemap.js           custom element: canvas render + hit-testing + toolbar
+  painter.js              per-pixel raised-tile painter
+  lut.js                  brightness-ramp LUT
   layout.js               BSP slice-and-dice
   balancer.js             balanced-binary-tree merge
   builder.js              tabular + tree accessor ingestion
@@ -159,7 +172,7 @@ samples/                one HTML per behavior (load via <script src>)
   data/                   small datasets the samples attach to window.__data
 
 dist/                   build output
-  raised-treemap.bundle.js    single-file IIFE; defines the custom element
+  gp-treemap.bundle.js        single-file IIFE; defines the custom element
 
 tests/                  Playwright suite (Chromium)
   visual.spec.js          screenshots → tests/screenshots/*.png
@@ -169,11 +182,13 @@ tests/                  Playwright suite (Chromium)
   screenshots/            committed PNGs — browse offline
 
 tools/
-  build.js                concatenates src/ → dist/raised-treemap.bundle.js
+  build.js                concatenates src/ → dist/gp-treemap.bundle.js
   server.js               tiny static server (used by Playwright & local dev)
   scan.js                 recursive directory scan → self-contained treemap HTML
   profile-load.js         Playwright+CDP CPU profile capture → .cpuprofile
   profile-to-html.js      .cpuprofile → treemap HTML (thread / call-stack)
+
+GrandPerspective-3_6_4/ upstream source bundled for reference (GPL v2)
 ```
 
 ## Tests
@@ -183,50 +198,17 @@ npm run test:install     # one-time: download Chromium
 npm test                 # run units + visual snapshots
 ```
 
-## Licensing
+## Spec deltas from upstream GrandPerspective
 
-The visual effect this component produces is inspired by
-[GrandPerspective](https://grandperspectiv.sourceforge.net/) (GPL v2), which is
-included under `GrandPerspective-3_6_4/` for reference only and is not shipped
-in the build output.
-
-The implementation of the two shading-critical modules — `src/painter.js`
-(pixel painter) and `src/lut.js` (brightness ramp) — was written clean-room by
-a fresh implementer who had not seen GrandPerspective's source. They were
-given only a plain-English description of the visual effect and the API
-contract, and chose their own algorithms:
-
-- `painter.js` uses a **single-scanline loop** that decides, per pixel,
-  whether to shade from the horizontal or vertical axis based on a normalized
-  in-cell coordinate comparison. GrandPerspective uses two separate triangle
-  passes with an `xMax`/`yMin` clip. Both produce the same visual family but
-  the code expressions are independent.
-- `lut.js` ramps from black to the base color to white in **linear sRGB**,
-  scaled by `intensity`. GrandPerspective ramps in HSV using a "raise
-  brightness toward 1, then desaturate toward white" recipe. Independent
-  algorithmic choice.
-
-The rest of the codebase (`layout.js`, `balancer.js`, `builder.js`, color
-scales, hash, palettes) uses textbook techniques — slice-and-dice BSP,
-Huffman-style pairwise merge, FNV-1a — written without consulting the GP
-source. Algorithms are not copyrightable; only specific expressions are.
-
-Given the above, an MIT release is defensible. This is not legal advice — if
-it matters commercially, have an attorney do a proper code-provenance review.
-
-## Spec deltas
-
-- **Main thread, not a Worker** — paint of a full 1280×720 canvas with a
-  few thousand cells takes ~10–30 ms. WASM could give 5–20× headroom for
-  100k+ cells or per-frame animation; not needed for MVP.
-- **Plain ES modules + IIFE bundle** instead of Stencil + generated Vue/React
-  wrappers. Prop surface, events, and methods match the spec; a Stencil
-  wrapper can be grafted on later without API churn.
+- **Web Component, not a Cocoa view.** Rendering is a per-pixel loop on a
+  single `<canvas>`. Paint of a full 1280×720 canvas with a few thousand cells
+  takes ~10–30 ms; WASM could give 5–20× headroom for 100k+ cells or per-frame
+  animation, not needed for MVP.
+- **Plain ES modules + IIFE bundle** — no Stencil, no generated React/Vue
+  wrappers. A Stencil wrapper can be grafted on later without API churn.
 - **FLIP data-change animations** are not yet implemented; a data change
   rerenders the whole canvas.
 - **Resize** immediately CSS-scales the canvas, then re-paints after a
-  150 ms debounce (per spec).
-
-Events, prop surface, toolbar sections, palettes, color scales, keyboard /
-wheel / double-click behavior, and FNV-1a categorical hashing all match the
-spec.
+  150 ms debounce.
+- Toolbar, palettes, color scales, keyboard / wheel / double-click behavior,
+  and FNV-1a categorical hashing are all new to this port.

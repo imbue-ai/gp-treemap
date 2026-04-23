@@ -1,0 +1,42 @@
+/* Class = "NSWindow"; title = "Filter"; ObjectID = "5"; */
+"5.title" = "Filter";
+
+/* Class = "NSBox"; title = "Selected tests"; ObjectID = "18"; */
+"18.title" = "Ausgewählte Tests";
+
+/* Class = "NSBox"; title = "Available tests"; ObjectID = "24"; */
+"24.title" = "Verfügbare Prüfungen";
+
+/* Class = "NSButtonCell"; title = "<"; ObjectID = "173"; */
+"173.title" = "<";
+
+/* Class = "NSButtonCell"; title = ">"; ObjectID = "174"; */
+"174.title" = ">";
+
+/* Class = "NSButtonCell"; title = "Edit"; ObjectID = "175"; */
+"175.title" = "Bearbeiten";
+
+/* Class = "NSButtonCell"; title = "New"; ObjectID = "176"; */
+"176.title" = "Neu";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "177"; */
+"177.title" = "Entfernen";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "178"; */
+"178.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "179"; */
+"179.title" = "Abbrechen";
+
+/* Class = "NSButtonCell"; title = ">>"; ObjectID = "182"; */
+"182.title" = ">>";
+
+/* Class = "NSTextFieldCell"; title = "Name:"; ObjectID = "183"; */
+"183.title" = "Name:";
+
+/* Class = "NSTextFieldCell"; title = "Match none"; ObjectID = "IC9-7o-Jmg"; */
+"IC9-7o-Jmg.title" = "Keine Übereinstimmung";
+
+/* Class = "NSTextFieldCell"; title = "Match any"; ObjectID = "K2j-w8-a6Z"; */
+"K2j-w8-a6Z.title" = "Irgendeine Übereinstimmung";
+

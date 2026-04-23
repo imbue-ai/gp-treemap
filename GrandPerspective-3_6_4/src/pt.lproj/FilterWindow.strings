@@ -1,0 +1,48 @@
+/* Class = "NSWindow"; title = "Filter"; ObjectID = "5"; */
+"5.title" = "Filter";
+
+/* Class = "NSBox"; title = "Selected tests"; ObjectID = "18"; */
+"18.title" = "Match any of:";
+
+/* Class = "NSBox"; title = "Available tests"; ObjectID = "24"; */
+"24.title" = "Available tests";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "108"; */
+"108.title" = "Text Cell";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "134"; */
+"134.title" = "Text Cell";
+
+/* Class = "NSButtonCell"; title = "<"; ObjectID = "173"; */
+"173.title" = "<";
+
+/* Class = "NSButtonCell"; title = ">"; ObjectID = "174"; */
+"174.title" = ">";
+
+/* Class = "NSButtonCell"; title = "Edit"; ObjectID = "175"; */
+"175.title" = "Edit";
+
+/* Class = "NSButtonCell"; title = "New"; ObjectID = "176"; */
+"176.title" = "New";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "177"; */
+"177.title" = "Remove";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "178"; */
+"178.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "179"; */
+"179.title" = "Cancel";
+
+/* Class = "NSButtonCell"; title = ">>"; ObjectID = "182"; */
+"182.title" = ">>";
+
+/* Class = "NSTextFieldCell"; title = "Name:"; ObjectID = "183"; */
+"183.title" = "Name:";
+
+/* Class = "NSTextFieldCell"; title = "Match none"; ObjectID = "IC9-7o-Jmg"; */
+"IC9-7o-Jmg.title" = "Corresponde a nenhum";
+
+/* Class = "NSTextFieldCell"; title = "Match any"; ObjectID = "K2j-w8-a6Z"; */
+"K2j-w8-a6Z.title" = "corresponde a qualquer";
+

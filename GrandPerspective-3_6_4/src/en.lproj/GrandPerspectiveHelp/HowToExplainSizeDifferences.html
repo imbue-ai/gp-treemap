@@ -1,0 +1,73 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>How to explain differences in reported sizes</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="How to explain size differences.">
+<meta name="keywords" content="how to, explain, size, differences, file size, file size measurement, file size unit">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>How to explain differences in reported sizes</h1>
+</div>
+
+<p>This section explains why GrandPerspective may sometimes report different sizes than other tools, for example Finder.</p>
+
+<h2>Differences in the reported size for a given folder or volume</h2>
+
+<p>Sometimes the total size of a folder or total used size of a volume as reported by GrandPerspective may differ from that reported by other means, e.g. via Finder's Info Panel.
+There can be various reasons for these differences:</p>
+
+<ul>
+<li><b>Usage of different file size measurements.</b>
+There are two different ways to measure a <a href="FileSizes.html">file's size</a>.
+The logical size corresponds to the size of the file's contents.
+The physical file size is the space needed to store it, which is typically slightly larger.
+Finder uses logical file sizes, whereas GrandPerspective can use either depending on your <a href="Preferences.html">Preferences</a> setting.
+So when you scan using the physical size measure, the size reported by GrandPerspective will typically be larger.
+</li>
+
+<li><b>Usage of different file size unit systems.</b>
+There are two common unit systems for reporting <a href="FileSizes.html">file sizes</a>.
+When the binary unit system is used, 1 KB corresponds to 1024 bytes.
+When the decimal unit system is used, 1 KB corresponds to 1000 bytes.
+Finder uses the decimal unit system, whereas GrandPerspective can use either depending on your <a href="Preferences.html">Preferences</a> setting.
+So when you scan using the binary unit system in GrandPerspective, the size reported by GrandPerspective will be smaller.
+</li>
+
+<li><b>The difference caused by hard-linked files.</b>
+<a href="HardLinks.html">Hard links</a> allow multiple copies of the same file to exist, without the content being replicated in the physical storage.
+The file is only stored once.
+So for example, if you have a file of 1 MB and two hard-linked copies of it, this requires only 1 MB of storage instead of 3 MB.
+GrandPerspective accounts for this and reports the actual storage space that is required.
+Finder, on the other hand, counts every copy of the file thus over-estimating the actual storage space.
+So when GrandPerspective scans a folder with multiple hard-linked copies of the same file, the size reported by GrandPerspective will be smaller.
+</li>
+
+<li><b>The difference caused by ignored files and folders.</b>
+When you scan using a <a href="MasksAndFilters">filter</a>, GrandPerspective may exclude certain files and folders.
+Their size will then not be accounted for in the total folder size.
+Similarly, when GrandPerspective does not have the required permissions to read certain files and folders, they are also not accounted for.
+When this happens the size reported by GrandPerspective will therefore be smaller than the actual storage space that is used.
+</li>
+</ul>
+
+<h2>Differences in the reported amount of free space</h2>
+
+<p>The free space of a volume as shown by GrandPerspective in a <a href="Views.html">view window</a> when the entire volume is shown, can be less than the (initial) free size shown in the <a href="ViewInfoPanel.html">Info tab</a>.
+The free space shown in the Info tab is the free space as reported by the file system.
+Let's call it X.
+GrandPerspective also calculates the size of the volume minus the total size of scanned files.
+Let's call that Y.
+As the total size of scanned files can under-estimate but never over-estimate the actual used storage size, it should be the case that Y &ge; X.
+However, it can occur that Y &lt; X, apparently because either the volume size or the free space as reported by the file system is inaccurate.
+In this case, Y is used as the size of free space in the view window.
+This way the mismatch between the volume size in the view and the volume size as reported by the file system is minimised.
+</p>
+
+</body>
+</html>

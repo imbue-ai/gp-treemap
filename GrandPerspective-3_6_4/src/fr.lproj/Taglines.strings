@@ -1,0 +1,24 @@
+/* (No Comment) */
+"num-taglines" = "7";
+
+/* Tag line in Welcome window */
+"tagline-1" = "vous aide à récupérer de l'espace disque perdu";
+
+/* Tag line in Welcome window */
+"tagline-2" = "vous permet de suivre et chasser les gaspilleurs d'espace géants";
+
+/* Tag line in Welcome window */
+"tagline-3" = "révèle où votre espace disque libre est allé";
+
+/* Tag line in Welcome window */
+"tagline-4" = "montre graphiquement votre utilisation du disque";
+
+/* Tag line in Welcome window */
+"tagline-5" = "fait de jolies photos de votre disque dur";
+
+/* Tag line in Welcome window */
+"tagline-6" = "trouve ces fichiers géants qui absorbent votre espace disque";
+
+/* Tag line in Welcome window */
+"tagline-7" = "découvre les fichiers et dossiers occupant de l'espace";
+

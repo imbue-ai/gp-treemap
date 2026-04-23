@@ -1,0 +1,91 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Saving view data</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Legt uit hoe data die getoond wordt in een venster opgeslagen en ge�xporteerd kan worden.">
+<meta name="keywords" content="venster, opslaan, laden, exporteren, beeld, afbeelding, plaatje, data, tekst">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>Opslaan en exporteren van ingelezen data</h1>
+</div>
+
+<p>
+Via het "Archief" menu kunt u data die getoond wordt in <a href="Views.html">vensters</a> opslaan en exporteren.
+Als vuistregel, kies opslaan wanneer u de data op een later tijdstip weer in GrandPerspective wilt inlezen en gebruiken.
+Kies voor exporteren wanneer u de data elders wilt gebruiken.
+</p>
+
+<h2>Opslaan van ingelezen data</h2>
+
+<p>
+Via <b>Ingelezen data opslaan</b> kunt u alle data in een venster opslaan.
+De data wordt opgeslagen als XML (en gecomprimeerd met behulp van gzip).
+Het doet er niet toe welke map getoond wordt in het venster.
+Alle bestanden &#151;ook degenen die momenteel niet worden getoond in het venster&#151; worden opgeslagen.
+Echter, wanneer een <a href="MasksAndFilters.html">filter</a> gebruikt is om het venster te cre&euml;ren, dan zullen bestanden die uitgefilterd zijn niet worden opgeslagen.
+Commentaar dat u intypt in het tekst venster van het <a href="ViewInfoPanel.html">Info tabblad</a> wordt ook opgeslagen.
+Dit kunt u gebruiken om extra informatie aan de ingelezen data toe te voegen.
+</p>
+
+<p>
+De opgeslagen data kan op ieder later moment weer ingeladen in <a href="CreatingViews.html">een nieuw venster</a> door middel van de opdracht <b>Ingelezen data laden</b>.
+Opslaan en laden van data kan nuttig zijn voor verschillende redenen, waaronder de volgende:
+</p>
+
+<ul>
+<li>
+U kan de oude inhoud van een map <a href="NavigatingViews.html">bekijken en navigeren</a> nadat de inhoud van deze map gewijzigd is.
+Het vergelijken van de oude inhoud van een map met de huidige inhoud kan bijvoorbeeld nuttig zijn om uit te vinden waarom uw schijf plotseling vol is.
+Merk op dat wanneer u Time Machine gebruikt u de oude inhoud van folders ook kan bekijken door het <a href="HowToAnalyseTimeMachineBackups.html">inlezen van oude Time Machine reservekopie&euml;n</a>,
+</li>
+<li>
+U kunt de inhoud van uw harde schijf met GrandPerspective bekijken vanaf een andere computer.
+</li>
+<li>
+Het laden van ingelezen data is sneller dan het opnieuw inlezen van de map.
+</li>
+</ul>
+
+<p>
+<em>Let op: Wanneer u ingeladen data bekijkt moet u extra voorzichtig zijn met het gebruik van de <b>Verwijder</b> opdracht.
+Bestanden en mappen die u selecteert om te verwijderen kunnen namelijk ondertussen een andere inhoud hebben dan de ingeladen data suggereert;
+mappen kunnen bijvoorbeeld meer bestanden bevatten en bestanden kunnen ook (in grootte) veranderd zijn.
+</em>
+</p>
+
+<h2>Exporteren van ingelezen data</h2>
+
+<p>
+Ingelezen data kan op twee manieren ge&euml;xporteerd worden:
+</p>
+
+<ul>
+<li>
+<p>
+<b>Exporteren Als Afbeelding</b> kan gebruikt worden om een TIFF plaatje van het venster te maken.
+De afbeelding zal getekend worden met de <a href="ViewDisplayPanel.html">Weergave</a> instellingen van het venster en zal dezelfde map bevatten.
+De afbeelding is een statische representatie van de data in het venster;
+het kan niet meer ingeladen worden in GrandPerspective.
+U kunt de afbeelding echter gebruiken om uw blog te versieren, u kunt het emailen naar vrienden, of u kunt het inlijsten en aan uw muur hangen :-).
+</p>
+</li>
+
+<li>
+<p>
+<b>Exporteren Als Tekst</b> kan gebruikt worden om de ingelezen data te exporteren naar een tekstbestand.
+Iedere regel in het bestand beslaat een bestand.
+U kunt kiezen welke eigenschappen van ieder bestand ge&euml;xporteerd moeten worden.
+Deze eigenschappen worden door tab-karakters gescheiden in het ge&euml;xporteerde tekstbestand.
+Ervaren gebruikers kunnen de ge&euml;xporteerde data bewerken en analyseren door middel van scripts en andere software.
+</p>
+</li>
+</ul>
+
+</body>
+</html>

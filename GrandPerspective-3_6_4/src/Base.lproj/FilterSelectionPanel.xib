@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="FilterSelectionPanelControl">
+            <connections>
+                <outlet property="applyDefaultFilterCheckbox" destination="FLD-1l-z7g" id="r4k-R0-P6f"/>
+                <outlet property="filterPopUp" destination="12" id="32"/>
+                <outlet property="window" destination="1" id="30"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Select filter" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="349" width="303" height="190"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <value key="minSize" type="size" width="303" height="161"/>
+            <view key="contentView" id="2">
+                <rect key="frame" x="0.0" y="0.0" width="303" height="190"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <box autoresizesSubviews="NO" verticalCompressionResistancePriority="700" borderType="line" title="Filter" translatesAutoresizingMaskIntoConstraints="NO" id="11">
+                        <rect key="frame" x="17" y="55" width="269" height="130"/>
+                        <view key="contentView" id="dlB-ey-yJS">
+                            <rect key="frame" x="3" y="3" width="263" height="112"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="12">
+                                    <rect key="frame" x="14" y="78" width="235" height="25"/>
+                                    <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="15" id="13">
+                                        <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="menu"/>
+                                        <menu key="menu" title="OtherViews" id="14">
+                                            <items>
+                                                <menuItem title="Item 1" state="on" id="15"/>
+                                                <menuItem title="Item 2" id="16"/>
+                                                <menuItem title="Item 3" id="17"/>
+                                            </items>
+                                        </menu>
+                                    </popUpButtonCell>
+                                </popUpButton>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="18">
+                                    <rect key="frame" x="190" y="47" width="62" height="32"/>
+                                    <buttonCell key="cell" type="push" title="New" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="19">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="addFilter:" target="-2" id="27"/>
+                                    </connections>
+                                </button>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="24">
+                                    <rect key="frame" x="130" y="47" width="62" height="32"/>
+                                    <buttonCell key="cell" type="push" title="Edit" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="25">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="editFilter:" target="-2" id="26"/>
+                                    </connections>
+                                </button>
+                                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FLD-1l-z7g">
+                                    <rect key="frame" x="18" y="19" width="225" height="18"/>
+                                    <buttonCell key="cell" type="check" title="Apply default filter" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oBx-0o-cNN">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="system"/>
+                                    </buttonCell>
+                                </button>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="18" firstAttribute="leading" secondItem="24" secondAttribute="trailing" constant="12" id="9eE-a2-LcH"/>
+                                <constraint firstItem="18" firstAttribute="width" secondItem="24" secondAttribute="width" id="ITQ-W7-FnG"/>
+                                <constraint firstItem="12" firstAttribute="top" secondItem="dlB-ey-yJS" secondAttribute="top" constant="10" id="Kz4-bq-Vg7"/>
+                                <constraint firstAttribute="trailing" secondItem="12" secondAttribute="trailing" constant="18" id="Lni-KF-UUm"/>
+                                <constraint firstAttribute="trailing" secondItem="FLD-1l-z7g" secondAttribute="trailing" constant="20" symbolic="YES" id="S6G-xt-ode"/>
+                                <constraint firstAttribute="trailing" secondItem="18" secondAttribute="trailing" constant="18" id="f65-Gc-E5z"/>
+                                <constraint firstItem="24" firstAttribute="centerY" secondItem="18" secondAttribute="centerY" id="kc9-2c-o3V"/>
+                                <constraint firstAttribute="bottom" secondItem="FLD-1l-z7g" secondAttribute="bottom" constant="20" symbolic="YES" id="kv5-Rb-yNd"/>
+                                <constraint firstItem="12" firstAttribute="leading" secondItem="dlB-ey-yJS" secondAttribute="leading" constant="17" id="lD4-Do-i9m"/>
+                                <constraint firstItem="18" firstAttribute="top" secondItem="12" secondAttribute="bottom" constant="8" symbolic="YES" id="nSp-VK-Joa"/>
+                                <constraint firstItem="24" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="dlB-ey-yJS" secondAttribute="leading" priority="750" constant="20" symbolic="YES" id="sq8-mA-HBf"/>
+                                <constraint firstItem="FLD-1l-z7g" firstAttribute="leading" secondItem="dlB-ey-yJS" secondAttribute="leading" constant="20" symbolic="YES" id="uSb-xY-qBr"/>
+                            </constraints>
+                        </view>
+                    </box>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20">
+                        <rect key="frame" x="214" y="12" width="76" height="32"/>
+                        <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="21">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="okAction:" target="-2" id="29"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="22">
+                        <rect key="frame" x="140" y="12" width="76" height="32"/>
+                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="23">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="cancelAction:" target="-2" id="28"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="20" secondAttribute="trailing" constant="20" id="22E-jR-Zld"/>
+                    <constraint firstItem="20" firstAttribute="leading" secondItem="22" secondAttribute="trailing" constant="12" id="9dW-m7-r9D"/>
+                    <constraint firstAttribute="bottom" secondItem="22" secondAttribute="bottom" constant="19" id="CsJ-hj-pJr"/>
+                    <constraint firstAttribute="bottom" secondItem="20" secondAttribute="bottom" constant="19" id="Hqe-a2-kxz"/>
+                    <constraint firstItem="22" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2" secondAttribute="leading" priority="750" constant="20" symbolic="YES" id="PZI-ar-u0i"/>
+                    <constraint firstItem="22" firstAttribute="top" secondItem="11" secondAttribute="bottom" constant="20" id="RM6-Oc-Q7E"/>
+                    <constraint firstItem="11" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="20" id="Yho-PE-P5E"/>
+                    <constraint firstItem="11" firstAttribute="top" secondItem="2" secondAttribute="top" constant="5" id="jxC-a9-p77"/>
+                    <constraint firstAttribute="trailing" secondItem="11" secondAttribute="trailing" constant="20" id="uKo-by-0r4"/>
+                    <constraint firstItem="22" firstAttribute="width" secondItem="20" secondAttribute="width" id="wMj-ZE-UyE"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="140.5" y="161"/>
+        </window>
+    </objects>
+</document>

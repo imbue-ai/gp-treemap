@@ -1,0 +1,225 @@
+/* Class = "NSMenuItem"; title = "Item"; ObjectID = "3LR-fJ-0Ck"; */
+"3LR-fJ-0Ck.title" = "Στοιχείο";
+
+/* Class = "NSMenu"; title = "Selection"; ObjectID = "4K2-IU-hcw"; */
+"4K2-IU-hcw.title" = "Επιλογή";
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "5"; */
+"5.title" = "Όλα Μπροστά";
+
+/* Class = "NSMenu"; title = "Display Focus"; ObjectID = "6AB-sL-t6U"; */
+"6AB-sL-t6U.title" = "Εστίαση εμφάνισης";
+
+/* Class = "NSMenuItem"; title = "Selection"; ObjectID = "8Lj-RY-z1e"; */
+"8Lj-RY-z1e.title" = "Επιλογή";
+
+/* Class = "NSMenuItem"; title = "Refresh"; ObjectID = "9aB-S3-Sb7"; */
+"9aB-S3-Sb7.title" = "Ανανέωση";
+
+/* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "9gG-CK-G0v"; */
+"9gG-CK-G0v.title" = "Γρήγορη ματιά";
+
+/* Class = "NSMenuItem"; title = "Show/Hide Control Panel"; ObjectID = "9Ho-ON-BCj"; */
+"9Ho-ON-BCj.title" = "Εμφάνιση/Απόκρυψη Κέντρου Ελέγχου";
+
+/* Class = "NSMenuItem"; title = "Reset Focus"; ObjectID = "15W-vC-r8v"; */
+"15W-vC-r8v.title" = "Επαναφορά εστίασης";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "19"; */
+"19.title" = "Παράθυρο";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "23"; */
+"23.title" = "Ελαχιστοποίηση";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "24"; */
+"24.title" = "Παράθυρο";
+
+/* Class = "NSMenu"; title = "MainMenu"; ObjectID = "29"; */
+"29.title" = "Κύριο Μενού";
+
+/* Class = "NSMenuItem"; title = "Open"; ObjectID = "33Q-IV-RrZ"; */
+"33Q-IV-RrZ.title" = "Άνοιγμα";
+
+/* Class = "NSMenuItem"; title = "About GrandPerspective"; ObjectID = "58"; */
+"58.title" = "Σχετικά με το GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "Scan Folder..."; ObjectID = "72"; */
+"72.title" = "Σάρωση φακέλου...";
+
+/* Class = "NSMenu"; title = "File"; ObjectID = "81"; */
+"81.title" = "Αρχείο";
+
+/* Class = "NSMenuItem"; title = "File"; ObjectID = "83"; */
+"83.title" = "Αρχείο";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "103"; */
+"103.title" = "Βοήθεια";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "106"; */
+"106.title" = "Βοήθεια";
+
+/* Class = "NSMenuItem"; title = "GrandPerspective Help"; ObjectID = "111"; */
+"111.title" = "Βοήθεια για το GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "129"; */
+"129.title" = "Προτιμήσεις";
+
+/* Class = "NSMenuItem"; title = "Hide GrandPerspective"; ObjectID = "134"; */
+"134.title" = "Απόκρυψη GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "Quit GrandPerspective"; ObjectID = "136"; */
+"136.title" = "Κλείσιμο GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "145"; */
+"145.title" = "Απόκρυψη άλλων";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "150"; */
+"150.title" = "Εμφάνιση όλων";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "197"; */
+"197.title" = "Μεγέθυνση";
+
+/* Class = "NSMenuItem"; title = "Duplicate"; ObjectID = "272"; */
+"272.title" = "Αντιγραφή (Duplicate)";
+
+/* Class = "NSMenuItem"; title = "Close"; ObjectID = "319"; */
+"319.title" = "Κλείσιμο";
+
+/* Class = "NSMenuItem"; title = "Twin"; ObjectID = "321"; */
+"321.title" = "Αντιγραφή (Twin)";
+
+/* Class = "NSMenuItem"; title = "Export As Image..."; ObjectID = "324"; */
+"324.title" = "Εξαγωγή ως Εικόνα...";
+
+/* Class = "NSMenuItem"; title = "Filter..."; ObjectID = "331"; */
+"331.title" = "Φίλτρο...";
+
+/* Class = "NSMenuItem"; title = "Filtered Scan..."; ObjectID = "335"; */
+"335.title" = "Φιλτραρισμένη Σάρωση...";
+
+/* Class = "NSMenuItem"; title = "Save Scan Data..."; ObjectID = "339"; */
+"339.title" = "Αποθήκευση δεδομένων σάρωσης...";
+
+/* Class = "NSMenuItem"; title = "Load Scan Data..."; ObjectID = "340"; */
+"340.title" = "Φόρτωση δεδομένων σάρωσης...";
+
+/* Class = "NSMenuItem"; title = "GrandPerspective Website"; ObjectID = "345"; */
+"345.title" = "Ιστοσελίδα GrandPerspective";
+
+/* Class = "NSMenuItem"; title = "View"; ObjectID = "348"; */
+"348.title" = "Προβολή";
+
+/* Class = "NSMenu"; title = "View"; ObjectID = "349"; */
+"349.title" = "Προβολή";
+
+/* Class = "NSMenuItem"; title = "Show/Hide Toolbar"; ObjectID = "350"; */
+"350.title" = "Εμφάνιση/Απόκρυψη γραμμής εργαλείων";
+
+/* Class = "NSMenuItem"; title = "Customize Toolbar..."; ObjectID = "351"; */
+"351.title" = "Εξατομίκευση γραμμής εργαλείων...";
+
+/* Class = "NSMenuItem"; title = "Filters..."; ObjectID = "357"; */
+"357.title" = "Φίλτρα...";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "388"; */
+"388.title" = "Τροποποίηση";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "389"; */
+"389.title" = "Τροποποίηση";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "393"; */
+"393.title" = "Αποκοπή";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "394"; */
+"394.title" = "Αντιγραφή";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "395"; */
+"395.title" = "Επικόλληση";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "397"; */
+"397.title" = "Διαγραφή";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "398"; */
+"398.title" = "Επιλογή Όλων";
+
+/* Class = "NSMenuItem"; title = "Uniform type ranking..."; ObjectID = "421"; */
+"421.title" = "Ομοιόμορφη κατάταξη τύπου...";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "425"; */
+"425.title" = "Υπηρεσίες";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "426"; */
+"426.title" = "Υπηρεσίες";
+
+/* Class = "NSMenuItem"; title = "Zoom Out"; ObjectID = "bKM-Ec-4Gi"; */
+"bKM-Ec-4Gi.title" = "Σμίκρυνση";
+
+/* Class = "NSMenuItem"; title = "Rescan with mask as filter"; ObjectID = "BMK-MQ-DB3"; */
+"BMK-MQ-DB3.title" = "Επανασάρωση με μάσκα ως φίλτρο";
+
+/* Class = "NSMenuItem"; title = "Rescan folder in view"; ObjectID = "CV5-Fw-5D7"; */
+"CV5-Fw-5D7.title" = "Επανασάρωση φακέλου σε προβολή";
+
+/* Class = "NSMenuItem"; title = "Move Focus Down"; ObjectID = "dJ2-6K-v9P"; */
+"dJ2-6K-v9P.title" = "Μεταφορά εστίασης προς τα μέσα";
+
+/* Class = "NSMenuItem"; title = "Selection Focus"; ObjectID = "frA-lr-FOa"; */
+"frA-lr-FOa.title" = "Εστίαση επιλογής";
+
+/* Class = "NSMenuItem"; title = "Rescan"; ObjectID = "gUG-Nh-FTx"; */
+"gUG-Nh-FTx.title" = "Επανασάρωση";
+
+/* Class = "NSMenuItem"; title = "Move Focus Up"; ObjectID = "gZj-8W-T7o"; */
+"gZj-8W-T7o.title" = "Μεταφορά εστίασης προς τα έξω";
+
+/* Class = "NSMenuItem"; title = "Export As Text..."; ObjectID = "hJw-Fc-daG"; */
+"hJw-Fc-daG.title" = "Εξαγωγή ως Κείμενο...";
+
+/* Class = "NSMenuItem"; title = "Scan Recent"; ObjectID = "hUr-J9-FbH"; */
+"hUr-J9-FbH.title" = "Σάρωση προσφάτων";
+
+/* Class = "NSMenu"; title = "Scan Recent"; ObjectID = "HXb-90-KwJ"; */
+"HXb-90-KwJ.title" = "Σάρωση προσφάτων";
+
+/* Class = "NSMenuItem"; title = "Zoom In"; ObjectID = "Iyw-2V-esC"; */
+"Iyw-2V-esC.title" = "Μεγέθυνση";
+
+/* Class = "NSMenuItem"; title = "Move Focus Up"; ObjectID = "K6z-Zt-rLu"; */
+"K6z-Zt-rLu.title" = "Μεταφορά εστίασης προς τα έξω";
+
+/* Class = "NSMenuItem"; title = "Reset Focus"; ObjectID = "l4V-Wf-FCv"; */
+"l4V-Wf-FCv.title" = "Επαναφορά εστίασης";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "lnG-FS-oUL"; */
+"lnG-FS-oUL.title" = "Διαγραφή";
+
+/* Class = "NSMenuItem"; title = "Rescan selected"; ObjectID = "Lsx-9H-7TJ"; */
+"Lsx-9H-7TJ.title" = "Επανασάρωση επιλεγμένων";
+
+/* Class = "NSMenuItem"; title = "Rescan all"; ObjectID = "nFT-y9-xF4"; */
+"nFT-y9-xF4.title" = "Επανασάρωση όλων";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "oY0-9q-f9z"; */
+"oY0-9q-f9z.title" = "Μεγέθυνση";
+
+/* Class = "NSMenuItem"; title = "Move Focus Down"; ObjectID = "QCC-Gl-y9i"; */
+"QCC-Gl-y9i.title" = "Μεταφορά εστίασης προς τα μέσα";
+
+/* Class = "NSMenu"; title = "Zoom"; ObjectID = "qtI-xz-v9u"; */
+"qtI-xz-v9u.title" = "Μεγέθυνση";
+
+/* Class = "NSMenu"; title = "Rescan"; ObjectID = "rfs-HZ-ODE"; */
+"rfs-HZ-ODE.title" = "Επανασάρωση";
+
+/* Class = "NSMenuItem"; title = "Display Focus"; ObjectID = "wd7-sh-TkA"; */
+"wd7-sh-TkA.title" = "Εστίαση εμφάνισης";
+
+/* Class = "NSMenu"; title = "Selection Focus"; ObjectID = "wHh-Gg-e7R"; */
+"wHh-Gg-e7R.title" = "Εστίαση επιλογής";
+
+/* Class = "NSMenuItem"; title = "Reveal"; ObjectID = "wVF-ys-3UQ"; */
+"wVF-ys-3UQ.title" = "Εμφάνιση";
+
+/* Class = "NSMenuItem"; title = "Reset Zoom"; ObjectID = "y2y-vX-zhd"; */
+"y2y-vX-zhd.title" = "Επαναφορά μεγέθυνσης";
+

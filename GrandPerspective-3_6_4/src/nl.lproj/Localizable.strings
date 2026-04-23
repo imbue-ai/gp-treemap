@@ -1,0 +1,477 @@
+/* Legend for Size-based mapping scheme. */
+"%@ - %@" = "%1$@ - %2$@";
+
+/* Enumeration of two items */
+"%@ and %@" = "%1$@ en %2$@";
+
+/* Enumeration of two items */
+"%@ or %@" = "%1$@ of %2$@";
+
+/* Enumeration of three or more items with 1: an item, 2: two or more items */
+"%@, %@" = "%1$@, %2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, and %@" = "%1$@, en %2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, or %@" = "%1$@, of %2$@";
+
+/* Legend for Time-based mapping schemes. */
+"%d - %d days ago" = "%1$d - %2$d dagen geleden";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago" = "%d dagen geleden";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago or more" = "%d dagen of meer geleden";
+
+/* Message in progress panel while filtering */
+"%d folders filtered" = "%d mappen gefilterd";
+
+/* Message in progress panel while executing refresh-based scan */
+"%d folders processed" = "%d mappen verwerkt";
+
+/* Message in progress panel while loading data */
+"%d folders read" = "%d mappen geladen";
+
+/* Message in progress panel while saving data */
+"%d folders saved" = "%d mappen opgeslagen";
+
+/* Message in progress panel while executing a full scan */
+"%d folders scanned" = "%d mappen ingelezen";
+
+/* Exact file size (in bytes) */
+"%qu bytes" = "%qu bytes";
+
+/* Tally folder size (in number of files) */
+"%qu files" = "%qu bestanden";
+
+/* Alert message */
+"A filter named \"%@\" already exists" = "Een filter met naam \"%@\" bestaat al";
+
+/* Alert message (Note: 'it' can refer to a file or a folder) */
+"A possible reason is that it does not exist anymore" = "Het kan zijn dat het niet meer bestaat";
+
+/* Alert message */
+"A test named \"%@\" already exists" = "Een filtertest met naam \"%@\" bestaat al";
+
+/* Alert message (with filename arg) */
+"Aborted saving the scan data to \"%@\"" = "De opslag van de data naar \"%@\" is geannuleerd";
+
+/* Header in exported text file */
+"Accessed" = "Gebruikt";
+
+/* Label in Focus panel */
+"Area in view:" = "Getoond gebied:";
+
+/* Parse error */
+"Attribute not found" = "Attribuut niet gevonden";
+
+/* File size unit for bytes. */
+"B" = "B";
+
+/* Alert panel button */
+"Cancel" = "Annuleer";
+
+/* Part of tool tip for uniform types */
+"Conforms to:" = "Voldoet aan:";
+
+/* Alert panel button */
+"Continue" = "Ga door";
+
+/* Header in exported text file */
+"Created" = "Aangemaakt";
+
+/* Alert panel button */
+"Delete" = "Verwijder";
+
+/* Menu item */
+"Delete File" = "Verwijder Bestand";
+
+/* Menu item */
+"Delete Folder" = "Verwijder Map";
+
+/* FDA warning sheet */
+"Disk access required" = "Schijf toegang vereist";
+
+/* Status update message */
+"Display focus changed to %@" = "Weergave focus is gewijzigd naar %@";
+
+/* FDA warning alert */
+"Do not show again" = "Toon niet nog een keer";
+
+/* Alert message */
+"Do you want to delete the file \"%@\"?" = "Wilt u het bestand \"%@\" verwijderen?";
+
+/* Alert message */
+"Do you want to delete the folder \"%@\"?" = "Wilt u de map \"%@\" verwijderen?";
+
+/* Alert message */
+"Do you want to delete the package \"%@\"?" = "Wilt u het pakket \"%@\" verwijderen?";
+
+/* FDA warning alert */
+"Edit System Preferences" = "Wijzig Systeem Voorkeuren";
+
+/* Parse error */
+"Encountered filter after folder" = "Een filter volgde na een folder";
+
+/* Parse error */
+"Encountered more than one root element" = "Meer dan één buitenste element";
+
+/* Parse error */
+"Encountered more than one root folder" = "Meer dan één buitenste map";
+
+/* Parse error */
+"Encountered multiple %@ elements" = "Meerdere %@ elementen";
+
+/* Parse error */
+"Error parsing \"%@\" attribute: %@" = "Ongeldige waarde van attribuut \"%1$@\": %2$@";
+
+/* Parse error */
+"Expected %@ element" = "%@ element verwacht";
+
+/* Error message */
+"Expected a folder" = "Map verwacht";
+
+/* Parse error */
+"Expected boolean value" = "Booleaanse waarde verwacht";
+
+/* Parse error */
+"Expected date value" = "Datum verwacht";
+
+/* Parse error */
+"Expected integer value" = "Geheel getal verwacht";
+
+/* Error message */
+"Expected scandata file" = "Data bestand verwacht";
+
+/* Parse error */
+"Expected time value" = "Tijd verwacht";
+
+/* Parse error */
+"Expected unsigned integer value" = "Positief geheel getal verwacht";
+
+/* Title of save panel */
+"Export image" = "Exporteer afbeelding";
+
+/* Title of save panel */
+"Export scan data as text" = "Exporteer als tekst";
+
+/* Alert message */
+"Failed to bind one or more filter tests:\n%@" = "Onbekende filtertesten:\n%@";
+
+/* Error message */
+"Failed to close file" = "Het sluiten van het bestand is mislukt";
+
+/* Error message */
+"Failed to create file" = "Het aanmaken van het bestand is mislukt";
+
+/* Alert message */
+"Failed to delete the file \"%@\"" = "Het verwijderen van het bestand \"%@\" is mislukt";
+
+/* Alert message */
+"Failed to delete the folder \"%@\"" = "Het verwijderen van de map \"%@\" is mislukt";
+
+/* Alert message */
+"Failed to determine volume root" = "Het bepalen van het opslagmedium is mislukt";
+
+/* Error message */
+"Failed to get path from pasteboard" = "Het ophalen van de padnaam van het klembord is mislukt";
+
+/* Alert message (with filename arg) */
+"Failed to load the scan data from \"%@\"" = "Het laden van de data in \"%@\" is mislukt";
+
+/* Alert message */
+"Failed to open the file \"%@\"" = "Het openen van het bestand \"%@\" is mislukt";
+
+/* Alert message */
+"Failed to open the folder \"%@\"" = "Het openen van de map \"%@\" is mislukt";
+
+/* Alert message */
+"Failed to open the package \"%@\"" = "Het openen van het pakket \"%@\" is mislukt";
+
+/* Parse error */
+"Failed to read any tree data" = "Het is niet gelukt data in te lezen";
+
+/* Alert message */
+"Failed to reveal the file \"%@\"" = "Het tonen van het bestand \"%@\" is mislukt";
+
+/* Alert message */
+"Failed to reveal the folder \"%@\"" = "Het tonen van de map \"%@\" is mislukt";
+
+/* Alert message */
+"Failed to reveal the package \"%@\"" = "Het tonen van het pakket \"%@\" is mislukt";
+
+/* Alert message */
+"Failed to save the image" = "Het bewaren van het beeld is mislukt";
+
+/* Alert message (with filename arg) */
+"Failed to save the scan data to \"%@\"" = "Het opslaan van de data naar \"%@\" is mislukt";
+
+/* Alert message */
+"Failed to update one or more filters:\n%@" = "De volgende filters konden niet bijgewerkt worden:\n%@";
+
+/* Error message */
+"Failed to write to file" = "Het schrijven van data is mislukt";
+
+/* Label in Focus panel */
+"File in view:" = "Getoond bestand:";
+
+/* Header in exported text file */
+"Filename" = "Bestandsnaam";
+
+/* Window title */
+"Filter - %@" = "Filter - %@";
+
+/* Window title */
+"Filter test - %@" = "Filtertest - %@";
+
+/* Message in progress panel while filtering */
+"Filtering %@" = "Bezig met filteren van %@";
+
+/* Title of progress panel. */
+"Filtering in progress" = "Bezig met filteren";
+
+/* Label in Focus panel */
+"Folder in view:" = "Getoonde map:";
+
+/* Alert message */
+"For %d files the reported (logical) size is larger than their actual (physical) size. Consider rescanning using the Physical file size measure" = "De geraporteerde (intrinsieke) grootte van %d bestanden is groter dan de werkelijke (fysische) grootte. Overweeg of u wilt herlezen met de Intrinsieke bestandsgrootte maat";
+
+/* FDA success alert */
+"Full Disk Access is verified." = "Volledige Schijf Toegang is bevestigd.";
+
+/* File size unit for gigabytes. */
+"GB" = "GB";
+
+/* FDA warning sheet */
+"GrandPerspective needs full access to your disk for optimal scan performance. Please select your main volume (e.g. Macintosh HD) in the following prompt." = "GrandPerspective heeft volledige toegang tot uw schijf nodig om disk gebruik optimaal te kunnen bepalen. Selecteer straks alstublieft uw hoofdschijf (e.g. Macintosh HD).";
+
+/* FDA warning alert */
+"GrandPerspective seems to lack Full Disk Access permissions" = "GrandPerspective lijkt geen Volledige Schijftoegang te hebben";
+
+/* Menu item */
+"Hide Control Panel" = "Verberg Besturingspaneel";
+
+/* Alert message */
+"Inaccuracies in hard-linked folder contents" = "Onnauwkeurigheden in mappen met harde links";
+
+/* File size unit for kilobytes. */
+"kB" = "kB";
+
+/* Legend for Size-based mapping scheme. */
+"Larger than %@" = "Groter dan %@";
+
+/* Legend for Level mapping scheme. */
+"Level %d" = "Nivo %d";
+
+/* Title of load panel */
+"Load scan data" = "Data laden";
+
+/* Title of progress panel. */
+"Loading in progress" = "Bezig met laden";
+
+/* Misc. description for Level mapping scheme. */
+"Lower levels" = "Lagere nivos";
+
+/* File size unit for megabytes. */
+"MB" = "MB";
+
+/* Header in exported text file */
+"Modified" = "Gewijzigd";
+
+/* Legend for Time-based mapping schemes. */
+"More recent" = "Recenter";
+
+/* Initial match value in FilterTestWindow */
+"New match" = "Bla";
+
+/* The filter name when there is no filter. */
+"None" = "Geen";
+
+/* Alert additional informative text */
+"Note: The file is hard-linked. It will take up space until all links to it are deleted" = "Het bestand is een harde link. Deze zal ruimte innemen totdat alle links verwijderd zijn";
+
+/* Alert additional informative text */
+"Note: The folder is hard-linked. It will take up space until all links to it are deleted" = "De map is een harde link. Deze zal ruimte innemen totdat alle links verwijderd zijn";
+
+/* Alert additional informative text */
+"Note: The package is hard-linked. It will take up space until all links to it are deleted" = "Het pakket is een harde link. Deze zal ruimte innemen totdat alle links verwijderd zijn";
+
+/* Alert panel button */
+"OK" = "OK";
+
+/* Misc. description for File type mapping scheme. */
+"other file types" = "overige bestandstypes";
+
+/* Legend for Level mapping scheme. */
+"Outermost level" = "Buitenste nivo";
+
+/* Label in Focus panel */
+"Package in view:" = "Getoond pakket:";
+
+/* Parse error */
+"Parse error (line %d): %@" = "Inleesfout (regel %1$d): %2$@";
+
+/* Parse error */
+"Parsing aborted" = "Laden geannuleerd";
+
+/* Header in exported text file */
+"Path" = "Pad";
+
+/* FDA success alert */
+"Permission setup complete" = "Toekenning van rechten is afgerond";
+
+/* Message in progress panel while loading data */
+"Reading %@" = "Laden van %@";
+
+/* Title of progress panel. */
+"Refresh in progress" = "Bezig met verversen";
+
+/* Alert panel button */
+"Remove" = "Verwijder";
+
+/* Alert message */
+"Remove the filter named \"%@\"?" = "De filter \"%@\" verwijderen?";
+
+/* Alert message */
+"Remove the test named \"%@\"?" = "De filtertest \"%@\" verwijderen?";
+
+/* Title of save panel */
+"Save scan data" = "Data opslaan";
+
+/* Message in progress panel while saving data */
+"Saving %@" = "Opslaan van %@";
+
+/* Title of progress panel. */
+"Saving in progress" = "Bezig met opslaan";
+
+/* Prompt in open panel */
+"Scan" = "Lees in";
+
+/* Title of open panel */
+"Scan folder" = "Map inlezen";
+
+/* Solitairy entry in Start window */
+"Scan Folder" = "Map Inlezen";
+
+/* Entry in Start window, alongside other options */
+"Scan Other Folder" = "Andere Map Inlezen";
+
+/* Message in progress panel while scanning */
+"Scanning %@" = "Inlezen van %@";
+
+/* Alert message */
+"Scanning failed" = "Inlezen is mislukt";
+
+/* Title of progress panel. */
+"Scanning in progress" = "Bezig met inlezen";
+
+/* Button of Open panel */
+"Select Drive" = "Selecteer Schijf";
+
+/* Open panel message */
+"Select your main drive (e.g. Macintosh HD)" = "Selecteer uw hoofdschijf (b.v. Macintosh HD)";
+
+/* Label in Focus panel */
+"Selected area:" = "Geselecteerd gebied:";
+
+/* Label in Focus panel */
+"Selected file:" = "Geselecteerd bestand:";
+
+/* Label in Focus panel */
+"Selected folder:" = "Geselecteerde map:";
+
+/* Label in Focus panel */
+"Selected package:" = "Geselecteerd pakket:";
+
+/* Menu item */
+"Show Control Panel" = "Toon Besturingspaneel";
+
+/* Header in exported text file */
+"Size" = "Grootte";
+
+/* Legend for Size-based mapping scheme. */
+"Smaller than %@" = "Kleiner dan %@";
+
+/* Legend for Size-based mapping scheme. */
+"Smallest" = "Kleinst";
+
+/* Alert message (with filename arg) */
+"Successfully saved the scan data to \"%@\"" = "Opslag van data naar \"%@\" is voltooid";
+
+/* File size unit for terabytes. */
+"TB" = "TB";
+
+/* Alert message */
+"The actual (physical) size is %.1f%% of the reported (logical) size. Consider rescanning using the Physical file size measure" = "De werkelijke (fysische) grootte is %.1f%% van de geraporteerde (intrinsieke) grootte. Overweeg of u wilt herlezen met de Intrinsieke bestandsgrootte maat";
+
+/* Alert message */
+"The filter must have a name" = "De filter moet een naam hebben";
+
+/* Alert informative text */
+"The filter will be irrevocably removed from the filter repository" = "De filter zal onherroepelijk verwijderd worden uit de filterverzameling";
+
+/* Alert informative text */
+"The filter will be replaced by the default filter with this name" = "De filter zal worden vervangen door de standaard filter met dezelfde naam";
+
+/* Alert message */
+"The path %@ does not exist or is not a folder" = "De padnaam %@ bestaat niet of is geen map";
+
+/* Alert message */
+"The refreshed content may not be fully accurate. Hard-linked items may occur more than once or could be missing. Perform a rescan to ensure that each hard-linked item occurs only once" = "De ververste inhoud is mogelijk niet volledig correct. Harde links komen mogelijk meer dan eens voor of kunnen ontbreken. Herlees alles om zeker te zijn dat harde links maar één keer voorkomen";
+
+/* Alert message */
+"The reported size of some files is larger than their actual size on disk" = "De geraporteerde grootte van sommige bestanden is groter dan de werkelijke benodigde opslagruimte";
+
+/* Alert message */
+"The reported total size is larger than the actual size on disk" = "De geraporteerde totale grootte is groter dan de werkelijke gebruikte opslagruimte";
+
+/* Alert informative text */
+"The resulting file is valid but incomplete" = "Het bestand is geldig maar incompleet";
+
+/* Alert informative text */
+"The selected file will be moved to Trash" = "Het geselecteerde bestand zal naar de Prullenbak verplaatst worden";
+
+/* Alert informative text */
+"The selected folder, with all its contents, will be moved to Trash. Beware, any files in the folder that are not shown in the view will also be deleted" = "De geselecteerde map zal met de gehele inhoud naar de Prullenbak verplaatst worden. Let op, bestanden in de map die eventueel niet getoond zijn, zullen ook verwijderd worden";
+
+/* Alert informative text */
+"The selected package will be moved to Trash" = "Het geselecteerde pakket zal naar de Prullenbak verplaatst worden";
+
+/* Alert message */
+"The test must have a name" = "De filtertest moet een naam hebben";
+
+/* Alert informative text */
+"The test will be irrevocably removed from the test repository" = "De filtertest zal onherroepelijk verwijderd worden uit de filtertestverzameling";
+
+/* Alert informative text */
+"The test will be replaced by the default test with this name" = "De filtertest zal worden vervangen door de standaard filtertest met dezelfde naam";
+
+/* Alert informative text */
+"The unbound tests have been omitted from the filter" = "De niet-geinitialiseerde filtertesten zijn uit het filter verwijderd";
+
+/* Alert informative text */
+"These filters do not exist anymore. Their old definition is used instead" = "Deze filters bestaan niet meer. Hun oorspronkelijke definitie zal daarom gebruikt worden";
+
+/* FDA warning alert */
+"This may limit the disk content it can see. To remedy this, you can grant the permissions via the System Preferences." = "Dit beperkt mogelijk de schijfinhoud die het kan zien. Dit kan verholpen worden door de rechten toe te kennen in de Systeem Voorkeuren.";
+
+/* Part of tool tip for uniform types */
+"Top-level type" = "Basistype";
+
+/* Header in exported text file */
+"Type" = "Bestandstype";
+
+/* Description for 'unknown' UTI. */
+"unknown file type" = "onbekend bestandstype";
+
+/* Window title */
+"Unnamed filter" = "Filter - ?";
+
+/* Window title */
+"Unnamed filter test" = "Filtertest - ?";
+
+/* Parse error */
+"Unrecognized value" = "Waarde onbekend";
+

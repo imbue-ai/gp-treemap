@@ -1,0 +1,84 @@
+/* Class = "NSTabViewItem"; label = "Info"; ObjectID = "92"; */
+"92.label" = "Bilgi";
+
+/* Class = "NSTabViewItem"; label = "Display"; ObjectID = "93"; */
+"93.label" = "Görüntü";
+
+/* Class = "NSTabViewItem"; label = "Focus"; ObjectID = "97"; */
+"97.label" = "Odak";
+
+/* Class = "NSTextFieldCell"; title = "Time of scan:"; ObjectID = "909"; */
+"909.title" = "Tarama zamanı:";
+
+/* Class = "NSTextFieldCell"; title = "Size of scanned files:"; ObjectID = "910"; */
+"910.title" = "Taranan dosyaların boyutu:";
+
+/* Class = "NSTextFieldCell"; title = "File sizes:"; ObjectID = "911"; */
+"911.title" = "Dosya boyutları:";
+
+/* Class = "NSTextFieldCell"; title = "Initial free space:"; ObjectID = "912"; */
+"912.title" = "Başlangıçtaki boş alan:";
+
+/* Class = "NSTextFieldCell"; title = "Physical"; ObjectID = "915"; */
+"915.title" = "Fiziksel";
+
+/* Class = "NSTextFieldCell"; title = "Filter1"; ObjectID = "916"; */
+"916.title" = "Süzgeç1";
+
+/* Class = "NSTextFieldCell"; title = "Volume size:"; ObjectID = "918"; */
+"918.title" = "Bölüm boyutu:";
+
+/* Class = "NSTextFieldCell"; title = "Miscellaneous used space:"; ObjectID = "921"; */
+"921.title" = "Diğer kullanılan alan:";
+
+/* Class = "NSTextFieldCell"; title = "Freed space:"; ObjectID = "923"; */
+"923.title" = "Boşaltılan alan:";
+
+/* Class = "NSTextFieldCell"; title = "Volume name"; ObjectID = "925"; */
+"925.title" = "Bölüm adı";
+
+/* Class = "NSTextFieldCell"; title = "Filter:"; ObjectID = "926"; */
+"926.title" = "Süzgeç:";
+
+/* Class = "NSTextFieldCell"; title = "Number of scanned files:"; ObjectID = "927"; */
+"927.title" = "Taranan dosya sayısı:";
+
+/* Class = "NSTextFieldCell"; title = "Number of deleted files:"; ObjectID = "930"; */
+"930.title" = "Silinen dosya sayısı:";
+
+/* Class = "NSTextFieldCell"; title = "Mask:"; ObjectID = "931"; */
+"931.title" = "Maske:";
+
+/* Class = "NSButtonCell"; title = "Enable mask"; ObjectID = "933"; */
+"933.title" = "Maskeyi etkinleştir";
+
+/* Class = "NSTextFieldCell"; title = "Color by:"; ObjectID = "935"; */
+"935.title" = "Renklendirme ölçütü:";
+
+/* Class = "NSTextFieldCell"; title = "Palette:"; ObjectID = "937"; */
+"937.title" = "Palet:";
+
+/* Class = "NSButtonCell"; title = "Show entire volume"; ObjectID = "938"; */
+"938.title" = "Tüm bölümü göster";
+
+/* Class = "NSTextFieldCell"; title = "File type:"; ObjectID = "946"; */
+"946.title" = "Dosya türü:";
+
+/* Class = "NSTextFieldCell"; title = "File type identifier"; ObjectID = "947"; */
+"947.title" = "Dosya türü tanımlayıcısı";
+
+/* Class = "NSTextFieldCell"; title = "Created:"; ObjectID = "974"; */
+"974.title" = "Oluşturulma:";
+
+/* Class = "NSTextFieldCell"; title = "Modified:"; ObjectID = "976"; */
+"976.title" = "Değiştirilme:";
+
+/* Class = "NSTextFieldCell"; title = "Accessed:"; ObjectID = "984"; */
+"984.title" = "Erişilme:";
+
+/* Class = "NSTextFieldCell"; title = "Show:"; ObjectID = "GbF-h3-YU9"; */
+"GbF-h3-YU9.title" = "Göster:";
+
+/* Class = "NSWindow"; title = "Control"; ObjectID = "GHT-tk-zeb"; */
+"GHT-tk-zeb.title" = "Denetim";
+

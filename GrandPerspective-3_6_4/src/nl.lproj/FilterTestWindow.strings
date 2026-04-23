@@ -1,0 +1,144 @@
+/* Class = "NSWindow"; title = "Filter test"; ObjectID = "5"; */
+"5.title" = "Filter test";
+
+/* Class = "NSBox"; title = "Subtests"; ObjectID = "10"; */
+"10.title" = "Subtesten";
+
+/* Class = "NSMenuItem"; title = "contains"; ObjectID = "18"; */
+"18.title" = "bevat";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "21"; */
+"21.title" = "is";
+
+/* Class = "NSMenuItem"; title = "starts with"; ObjectID = "22"; */
+"22.title" = "begint met";
+
+/* Class = "NSMenuItem"; title = "starts with"; ObjectID = "39"; */
+"39.title" = "eindigt met";
+
+/* Class = "NSMenuItem"; title = "contains"; ObjectID = "40"; */
+"40.title" = "bevat";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "42"; */
+"42.title" = "is";
+
+/* Class = "NSMenuItem"; title = "bytes"; ObjectID = "45"; */
+"45.title" = "bytes";
+
+/* Class = "NSMenuItem"; title = "MB"; ObjectID = "46"; */
+"46.title" = "MB";
+
+/* Class = "NSMenuItem"; title = "kB"; ObjectID = "47"; */
+"47.title" = "kB";
+
+/* Class = "NSMenuItem"; title = "MB"; ObjectID = "51"; */
+"51.title" = "MB";
+
+/* Class = "NSMenuItem"; title = "bytes"; ObjectID = "53"; */
+"53.title" = "bytes";
+
+/* Class = "NSMenuItem"; title = "kB"; ObjectID = "56"; */
+"56.title" = "kB";
+
+/* Class = "NSMenuItem"; title = "ends with"; ObjectID = "93"; */
+"93.title" = "eindigt met";
+
+/* Class = "NSMenuItem"; title = "ends with"; ObjectID = "94"; */
+"94.title" = "eindigt met";
+
+/* Class = "NSMenuItem"; title = "GB"; ObjectID = "95"; */
+"95.title" = "GB";
+
+/* Class = "NSMenuItem"; title = "GB"; ObjectID = "96"; */
+"96.title" = "GB";
+
+/* Class = "NSMenuItem"; title = "files and folders"; ObjectID = "151"; */
+"151.title" = "bestanden en mappen";
+
+/* Class = "NSMenuItem"; title = "folders"; ObjectID = "152"; */
+"152.title" = "mappen";
+
+/* Class = "NSMenuItem"; title = "files"; ObjectID = "153"; */
+"153.title" = "bestanden";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "173"; */
+"173.title" = "is";
+
+/* Class = "NSMenuItem"; title = "is not"; ObjectID = "174"; */
+"174.title" = "is niet";
+
+/* Class = "NSMenuItem"; title = "is not"; ObjectID = "183"; */
+"183.title" = "is niet";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "184"; */
+"184.title" = "is";
+
+/* Class = "NSMenuItem"; title = "conforms to"; ObjectID = "387"; */
+"387.title" = "voldoet aan";
+
+/* Class = "NSMenuItem"; title = "equals"; ObjectID = "388"; */
+"388.title" = "is";
+
+/* Class = "NSMenuItem"; title = "Add"; ObjectID = "396"; */
+"396.title" = "Voeg toe";
+
+/* Class = "NSButtonCell"; title = "name"; ObjectID = "489"; */
+"489.title" = "naam";
+
+/* Class = "NSButtonCell"; title = "path"; ObjectID = "490"; */
+"490.title" = "padnaam";
+
+/* Class = "NSButtonCell"; title = "size is larger than"; ObjectID = "492"; */
+"492.title" = "grootte is groter dan";
+
+/* Class = "NSButtonCell"; title = "size is smaller than"; ObjectID = "495"; */
+"495.title" = "grootte is kleiner dan";
+
+/* Class = "NSButtonCell"; title = "Ignore case"; ObjectID = "498"; */
+"498.title" = "Negeer hoofdletters";
+
+/* Class = "NSButtonCell"; title = "Ignore case"; ObjectID = "499"; */
+"499.title" = "Negeer hoofdletters";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "500"; */
+"500.title" = "Verwijder";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "501"; */
+"501.title" = "Voeg toe";
+
+/* Class = "NSButtonCell"; title = "item"; ObjectID = "502"; */
+"502.title" = "item";
+
+/* Class = "NSTextFieldCell"; title = "hard-linked"; ObjectID = "504"; */
+"504.title" = "een harde link";
+
+/* Class = "NSButtonCell"; title = "item"; ObjectID = "505"; */
+"505.title" = "item";
+
+/* Class = "NSTextFieldCell"; title = "a package"; ObjectID = "506"; */
+"506.title" = "een pakket";
+
+/* Class = "NSButtonCell"; title = "type"; ObjectID = "508"; */
+"508.title" = "bestandstype";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "509"; */
+"509.title" = "Verwijder";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "510"; */
+"510.title" = "Verwijder";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "511"; */
+"511.title" = "Voeg toe";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "514"; */
+"514.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "515"; */
+"515.title" = "Annuleer";
+
+/* Class = "NSTextFieldCell"; title = "Apply to:"; ObjectID = "517"; */
+"517.title" = "Pas toe op:";
+
+/* Class = "NSTextFieldCell"; title = "Name:"; ObjectID = "M2Z-4Q-CYi"; */
+"M2Z-4Q-CYi.title" = "Naam:";
+

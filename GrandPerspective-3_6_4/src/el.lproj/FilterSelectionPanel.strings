@@ -1,0 +1,21 @@
+/* Class = "NSWindow"; title = "Select filter"; ObjectID = "1"; */
+"1.title" = "Επιλογή φίλτρου";
+
+/* Class = "NSBox"; title = "Filter"; ObjectID = "11"; */
+"11.title" = "Φίλτρο";
+
+/* Class = "NSButtonCell"; title = "New"; ObjectID = "19"; */
+"19.title" = "Νέο";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "21"; */
+"21.title" = "ΟΚ";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "23"; */
+"23.title" = "Ακύρωση";
+
+/* Class = "NSButtonCell"; title = "Edit"; ObjectID = "25"; */
+"25.title" = "Τροποποίηση";
+
+/* Class = "NSButtonCell"; title = "Apply default filter"; ObjectID = "oBx-0o-cNN"; */
+"oBx-0o-cNN.title" = "Εφαρμογή προεπιλεγμένου φίλτρου";
+

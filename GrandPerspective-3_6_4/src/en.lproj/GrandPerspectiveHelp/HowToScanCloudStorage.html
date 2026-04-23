@@ -1,0 +1,86 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>How to scan cloud storage</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="How to scan cloud storage">
+<meta name="keywords" content="how to, Cloud storage, online only, iCloud, Google Drive, Dropbox, One Drive, no cloud files">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+
+<div id="pagetitle">
+<h1>How to scan cloud storage</h1>
+</div>
+
+<p>
+macOS provides the ability to access files stored in the cloud from Finder.
+This holds for files stored using Apple's iCloud storage solution, but also for third-party cloud storage providers such as Dropbox, Google Drive and Microsoft One Drive.
+By default these files are only stored in the cloud and their content is only retrieved when needed.
+</p>
+
+<p>
+How this works in combination with GrandPerspective is explained below.
+</p>
+
+<h2>How does macOS provide access to "online only" cloud files?</h2>
+
+<p>
+macOS provides the "File Provider" extension for apps to manage files stored in the cloud.
+From macOS 12.3 onwards this is the only on-demand solution for managing cloud storage.
+It is used by all major cloud storage solutions on macOS, including iCloud, Google Drive, Dropbox, and One Drive.
+</p>
+
+<p>
+Files are by default stored as "online only".
+This means that they do not take up space on the local disk.
+To view the contents of such a file, the file is downloaded on demand by macOS.
+The file contents may then be cached locally so that it is quickly available the next time.
+When you run out of storage space, macOS will purge these files automatically to free up space.
+</p>
+
+<h2>How to determine how much space the cloud files take up on your disk?</h2>
+
+<p>
+Scan the "CloudStorage" folder using the <a href="FileSizes.html">physical file size</a> measure.
+As "online only" files take up no space, they are not shown in the resulting <a href="Views.html">GrandPerspective view</a>.
+The view could therefore contain only a small subset of all files.
+</p>
+
+<h2>How to determine how much space the cloud files take up in the cloud?</h2>
+
+<p>
+Scan the "CloudStorage" folder using the <a href="FileSizes.html">logical file size</a> measure.
+This typically triggers a warning that the reported size larger than the actual size on disk.
+</p>
+
+<h2>Does scanning cloud storage folders trigger download of files?</h2>
+
+<p>
+No, GrandPerspective only requests file metadata (size, time of last change, etc) from macOS.
+macOS does not need to download "online only" files to return this information.
+</p>
+
+<p>
+However, if the folder was not yet browsed or scanned before, the scan will trigger macOS to create the folder structure locally.
+This may take some time but does not result in the download of contained files.
+</p>
+
+<h2>How can I ensure that GrandPerspective skips the folders with cloud files when scanning?</h2>
+
+<p>
+For this you can use the <a href="MasksAndFilters.html">filter</a> "No cloud files".
+When this filter is used the maps containing the cloud files are fully skipped during the scan.
+</p>
+
+<p>
+This filter can speed up the scan and is particularly handy when you have many cloud files that are mostly stored online.
+In that case you can even consider to apply this filter by default.
+This you do by changing your <a href="Preferences.html">Preferences</a>.
+</p>
+
+</body>
+</html>

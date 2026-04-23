@@ -1,0 +1,21 @@
+/* Class = "NSWindow"; title = "Select filter"; ObjectID = "1"; */
+"1.title" = "选择过滤条件";
+
+/* Class = "NSBox"; title = "Filter"; ObjectID = "11"; */
+"11.title" = "过滤条件";
+
+/* Class = "NSButtonCell"; title = "New"; ObjectID = "19"; */
+"19.title" = "新建";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "21"; */
+"21.title" = "好";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "23"; */
+"23.title" = "取消";
+
+/* Class = "NSButtonCell"; title = "Edit"; ObjectID = "25"; */
+"25.title" = "编辑";
+
+/* Class = "NSButtonCell"; title = "Apply default filter"; ObjectID = "oBx-0o-cNN"; */
+"oBx-0o-cNN.title" = "应用默认过滤条件";
+

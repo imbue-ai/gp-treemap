@@ -1,4 +1,4 @@
-# Agent notes for raised-treemap
+# Agent notes for gp-treemap
 
 ## Bundle
 
@@ -7,7 +7,7 @@ After editing any file in `src/`, rebuild the bundle:
     node tools/build.js
 
 The scan viewer (`tools/scan.js`) and the unit-fixture test page both load
-`dist/raised-treemap.bundle.js`, not the ES modules directly. If you forget
+`dist/gp-treemap.bundle.js`, not the ES modules directly. If you forget
 to rebuild, your changes won't appear in scanned HTML output.
 
 A test (`tests/bundle-freshness.spec.js`) will catch a stale bundle.
@@ -15,7 +15,7 @@ A test (`tests/bundle-freshness.spec.js`) will catch a stale bundle.
 ## URL hash state
 
 UI state is persisted in the URL hash **at the page level**, not inside the
-`<raised-treemap>` component. The component fires events; the page script
+`<gp-treemap>` component. The component fires events; the page script
 reads/writes the hash. Hash params:
 
 | Param    | Meaning                          | Omitted when          |

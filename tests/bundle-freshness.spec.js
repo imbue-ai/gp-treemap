@@ -1,4 +1,4 @@
-// Verifies that dist/raised-treemap.bundle.js is up-to-date with the source
+// Verifies that dist/gp-treemap.bundle.js is up-to-date with the source
 // files in src/. Runs `node tools/build.js` into a temp file and diffs it
 // against the checked-in bundle.
 import { test, expect } from '@playwright/test';
@@ -8,7 +8,7 @@ import path from 'node:path';
 import url from 'node:url';
 
 const ROOT = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '..');
-const BUNDLE = path.join(ROOT, 'dist', 'raised-treemap.bundle.js');
+const BUNDLE = path.join(ROOT, 'dist', 'gp-treemap.bundle.js');
 
 test('dist bundle is not stale', () => {
   const before = fs.readFileSync(BUNDLE, 'utf8');

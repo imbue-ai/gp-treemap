@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>raised-treemap · located nodes</title>
+<title>gp-treemap · located nodes</title>
 <style>
   html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, sans-serif; background:#fafafa; color:#111; }
   header { padding: 10px 14px; border-bottom: 1px solid #0002; display: flex; gap: 12px; align-items: center; }
   header h1 { margin: 0; font-size: 16px; font-weight: 600; }
   header a { margin-left: auto; color: #0645ad; text-decoration: none; font-size: 13px; }
-  raised-treemap { display: flex; height: calc(100vh - 47px); }
+  gp-treemap { display: flex; height: calc(100vh - 47px); }
   .pick { display: flex; gap: 4px; align-items: center; }
   .pick input { font: inherit; padding: 2px 6px; width: 260px; border: 1px solid #0003; border-radius: 4px; }
   .pick button { padding: 2px 8px; }
@@ -23,12 +23,12 @@
   </div>
   <a href="index.html">← all samples</a>
 </header>
-<raised-treemap id="tm"
+<gp-treemap id="tm"
   color-mode="categorical"
   palette="gp-default"
   value-format="b"
-  min-cell-area="40"></raised-treemap>
-<script src="../dist/raised-treemap.bundle.js"></script>
+  min-cell-area="40"></gp-treemap>
+<script src="../dist/gp-treemap.bundle.js"></script>
 <script src="data/filesystem.js"></script>
 <script>
 (function () {

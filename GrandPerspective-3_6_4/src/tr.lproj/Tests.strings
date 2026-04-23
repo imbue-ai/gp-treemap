@@ -1,0 +1,90 @@
+/* AND-test with 1: sub test, and 2: another sub test */
+"(%@) and (%@)" = "(%1$@) ve (%2$@)";
+
+/* AND-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) and %@" = "(%1$@) ve %2$@";
+
+/* OR-test with 1: sub test, and 2: another sub test */
+"(%@) or (%@)" = "(%1$@) veya (%2$@)";
+
+/* OR-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) or %@" = "(%1$@) veya %2$@";
+
+/* AND-test for flags sub tests with 1: subtest, 2: one or more sub tests */
+"%@ and %@" = "%1$@ ve %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ contains %@" = "%1$@, %2$@ içerir";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ conTains %@" = "%1$@, %2$@ içerir";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ ends with %@" = "%1$@, %2$@ ile biter";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ enDs with %@" = "%1$@, %2$@ ile biter";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ equals %@" = "%1$@ eşittir %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ eQuals %@" = "%1$@ eşittir %2$@";
+
+/* Pair of match targets with 1: a target match, and 2: another target match */
+"%@ or %@" = "%1$@ veya %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ starts with %@" = "%1$@, %2$@ ile başlar";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ starTs with %@" = "%1$@, %2$@ ile başlar";
+
+/* Three or more match targets with 1: a target match, and 2: two or more other target matches */
+"%@, %@" = "%1$@, %2$@";
+
+/* Size test without any bounds */
+"any size" = "herhangi bir boyut";
+
+/* Selective test with 1: sub test */
+"files: %@" = "dosyalar: %@";
+
+/* Selective test with 1: sub test */
+"folders: %@" = "klasörler: %@";
+
+/* File/folder flags sub test */
+"item is a package" = "öğe bir paket";
+
+/* File/folder flags sub test */
+"item is hard-linked" = "öğe sabit bağlantılı";
+
+/* File/folder flags sub test */
+"item is not a package" = "öğe bir paket değil";
+
+/* File/folder flags sub test */
+"item is not hard-linked" = "öğe sabit bağlantılı değil";
+
+/* A filename as the subject of a string test */
+"name" = "ad";
+
+/* NOT-test with 1: sub test */
+"not (%@)" = "(%@) değil";
+
+/* A pathname as the subject of a string test */
+"path" = "yol";
+
+/* Size test with 1: lower bound, and 2: upper bound */
+"size is between %@ and %@" = "boyutu %1$@ ve %2$@ arasında";
+
+/* Size test with 1: lower bound */
+"size is larger than %@" = "boyutu büyüktür %@";
+
+/* Size test with 1: upper bound */
+"size is smaller than %@" = "boyutu küçüktür %@";
+
+/* Filetype test with 1: match targets */
+"type conforms to %@" = "türü %@ ile uyumludur";
+
+/* Filetype test with 1: match targets */
+"type equals %@" = "türü eşittir %@";
+

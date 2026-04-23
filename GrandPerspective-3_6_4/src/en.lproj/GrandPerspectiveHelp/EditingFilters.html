@@ -1,0 +1,96 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Editing filters</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Explains how to edit filters.">
+<meta name="keywords" content="edit filter, modify filter, green checkmark, red cross">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>Editing filters</h1>
+</div>
+
+<br>
+<h2>The Filters window</h2>
+
+<!-- Note: The next two paragraphs are very similar to those near the end of this file that describe editing filter _tests_ -->
+<p>
+You can edit <a href="MasksAndFilters.html">filters</a> in the "Filters" window, accessible from the GrandPerspective menu.
+GrandPerspective comes with a few default filters.
+You can create your own filters using the <b>New</b> button, or modify existing filters using the <b>Edit</b> button.
+In both cases, a new "Filter" window will appear where you can edit the filter.
+Filters that you create or modify are maintained in the filter repository, which is automatically stored in your preferences.
+That way they are available next time you run GrandPerspective.
+</p>
+
+<p>
+You can remove filters that you created, using the <b>Remove</b> button.
+You can also use this button to undo changes you have made to the default application-provided filters.
+The filter will then be replaced by the original filter with this name.
+</p>
+
+<h2>The Filter window</h2>
+<p>
+Configuring a specific filter is done in a "Filter" window.
+The window contains two lists.
+The list at the left shows the tests that are to be used in the filter.
+The list at the right shows all tests that are still available.
+You can select tests that should be used by moving them from the right to the left, using the <b>&lt;</b> button.
+</p>
+
+<p>
+An icon to the left of each test in the filter indicates if the test is inverted or not:
+</p>
+<dl>
+<dt><center><img src="images/Checkmark.png" alt="green checkmark" width=11 height=10></center></dt>
+<dd>items that pass the test are selected</dd>
+<dt><center><img src="images/Cross.png" alt="red cross" width=11 height=10></center></dt>
+<dd>items that pass the text are excluded</dd>
+</dl>
+
+<p>
+You can toggle between both states by double-clicking on the test.
+Some tests cannot be toggled.
+This holds for tests for which there is only one sensible state.
+Tests that apply to folders are always inverted.
+If they were not, a file would only pass the test when <em>all folders in its path</em> (starting from the folder that was scanned) pass the test.
+In practice, this is not what you want, as typically no files will pass the test.
+</p>
+
+<p>
+When there is more than one test in the filter, the selection logic is as follows:
+</p>
+<ul>
+<li>If there are one or more tests with a green checkmark, a file only needs to match one of these</li>
+<li>If there are one or more tests with a red cross, a file should not match any of these</li>
+</ul>
+
+<p>
+GrandPerspective comes with a few default filter tests.
+You can create your own tests using the <b>New</b> button, or modify existing tests using the <b>Edit</b> button.
+In both cases, a new "Filter test" window will appear where you can <a href="EditingFilterTests.html">edit the test</a>.
+Tests that you create or modify are maintained in the filter test repository, which is automatically stored in your preferences.
+That way they are available next time you run GrandPerspective.
+</p>
+
+<p>
+You can remove tests that you created, using the <b>Remove</b> button.
+You can also use this button to undo changes you have made to the default application-provided tests.
+The test will then be replaced by the original test with this name.
+</p>
+
+<h2>See also</h2>
+
+<p>
+<ul>
+<li><a href="EditingFilterTests.html">Editing filter tests</a></li>
+</ul>
+</p>
+
+</body>
+</html>

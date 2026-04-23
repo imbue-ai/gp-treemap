@@ -1,0 +1,134 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>The Display tab of the Control panel</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Describes the Display tab of the Control panel and explains how to change the view's appearance.">
+<meta name="keywords" content="GrandPerspective, control panel, display tab, display, color, palette, mapping, mask, top folder, show entire volume, show package contents" >
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>The Display tab</h1>
+</div>
+
+<p>
+The Display tab in the <a href="ControlPanel.html">Control Panel</a> enables you to change how the active <a href="Views.html">view</a> is drawn.
+</p>
+
+<p>
+First, you can choose what items are shown.
+The options, ordered from most detailed to least detailed, are:
+
+<ul>
+
+<li>
+<b>Files</b>:
+Each rectangle in the view is a file.
+</li>
+
+<li>
+<b>Packages &amp; Files</b>:
+The contents of packages are hidden; each package is shown as a single file.
+Files that are not part of a package are shown as before.
+</li>
+
+<li>
+<b>Packages &amp; Folders</b>:
+All files inside a folder are grouped and shown as a single rectangle.
+Packages are shown as before.
+</li>
+
+</ul>
+</p>
+
+<p>
+You can choose from various file color mappings:
+
+<ul>
+
+<li>
+<b>Creation</b>:
+Files are colored based on the time when they were created.
+</li>
+
+<li>
+<b>Extension</b>:
+All files with the same extension have the same color.
+</li>
+
+<li>
+<b>File type</b>:
+The <a href="FileTypes.html">file type</a> of each file determines its color.
+You can <a href="EditingFileTypeColorMapping.html">edit the order of the list of file types</a> to control which file types are mapped to a unique color.
+</li>
+
+<li>
+<b>Folder</b>:
+All files in the same folder have the same color.
+</li>
+
+<li>
+<b>Last access</b>:
+Files are colored based on the time when they were last accessed.
+</li>
+
+<li>
+<b>Last change</b>:
+Files are colored based on the time when they were last modified.
+</li>
+
+<li>
+<b>Level</b>:
+The number of sub-folders in the path of each file, relative to the folder that is currently shown in the view, determines its color.
+All files at the same "level" of the file hierarchy have the same color.
+</li>
+
+<li>
+<b>Name</b>:
+Files with the same name will have the same color.
+</li>
+
+<li>
+<b>Nothing</b>:
+All files will have the same color.
+</li>
+
+<li>
+<b>Top Folder</b>:
+The first sub-folder in the path of each file, relative to the folder that is currently shown in the view, determines its color.
+All files that appear in the same "top folder" have the same color.
+</li>
+
+</ul>
+</p>
+
+<p>
+You can also select one of the various color palettes that is provided with the application.
+You can pick one that suits your taste.
+Note, however, that the number of colors per palette varies, which has an effect on the color mapping.
+The colors in the palette are shown below it.
+When a color mapping is used where colors have a meaningful interpretation, a description will be shown alongside each color.
+</p>
+
+<p>
+You can also configure a <a href="MasksAndFilters.html">mask</a>.
+When you use a mask, only certain files are shown.
+Files that are masked, on the other hand, still take up space but are not drawn.
+Masking can be useful for quickly identifying certain (types of) files, and can also be useful step before applying a <a href="MasksAndFilters.html">filter</a>.
+</p>
+
+<p>
+By default, the view only shows the files that have been scanned (or a subset thereof).
+However, you can choose to show the entire volume.
+By enabling this setting, the view also shows the free space and the miscellaneous used space.
+Note, if the total size of the scanned files is small compared to the size of the overall volume then the view will not be very interesting.
+In this case, you are better off disabling the "Show entire volume" setting again.
+Alternatively, you can scan the folder at the root of the volume, if you had not already done so.
+</p>
+
+</body>
+</html>

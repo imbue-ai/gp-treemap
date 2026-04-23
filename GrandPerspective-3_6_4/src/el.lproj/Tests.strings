@@ -1,0 +1,90 @@
+/* AND-test with 1: sub test, and 2: another sub test */
+"(%@) and (%@)" = "(%1$@) και (%2$@)";
+
+/* AND-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) and %@" = "(%1$@) και %2$@";
+
+/* OR-test with 1: sub test, and 2: another sub test */
+"(%@) or (%@)" = "(%1$@) ή (%2$@)";
+
+/* OR-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) or %@" = "(%1$@) ή %2$@";
+
+/* AND-test for flags sub tests with 1: subtest, 2: one or more sub tests */
+"%@ and %@" = "%1$@ και %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ contains %@" = "%1$@ περιέXει %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ conTains %@" = "%1$@ περιέχει %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ ends with %@" = "%1$@ τελειώνει με %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ enDs with %@" = "%1$@ τεΛειώνει με %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ equals %@" = "%1$@ ισούται με %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ eQuals %@" = "%1$@ ισούTαι με %2$@";
+
+/* Pair of match targets with 1: a target match, and 2: another target match */
+"%@ or %@" = "%1$@ ή %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ starts with %@" = "%1$@ αρχίζει με %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ starTs with %@" = "%1$@ αρΧίζει με %2$@";
+
+/* Three or more match targets with 1: a target match, and 2: two or more other target matches */
+"%@, %@" = "%1$@, %2$@";
+
+/* Size test without any bounds */
+"any size" = "οποιοδήποτε μέγεθος";
+
+/* Selective test with 1: sub test */
+"files: %@" = "αρχεία: %@";
+
+/* Selective test with 1: sub test */
+"folders: %@" = "φάκελοι: %@";
+
+/* File/folder flags sub test */
+"item is a package" = "Το στοιχείο είναι πακέτο";
+
+/* File/folder flags sub test */
+"item is hard-linked" = "Το στοιχείο είναι σκληρά συνδεδεμένο";
+
+/* File/folder flags sub test */
+"item is not a package" = "Το στοιχείο δεν είναι πακέτο";
+
+/* File/folder flags sub test */
+"item is not hard-linked" = "Το στοιχείο δεν είναι σκληρά συνδεδεμένο";
+
+/* A filename as the subject of a string test */
+"name" = "όνομα";
+
+/* NOT-test with 1: sub test */
+"not (%@)" = "όχι (%@)";
+
+/* A pathname as the subject of a string test */
+"path" = "μονοπάτι";
+
+/* Size test with 1: lower bound, and 2: upper bound */
+"size is between %@ and %@" = "μέγεθος μεταξύ %1$@ και %2$@";
+
+/* Size test with 1: lower bound */
+"size is larger than %@" = "μέγεθος μεγαλύτερο από %@";
+
+/* Size test with 1: upper bound */
+"size is smaller than %@" = "μέγεθος μικρότερο από %@";
+
+/* Filetype test with 1: match targets */
+"type conforms to %@" = "o τύπος συμμορφώνεται με %@";
+
+/* Filetype test with 1: match targets */
+"type equals %@" = "ο τύπος ισούται με %@";
+

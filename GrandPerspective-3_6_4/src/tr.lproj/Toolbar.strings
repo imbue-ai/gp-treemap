@@ -1,0 +1,75 @@
+/* Toolbar action */
+"Delete" = "Sil";
+
+/* Label for focus controls */
+"Focus" = "Odak";
+
+/* Menu item */
+"Hide Toolbar" = "Araç Çubuğunu Gizle";
+
+/* Toolbar action */
+"Info" = "Bilgi";
+
+/* Toolbar action */
+"Move focus down" = "Odağı aşağı al";
+
+/* Toolbar action */
+"Move focus up" = "Odağı yukarı al";
+
+/* Tooltip */
+"Move to trash" = "Çöp Sepeti’ne taşı";
+
+/* Toolbar action */
+"Open" = "Aç";
+
+/* Tooltip */
+"Open with Finder" = "Aç";
+
+/* Tooltip */
+"Preview item in Quick Look panel" = "Göz At Panelinde Önizle";
+
+/* Toolbar action */
+"Quick Look" = "Göz At";
+
+/* Toolbar action */
+"Refresh" = "Yenile";
+
+/* Tooltip */
+"Refresh view data" = "Görüntü verisini yenile";
+
+/* Toolbar action */
+"Rescan" = "Yeniden Tara";
+
+/* Tooltip */
+"Rescan view data" = "Görüntü verisini yeniden tara";
+
+/* Toolbar action */
+"Reset focus" = "Odağı sıfırla";
+
+/* Toolbar action */
+"Reset zoom" = "Yakınlaştırmayı sıfırla";
+
+/* Toolbar action */
+"Reveal" = "Göster";
+
+/* Tooltip */
+"Reveal in Finder" = "Finder’da Göster ";
+
+/* Tooltip */
+"Search files by name" = "Dosyaları ada göre ara";
+
+/* Tooltip */
+"Show info" = "Bilgi ver";
+
+/* Menu item */
+"Show Toolbar" = "Araç Çubuğunu Göster";
+
+/* Label for zooming controls */
+"Zoom" = "Yakınlaştırma";
+
+/* Toolbar action */
+"Zoom in" = "Yakınlaştır";
+
+/* Toolbar action */
+"Zoom out" = "Uzaklaştır";
+

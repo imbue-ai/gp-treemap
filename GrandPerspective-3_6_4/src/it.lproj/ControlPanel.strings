@@ -1,0 +1,84 @@
+/* Class = "NSTabViewItem"; label = "Info"; ObjectID = "92"; */
+"92.label" = "Info";
+
+/* Class = "NSTabViewItem"; label = "Display"; ObjectID = "93"; */
+"93.label" = "Visualizzazione";
+
+/* Class = "NSTabViewItem"; label = "Focus"; ObjectID = "97"; */
+"97.label" = "Livello";
+
+/* Class = "NSTextFieldCell"; title = "Time of scan:"; ObjectID = "909"; */
+"909.title" = "Ora scansione:";
+
+/* Class = "NSTextFieldCell"; title = "Size of scanned files:"; ObjectID = "910"; */
+"910.title" = "Dimensione file scansionati:";
+
+/* Class = "NSTextFieldCell"; title = "File sizes:"; ObjectID = "911"; */
+"911.title" = "Dimensione file:";
+
+/* Class = "NSTextFieldCell"; title = "Initial free space:"; ObjectID = "912"; */
+"912.title" = "Spazio disponibile iniziale:";
+
+/* Class = "NSTextFieldCell"; title = "Physical"; ObjectID = "915"; */
+"915.title" = "Fisico";
+
+/* Class = "NSTextFieldCell"; title = "Filter1"; ObjectID = "916"; */
+"916.title" = "Filtro1";
+
+/* Class = "NSTextFieldCell"; title = "Volume size:"; ObjectID = "918"; */
+"918.title" = "Dimensione volume:";
+
+/* Class = "NSTextFieldCell"; title = "Miscellaneous used space:"; ObjectID = "921"; */
+"921.title" = "Spazio utilizzato generico:";
+
+/* Class = "NSTextFieldCell"; title = "Freed space:"; ObjectID = "923"; */
+"923.title" = "Spazio liberato:";
+
+/* Class = "NSTextFieldCell"; title = "Volume name"; ObjectID = "925"; */
+"925.title" = "Nome volume";
+
+/* Class = "NSTextFieldCell"; title = "Filter:"; ObjectID = "926"; */
+"926.title" = "Filtro:";
+
+/* Class = "NSTextFieldCell"; title = "Number of scanned files:"; ObjectID = "927"; */
+"927.title" = "Numero di file scansionato:";
+
+/* Class = "NSTextFieldCell"; title = "Number of deleted files:"; ObjectID = "930"; */
+"930.title" = "Numero di file cancellati:";
+
+/* Class = "NSTextFieldCell"; title = "Mask:"; ObjectID = "931"; */
+"931.title" = "Maschera:";
+
+/* Class = "NSButtonCell"; title = "Enable mask"; ObjectID = "933"; */
+"933.title" = "Attiva maschera";
+
+/* Class = "NSTextFieldCell"; title = "Color by:"; ObjectID = "935"; */
+"935.title" = "Colora per:";
+
+/* Class = "NSTextFieldCell"; title = "Palette:"; ObjectID = "937"; */
+"937.title" = "Combinazione colori:";
+
+/* Class = "NSButtonCell"; title = "Show entire volume"; ObjectID = "938"; */
+"938.title" = "Visualizza tutto il volume";
+
+/* Class = "NSTextFieldCell"; title = "File type:"; ObjectID = "946"; */
+"946.title" = "Tipo file:";
+
+/* Class = "NSTextFieldCell"; title = "File type identifier"; ObjectID = "947"; */
+"947.title" = "Identificatore tipo file";
+
+/* Class = "NSTextFieldCell"; title = "Created:"; ObjectID = "974"; */
+"974.title" = "Creazione:";
+
+/* Class = "NSTextFieldCell"; title = "Modified:"; ObjectID = "976"; */
+"976.title" = "Modifica:";
+
+/* Class = "NSTextFieldCell"; title = "Accessed:"; ObjectID = "984"; */
+"984.title" = "Accesso:";
+
+/* Class = "NSTextFieldCell"; title = "Show:"; ObjectID = "GbF-h3-YU9"; */
+"GbF-h3-YU9.title" = "Mostra:";
+
+/* Class = "NSWindow"; title = "Control"; ObjectID = "GHT-tk-zeb"; */
+"GHT-tk-zeb.title" = "Controllo";
+

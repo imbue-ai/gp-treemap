@@ -1,0 +1,18 @@
+/* Class = "NSWindow"; title = "Filters"; ObjectID = "1"; */
+"1.title" = "Filtri";
+
+/* Class = "NSBox"; title = "Available filters"; ObjectID = "3"; */
+"3.title" = "Filtri disponibili";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "14"; */
+"14.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Edit"; ObjectID = "16"; */
+"16.title" = "Modifica";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "18"; */
+"18.title" = "Rimuovi";
+
+/* Class = "NSButtonCell"; title = "New"; ObjectID = "20"; */
+"20.title" = "Nuovo";
+

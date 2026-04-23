@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
+            <connections>
+                <outlet property="delegate" destination="222" id="226"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <menu title="MainMenu" systemMenu="main" id="29" userLabel="MainMenu">
+            <items>
+                <menuItem title="GrandPerspective" id="56">
+                    <menu key="submenu" title="GrandPerspective" systemMenu="apple" id="57">
+                        <items>
+                            <menuItem title="About GrandPerspective" id="58">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="orderFrontStandardAboutPanel:" target="-2" id="142"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="196">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Preferences…" keyEquivalent="," id="129">
+                                <connections>
+                                    <action selector="editPreferences:" target="222" id="333"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Filters..." id="357">
+                                <connections>
+                                    <action selector="editFilters:" target="222" id="358"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Uniform type ranking..." id="421">
+                                <connections>
+                                    <action selector="editUniformTypeRanking:" target="222" id="422"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="144">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Services" id="425">
+                                <menu key="submenu" title="Services" systemMenu="services" id="426"/>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="428">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Hide GrandPerspective" keyEquivalent="h" id="134">
+                                <connections>
+                                    <action selector="hide:" target="-2" id="152"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Hide Others" keyEquivalent="h" id="145">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="hideOtherApplications:" target="-2" id="146"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Show All" id="150">
+                                <connections>
+                                    <action selector="unhideAllApplications:" target="-2" id="153"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="149">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Quit GrandPerspective" keyEquivalent="q" id="136">
+                                <connections>
+                                    <action selector="terminate:" target="-2" id="139"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="File" tag="100" id="83">
+                    <menu key="submenu" title="File" id="81">
+                        <items>
+                            <menuItem title="Scan Folder..." keyEquivalent="n" id="72">
+                                <connections>
+                                    <action selector="scanDirectoryView:" target="222" id="9j8-ZE-lB6"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Scan Recent" tag="102" id="hUr-J9-FbH">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Scan Recent" id="HXb-90-KwJ">
+                                    <items>
+                                        <menuItem title="Item" id="3LR-fJ-0Ck">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Filtered Scan..." keyEquivalent="n" id="335">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="scanFilteredDirectoryView:" target="222" id="337"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Refresh" keyEquivalent="N" id="9aB-S3-Sb7">
+                                <connections>
+                                    <action selector="refresh:" target="222" id="zWW-vk-Lez"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Rescan" id="gUG-Nh-FTx">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Rescan" id="rfs-HZ-ODE">
+                                    <items>
+                                        <menuItem title="Rescan all" id="nFT-y9-xF4">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="rescanAll:" target="222" id="Tcm-oD-oSe"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Rescan folder in view" id="CV5-Fw-5D7">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="rescanVisible:" target="222" id="JDl-pV-mme"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Rescan selected" id="Lsx-9H-7TJ">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="rescanSelected:" target="222" id="PW3-rf-x8d"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Rescan with mask as filter" id="BMK-MQ-DB3">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="rescanWithMaskAsFilter:" target="222" id="bVe-Sh-9tB"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="327">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Load Scan Data..." keyEquivalent="o" id="340">
+                                <connections>
+                                    <action selector="loadScanData:" target="222" id="343"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Save Scan Data..." keyEquivalent="s" id="339">
+                                <connections>
+                                    <action selector="saveScanData:" target="222" id="342"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="341">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Export As Image..." id="324">
+                                <connections>
+                                    <action selector="saveDirectoryViewImage:" target="222" id="325"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Export As Text..." id="hJw-Fc-daG">
+                                <connections>
+                                    <action selector="saveScanDataAsText:" target="-1" id="Cjb-FT-Bj9"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Edit" id="388">
+                    <menu key="submenu" title="Edit" id="389">
+                        <items>
+                            <menuItem title="Cut" keyEquivalent="x" id="393">
+                                <connections>
+                                    <action selector="cut:" target="-1" id="416"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Copy" keyEquivalent="c" id="394">
+                                <connections>
+                                    <action selector="copy:" target="-1" id="417"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Paste" keyEquivalent="v" id="395">
+                                <connections>
+                                    <action selector="paste:" target="-1" id="418"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Delete" id="397">
+                                <connections>
+                                    <action selector="delete:" target="-1" id="419"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Select All" keyEquivalent="a" id="398">
+                                <connections>
+                                    <action selector="selectAll:" target="-1" id="420"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="View" id="348">
+                    <menu key="submenu" title="View" id="349">
+                        <items>
+                            <menuItem title="Zoom" id="oY0-9q-f9z">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Zoom" id="qtI-xz-v9u">
+                                    <items>
+                                        <menuItem title="Zoom In" keyEquivalent="+" id="Iyw-2V-esC">
+                                            <connections>
+                                                <action selector="zoomIn:" target="-1" id="uqy-WU-hvT"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Zoom Out" keyEquivalent="-" id="bKM-Ec-4Gi">
+                                            <connections>
+                                                <action selector="zoomOut:" target="-1" id="fAF-AB-5kU"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Reset Zoom" id="y2y-vX-zhd">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="resetZoom:" target="-1" id="Z1N-KH-LdB"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Selection Focus" id="frA-lr-FOa">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Selection Focus" id="wHh-Gg-e7R">
+                                    <items>
+                                        <menuItem title="Move Focus Up" keyEquivalent="[" id="gZj-8W-T7o">
+                                            <connections>
+                                                <action selector="moveSelectionFocusUp:" target="-1" id="JdZ-1G-R4W"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Move Focus Down" keyEquivalent="]" id="QCC-Gl-y9i">
+                                            <connections>
+                                                <action selector="moveSelectionFocusDown:" target="-1" id="ejb-TT-bpU"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Reset Focus" id="l4V-Wf-FCv">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="resetSelectionFocus:" target="-1" id="Y3l-rD-KDc"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem title="Display Focus" id="wd7-sh-TkA">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Display Focus" id="6AB-sL-t6U">
+                                    <items>
+                                        <menuItem title="Move Focus Up" id="K6z-Zt-rLu">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="moveDisplayFocusUp:" target="-1" id="VjL-AL-UBh"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Move Focus Down" id="dJ2-6K-v9P">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="moveDisplayFocusDown:" target="-1" id="H3Q-gg-U6E"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Reset Focus" id="15W-vC-r8v">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="resetDisplayFocus:" target="-1" id="rpU-ix-vlX"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="NvV-Xg-wc5"/>
+                            <menuItem title="Show/Hide Toolbar" keyEquivalent="t" id="350">
+                                <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
+                                <connections>
+                                    <action selector="toggleToolbarShown:" target="222" id="354"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Customize Toolbar..." id="351">
+                                <connections>
+                                    <action selector="customizeToolbar:" target="222" id="353"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Selection" id="8Lj-RY-z1e">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Selection" id="4K2-IU-hcw">
+                        <items>
+                            <menuItem title="Open" id="33Q-IV-RrZ">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="openFile:" target="-1" id="PT2-tJ-UJC"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Quick Look" keyEquivalent=" " id="9gG-CK-G0v">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="previewFile:" target="-1" id="Bfm-um-sWM"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Reveal" id="wVF-ys-3UQ">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="revealFileInFinder:" target="-1" id="bqU-Gh-tYY"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Delete" id="lnG-FS-oUL">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="deleteFile:" target="-1" id="ZQo-kD-l8R"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Window" id="19">
+                    <menu key="submenu" title="Window" systemMenu="window" id="24">
+                        <items>
+                            <menuItem title="Zoom" id="197">
+                                <connections>
+                                    <action selector="performZoom:" target="-1" id="198"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Minimize" keyEquivalent="m" id="23">
+                                <connections>
+                                    <action selector="performMiniaturize:" target="-1" id="37"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="271">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Show/Hide Control Panel" id="9Ho-ON-BCj">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleControlPanelShown:" target="-1" id="UOt-FM-Yoj"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="GD1-b0-wSy"/>
+                            <menuItem title="Duplicate" id="272">
+                                <connections>
+                                    <action selector="duplicateDirectoryView:" target="222" id="274"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Twin" id="321">
+                                <connections>
+                                    <action selector="twinDirectoryView:" target="222" id="323"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Filter..." id="331">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="filterDirectoryView:" target="222" id="332"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Close" keyEquivalent="w" id="319">
+                                <connections>
+                                    <action selector="performClose:" target="-1" id="320"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="92">
+                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
+                            </menuItem>
+                            <menuItem title="Bring All to Front" id="5">
+                                <connections>
+                                    <action selector="arrangeInFront:" target="-1" id="39"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Help" id="103">
+                    <menu key="submenu" title="Help" id="106">
+                        <items>
+                            <menuItem title="GrandPerspective Website" id="345">
+                                <connections>
+                                    <action selector="openWebsite:" target="222" id="346"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="GrandPerspective Help" keyEquivalent="?" id="111">
+                                <connections>
+                                    <action selector="showHelp:" target="-1" id="122"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+            </items>
+            <point key="canvasLocation" x="132" y="260"/>
+        </menu>
+        <customObject id="222" userLabel="MainMenuControl" customClass="MainMenuControl"/>
+    </objects>
+</document>

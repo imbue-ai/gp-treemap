@@ -1,0 +1,477 @@
+/* Legend for Size-based mapping scheme. */
+"%@ - %@" = "%1$@ - %2$@";
+
+/* Enumeration of two items */
+"%@ and %@" = "%1$@ et %2$@";
+
+/* Enumeration of two items */
+"%@ or %@" = "%1$@ ou %2$@";
+
+/* Enumeration of three or more items with 1: an item, 2: two or more items */
+"%@, %@" = "%1$@, %2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, and %@" = "%1$@, et %2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, or %@" = "%1$@, ou %2$@";
+
+/* Legend for Time-based mapping schemes. */
+"%d - %d days ago" = "il y a %1$d - %2$d jours";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago" = "il y a %d jour";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago or more" = "il y a %d jours ou plus";
+
+/* Message in progress panel while filtering */
+"%d folders filtered" = "%d dossiers filtrés";
+
+/* Message in progress panel while executing refresh-based scan */
+"%d folders processed" = "%d dossiers traités";
+
+/* Message in progress panel while loading data */
+"%d folders read" = "%d dossiers lus";
+
+/* Message in progress panel while saving data */
+"%d folders saved" = "%d dossiers enregistrés";
+
+/* Message in progress panel while executing a full scan */
+"%d folders scanned" = "%d dossiers analysés";
+
+/* Exact file size (in bytes) */
+"%qu bytes" = "%qu octets";
+
+/* Tally folder size (in number of files) */
+"%qu files" = "%qu fichiers";
+
+/* Alert message */
+"A filter named \"%@\" already exists" = "Un filtre nommé \"%@\" existe déjà";
+
+/* Alert message (Note: 'it' can refer to a file or a folder) */
+"A possible reason is that it does not exist anymore" = "Une raison possible est qu'il n'existe plus";
+
+/* Alert message */
+"A test named \"%@\" already exists" = "Un essai nommé \"%@\" existe déjà";
+
+/* Alert message (with filename arg) */
+"Aborted saving the scan data to \"%@\"" = "Interruption de l'enregistrement de l'analyse des données vers \"%@\"";
+
+/* Header in exported text file */
+"Accessed" = "Accédé";
+
+/* Label in Focus panel */
+"Area in view:" = "Affichage de la zone:";
+
+/* Parse error */
+"Attribute not found" = "Attribut introuvable";
+
+/* File size unit for bytes. */
+"B" = "O";
+
+/* Alert panel button */
+"Cancel" = "Annuler";
+
+/* Part of tool tip for uniform types */
+"Conforms to:" = "Conforme à:";
+
+/* Alert panel button */
+"Continue" = "Continuer";
+
+/* Header in exported text file */
+"Created" = "Créé";
+
+/* Alert panel button */
+"Delete" = "Supprimer";
+
+/* Menu item */
+"Delete File" = "Supprimer le Fichier";
+
+/* Menu item */
+"Delete Folder" = "Supprimer le dossier";
+
+/* FDA warning sheet */
+"Disk access required" = "Accès disque requis";
+
+/* Status update message */
+"Display focus changed to %@" = "Mise au point de l’affichage changée à %@";
+
+/* FDA warning alert */
+"Do not show again" = "Ne plus afficher";
+
+/* Alert message */
+"Do you want to delete the file \"%@\"?" = "Voulez vous supprimer le fichier \"%@\"?";
+
+/* Alert message */
+"Do you want to delete the folder \"%@\"?" = "Voulez vous supprimer le dossier \"%@\"?";
+
+/* Alert message */
+"Do you want to delete the package \"%@\"?" = "Voulez vous supprimer le paquet \"%@\"?";
+
+/* FDA warning alert */
+"Edit System Preferences" = "Modifier les Préférences Système";
+
+/* Parse error */
+"Encountered filter after folder" = "Filtre rencontré après le dossier";
+
+/* Parse error */
+"Encountered more than one root element" = "Rencontré plus d'un élément racine";
+
+/* Parse error */
+"Encountered more than one root folder" = "Rencontré plus d'un dossier racine";
+
+/* Parse error */
+"Encountered multiple %@ elements" = "Rencontré plusieurs éléments %@";
+
+/* Parse error */
+"Error parsing \"%@\" attribute: %@" = "Erreur d'analyse \"%1$@\" de l'attribut: %2$@";
+
+/* Parse error */
+"Expected %@ element" = "%@ éléments attendus";
+
+/* Error message */
+"Expected a folder" = "Dossier attendu";
+
+/* Parse error */
+"Expected boolean value" = "Valeur booléenne attendue";
+
+/* Parse error */
+"Expected date value" = "Valeur date attendue";
+
+/* Parse error */
+"Expected integer value" = "Valeur entière attendue";
+
+/* Error message */
+"Expected scandata file" = "Fichier scandata attendu";
+
+/* Parse error */
+"Expected time value" = "Valeur temps attendue";
+
+/* Parse error */
+"Expected unsigned integer value" = "Valeur entier non-signé attendue";
+
+/* Title of save panel */
+"Export image" = "Exporter une image";
+
+/* Title of save panel */
+"Export scan data as text" = "Exporter les données de l'analyse comme texte";
+
+/* Alert message */
+"Failed to bind one or more filter tests:\n%@" = "Impossible de lier un ou plusieurs essais de filtres:\n%@";
+
+/* Error message */
+"Failed to close file" = "Echec de la fermeture du fichier";
+
+/* Error message */
+"Failed to create file" = "Echec de la création du fichier";
+
+/* Alert message */
+"Failed to delete the file \"%@\"" = "Impossible de supprimer le fichier \"%@\"";
+
+/* Alert message */
+"Failed to delete the folder \"%@\"" = "Impossible de supprimer le dossier \"%@\"";
+
+/* Alert message */
+"Failed to determine volume root" = "Echec pour déterminer le volume racine";
+
+/* Error message */
+"Failed to get path from pasteboard" = "Impossible de récupérer le chemin du presse-papier";
+
+/* Alert message (with filename arg) */
+"Failed to load the scan data from \"%@\"" = "Echec de chargement des données d'analyse depuis \"%@\"";
+
+/* Alert message */
+"Failed to open the file \"%@\"" = "Echec d'ouverture du fichier \"%@\"";
+
+/* Alert message */
+"Failed to open the folder \"%@\"" = "Echec d'ouverture du dossier \"%@\"";
+
+/* Alert message */
+"Failed to open the package \"%@\"" = "Echec d'ouverture du paquet \"%@\"";
+
+/* Parse error */
+"Failed to read any tree data" = "Echec de la lecture des données de l'arbre";
+
+/* Alert message */
+"Failed to reveal the file \"%@\"" = "Echec de la révélation du fichier \"%@\"";
+
+/* Alert message */
+"Failed to reveal the folder \"%@\"" = "Echec de la révélation du dossier \"%@\"";
+
+/* Alert message */
+"Failed to reveal the package \"%@\"" = "Echec de la révélation du paquet \"%@\"";
+
+/* Alert message */
+"Failed to save the image" = "Echec de l'enregistrement de l'image";
+
+/* Alert message (with filename arg) */
+"Failed to save the scan data to \"%@\"" = "Echec de l'enregistrement des données d'analyse vers \"%@\"";
+
+/* Alert message */
+"Failed to update one or more filters:\n%@" = "Echec de la mise à jour d'un ou plusieurs filtres:\n%@";
+
+/* Error message */
+"Failed to write to file" = "Echec de l'écriture dans le fichier";
+
+/* Label in Focus panel */
+"File in view:" = "Affichage du fichier:";
+
+/* Header in exported text file */
+"Filename" = "Nom de fichier";
+
+/* Window title */
+"Filter - %@" = "Filtre - %@";
+
+/* Window title */
+"Filter test - %@" = "Essai de filtre - %@";
+
+/* Message in progress panel while filtering */
+"Filtering %@" = "Filtrage %@";
+
+/* Title of progress panel. */
+"Filtering in progress" = "Filtrage en cours";
+
+/* Label in Focus panel */
+"Folder in view:" = "Affichage du dossier:";
+
+/* Alert message */
+"For %d files the reported (logical) size is larger than their actual (physical) size. Consider rescanning using the Physical file size measure" = "Pour %d fichiers, la taille (logique) est supérieure à leur taille (physique) réelle. Envisager une nouvelle analyse à l'aide de la mesure de la taille du fichier physique";
+
+/* FDA success alert */
+"Full Disk Access is verified." = "L’accès complet au disque est confirmé";
+
+/* File size unit for gigabytes. */
+"GB" = "GO";
+
+/* FDA warning sheet */
+"GrandPerspective needs full access to your disk for optimal scan performance. Please select your main volume (e.g. Macintosh HD) in the following prompt." = "GrandPerspective a besoin d’un accès complet au disque pour des performances de scan optimales. Merci de sélectionner le volume principal (par ex. Macintosh HD) à l’invite suivante";
+
+/* FDA warning alert */
+"GrandPerspective seems to lack Full Disk Access permissions" = "GrandPerspective semble ne pas avoir les permissions d’accès complet au disque";
+
+/* Menu item */
+"Hide Control Panel" = "Cacher le panneau de contrôle";
+
+/* Alert message */
+"Inaccuracies in hard-linked folder contents" = "Inexactitudes dans le contenu des dossiers liés en dur";
+
+/* File size unit for kilobytes. */
+"kB" = "kO";
+
+/* Legend for Size-based mapping scheme. */
+"Larger than %@" = "Plus grand que %@";
+
+/* Legend for Level mapping scheme. */
+"Level %d" = "Niveau %d";
+
+/* Title of load panel */
+"Load scan data" = "Charger les données d'analyse";
+
+/* Title of progress panel. */
+"Loading in progress" = "Chargement en cours";
+
+/* Misc. description for Level mapping scheme. */
+"Lower levels" = "Niveaux inférieurs";
+
+/* File size unit for megabytes. */
+"MB" = "MO";
+
+/* Header in exported text file */
+"Modified" = "Modifié";
+
+/* Legend for Time-based mapping schemes. */
+"More recent" = "Plus récent";
+
+/* Initial match value in FilterTestWindow */
+"New match" = "Nouvelle correspondance";
+
+/* The filter name when there is no filter. */
+"None" = "Aucun";
+
+/* Alert additional informative text */
+"Note: The file is hard-linked. It will take up space until all links to it are deleted" = "Note: Le fichier est lié en dur. Il prendra de l'espace jusqu'à ce que tous les liens vers ce dernier soient supprimés";
+
+/* Alert additional informative text */
+"Note: The folder is hard-linked. It will take up space until all links to it are deleted" = "Note: Le dossier est lié en dur. Il prendra de l'espace jusqu'à ce que tous les liens vers ce dernier soient supprimés";
+
+/* Alert additional informative text */
+"Note: The package is hard-linked. It will take up space until all links to it are deleted" = "Note: Le paquet est lié en dur. Il prendra de l'espace jusqu'à ce que tous les liens vers ce dernier soient supprimés";
+
+/* Alert panel button */
+"OK" = "OK";
+
+/* Misc. description for File type mapping scheme. */
+"other file types" = "autres types de fichiers";
+
+/* Legend for Level mapping scheme. */
+"Outermost level" = "Niveau le plus extérieur";
+
+/* Label in Focus panel */
+"Package in view:" = "Affichage du paquet:";
+
+/* Parse error */
+"Parse error (line %d): %@" = "Erreur d'analyse (ligne %1$d): %2$@";
+
+/* Parse error */
+"Parsing aborted" = "Analyse interrompue";
+
+/* Header in exported text file */
+"Path" = "Chemin";
+
+/* FDA success alert */
+"Permission setup complete" = "Configuration des autorisations terminée";
+
+/* Message in progress panel while loading data */
+"Reading %@" = "Lecture de %@";
+
+/* Title of progress panel. */
+"Refresh in progress" = "Rafraîchissement en cours";
+
+/* Alert panel button */
+"Remove" = "Supprimer";
+
+/* Alert message */
+"Remove the filter named \"%@\"?" = "Supprimer le filtre nommé \"%@\"?";
+
+/* Alert message */
+"Remove the test named \"%@\"?" = "Supprimer l'essai nommé \"%@\"?";
+
+/* Title of save panel */
+"Save scan data" = "Enregistrer les données de l'analyse";
+
+/* Message in progress panel while saving data */
+"Saving %@" = "Enregistrement de %@";
+
+/* Title of progress panel. */
+"Saving in progress" = "Enregistrement en cours";
+
+/* Prompt in open panel */
+"Scan" = "Analyse";
+
+/* Title of open panel */
+"Scan folder" = "Analyser un dossier";
+
+/* Solitairy entry in Start window */
+"Scan Folder" = "Dossier sélectionné";
+
+/* Entry in Start window, alongside other options */
+"Scan Other Folder" = "Sélectionner un autre dossier";
+
+/* Message in progress panel while scanning */
+"Scanning %@" = "Analyse de %@";
+
+/* Alert message */
+"Scanning failed" = "L'analyse a échoué";
+
+/* Title of progress panel. */
+"Scanning in progress" = "Analyse en cours";
+
+/* Button of Open panel */
+"Select Drive" = "Sélectionner le lecteur";
+
+/* Open panel message */
+"Select your main drive (e.g. Macintosh HD)" = "Sélectionner le lecteur principal (par ex. Macintosh HD)";
+
+/* Label in Focus panel */
+"Selected area:" = "Zone sélectionnée:";
+
+/* Label in Focus panel */
+"Selected file:" = "Fichier sélectionné:";
+
+/* Label in Focus panel */
+"Selected folder:" = "Dossier sélectionné:";
+
+/* Label in Focus panel */
+"Selected package:" = "Paquet sélectionné:";
+
+/* Menu item */
+"Show Control Panel" = "Afficher le panneau de contrôle";
+
+/* Header in exported text file */
+"Size" = "Taille";
+
+/* Legend for Size-based mapping scheme. */
+"Smaller than %@" = "Plus petit que %@";
+
+/* Legend for Size-based mapping scheme. */
+"Smallest" = "Le plus petit";
+
+/* Alert message (with filename arg) */
+"Successfully saved the scan data to \"%@\"" = "Les données de l'analyse ont bien été enregistrées dans \"%@\"";
+
+/* File size unit for terabytes. */
+"TB" = "TO";
+
+/* Alert message */
+"The actual (physical) size is %.1f%% of the reported (logical) size. Consider rescanning using the Physical file size measure" = "La taille réelle (physique) est %.1f%% de la taille (logique) signalée. Envisagez une nouvelle analyse à l'aide de la mesure de la taille du fichier physique";
+
+/* Alert message */
+"The filter must have a name" = "Le filtre doit avoir un nom";
+
+/* Alert informative text */
+"The filter will be irrevocably removed from the filter repository" = "Le filtre sera définitivement supprimé du référentiel des filtres";
+
+/* Alert informative text */
+"The filter will be replaced by the default filter with this name" = "Le filtre sera remplacé par le filtre par défaut avec ce nom";
+
+/* Alert message */
+"The path %@ does not exist or is not a folder" = "Le chemin %@ n'existe pas ou n'est pas un dossier";
+
+/* Alert message */
+"The refreshed content may not be fully accurate. Hard-linked items may occur more than once or could be missing. Perform a rescan to ensure that each hard-linked item occurs only once" = "Le contenu actualisé peut ne pas être entièrement exact. Les éléments liés en dur peuvent apparaître plus d’une fois ou peuvent être manquants. Effectuez une nouvelle analyse pour vous assurer que chaque élément lié en dur n’apparaît qu’une seule fois";
+
+/* Alert message */
+"The reported size of some files is larger than their actual size on disk" = "La taille signalée de certains fichiers est supérieure à leur taille réelle sur le disque";
+
+/* Alert message */
+"The reported total size is larger than the actual size on disk" = "La taille totale signalée est supérieure à la taille réelle sur le disque";
+
+/* Alert informative text */
+"The resulting file is valid but incomplete" = "Le fichier résultant est valide mais incomplet";
+
+/* Alert informative text */
+"The selected file will be moved to Trash" = "Le fichier sélectionné sera déplacé vers la corbeille";
+
+/* Alert informative text */
+"The selected folder, with all its contents, will be moved to Trash. Beware, any files in the folder that are not shown in the view will also be deleted" = "Le dossier sélectionné, avec tout son contenu, sera déplacé vers la corbeille. Attention, tous les fichiers du dossier qui ne sont pas affichés dans la vue seront également supprimés";
+
+/* Alert informative text */
+"The selected package will be moved to Trash" = "Le paquet sélectionné sera déplacé vers la corbeille";
+
+/* Alert message */
+"The test must have a name" = "L'essai doit avoir un nom";
+
+/* Alert informative text */
+"The test will be irrevocably removed from the test repository" = "L'essai sera définitivement supprimé du référentiel des essais";
+
+/* Alert informative text */
+"The test will be replaced by the default test with this name" = "L'essai sera remplacé par l'essai par défaut avec ce nom";
+
+/* Alert informative text */
+"The unbound tests have been omitted from the filter" = "Les essais non liés ont été omis du filtre";
+
+/* Alert informative text */
+"These filters do not exist anymore. Their old definition is used instead" = "Ces filtres n'existent plus. Leur ancienne définition est utilisée à la place";
+
+/* FDA warning alert */
+"This may limit the disk content it can see. To remedy this, you can grant the permissions via the System Preferences." = "Ceci peut limiter le contenu visible du disque. Pour y remédier, vous pouvez accorder les autorisations nécessaires via les Préférences Système.";
+
+/* Part of tool tip for uniform types */
+"Top-level type" = "Type du niveau le plus haut";
+
+/* Header in exported text file */
+"Type" = "Type";
+
+/* Description for 'unknown' UTI. */
+"unknown file type" = "type de fichier inconnu";
+
+/* Window title */
+"Unnamed filter" = "Filtre sans nom";
+
+/* Window title */
+"Unnamed filter test" = "Essai de filtre sans nom";
+
+/* Parse error */
+"Unrecognized value" = "Valeur non reconnue";
+

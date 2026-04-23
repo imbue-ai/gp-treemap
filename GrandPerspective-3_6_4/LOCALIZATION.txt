@@ -1,0 +1,47 @@
+----------------------------------------------------------------------
+  GrandPerspective Localization
+----------------------------------------------------------------------
+
+The latest version of GrandPerspective is available in the following
+languages, besides English:
+
+  * Finnish, by Mikko Oksalahti
+  * French, by Marc Croteau
+  * German, by Carsten Bracke, Klaus Rade, Helge Baumann and Michael
+    Wagner
+  * Greek, by Dimitris Pergelidis
+  * Italian, by Mattia Mazzucchelli and Matteo Guarnerio
+  * Portuguese, by Aristóteles Soares Benicio and Mauricio Panata
+  * Simplified Chinese, by Albert Leng, Rex Chiu and Whyto
+  * Spanish, by Jorge Ruiz Calpe
+  * Turkish, by Alp Tunc and Emir Sarı
+  * Dutch, by myself
+
+Translations have also been provided for earlier versions of the
+application. In particular, the following localizations have been
+created:
+
+  * Japanese, by Chris Li
+  * Spanish, by Javier Alfonso
+  * French, by Maxime Hadjinlian
+
+Unfortunately, the application has evolved since then and these
+localizations are not up to date anymore. Furthermore, Apple has
+changed the mechanism used to internationalize applications.
+GrandPerspective has been adapted to support this, which means that
+additional effort is required to adapt these older localizations.
+
+So I am looking for volunteers who can update the existing
+localizations or who are willing to provide new ones. You can do so
+for any language you speak fluently. You can post a message on the
+GrandPerspective localization forum to express your interest:
+
+  https://sourceforge.net/p/grandperspectiv/discussion/634668/
+
+We can then take it from there.
+
+Thanks again to everyone who has been providing localizations for
+GrandPerspective so far.
+
+Cheers,
+Erwin Bonsma

@@ -1,0 +1,36 @@
+/* Class = "NSButtonCell"; title = "Path"; ObjectID = "0Yh-UN-zmZ"; */
+"0Yh-UN-zmZ.title" = "Percorso";
+
+/* Class = "NSButtonCell"; title = "Add headers"; ObjectID = "1St-Xy-2b2"; */
+"1St-Xy-2b2.title" = "Aggiungi intestazione";
+
+/* Class = "NSButtonCell"; title = "Last access time"; ObjectID = "aFG-JK-wpH"; */
+"aFG-JK-wpH.title" = "Data ultimo accesso";
+
+/* Class = "NSWindow"; title = "Export As Text"; ObjectID = "F0z-JX-Cv5"; */
+"F0z-JX-Cv5.title" = "Esporta Come Testo";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "gTS-re-YU5"; */
+"gTS-re-YU5.title" = "Annulla";
+
+/* Class = "NSButtonCell"; title = "Size"; ObjectID = "Hdn-NZ-wDs"; */
+"Hdn-NZ-wDs.title" = "Dimensione";
+
+/* Class = "NSBox"; title = "Columns"; ObjectID = "JJj-UK-Iym"; */
+"JJj-UK-Iym.title" = "Colonne";
+
+/* Class = "NSButtonCell"; title = "Modification time"; ObjectID = "lAg-UP-tz5"; */
+"lAg-UP-tz5.title" = "Data modifica";
+
+/* Class = "NSButtonCell"; title = "Creation time"; ObjectID = "rkM-n0-LX3"; */
+"rkM-n0-LX3.title" = "Data creazione";
+
+/* Class = "NSButtonCell"; title = "Type"; ObjectID = "rXh-ic-X4t"; */
+"rXh-ic-X4t.title" = "Tipo";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "uuD-S3-4Fx"; */
+"uuD-S3-4Fx.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Filename"; ObjectID = "w0D-i0-Hgy"; */
+"w0D-i0-Hgy.title" = "Nome file";
+

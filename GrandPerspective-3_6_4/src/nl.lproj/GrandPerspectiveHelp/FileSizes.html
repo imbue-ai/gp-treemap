@@ -1,0 +1,116 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=x-mac-roman">
+<title>Bestandsgrootte maten</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Beschrijft de bestandsgrootte maten die ondersteund worden en legt uit hoe deze gekozen kunnen worden.">
+<meta name="keywords" content="grootte, bestandsgrootte, bestandsgrootte maat, intrinsiek, fysisch, aantal, bestandsgrootte eenheid, binair, decimaal">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icoon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>Bestandsgroottes</h1>
+</div>
+
+<p>
+De grootte van elke rechthoek in een <a href="Views.html">overzicht venster</a> is evenredig met de grootte van het bestand dat het vertegenwoordigt.
+Er zijn verschillende manieren om de grootte van een bestand te meten.
+De bestandsgrootte maat die GrandPerspective gebruikt wanneer het een nieuwe map inleest is te kiezen via het <a href="Preferences.html">Voorkeuren</a> venster.
+</p>
+
+<h2>Bestandsgrootte maten</h2>
+
+<p>
+GrandPerspective ondersteunt de volgende bestandsgrootte maten:
+
+<ul>
+<li><b>Intrinsiek</b>.
+Deze maat is gebaseerd op de grootte van de inhoud van een bestand.
+De intrinsieke grootte van een tekstbestand is bijvoorbeeld gelijk aan het aantal tekens (inclusief spaties en regelonderbrekingen) die het bevat.</li>
+
+<li><b>Fysisch</b>.
+Deze maat is gebaseerd op de ruimte die een bestand inneemt op schijf.
+De fysische grootte van een bestand is typisch iets groter dan de intrinsieke grootte.
+Dit wordt veroorzaakt door de manier waarop een schijf ingericht is.
+Een bestand met een intrinsieke grootte van tien bytes kan bijvoorbeeld een fysische grootte hebben van 4096 bytes.
+</li>
+
+<li><b>Aantal</b>.
+Hier telt slechts het aantal bestanden.
+Ieder bestand heeft grootte "&eacute;&eacute;n" onafhankelijk van de ruimte die het inneemt.
+De grootte van een map komt daarom overeen met het aantal bestanden die het bevat.
+</li>
+</ul>
+
+<p>
+Welke type bestandsgrootte u kiest is deels een kwestie van smaak maar hangt ook af van de situatie.
+De Fysische grootte geeft het beste aan hoeveel ruimte beschikbaar komt wanneer u een bestand verwijdert maar legt ook meer implementatie details van het bestandssysteem bloot.
+De Intrinsieke grootte geeft het beste weer hoe groot de inhoud is van een bestand, maar kan af en toe de benodigde schijfruimte ernstig overschatten.
+Dit kan gebeuren in de volgende gevallen:
+</p>
+
+<ul>
+<li>
+Bestanden die zijn opgeslagen met behulp van HFS+ compressie.
+In dit geval kunnen kleine bestanden zelfs een fysische grootte van <em>nul bytes</em> hebben.
+Dit gebeurt wanneer de gehele inhoud opgeslagen kan worden als deel van de metadata van het bestand.
+Zo'n bestand is dan onzichtbaar in het <a href="Views.html">overzicht venster</a>.
+</li>
+
+<li>
+Sparse-bestanden binnen het APFS bestandssysteem.
+Sparse-bestanden worden gebruikt om efficient data met veel lege blokken op te slaan.
+Een typische toepassing is een bestandsvolume voor een Virtuele Machine of een Docker container.
+De logische grootte van zo'n volume kan erg groot zijn, maar weinig opslagruimte in gebruik nemen wanneer het betreffende volume grotendeels leeg is.
+</li>
+
+<li>
+Cloud bestanden die niet lokaal opgeslagen zijn.
+Deze hebben een <img src="images/icloud.png" height="12" width="12" alt="iCloud"> icoon in Finder.
+De grootte van deze bestanden op uw schijf is minimaal.
+De gerapporteerde intrinsieke grootte is typisch aanzienlijk groter, aangezien deze overeenkomt met de inhoud.
+De intrinsieke grootte helpt u daarom niet echt om ruimte op uw schijf vrij te maken, maar kan wel nuttig zijn om uw gebruik in de cloud te reduceren.
+</li>
+
+<li>
+Online-only Dropbox bestanden.
+Deze bestanden maken onderdeel uit van de Dropbox Smart Synch functionaliteit.
+Ze zijn beschikbaar binnen de Dropbox map op uw computer maar de inhoud is online opgeslagen.
+Deze bestanden nemen daardoor ook minder ruimte in op uw schijf dan hun intrinsieke grootte.
+</li>
+</ul>
+
+<p>
+De Aantal bestandsgrootte maat is bruikbaar in uitzonderlijke situaties.
+Bijvoorbeeld wanneer u mappen wilt vinden die veel (mogelijke kleine) bestanden bevatten.
+</p>
+
+<h2>Bestandsgrootte eenheidssystemen</h2>
+
+<p>
+Voor het rapporteren van bestandsgroottes gebruikt GrandPerspective een van de volgende eenheidssystemen:
+
+<ul>
+<li><b>Binair</b>,
+in dit geval bevat een kilobyte 2<sup>10</sup>=1024 bytes.
+Een megabyte bevat vervolgens 2<sup>20</sup> bytes, enzovoort.</li>
+
+<li><b>Decimaal</b>,
+in dit geval bevat een kilobyte 10<sup>3</sup>=1000 bytes.
+Een megabyte bevat vervolgens een miljoen bytes, enzovoort.</li>
+</ul>
+</p>
+
+<h2>Zie ook</h2>
+
+<p>
+<ul>
+<li><a href="HowToExplainSizeDifferences.html">Verklaringen voor verschillen in groottes gerapporteerd door GrandPerspective ten opzichte van andere bronnen</a></li>
+</ul>
+</p>
+
+</body>
+</html>

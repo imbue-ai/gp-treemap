@@ -1,0 +1,18 @@
+/* (No Comment) */
+"GrandPerspective scan results" = "Resultados del escaneo de GrandPrespective";
+
+/* Privacy - Desktop Folder Usage Description */
+"NSDesktopFolderUsageDescription" = "La aplicación comprueba cuanto espacio de disco utiliza Escritorio";
+
+/* Privacy - Documents Folder Usage Description */
+"NSDocumentsFolderUsageDescription" = "La aplicación comprueba cuanto espacio de disco utiliza Documentos";
+
+/* Privacy - Downloads Folder Usage Description */
+"NSDownloadsFolderUsageDescription" = "La aplicación comprueba cuanto espacio de disco utiliza Descargas";
+
+/* Privacy - Photo Library Usage Description */
+"NSPhotoLibraryUsageDescription" = "La aplicación comprueba cuánto espacio en disco utiliza Fotos";
+
+/* Privacy - Reminders Usage Description */
+"NSRemindersUsageDescription" = "La aplicación comprueba cuanto espacio de disco utiliza Recordatorios";
+

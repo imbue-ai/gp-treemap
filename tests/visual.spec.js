@@ -25,9 +25,9 @@ test.describe('visual snapshots', () => {
   test('filesystem · categorical', async ({ page }) => {
     await page.goto('/samples/filesystem.html');
     await waitForRender(page);
-    await expect(page.locator('raised-treemap')).toBeVisible();
+    await expect(page.locator('gp-treemap')).toBeVisible();
     await snap(page, '01-filesystem-categorical');
-    const cellCount = await page.locator('raised-treemap').evaluate((el) => el._leaves.length);
+    const cellCount = await page.locator('gp-treemap').evaluate((el) => el._leaves.length);
     expect(cellCount).toBeGreaterThan(10);
   });
 
@@ -53,7 +53,7 @@ test.describe('visual snapshots', () => {
     await page.goto('/samples/depth.html');
     await waitForRender(page);
     await snap(page, '04-depth-hierarchy');
-    const cellCount = await page.locator('raised-treemap').evaluate((el) => el._leaves.length);
+    const cellCount = await page.locator('gp-treemap').evaluate((el) => el._leaves.length);
     expect(cellCount).toBeGreaterThan(100);
   });
 
@@ -73,7 +73,7 @@ test.describe('visual snapshots', () => {
     await page.goto('/samples/located.html');
     await waitForRender(page);
     await snap(page, '07-located-node');
-    const hasLocated = await page.locator('raised-treemap').evaluate((el) =>
+    const hasLocated = await page.locator('gp-treemap').evaluate((el) =>
       !!el.shadowRoot.querySelector('.overlay .loc'));
     expect(hasLocated).toBe(true);
   });
@@ -82,18 +82,18 @@ test.describe('visual snapshots', () => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);
     // click a cell
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await waitForRender(page);
     await snap(page, '08-interactions-after-click');
     const logText = await page.locator('#log').textContent();
-    expect(logText).toMatch(/rt-click/);
-    expect(logText).toMatch(/rt-target/);
+    expect(logText).toMatch(/gp-click/);
+    expect(logText).toMatch(/gp-target/);
     // Breadcrumb should immediately reflect the clicked cell's path.
     // Verify synchronously inside the click handler — patch _onClick to
     // capture the info-line state right after the native handler runs,
     // before any microtask re-render.
-    const info = await page.locator('raised-treemap').evaluate((el) => {
+    const info = await page.locator('gp-treemap').evaluate((el) => {
       const infoLine = el.shadowRoot.querySelector('.info-line');
       const focusedLink = infoLine.querySelector('a.focused');
       return {
@@ -107,11 +107,11 @@ test.describe('visual snapshots', () => {
   test('interactions · wheel scrolls focus along ancestor chain', async ({ page }) => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     // Click a cell to set target
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await waitForRender(page);
-    const initial = await page.locator('raised-treemap').evaluate((el) => ({
+    const initial = await page.locator('gp-treemap').evaluate((el) => ({
       targetId: el._targetId,
       focusId: el._focusId,
       depth: el._tree.nodes.get(el._focusId).depth,
@@ -119,7 +119,7 @@ test.describe('visual snapshots', () => {
     // Scroll down (positive deltaY) to move focus toward root (shallower / zoom out)
     await page.mouse.wheel(0, 100);
     await waitForRender(page);
-    const afterUp = await page.locator('raised-treemap').evaluate((el) => ({
+    const afterUp = await page.locator('gp-treemap').evaluate((el) => ({
       focusId: el._focusId,
       depth: el._tree.nodes.get(el._focusId).depth,
       targetId: el._targetId,
@@ -129,13 +129,13 @@ test.describe('visual snapshots', () => {
     // Scroll up (negative deltaY) to move focus back toward target (deeper / zoom in)
     await page.mouse.wheel(0, -100);
     await waitForRender(page);
-    const afterDown = await page.locator('raised-treemap').evaluate((el) => ({
+    const afterDown = await page.locator('gp-treemap').evaluate((el) => ({
       focusId: el._focusId,
       depth: el._tree.nodes.get(el._focusId).depth,
     }));
     expect(afterDown.depth).toBeGreaterThan(afterUp.depth);
     // Focus must always stay on the target's ancestor chain
-    const onAncestorChain = await page.locator('raised-treemap').evaluate((el) => {
+    const onAncestorChain = await page.locator('gp-treemap').evaluate((el) => {
       let cur = el._tree.nodes.get(el._targetId);
       while (cur) {
         if (cur.id === el._focusId) return true;
@@ -149,13 +149,13 @@ test.describe('visual snapshots', () => {
   test('hover shows tooltip', async ({ page }) => {
     await page.goto('/samples/filesystem.html');
     await waitForRender(page);
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.move(box.x + box.width * 0.2, box.y + box.height * 0.2);
     await page.waitForTimeout(80);
     await page.mouse.move(box.x + box.width * 0.2 + 1, box.y + box.height * 0.2 + 1);
     await waitForRender(page);
     await snap(page, '10-hover-tooltip');
-    const hasTip = await page.locator('raised-treemap').evaluate((el) => {
+    const hasTip = await page.locator('gp-treemap').evaluate((el) => {
       const t = el.shadowRoot.querySelector('.tooltip');
       return t && !t.hidden;
     });

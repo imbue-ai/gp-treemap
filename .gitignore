@@ -3,10 +3,6 @@ playwright-report/
 test-results/
 .DS_Store
 
-# GrandPerspective source (GPL) — used only as a reference during development.
-# Kept outside version control so this repo can ship under a permissive license.
-GrandPerspective-3_6_4/
-
 # Scratch / editor state
 .claude/
 *.swp

@@ -1,0 +1,63 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>User preferences</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Describes the user preferences.">
+<meta name="keywords" content="preferences, default, settings, configure, configuration, customise, customize, customisation, customization" >
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>Preferences</h1>
+</div>
+
+<p>
+The application can be customized using the Preferences, accessible from the GrandPerspective menu.
+The Preferences panel consists of three parts: Scanning, Display and Actions.
+</p>
+
+<p>
+In the <b>Scanning</b> section you can configure the <a href="FileSizes.html">file size measure</a> that is used to report file sizes.
+A change to this setting comes into effect when new folders are scanned.
+It does not affect existing views, or views that are <a href="CreatingViews.html">created</a> after re-scanning (as the latter take their settings from their original view).
+The file size measure that is used by a specific view window can be found in the <a href="ViewInfoPanel.html">Info tab</a>.
+You can also select the <a href="FileSizes.html">unit system</a> that is used to report file sizes.
+A change to this setting comes into effect immediately, and applies to all views.
+Finally, you can specify a <a href="MasksAndFilters.html">filter</a> that is used by default when scanning.
+</p>
+
+<p>
+The <b>Display</b> section contains settings that affect the appearance of views.
+Here you specify which items are shown in newly created views.
+You can also specify the color mapping and color palette for newly created views.
+Most of these settings only specify the initial appearance of newly created views.
+You can subsequently change a view's appearance from the <a href="ViewDisplayPanel.html">Display tab</a>.
+The display focus is an exception; it can be changed from the view's toolbar, when <a href="NavigatingViews.html">navigating the view</a>.
+</p>
+
+<p>
+In the <b>Actions</b> section you can configure whether file deletion is supported in the <a href="Views.html">view window</a>.
+You can disable deletion, enable deletion of single files, or enable deletion of entire folders.
+Furthermore, you can specify whether confirmation is required.
+</p>
+
+<!-- Note: warning repeated in NavigatingViews.html -->
+<p>
+<em>Beware: Deleting folders will move the entire folder to the Trash, including any files in the folder that are not shown in the view.
+A file may not be shown because it was <a href="MasksAndFilters.html">masked or filtered</a>, it could not be scanned because of insufficient permissions, or it appeared in the folder after the scan was made.
+In short, you should be very careful when deleting folders.
+</em>
+</p>
+
+<p>
+In the Actions section you can also specify whether or not the old view should automatically be closed when you rescan its contents.
+You can furthermore specify what should happen after you close the last view window.
+You can choose if the Welcome window should appear again, or if the application should terminate, or if neither should happen.
+</p>
+
+</body>
+</html>

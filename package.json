@@ -1,13 +1,13 @@
 {
-  "name": "raised-treemap",
+  "name": "gp-treemap",
   "version": "0.1.0",
   "private": true,
   "bin": {
-    "raised-treemap": "./tools/scan.js",
-    "raised-treemap-profile-load": "./tools/profile-load.js",
-    "raised-treemap-profile-to-html": "./tools/profile-to-html.js"
+    "gp-treemap": "./tools/scan.js",
+    "gp-treemap-profile-load": "./tools/profile-load.js",
+    "gp-treemap-profile-to-html": "./tools/profile-to-html.js"
   },
-  "description": "GrandPerspective-style <raised-treemap> Web Component",
+  "description": "GrandPerspective-lineage <gp-treemap> Web Component",
   "type": "module",
   "scripts": {
     "serve": "node tools/server.js",

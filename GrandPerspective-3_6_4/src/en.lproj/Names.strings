@@ -1,0 +1,195 @@
+/* Filter name */
+"None" = "None";
+
+/* Filter name */
+"No cloud files" = "No cloud files";
+
+/* Filter name */
+"No hard-links" = "No hard-links";
+
+/* Filter name */
+"No version control" = "No version control";
+
+
+/* Filter test */
+"Tiny files" = "Tiny files";
+
+/* Filter test */
+"Small files" = "Small files";
+
+/* Filter test */
+"Medium files" = "Medium files";
+
+/* Filter test */
+"Large files" = "Large files";
+
+/* Filter test */
+"Huge files" = "Huge files";
+
+/* Filter test */
+"Images" = "Images";
+
+/* Filter test */
+"Audio" = "Audio";
+
+/* Filter test */
+"Version control" = "Version control";
+
+/* Filter test */
+"Packages" = "Packages";
+
+/* Filter test */
+"Hard-linked items" = "Hard-linked items";
+
+
+/* Color palette */
+"OliveSunset" = "Olive sunset";
+
+/* Color palette */
+"MossAndLichen" = "Moss and lichen";
+
+/* Color palette */
+"Monaco" = "Monaco";
+
+/* Color palette */
+"Bujumbura" = "Bujumbura";
+
+/* Color palette */
+"CoffeeBeans" = "Coffee beans";
+
+/* Color palette */
+"BlueSkyTulips" = "Blue sky tulips";
+
+/* Color palette */
+"OrigamiMice" = "Origami mice";
+
+/* Color palette */
+"GreenEggs" = "Green eggs";
+
+/* Color palette */
+"FengShui" = "Feng Shui";
+
+/* Color palette */
+"Daytona" = "Daytona Beach";
+
+/* Color palette */
+"FlyingGeese" = "Magenta magic";
+
+/* Color palette */
+"Rainbow" = "Rainbow";
+
+/* Color palette */
+"LagoonNebula" = "Lagoon nebula";
+
+/* Color palette */
+"Heatmap-23" = "Heatmap 23";
+
+/* Color palette */
+"Heatmap-12" = "Heatmap 12";
+
+
+/* Color mapping scheme */
+"level" = "Level";
+
+/* Color mapping scheme */
+"extension" = "Extension";
+
+/* Color mapping scheme */
+"folder" = "Folder";
+
+/* Color mapping scheme */
+"name" = "Name";
+
+/* Color mapping scheme */
+"nothing" = "Nothing";
+
+/* Color mapping scheme */
+"top folder" = "Top folder";
+
+/* Color mapping scheme */
+"uniform type" = "File type";
+
+/* Color mapping scheme */
+"creation" = "Creation";
+
+/* Color mapping scheme */
+"modification" = "Last change";
+
+/* Color mapping scheme */
+"access" = "Last access";
+
+/* Color mapping scheme */
+"size" = "Size";
+
+
+/* Draw setting */
+"files" = "Files";
+
+/* Draw setting */
+"folders" = "Packages & Folders";
+
+/* Draw setting */
+"packages and files" = "Packages & Files";
+
+/* File size type */
+"logical" = "Logical";
+
+/* File size type */
+"physical" = "Physical";
+
+/* File size type */
+"tally" = "Tally";
+
+
+/* File size base type */
+"base-2" = "Binary";
+
+/* File size base type */
+"base-10" = "Decimal";
+
+
+/* Name of "special" file in the viewer */
+"free" = "Free space";
+
+/* Name of "special" file in the viewer */
+"freed" = "Freed space";
+
+/* Name of "special" file in the viewer */
+"misc used" = "Miscellaneous used space";
+
+
+/* File deletion preference option */
+"delete nothing" = "Nothing";
+
+/* File deletion preference option */
+"only delete files" = "Files";
+
+/* File deletion preference option */
+"delete files and folders" = "Files and folders";
+
+
+/* Rescan preference option */
+"rescan all" = "Full rescan";
+
+/* Rescan preference option */
+"rescan visible" = "Rescan folder in view";
+
+
+/* Rescan preference behaviour */
+"close old window" = "Close old window";
+
+/* Rescan preference behaviour */
+"keep old window" = "Keep old window";
+
+
+/* Preference option for what to do after last view is closed */
+"quit" = "Terminate application";
+
+/* Preference option for what to do after last view is closed */
+"show welcome" = "Show welcome window";
+
+/* Preference option for what to do after last view is closed */
+"do nothing" = "Do nothing";
+
+/* Preference option for display focus */
+"unlimited" = "Unlimited";

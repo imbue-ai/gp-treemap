@@ -1,0 +1,75 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Wat te doen als de applicatie lijkt vast te lopen tijdens het inlezen</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Wat te doen als de applicatie lijkt vast te lopen tijdens het inlezen.">
+<meta name="keywords" content="hoe, hangen, vastlopen, inlezen">
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>Wat te doen als de applicatie lijkt vast te lopen tijdens het inlezen</h1>
+</div>
+
+<p>
+GrandPerspective is erg stabiel.
+Af en toe rapporteren gebruikers echter dat de applicatie vast loopt tijdens het inlezen.
+Als u ook denkt dat de applicatie vast gelopen is tijdens het inlezen, volg dan deze stappen:
+</p>
+
+<ol>
+<li><a href="FullDiskAccess.html">Ken volledige schijftoegang toe</a>.
+Sommige gebruikers hebben gerapporteerd dat dit in hun geval vastlopen verhielp.
+Het is hoe dan ook goed om dit recht toe te kennen, omdat GrandPerspective hiermee meer van uw diskinhoud kan inlezen.
+</li>
+
+<li>Controleer dat er geen venster is waarin u toestemming gevraagd wordt voor toegang tot bepaalde data.
+De eerste keer dat (een nieuwe versie van) GrandPerspective uw schijf inleest, heeft het deze toestemming nodig.
+Het inlezen is gepauzeerd totdat dit verzoek wordt toegekend of afgewezen.
+</li>
+
+<li>Controleer dat u versie 3.5.2 of hoger gebruikt.
+In eerdere versies waren er problemen met het inlezen van cloud bestanden.
+Inlezen van deze mappen kon resulteren in het downloaden van de inhoud van deze bestanden.
+Dit kan lang duren waardoor het lijkt alsof het inlezen geen voortgang boekt.
+Dit probleem is opgelost in versie 3.5.2.</li>
+
+<li>Activeer alle log berichten wanneer u de application start.
+Hiertoe start u de applicatie vanuit de Terminal met <tt>-logAll YES</tt> als extra argument.<br><br>
+Bijvoorbeeld, wanneer u de applicatie in uw Applicatie folder heeft geinstalleerd, type dan:<br>
+<tt>/Applications/GrandPerspective.app/Contents/MacOS/GrandPerspective -logAll YES</tt>
+</li>
+
+<li>Probeer nu het vastlopen te reproduceren. is dit gelukt?
+
+  <ul>
+  <li>Nee, blijf proberen.
+Go terug naar Stap 4.</li>
+
+  <li>Ja, inspecteer dan de log berichten in het Terminal scherm om te bepalen welke map ingelezen werd toen de applicatie vastliep.
+Ga door naar Stap 6.</li>
+  </ul></li>
+
+<li>Probeer de onderliggende oorzaak van het probleem te achterhalen door de volgende vragen te beantwoorden:
+
+  <ul>
+  <li>Is het vastlopen herhaalbaar?
+Loopt het inlezen altijd vast wanneer dezelfde map ingelezen wordt?</li>
+  <li>Is er iets bijzonders aan de hand met deze map?</li>
+  </ul></li>
+
+<li>Zodra het u lukt het inlezen herhaalbaar vast te laten lopen, dan kunt u <a href="https://sourceforge.net/p/grandperspectiv/bugs/">een probleem rapport indienen</a>.
+Vermeld hierbij zoveel mogelijk details:
+naast de stappen om het probleem te reproduceren ook uw versie van GrandPerspective en de versie van macOS.<br><br>
+
+Merk op: U kunt ook een probleem rapport indienen wanneer het niet is gelukt het probleem herhaalbaar te reproduceren.
+De kans dat het probleem vervolgens opgelost kan worden is echter dan veel kleiner.
+</li>
+</ol>
+
+</body>
+</html>

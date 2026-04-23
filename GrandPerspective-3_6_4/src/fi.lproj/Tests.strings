@@ -1,0 +1,90 @@
+/* AND-test with 1: sub test, and 2: another sub test */
+"(%@) and (%@)" = "(%1$@) ja (%2$@)";
+
+/* AND-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) and %@" = "(%1$@) ja %2$@";
+
+/* OR-test with 1: sub test, and 2: another sub test */
+"(%@) or (%@)" = "(%1$@) tai (%2$@)";
+
+/* OR-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) or %@" = "(%1$@) tai %2$@";
+
+/* AND-test for flags sub tests with 1: subtest, 2: one or more sub tests */
+"%@ and %@" = "%1$@ ja %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ contains %@" = "%1$@ sisältää %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ conTains %@" = "%1$@ siSältää %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ ends with %@" = "%1$@ jonka lopussa on %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ enDs with %@" = "%1$@ joNka popussa on %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ equals %@" = "%1$@ on sama kuin %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ eQuals %@" = "%1$@ oN sama kuin %2$@";
+
+/* Pair of match targets with 1: a target match, and 2: another target match */
+"%@ or %@" = "%1$@ tai %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ starts with %@" = "%1$@ alkaa %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ starTs with %@" = "%1$@ alKaa %2$@";
+
+/* Three or more match targets with 1: a target match, and 2: two or more other target matches */
+"%@, %@" = "%1$@, %2$@";
+
+/* Size test without any bounds */
+"any size" = "mikä vaan koko";
+
+/* Selective test with 1: sub test */
+"files: %@" = "tiedostot: %@";
+
+/* Selective test with 1: sub test */
+"folders: %@" = "hakemistot: %@";
+
+/* File/folder flags sub test */
+"item is a package" = "on paketti";
+
+/* File/folder flags sub test */
+"item is hard-linked" = "on linkitetty (hard)";
+
+/* File/folder flags sub test */
+"item is not a package" = "ei ole paketti";
+
+/* File/folder flags sub test */
+"item is not hard-linked" = "ei ole linkitetty (hard)";
+
+/* A filename as the subject of a string test */
+"name" = "nimi";
+
+/* NOT-test with 1: sub test */
+"not (%@)" = "ei (%@)";
+
+/* A pathname as the subject of a string test */
+"path" = "polku";
+
+/* Size test with 1: lower bound, and 2: upper bound */
+"size is between %@ and %@" = "koko on välillä %1$@ ja %2$@";
+
+/* Size test with 1: lower bound */
+"size is larger than %@" = "koko on suurempi kuin %@";
+
+/* Size test with 1: upper bound */
+"size is smaller than %@" = "koko on pienempi kuin %@";
+
+/* Filetype test with 1: match targets */
+"type conforms to %@" = "tyyppi noudattaa %@";
+
+/* Filetype test with 1: match targets */
+"type equals %@" = "tyyppi on sama kuin %@";
+

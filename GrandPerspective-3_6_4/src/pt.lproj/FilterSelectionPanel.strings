@@ -1,0 +1,21 @@
+/* Class = "NSWindow"; title = "Select filter"; ObjectID = "1"; */
+"1.title" = "Escolha o filtro";
+
+/* Class = "NSBox"; title = "Filter"; ObjectID = "11"; */
+"11.title" = "Filtro";
+
+/* Class = "NSButtonCell"; title = "New"; ObjectID = "19"; */
+"19.title" = "Novo";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "21"; */
+"21.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "23"; */
+"23.title" = "Cancelar";
+
+/* Class = "NSButtonCell"; title = "Edit"; ObjectID = "25"; */
+"25.title" = "Editar";
+
+/* Class = "NSButtonCell"; title = "Apply default filter"; ObjectID = "oBx-0o-cNN"; */
+"oBx-0o-cNN.title" = "Aplicar filtro padrão";
+

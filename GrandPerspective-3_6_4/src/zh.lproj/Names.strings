@@ -1,0 +1,186 @@
+/* Color mapping scheme */
+"access" = "访问时间";
+
+/* Filter test */
+"Audio" = "音频";
+
+/* File size base type */
+"base-2" = "二进制";
+
+/* File size base type */
+"base-10" = "十进制";
+
+/* Color palette */
+"BlueSkyTulips" = "蓝天郁金香";
+
+/* Color palette */
+"Bujumbura" = "布琼布拉";
+
+/* Rescan preference behaviour */
+"close old window" = "关闭旧窗口";
+
+/* Color palette */
+"CoffeeBeans" = "咖啡豆";
+
+/* Color mapping scheme */
+"creation" = "创建时间";
+
+/* Color palette */
+"Daytona" = "代托纳";
+
+/* File deletion preference option */
+"delete files and folders" = "删除文件和文件夹";
+
+/* File deletion preference option */
+"delete nothing" = "不删除";
+
+/* Preference option for what to do after last view is closed */
+"do nothing" = "无操作";
+
+/* Color mapping scheme */
+"extension" = "扩展名";
+
+/* Color palette */
+"FengShui" = "风水";
+
+/* Draw setting */
+"files" = "文件";
+
+/* Color palette */
+"FlyingGeese" = "雁阵";
+
+/* Color mapping scheme */
+"folder" = "文件夹";
+
+/* Draw setting */
+"folders" = "包与文件夹";
+
+/* Name of "special" file in the viewer */
+"free" = "可用空间";
+
+/* Name of "special" file in the viewer */
+"freed" = "已释放空间";
+
+/* Color palette */
+"GreenEggs" = "绿鸡蛋";
+
+/* Filter test */
+"Hard-linked items" = "硬链接项目";
+
+/* Color palette */
+"Heatmap-12" = "热力图12";
+
+/* Color palette */
+"Heatmap-23" = "热力图23";
+
+/* Filter test */
+"Huge files" = "巨型文件";
+
+/* Filter test */
+"Images" = "图像";
+
+/* Rescan preference behaviour */
+"keep old window" = "保留旧窗口";
+
+/* Color palette */
+"LagoonNebula" = "礁湖星云";
+
+/* Filter test */
+"Large files" = "大型文件";
+
+/* Color mapping scheme */
+"level" = "层级";
+
+/* File size type */
+"logical" = "逻辑大小";
+
+/* Filter test */
+"Medium files" = "中型文件";
+
+/* Name of "special" file in the viewer */
+"misc used" = "其他已用空间";
+
+/* Color mapping scheme */
+"modification" = "修改时间";
+
+/* Color palette */
+"Monaco" = "摩纳哥";
+
+/* Color palette */
+"MossAndLichen" = "苔色斑斓";
+
+/* Color mapping scheme */
+"name" = "名称";
+
+/* Filter name */
+"No cloud files" = "无云端文件";
+
+/* Filter name */
+"No hard-links" = "无硬链接";
+
+/* Filter name */
+"No version control" = "无版本控制";
+
+/* Filter name */
+"None" = "无";
+
+/* Color mapping scheme */
+"nothing" = "无";
+
+/* Color palette */
+"OliveSunset" = "橄榄色日落";
+
+/* File deletion preference option */
+"only delete files" = "仅删除文件";
+
+/* Color palette */
+"OrigamiMice" = "老鼠折纸";
+
+/* Filter test */
+"Packages" = "包";
+
+/* Draw setting */
+"packages and files" = "包与文件";
+
+/* File size type */
+"physical" = "物理大小";
+
+/* Preference option for what to do after last view is closed */
+"quit" = "退出应用程序";
+
+/* Color palette */
+"Rainbow" = "彩虹";
+
+/* Rescan preference option */
+"rescan all" = "重新扫描全部内容";
+
+/* Rescan preference option */
+"rescan visible" = "重新扫描可见内容";
+
+/* Preference option for what to do after last view is closed */
+"show welcome" = "显示欢迎页面";
+
+/* Color mapping scheme */
+"size" = "大小";
+
+/* Filter test */
+"Small files" = "小型文件";
+
+/* File size type */
+"tally" = "数量大小";
+
+/* Filter test */
+"Tiny files" = "微型文件";
+
+/* Color mapping scheme */
+"top folder" = "上级文件夹";
+
+/* Color mapping scheme */
+"uniform type" = "统一类型";
+
+/* Preference option for display focus */
+"unlimited" = "无限制";
+
+/* Filter test */
+"Version control" = "版本控制";
+

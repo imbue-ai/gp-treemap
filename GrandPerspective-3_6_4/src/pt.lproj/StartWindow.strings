@@ -1,0 +1,24 @@
+/* Class = "NSButtonCell"; title = "Clear History"; ObjectID = "9nG-ap-dHC"; */
+"9nG-ap-dHC.title" = "Limpar Histórico";
+
+/* Class = "NSButtonCell"; title = "Scan"; ObjectID = "Cd8-ae-UVZ"; */
+"Cd8-ae-UVZ.title" = "Analisar";
+
+/* Class = "NSTextFieldCell"; placeholderString = "Foldername"; ObjectID = "duM-ug-7fu"; */
+"duM-ug-7fu.placeholderString" = "Nome da Pasta";
+
+/* Class = "NSTextFieldCell"; title = "Folder"; ObjectID = "duM-ug-7fu"; */
+"duM-ug-7fu.title" = "Pasta";
+
+/* Class = "NSButtonCell"; title = "Help"; ObjectID = "JEp-c0-ZgQ"; */
+"JEp-c0-ZgQ.title" = "Ajuda";
+
+/* Class = "NSTextFieldCell"; title = "graphically shows your disk usage"; ObjectID = "lT6-9A-q8Z"; */
+"lT6-9A-q8Z.title" = "Mostrar graficamente o uso do seu disco";
+
+/* Class = "NSWindow"; title = "Welcome"; ObjectID = "QvC-M9-y7g"; */
+"QvC-M9-y7g.title" = "Bem vindo";
+
+/* Class = "NSTextFieldCell"; title = "Path"; ObjectID = "UhX-F8-bW1"; */
+"UhX-F8-bW1.title" = "Caminho";
+

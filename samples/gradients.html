@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>raised-treemap · gradient intensities</title>
+<title>gp-treemap · gradient intensities</title>
 <style>
   html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, sans-serif; background:#fafafa; color:#111; }
   header { padding: 10px 14px; border-bottom: 1px solid #0002; display: flex; gap: 12px; align-items: center; }
@@ -11,7 +11,7 @@
   .row { display: grid; grid-template-columns: 1fr 1fr 1fr; height: calc(100vh - 47px); gap: 1px; background: #0002; }
   .cell { display: flex; flex-direction: column; background: #fafafa; min-width: 0; }
   .cell h2 { margin: 0; padding: 6px 10px; font-size: 13px; font-weight: 600; color: #444; background: #eee; border-bottom: 1px solid #0001; }
-  raised-treemap { flex: 1; display: flex; min-height: 0; }
+  gp-treemap { flex: 1; display: flex; min-height: 0; }
 </style>
 </head>
 <body>
@@ -20,12 +20,12 @@
   <a href="index.html">← all samples</a>
 </header>
 <div class="row">
-  <div class="cell"><h2>gradientIntensity = 0</h2><raised-treemap id="a" gradient-intensity="0" min-cell-area="40"></raised-treemap></div>
-  <div class="cell"><h2>gradientIntensity = 0.5</h2><raised-treemap id="b" gradient-intensity="0.5" min-cell-area="40"></raised-treemap></div>
-  <div class="cell"><h2>gradientIntensity = 1</h2><raised-treemap id="c" gradient-intensity="1" min-cell-area="40"></raised-treemap></div>
+  <div class="cell"><h2>gradientIntensity = 0</h2><gp-treemap id="a" gradient-intensity="0" min-cell-area="40"></gp-treemap></div>
+  <div class="cell"><h2>gradientIntensity = 0.5</h2><gp-treemap id="b" gradient-intensity="0.5" min-cell-area="40"></gp-treemap></div>
+  <div class="cell"><h2>gradientIntensity = 1</h2><gp-treemap id="c" gradient-intensity="1" min-cell-area="40"></gp-treemap></div>
 </div>
 
-<script src="../dist/raised-treemap.bundle.js"></script>
+<script src="../dist/gp-treemap.bundle.js"></script>
 <script src="data/filesystem.js"></script>
 <script>
 (function () {

@@ -1,0 +1,90 @@
+/* AND-test with 1: sub test, and 2: another sub test */
+"(%@) and (%@)" = "(%1$@) en (%2$@)";
+
+/* AND-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) and %@" = "(%1$@) en %2$@";
+
+/* OR-test with 1: sub test, and 2: another sub test */
+"(%@) or (%@)" = "(%1$@) of (%2$@)";
+
+/* OR-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) or %@" = "(%1$@) of %2$@";
+
+/* AND-test for flags sub tests with 1: subtest, 2: one or more sub tests */
+"%@ and %@" = "%1$@ en %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ contains %@" = "%1$@ bevat %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ conTains %@" = "%1$@ beVat %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ ends with %@" = "%1$@ eindigt met %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ enDs with %@" = "%1$@ einDigt met %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ equals %@" = "%1$@ is gelijk aan %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ eQuals %@" = "%1$@ is geLijk aan %2$@";
+
+/* Pair of match targets with 1: a target match, and 2: another target match */
+"%@ or %@" = "%@ of %@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ starts with %@" = "%1$@ begint met %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ starTs with %@" = "%1$@ beGint met %2$@";
+
+/* Three or more match targets with 1: a target match, and 2: two or more other target matches */
+"%@, %@" = "%1$@, %2$@";
+
+/* Size test without any bounds */
+"any size" = "elke grootte";
+
+/* Selective test with 1: sub test */
+"files: %@" = "bestanden: %@";
+
+/* Selective test with 1: sub test */
+"folders: %@" = "mappen: %@";
+
+/* File/folder flags sub test */
+"item is a package" = "item is een pakket";
+
+/* File/folder flags sub test */
+"item is hard-linked" = "item is een harde link";
+
+/* File/folder flags sub test */
+"item is not a package" = "item is niet een pakket";
+
+/* File/folder flags sub test */
+"item is not hard-linked" = "item is niet een harde link";
+
+/* A filename as the subject of a string test */
+"name" = "naam";
+
+/* NOT-test with 1: sub test */
+"not (%@)" = "niet (%@)";
+
+/* A pathname as the subject of a string test */
+"path" = "padnaam";
+
+/* Size test with 1: lower bound, and 2: upper bound */
+"size is between %@ and %@" = "grootte is tussen %@ en %@";
+
+/* Size test with 1: lower bound */
+"size is larger than %@" = "grootte is groter dan %@";
+
+/* Size test with 1: upper bound */
+"size is smaller than %@" = "grootte is kleiner dan %@";
+
+/* Filetype test with 1: match targets */
+"type conforms to %@" = "bestandstype voldoet aan %@";
+
+/* Filetype test with 1: match targets */
+"type equals %@" = "bestandstype is %@";
+

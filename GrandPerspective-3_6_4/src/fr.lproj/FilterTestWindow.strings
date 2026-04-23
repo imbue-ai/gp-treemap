@@ -1,0 +1,144 @@
+/* Class = "NSWindow"; title = "Filter test"; ObjectID = "5"; */
+"5.title" = "Essai de filtre";
+
+/* Class = "NSBox"; title = "Subtests"; ObjectID = "10"; */
+"10.title" = "Sous-essais";
+
+/* Class = "NSMenuItem"; title = "contains"; ObjectID = "18"; */
+"18.title" = "contient";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "21"; */
+"21.title" = "est";
+
+/* Class = "NSMenuItem"; title = "starts with"; ObjectID = "22"; */
+"22.title" = "commence par";
+
+/* Class = "NSMenuItem"; title = "starts with"; ObjectID = "39"; */
+"39.title" = "commence par";
+
+/* Class = "NSMenuItem"; title = "contains"; ObjectID = "40"; */
+"40.title" = "contient";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "42"; */
+"42.title" = "est";
+
+/* Class = "NSMenuItem"; title = "bytes"; ObjectID = "45"; */
+"45.title" = "octets";
+
+/* Class = "NSMenuItem"; title = "MB"; ObjectID = "46"; */
+"46.title" = "MO";
+
+/* Class = "NSMenuItem"; title = "kB"; ObjectID = "47"; */
+"47.title" = "kO";
+
+/* Class = "NSMenuItem"; title = "MB"; ObjectID = "51"; */
+"51.title" = "MO";
+
+/* Class = "NSMenuItem"; title = "bytes"; ObjectID = "53"; */
+"53.title" = "octets";
+
+/* Class = "NSMenuItem"; title = "kB"; ObjectID = "56"; */
+"56.title" = "kO";
+
+/* Class = "NSMenuItem"; title = "ends with"; ObjectID = "93"; */
+"93.title" = "se termine par";
+
+/* Class = "NSMenuItem"; title = "ends with"; ObjectID = "94"; */
+"94.title" = "se termine par";
+
+/* Class = "NSMenuItem"; title = "GB"; ObjectID = "95"; */
+"95.title" = "GO";
+
+/* Class = "NSMenuItem"; title = "GB"; ObjectID = "96"; */
+"96.title" = "GO";
+
+/* Class = "NSMenuItem"; title = "files and folders"; ObjectID = "151"; */
+"151.title" = "fichiers et dossiers";
+
+/* Class = "NSMenuItem"; title = "folders"; ObjectID = "152"; */
+"152.title" = "dossiers";
+
+/* Class = "NSMenuItem"; title = "files"; ObjectID = "153"; */
+"153.title" = "fichiers";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "173"; */
+"173.title" = "est";
+
+/* Class = "NSMenuItem"; title = "is not"; ObjectID = "174"; */
+"174.title" = "n'est pas";
+
+/* Class = "NSMenuItem"; title = "is not"; ObjectID = "183"; */
+"183.title" = "n'est pas";
+
+/* Class = "NSMenuItem"; title = "is"; ObjectID = "184"; */
+"184.title" = "est";
+
+/* Class = "NSMenuItem"; title = "conforms to"; ObjectID = "387"; */
+"387.title" = "est conforme à";
+
+/* Class = "NSMenuItem"; title = "equals"; ObjectID = "388"; */
+"388.title" = "est égal à";
+
+/* Class = "NSMenuItem"; title = "Add"; ObjectID = "396"; */
+"396.title" = "Ajouter";
+
+/* Class = "NSButtonCell"; title = "name"; ObjectID = "489"; */
+"489.title" = "nom";
+
+/* Class = "NSButtonCell"; title = "path"; ObjectID = "490"; */
+"490.title" = "chemin";
+
+/* Class = "NSButtonCell"; title = "size is larger than"; ObjectID = "492"; */
+"492.title" = "taille est supérieure à";
+
+/* Class = "NSButtonCell"; title = "size is smaller than"; ObjectID = "495"; */
+"495.title" = "taille est inférieure à";
+
+/* Class = "NSButtonCell"; title = "Ignore case"; ObjectID = "498"; */
+"498.title" = "Ignorer la case";
+
+/* Class = "NSButtonCell"; title = "Ignore case"; ObjectID = "499"; */
+"499.title" = "Ignorer la case";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "500"; */
+"500.title" = "Retirer";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "501"; */
+"501.title" = "Ajouter";
+
+/* Class = "NSButtonCell"; title = "item"; ObjectID = "502"; */
+"502.title" = "élément";
+
+/* Class = "NSTextFieldCell"; title = "hard-linked"; ObjectID = "504"; */
+"504.title" = "lié en dur";
+
+/* Class = "NSButtonCell"; title = "item"; ObjectID = "505"; */
+"505.title" = "élément";
+
+/* Class = "NSTextFieldCell"; title = "a package"; ObjectID = "506"; */
+"506.title" = "un paquet";
+
+/* Class = "NSButtonCell"; title = "type"; ObjectID = "508"; */
+"508.title" = "type";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "509"; */
+"509.title" = "Retirer";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "510"; */
+"510.title" = "Retirer";
+
+/* Class = "NSButtonCell"; title = "Add"; ObjectID = "511"; */
+"511.title" = "Ajouter";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "514"; */
+"514.title" = "OK";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "515"; */
+"515.title" = "Annuler";
+
+/* Class = "NSTextFieldCell"; title = "Apply to:"; ObjectID = "517"; */
+"517.title" = "S'applique à:";
+
+/* Class = "NSTextFieldCell"; title = "Name:"; ObjectID = "M2Z-4Q-CYi"; */
+"M2Z-4Q-CYi.title" = "Nom:";
+

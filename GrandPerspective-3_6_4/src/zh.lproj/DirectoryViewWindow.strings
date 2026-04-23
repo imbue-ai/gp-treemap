@@ -1,0 +1,6 @@
+/* Class = "NSWindow"; title = "Window"; ObjectID = "82"; */
+"82.title" = "窗口";
+
+/* Class = "NSTextFieldCell"; placeholderString = "No item selected"; ObjectID = "948"; */
+"948.placeholderString" = "未选择项目";
+

@@ -1,0 +1,18 @@
+/* Class = "NSWindow"; title = "Filters"; ObjectID = "1"; */
+"1.title" = "过滤条件";
+
+/* Class = "NSBox"; title = "Available filters"; ObjectID = "3"; */
+"3.title" = "可用过滤条件";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "14"; */
+"14.title" = "好";
+
+/* Class = "NSButtonCell"; title = "Edit"; ObjectID = "16"; */
+"16.title" = "编辑";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "18"; */
+"18.title" = "移除";
+
+/* Class = "NSButtonCell"; title = "New"; ObjectID = "20"; */
+"20.title" = "新建";
+

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Scan a directory recursively and emit a self-contained HTML file that
-// renders its size treemap with <raised-treemap>. The output has the bundle and
+// renders its size treemap with <gp-treemap>. The output has the bundle and
 // the dataset inlined, so you can open it from anywhere with no server.
 //
 // Usage:  node tools/scan.js [--color=extension|kind|folder|ctime|mtime|atime] <dir> [output.html]
@@ -17,7 +17,7 @@ import zlib from 'node:zlib';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const BUNDLE_PATH = path.join(ROOT, 'dist', 'raised-treemap.bundle.js');
+const BUNDLE_PATH = path.join(ROOT, 'dist', 'gp-treemap.bundle.js');
 
 const COLOR_MODES = ['extension', 'kind', 'folder', 'ctime', 'mtime', 'atime'];
 
@@ -55,7 +55,7 @@ async function main() {
   const target = path.resolve(args[0]);
   const out = args[1]
     ? path.resolve(args[1])
-    : path.join(os.tmpdir(), 'raised-treemap-' + path.basename(target).replace(/[^a-zA-Z0-9._-]/g, '_') + '-' + Date.now() + '.html');
+    : path.join(os.tmpdir(), 'gp-treemap-' + path.basename(target).replace(/[^a-zA-Z0-9._-]/g, '_') + '-' + Date.now() + '.html');
 
   let rootStat;
   try { rootStat = fs.lstatSync(target); }
@@ -465,7 +465,7 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
     color: var(--page-fg, #222); }
   header .stat { color: var(--page-fg-muted, #555); font-size:13px; font-variant-numeric: tabular-nums; }
   header .stat b { color: var(--page-fg, #000); font-weight:600; }
-  raised-treemap { display:flex; flex: 1; min-height: 0; }
+  gp-treemap { display:flex; flex: 1; min-height: 0; }
   #stats-bar { padding: 3px 14px; font-size: 12px; font-variant-numeric: tabular-nums; min-height: 18px;
     color: var(--page-fg-muted, #888); background: var(--page-surface, #fff);
     border-top: 1px solid var(--page-border, #0002); transition: background .15s, color .15s; }
@@ -500,12 +500,12 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
   </span>
   <span class="stat" style="color: var(--page-fg-muted, #888);">scanned ${escapeHtml(stats.when)}</span>
 </header>
-<raised-treemap id="tm"
+<gp-treemap id="tm"
   color-mode="${tmColorMode}"
   palette="${tmPalette}"
   gradient-intensity="0.6"
   value-format="b"
-  min-cell-area="30"></raised-treemap>
+  min-cell-area="30"></gp-treemap>
 <div id="stats-bar"></div>
 
 <script type="application/json" id="tmdata">
@@ -849,9 +849,9 @@ window._bootReady.then(function () {
     }
     bar.textContent = parts.join('  |  ');
   }
-  tm.addEventListener('rt-focus', update);
-  tm.addEventListener('rt-target', update);
-  tm.addEventListener('rt-zoom-change', update);
+  tm.addEventListener('gp-focus', update);
+  tm.addEventListener('gp-target', update);
+  tm.addEventListener('gp-zoom-change', update);
   requestAnimationFrame(function () { setTimeout(update, 0); });
 });
 // Color-by switcher + theme/palette switcher + URL hash sync.
@@ -967,10 +967,10 @@ window._bootReady.then(function () {
   colorSel.value = DEFAULT_COLOR;
   readHash();
   if (location.hash.length > 1) tm._queueRender();
-  tm.addEventListener('rt-zoom-change', writeHash);
-  tm.addEventListener('rt-depth-change', writeHash);
-  tm.addEventListener('rt-target', writeHash);
-  tm.addEventListener('rt-focus', writeHash);
+  tm.addEventListener('gp-zoom-change', writeHash);
+  tm.addEventListener('gp-depth-change', writeHash);
+  tm.addEventListener('gp-target', writeHash);
+  tm.addEventListener('gp-focus', writeHash);
 });
 <\/script>
 </body>

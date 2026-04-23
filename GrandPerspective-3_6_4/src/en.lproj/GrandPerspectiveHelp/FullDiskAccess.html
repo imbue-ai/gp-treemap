@@ -1,0 +1,58 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Full Disk Access</title>
+<link href="HelpStyle.css" rel="stylesheet" media="all">
+<meta name="description" content="Describes the need for Full Disk Access and how to grant it.">
+<meta name="keywords" content="Full Disk Access, permission, grant" >
+</head>
+<body>
+
+<div id="caticon">
+<img src="images/GrandPerspectiveIcon32.png" alt="GrandPerspective icon" height="32" width="32">
+</div>
+<div id="pagetitle">
+<h1>Full Disk Access</h1>
+</div>
+
+<p>
+To allow GrandPerspective to scan as much of your disk as possible, you should grant it Full Disk Access.
+This may also resolve <a href="HowToHandleHangsWhileScanning.html">hangs while scanning</a>.
+</p>
+
+<p>
+On start-up, GrandPerspective performs a check to try to establish if it has Full Disk Access.
+When that does not seem to be the case, it shows a dialog to notify you.
+From there, you can go to the System Preferences where you can grant the required permissions.
+</p>
+
+<p>
+Granting Full Disk Access can be done via "System Preferences" &gt; "Security &amp; Privacy" &gt; "Privacy".
+In the permission pane at the left, find "Full Disk Access" and select it.
+Click the lock to make changes.
+If needed add GrandPerspective to the application pane at the right; you can do so via drag and drop.
+Tick the checkbox to grant permissions.
+</p>
+
+<a id="limitations" class="nostyle">
+<h2>Limitations</h2>
+</a>
+
+<p>
+Even with Full Disk Access enabled, GrandPerspective cannot read all files.
+In particular, it is not able to scan the following:
+</p>
+
+<ul>
+<li><em>Files owned by other users.</em>
+These can be scanned by letting their owners scan their home directory themselves
+</li>
+
+<li><em>Certain system files.</em>
+Data Vaults, for example, are directories that are only readable by a process that has a specific entitlement.
+Being root will not give you access, nor will enabling FDA.
+</li>
+</ul>
+
+</body>
+</html>

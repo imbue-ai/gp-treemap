@@ -1,0 +1,477 @@
+/* Legend for Size-based mapping scheme. */
+"%@ - %@" = "%1$@ - %2$@";
+
+/* Enumeration of two items */
+"%@ and %@" = "%1$@与%2$@";
+
+/* Enumeration of two items */
+"%@ or %@" = "%1$@与%2$@";
+
+/* Enumeration of three or more items with 1: an item, 2: two or more items */
+"%@, %@" = "%1$@、%2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, and %@" = "%1$@与%2$@";
+
+/* Enumeration of three or more items with 1: two or more items, 2: last item */
+"%@, or %@" = "%1$@或%2$@";
+
+/* Legend for Time-based mapping schemes. */
+"%d - %d days ago" = "%1$d到%2$d天前";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago" = "%d天前";
+
+/* Legend for Time-based mapping schemes. */
+"%d days ago or more" = "超过%d天";
+
+/* Message in progress panel while filtering */
+"%d folders filtered" = "已过滤%d个文件夹";
+
+/* Message in progress panel while executing refresh-based scan */
+"%d folders processed" = "已处理%d个文件夹";
+
+/* Message in progress panel while loading data */
+"%d folders read" = "已读取%d个文件夹";
+
+/* Message in progress panel while saving data */
+"%d folders saved" = "已保存%d个文件夹";
+
+/* Message in progress panel while executing a full scan */
+"%d folders scanned" = "已扫描%d个文件夹";
+
+/* Exact file size (in bytes) */
+"%qu bytes" = "%qu字节";
+
+/* Tally folder size (in number of files) */
+"%qu files" = "%qu个文件";
+
+/* Alert message */
+"A filter named \"%@\" already exists" = "一个名为“%@”的过滤条件已存在";
+
+/* Alert message (Note: 'it' can refer to a file or a folder) */
+"A possible reason is that it does not exist anymore" = "可能原因之一是该文件或文件夹已不存在";
+
+/* Alert message */
+"A test named \"%@\" already exists" = "一个名为“%@”的测试已存在";
+
+/* Alert message (with filename arg) */
+"Aborted saving the scan data to \"%@\"" = "终止将扫描数据保存至“%@”";
+
+/* Header in exported text file */
+"Accessed" = "访问时间";
+
+/* Label in Focus panel */
+"Area in view:" = "视图里的区域：";
+
+/* Parse error */
+"Attribute not found" = "属性未找到";
+
+/* File size unit for bytes. */
+"B" = "B";
+
+/* Alert panel button */
+"Cancel" = "取消";
+
+/* Part of tool tip for uniform types */
+"Conforms to:" = "符合：";
+
+/* Alert panel button */
+"Continue" = "继续";
+
+/* Header in exported text file */
+"Created" = "创建时间";
+
+/* Alert panel button */
+"Delete" = "删除";
+
+/* Menu item */
+"Delete File" = "删除文件";
+
+/* Menu item */
+"Delete Folder" = "删除文件夹";
+
+/* FDA warning sheet */
+"Disk access required" = "需要磁盘访问权限";
+
+/* Status update message */
+"Display focus changed to %@" = "显示焦点更改至%@";
+
+/* FDA warning alert */
+"Do not show again" = "不再显示";
+
+/* Alert message */
+"Do you want to delete the file \"%@\"?" = "您要删除文件“%@”吗？";
+
+/* Alert message */
+"Do you want to delete the folder \"%@\"?" = "您要删除文件夹“%@”吗?";
+
+/* Alert message */
+"Do you want to delete the package \"%@\"?" = "你要删除包“%@”吗?";
+
+/* FDA warning alert */
+"Edit System Preferences" = "编辑系统偏好设置";
+
+/* Parse error */
+"Encountered filter after folder" = "在文件夹后遇到过滤条件";
+
+/* Parse error */
+"Encountered more than one root element" = "遇到超过一个根元素";
+
+/* Parse error */
+"Encountered more than one root folder" = "遇到超过一个根文件夹";
+
+/* Parse error */
+"Encountered multiple %@ elements" = "遇到多个“%@”元素";
+
+/* Parse error */
+"Error parsing \"%@\" attribute: %@" = "解析“%1$@”属性错误：%2$@";
+
+/* Parse error */
+"Expected %@ element" = "需要%@元素";
+
+/* Error message */
+"Expected a folder" = "需要一个文件夹";
+
+/* Parse error */
+"Expected boolean value" = "需要布尔值";
+
+/* Parse error */
+"Expected date value" = "需要日期值";
+
+/* Parse error */
+"Expected integer value" = "需要整数值";
+
+/* Error message */
+"Expected scandata file" = "需要扫描数据文件";
+
+/* Parse error */
+"Expected time value" = "需要时间值";
+
+/* Parse error */
+"Expected unsigned integer value" = "需要无符号整数值";
+
+/* Title of save panel */
+"Export image" = "导出图像";
+
+/* Title of save panel */
+"Export scan data as text" = "导出扫描数据为文本";
+
+/* Alert message */
+"Failed to bind one or more filter tests:\n%@" = "绑定至少一个过滤条件测试失败：%@";
+
+/* Error message */
+"Failed to close file" = "关闭文件失败";
+
+/* Error message */
+"Failed to create file" = "创建文件失败";
+
+/* Alert message */
+"Failed to delete the file \"%@\"" = "删除文件“%@”失败";
+
+/* Alert message */
+"Failed to delete the folder \"%@\"" = "删除文件夹“%@”失败";
+
+/* Alert message */
+"Failed to determine volume root" = "确定宗卷根路径失败";
+
+/* Error message */
+"Failed to get path from pasteboard" = "从剪贴板获取路径失败";
+
+/* Alert message (with filename arg) */
+"Failed to load the scan data from \"%@\"" = "从“%@”加载扫描数据失败";
+
+/* Alert message */
+"Failed to open the file \"%@\"" = "打开文件“%@”失败";
+
+/* Alert message */
+"Failed to open the folder \"%@\"" = "打开文件夹“%@”失败";
+
+/* Alert message */
+"Failed to open the package \"%@\"" = "打开包“%@”失败";
+
+/* Parse error */
+"Failed to read any tree data" = "读取所有树状数据失败";
+
+/* Alert message */
+"Failed to reveal the file \"%@\"" = "显示文件“%@”失败";
+
+/* Alert message */
+"Failed to reveal the folder \"%@\"" = "显示文件夹“%@”失败";
+
+/* Alert message */
+"Failed to reveal the package \"%@\"" = "显示组件“%@”失败";
+
+/* Alert message */
+"Failed to save the image" = "保存图像失败";
+
+/* Alert message (with filename arg) */
+"Failed to save the scan data to \"%@\"" = "将扫描数据保存到“%@”失败";
+
+/* Alert message */
+"Failed to update one or more filters:\n%@" = "更新至少一个过滤条件失败：%@";
+
+/* Error message */
+"Failed to write to file" = "写入文件失败";
+
+/* Label in Focus panel */
+"File in view:" = "视图中的文件：";
+
+/* Header in exported text file */
+"Filename" = "文件名";
+
+/* Window title */
+"Filter - %@" = "过滤条件 - %@";
+
+/* Window title */
+"Filter test - %@" = "过滤条件测试 - %@";
+
+/* Message in progress panel while filtering */
+"Filtering %@" = "正在过滤%@";
+
+/* Title of progress panel. */
+"Filtering in progress" = "正在进行过滤";
+
+/* Label in Focus panel */
+"Folder in view:" = "视图中的文件夹：";
+
+/* Alert message */
+"For %d files the reported (logical) size is larger than their actual (physical) size. Consider rescanning using the Physical file size measure" = "“%d”文件的报告（逻辑）大小超过其实际（物理）大小，请考虑使用物理大小测量方式重新扫描";
+
+/* FDA success alert */
+"Full Disk Access is verified." = "已验证完整磁盘访问权限。";
+
+/* File size unit for gigabytes. */
+"GB" = "GB";
+
+/* FDA warning sheet */
+"GrandPerspective needs full access to your disk for optimal scan performance. Please select your main volume (e.g. Macintosh HD) in the following prompt." = "GrandPerspective需要您磁盘的完整访问权限，以便达到最佳扫描效果。请在后续弹窗中选择您的主宗卷（例如：Macintosh HD）。";
+
+/* FDA warning alert */
+"GrandPerspective seems to lack Full Disk Access permissions" = "GrandPerspective似乎缺少完整磁盘访问权限";
+
+/* Menu item */
+"Hide Control Panel" = "隐藏控制面板";
+
+/* Alert message */
+"Inaccuracies in hard-linked folder contents" = "硬链接文件夹内容不准确";
+
+/* File size unit for kilobytes. */
+"kB" = "kB";
+
+/* Legend for Size-based mapping scheme. */
+"Larger than %@" = "超过%@";
+
+/* Legend for Level mapping scheme. */
+"Level %d" = "第%d层";
+
+/* Title of load panel */
+"Load scan data" = "加载扫描数据";
+
+/* Title of progress panel. */
+"Loading in progress" = "正在进行加载";
+
+/* Misc. description for Level mapping scheme. */
+"Lower levels" = "更低层级";
+
+/* File size unit for megabytes. */
+"MB" = "MB";
+
+/* Header in exported text file */
+"Modified" = "修改时间";
+
+/* Legend for Time-based mapping schemes. */
+"More recent" = "较新";
+
+/* Initial match value in FilterTestWindow */
+"New match" = "新匹配条件";
+
+/* The filter name when there is no filter. */
+"None" = "无";
+
+/* Alert additional informative text */
+"Note: The file is hard-linked. It will take up space until all links to it are deleted" = "注意：文件已被硬链接，其占据的空间将在所有链接均被删除后才会释放";
+
+/* Alert additional informative text */
+"Note: The folder is hard-linked. It will take up space until all links to it are deleted" = "注意：文件夹已被硬链接，其占据的空间将在所有链接均被删除后才会释放";
+
+/* Alert additional informative text */
+"Note: The package is hard-linked. It will take up space until all links to it are deleted" = "注意：包已被硬链接，其占据的空间将在所有链接均被删除后才会释放";
+
+/* Alert panel button */
+"OK" = "好";
+
+/* Misc. description for File type mapping scheme. */
+"other file types" = "其它文件类型";
+
+/* Legend for Level mapping scheme. */
+"Outermost level" = "最外层级";
+
+/* Label in Focus panel */
+"Package in view:" = "视图中的包：";
+
+/* Parse error */
+"Parse error (line %d): %@" = "解析错误（第%1$d行）：%2$@";
+
+/* Parse error */
+"Parsing aborted" = "解析终止";
+
+/* Header in exported text file */
+"Path" = "路径";
+
+/* FDA success alert */
+"Permission setup complete" = "权限设置完成";
+
+/* Message in progress panel while loading data */
+"Reading %@" = "正在读取%@";
+
+/* Title of progress panel. */
+"Refresh in progress" = "正在进行刷新";
+
+/* Alert panel button */
+"Remove" = "移除";
+
+/* Alert message */
+"Remove the filter named \"%@\"?" = "要移除名为“%@”的过滤条件吗？";
+
+/* Alert message */
+"Remove the test named \"%@\"?" = "要移除名为“%@”的测试吗？";
+
+/* Title of save panel */
+"Save scan data" = "保存扫描数据";
+
+/* Message in progress panel while saving data */
+"Saving %@" = "正在保存%@";
+
+/* Title of progress panel. */
+"Saving in progress" = "正在进行保存";
+
+/* Prompt in open panel */
+"Scan" = "扫描";
+
+/* Title of open panel */
+"Scan folder" = "扫描文件夹";
+
+/* Solitairy entry in Start window */
+"Scan Folder" = "选择文件夹";
+
+/* Entry in Start window, alongside other options */
+"Scan Other Folder" = "选择其它文件夹";
+
+/* Message in progress panel while scanning */
+"Scanning %@" = "正在扫描%@";
+
+/* Alert message */
+"Scanning failed" = "扫描失败";
+
+/* Title of progress panel. */
+"Scanning in progress" = "正在进行扫描";
+
+/* Button of Open panel */
+"Select Drive" = "选择驱动器";
+
+/* Open panel message */
+"Select your main drive (e.g. Macintosh HD)" = "选择您的主驱动器（例如：Macintosh HD）";
+
+/* Label in Focus panel */
+"Selected area:" = "已选区域：";
+
+/* Label in Focus panel */
+"Selected file:" = "已选文件：";
+
+/* Label in Focus panel */
+"Selected folder:" = "已选文件夹：";
+
+/* Label in Focus panel */
+"Selected package:" = "已选包：";
+
+/* Menu item */
+"Show Control Panel" = "显示控制面板";
+
+/* Header in exported text file */
+"Size" = "大小";
+
+/* Legend for Size-based mapping scheme. */
+"Smaller than %@" = "小于%@";
+
+/* Legend for Size-based mapping scheme. */
+"Smallest" = "最小";
+
+/* Alert message (with filename arg) */
+"Successfully saved the scan data to \"%@\"" = "已将扫描数据成功保存到“%@”";
+
+/* File size unit for terabytes. */
+"TB" = "TB";
+
+/* Alert message */
+"The actual (physical) size is %.1f%% of the reported (logical) size. Consider rescanning using the Physical file size measure" = "实际（物理）大小是报告（逻辑）大小的%.1f%%，请考虑使用物理大小测量方式重新扫描";
+
+/* Alert message */
+"The filter must have a name" = "必须为该过滤条件命名";
+
+/* Alert informative text */
+"The filter will be irrevocably removed from the filter repository" = "该过滤条件将从过滤条件存储库中永久删除";
+
+/* Alert informative text */
+"The filter will be replaced by the default filter with this name" = "该过滤条件将替换为使用这一名称的默认过滤条件";
+
+/* Alert message */
+"The path %@ does not exist or is not a folder" = "路径%@不存在或不是文件夹";
+
+/* Alert message */
+"The refreshed content may not be fully accurate. Hard-linked items may occur more than once or could be missing. Perform a rescan to ensure that each hard-linked item occurs only once" = "已刷新的内容可能不完全准确，硬链接项目可能重复出现或丢失，请重新扫描以确保每个硬链接项目只出现一次";
+
+/* Alert message */
+"The reported size of some files is larger than their actual size on disk" = "某些文件的报告大小（逻辑大小）超过其在磁盘上的实际大小（物理大小）";
+
+/* Alert message */
+"The reported total size is larger than the actual size on disk" = "总报告大小超过其在磁盘上的实际大小";
+
+/* Alert informative text */
+"The resulting file is valid but incomplete" = "生成的文件有效但不完整";
+
+/* Alert informative text */
+"The selected file will be moved to Trash" = "所选文件将被移到废纸篓";
+
+/* Alert informative text */
+"The selected folder, with all its contents, will be moved to Trash. Beware, any files in the folder that are not shown in the view will also be deleted" = "所选文件夹及其所有内容均将被移到废纸篓；注意，文件夹内未在视图中显示的所有文件也将被一并删除";
+
+/* Alert informative text */
+"The selected package will be moved to Trash" = "所选包将被移到废纸篓";
+
+/* Alert message */
+"The test must have a name" = "必须为该测试命名";
+
+/* Alert informative text */
+"The test will be irrevocably removed from the test repository" = "该测试将从测试存储库中永久删除";
+
+/* Alert informative text */
+"The test will be replaced by the default test with this name" = "该测试将替换为使用这一名称的默认测试";
+
+/* Alert informative text */
+"The unbound tests have been omitted from the filter" = "未绑定的测试已从过滤条件中省略";
+
+/* Alert informative text */
+"These filters do not exist anymore. Their old definition is used instead" = "这些过滤条件已不存在，将使用其旧定义";
+
+/* FDA warning alert */
+"This may limit the disk content it can see. To remedy this, you can grant the permissions via the System Preferences." = "这可能限制其可见的磁盘内容。要解决这一问题，您可以通过系统偏好设置授予权限。";
+
+/* Part of tool tip for uniform types */
+"Top-level type" = "顶层类型";
+
+/* Header in exported text file */
+"Type" = "类型";
+
+/* Description for 'unknown' UTI. */
+"unknown file type" = "未知文件类型";
+
+/* Window title */
+"Unnamed filter" = "未命名过滤条件";
+
+/* Window title */
+"Unnamed filter test" = "未命名过滤条件测试";
+
+/* Parse error */
+"Unrecognized value" = "未识别值";
+

@@ -24,14 +24,14 @@ test.describe('URL hash state', () => {
     await waitForRender(page);
 
     // Click a cell to select it
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await waitForRender(page);
-    const clickedId = await page.locator('raised-treemap').evaluate((el) => el._targetId);
+    const clickedId = await page.locator('gp-treemap').evaluate((el) => el._targetId);
     expect(clickedId).not.toBeNull();
 
     // Zoom to the clicked node's parent
-    await page.locator('raised-treemap').evaluate((el) => {
+    await page.locator('gp-treemap').evaluate((el) => {
       const n = el._tree.nodes.get(el._targetId);
       if (n && n.parentId !== null) el.zoomTo(n.parentId);
     });
@@ -41,13 +41,13 @@ test.describe('URL hash state', () => {
     const hash1 = await page.evaluate(() => window.location.hash);
     expect(hash1).toMatch(/zoom=/);
 
-    const zoomedId = await page.locator('raised-treemap').evaluate((el) => el._activeVisibleRootId());
+    const zoomedId = await page.locator('gp-treemap').evaluate((el) => el._activeVisibleRootId());
 
     // Reload the page with the same hash — the page script should restore it
     await page.goto('/samples/interactions.html' + hash1);
     await waitForRender(page);
 
-    const restoredId = await page.locator('raised-treemap').evaluate((el) => el._activeVisibleRootId());
+    const restoredId = await page.locator('gp-treemap').evaluate((el) => el._activeVisibleRootId());
     expect(restoredId).toBe(zoomedId);
   });
 
@@ -56,23 +56,23 @@ test.describe('URL hash state', () => {
     await waitForRender(page);
 
     // Set depth programmatically (depth buttons removed; URL param still supported)
-    await page.locator('raised-treemap').evaluate((el) => {
+    await page.locator('gp-treemap').evaluate((el) => {
       el.displayDepth = 2;
-      el.dispatchEvent(new CustomEvent('rt-depth-change', { detail: { displayDepth: 2 }, bubbles: true, composed: true }));
+      el.dispatchEvent(new CustomEvent('gp-depth-change', { detail: { displayDepth: 2 }, bubbles: true, composed: true }));
     });
     await waitForRender(page);
 
     const hash = await page.evaluate(() => window.location.hash);
     expect(hash).toMatch(/depth=2/);
 
-    const depth = await page.locator('raised-treemap').evaluate((el) => el.displayDepth);
+    const depth = await page.locator('gp-treemap').evaluate((el) => el.displayDepth);
     expect(depth).toBe(2);
 
     // Reload with the hash
     await page.goto('/samples/interactions.html' + hash);
     await waitForRender(page);
 
-    const restoredDepth = await page.locator('raised-treemap').evaluate((el) => el.displayDepth);
+    const restoredDepth = await page.locator('gp-treemap').evaluate((el) => el.displayDepth);
     expect(restoredDepth).toBe(2);
   });
 
@@ -80,7 +80,7 @@ test.describe('URL hash state', () => {
     await page.goto('/samples/interactions.html#zoom=src&depth=3');
     await waitForRender(page);
 
-    const state = await page.locator('raised-treemap').evaluate((el) => ({
+    const state = await page.locator('gp-treemap').evaluate((el) => ({
       visibleRootId: el._activeVisibleRootId(),
       displayDepth: el.displayDepth,
     }));
@@ -92,7 +92,7 @@ test.describe('URL hash state', () => {
     await page.goto('/samples/interactions.html#zoom=src');
     await waitForRender(page);
 
-    await page.locator('raised-treemap').evaluate((el) => el.zoomReset());
+    await page.locator('gp-treemap').evaluate((el) => el.zoomReset());
     await waitForRender(page);
 
     const hash = await page.evaluate(() => window.location.hash);
@@ -104,7 +104,7 @@ test.describe('URL hash state', () => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);
 
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await waitForRender(page);
 
@@ -116,7 +116,7 @@ test.describe('URL hash state', () => {
     await page.goto('/samples/interactions.html#target=src&focus=src');
     await waitForRender(page);
 
-    const state = await page.locator('raised-treemap').evaluate((el) => ({
+    const state = await page.locator('gp-treemap').evaluate((el) => ({
       targetId: el._targetId,
       focusId: el._focusId,
     }));
@@ -129,7 +129,7 @@ test.describe('URL hash state', () => {
     await waitForRender(page);
 
     // Double-click a cell to trigger stretch-zoom
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.dblclick(box.x + box.width * 0.5, box.y + box.height * 0.5);
     // Wait for the zoom animation (350ms default + buffer)
     await page.waitForTimeout(500);
@@ -139,14 +139,14 @@ test.describe('URL hash state', () => {
     expect(hash).toMatch(/zoom=/);
 
     // Verify the zoom ID was captured
-    const zoomId = await page.locator('raised-treemap').evaluate((el) => el._activeVisibleRootId());
+    const zoomId = await page.locator('gp-treemap').evaluate((el) => el._activeVisibleRootId());
     expect(zoomId).not.toBeNull();
 
     // Reload and verify zoom is restored
     await page.goto('/samples/interactions.html' + hash);
     await waitForRender(page);
 
-    const restored = await page.locator('raised-treemap').evaluate((el) => el._activeVisibleRootId());
+    const restored = await page.locator('gp-treemap').evaluate((el) => el._activeVisibleRootId());
     expect(restored).toBe(zoomId);
   });
 
@@ -155,12 +155,12 @@ test.describe('URL hash state', () => {
     await waitForRender(page);
 
     // Click a cell to set target
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await waitForRender(page);
 
     // Move focus up
-    await page.locator('raised-treemap').evaluate((el) => el._focusUp());
+    await page.locator('gp-treemap').evaluate((el) => el._focusUp());
     await waitForRender(page);
 
     const hash = await page.evaluate(() => window.location.hash);
@@ -171,7 +171,7 @@ test.describe('URL hash state', () => {
     await page.goto('/samples/interactions.html' + hash);
     await waitForRender(page);
 
-    const state = await page.locator('raised-treemap').evaluate((el) => ({
+    const state = await page.locator('gp-treemap').evaluate((el) => ({
       targetId: el._targetId,
       focusId: el._focusId,
     }));
@@ -186,13 +186,13 @@ test.describe('URL hash state', () => {
 // must coerce string params back to numbers so they match the tree's Map keys.
 test('scan HTML: numeric IDs round-trip through URL hash', async ({ page }) => {
   // Build a small temp directory for the scan.
-  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-hash-test-'));
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'gp-hash-test-'));
   fs.mkdirSync(path.join(target, 'sub'));
   fs.writeFileSync(path.join(target, 'sub', 'a.txt'), 'hello');
   fs.writeFileSync(path.join(target, 'sub', 'b.txt'), 'world');
   fs.writeFileSync(path.join(target, 'c.txt'), 'test');
 
-  const out = path.join(os.tmpdir(), 'rt-hash-test-' + Date.now() + '.html');
+  const out = path.join(os.tmpdir(), 'gp-hash-test-' + Date.now() + '.html');
   try {
     const res = spawnSync(process.execPath, [
       path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
@@ -204,12 +204,12 @@ test('scan HTML: numeric IDs round-trip through URL hash', async ({ page }) => {
     await page.waitForTimeout(400);
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await page.waitForTimeout(200);
 
     // Verify target is a number (scan uses integer IDs).
-    const targetId = await page.locator('raised-treemap').evaluate((el) => el._targetId);
+    const targetId = await page.locator('gp-treemap').evaluate((el) => el._targetId);
     expect(typeof targetId).toBe('number');
 
     // Read the hash — it should contain the numeric target as a string.
@@ -221,7 +221,7 @@ test('scan HTML: numeric IDs round-trip through URL hash', async ({ page }) => {
     await page.waitForTimeout(400);
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
-    const restored = await page.locator('raised-treemap').evaluate((el) => ({
+    const restored = await page.locator('gp-treemap').evaluate((el) => ({
       targetId: el._targetId,
       targetType: typeof el._targetId,
       hasFocusBox: el.shadowRoot.querySelector('.overlay .sel') !== null,
@@ -241,7 +241,7 @@ test('scan HTML: numeric IDs round-trip through URL hash', async ({ page }) => {
 // Reproduces the user scenario: navigate directly to a scan HTML with
 // zoom + target + focus all pre-set in the hash, and verify everything applies.
 test('scan HTML: direct navigation with zoom+target+focus hash params', async ({ page }) => {
-  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-hash-direct-'));
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'gp-hash-direct-'));
   // Create a deeper tree so we have interesting parent/child IDs.
   fs.mkdirSync(path.join(target, 'aaa'));
   fs.mkdirSync(path.join(target, 'aaa', 'bbb'));
@@ -250,7 +250,7 @@ test('scan HTML: direct navigation with zoom+target+focus hash params', async ({
   fs.writeFileSync(path.join(target, 'aaa', 'z.txt'), 'z'.repeat(500));
   fs.writeFileSync(path.join(target, 'top.txt'), 't'.repeat(500));
 
-  const out = path.join(os.tmpdir(), 'rt-hash-direct-' + Date.now() + '.html');
+  const out = path.join(os.tmpdir(), 'gp-hash-direct-' + Date.now() + '.html');
   try {
     const res = spawnSync(process.execPath, [
       path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
@@ -263,7 +263,7 @@ test('scan HTML: direct navigation with zoom+target+focus hash params', async ({
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
     // Find a leaf, its parent, and a zoom-worthy ancestor.
-    const ids = await page.locator('raised-treemap').evaluate((el) => {
+    const ids = await page.locator('gp-treemap').evaluate((el) => {
       const leaves = el._leaves;
       if (!leaves.length) return null;
       // Pick the first leaf that has a grandparent.
@@ -286,7 +286,7 @@ test('scan HTML: direct navigation with zoom+target+focus hash params', async ({
     await page.waitForTimeout(500);
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
-    const state = await page.locator('raised-treemap').evaluate((el) => ({
+    const state = await page.locator('gp-treemap').evaluate((el) => ({
       activeRoot: el._activeVisibleRootId(),
       targetId: el._targetId,
       focusId: el._focusId,
@@ -313,14 +313,14 @@ test('scan HTML: direct navigation with zoom+target+focus hash params', async ({
 // Scan data uses integer IDs starting at 0. ID 0 (the root) is falsy in JS.
 // The component must not treat a focusId / hoverId of 0 as "no value".
 test('scan HTML: focusing root (id 0) highlights the home icon, not a breadcrumb', async ({ page }) => {
-  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'rt-focus-root-'));
+  const target = fs.mkdtempSync(path.join(os.tmpdir(), 'gp-focus-root-'));
   fs.mkdirSync(path.join(target, 'sub'));
   fs.writeFileSync(path.join(target, 'sub', 'a.txt'), 'hello');      // 5 B
   fs.writeFileSync(path.join(target, 'sub', 'b.txt'), 'world');      // 5 B
   fs.writeFileSync(path.join(target, 'c.txt'), 'test');               // 4 B
   // Total: 3 files, 1 folder (sub), 14 bytes
 
-  const out = path.join(os.tmpdir(), 'rt-focus-root-' + Date.now() + '.html');
+  const out = path.join(os.tmpdir(), 'gp-focus-root-' + Date.now() + '.html');
   try {
     const res = spawnSync(process.execPath, [
       path.join(ROOT, 'tools', 'scan.js'), '--no-open', target, out,
@@ -332,22 +332,22 @@ test('scan HTML: focusing root (id 0) highlights the home icon, not a breadcrumb
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
     // Click a cell to set a target (so the breadcrumb renders).
-    const box = await page.locator('raised-treemap').boundingBox();
+    const box = await page.locator('gp-treemap').boundingBox();
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await page.waitForTimeout(200);
 
     // Verify root is id 0 (falsy).
-    const rootId = await page.locator('raised-treemap').evaluate((el) => el._tree.roots[0]);
+    const rootId = await page.locator('gp-treemap').evaluate((el) => el._tree.roots[0]);
     expect(rootId).toBe(0);
 
     // Focus root — what clicking the home icon does.
-    await page.locator('raised-treemap').evaluate((el) => {
+    await page.locator('gp-treemap').evaluate((el) => {
       el._setFocus(el._tree.roots[0]);
     });
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
     // --- 1. Home icon focused, no breadcrumb entry focused ---
-    const state = await page.locator('raised-treemap').evaluate((el) => {
+    const state = await page.locator('gp-treemap').evaluate((el) => {
       const rootIcon = el.shadowRoot.querySelector('.info-line .root-icon');
       const focusedBreadcrumbs = el.shadowRoot.querySelectorAll('.info-line a.focused:not(.root-icon)');
       return {
@@ -362,7 +362,7 @@ test('scan HTML: focusing root (id 0) highlights the home icon, not a breadcrumb
     expect(state.focusedBreadcrumbCount, 'no breadcrumb should be focused').toBe(0);
 
     // --- 2. Selection box covers the full canvas ---
-    const selBox = await page.locator('raised-treemap').evaluate((el) => {
+    const selBox = await page.locator('gp-treemap').evaluate((el) => {
       const sel = el.shadowRoot.querySelector('.overlay .sel');
       if (!sel) return null;
       return {

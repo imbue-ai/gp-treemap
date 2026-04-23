@@ -1,0 +1,42 @@
+/* Class = "NSWindow"; title = "Filter"; ObjectID = "5"; */
+"5.title" = "过滤条件";
+
+/* Class = "NSBox"; title = "Selected tests"; ObjectID = "18"; */
+"18.title" = "已选测试";
+
+/* Class = "NSBox"; title = "Available tests"; ObjectID = "24"; */
+"24.title" = "可用测试";
+
+/* Class = "NSButtonCell"; title = "<"; ObjectID = "173"; */
+"173.title" = "<";
+
+/* Class = "NSButtonCell"; title = ">"; ObjectID = "174"; */
+"174.title" = ">";
+
+/* Class = "NSButtonCell"; title = "Edit"; ObjectID = "175"; */
+"175.title" = "编辑";
+
+/* Class = "NSButtonCell"; title = "New"; ObjectID = "176"; */
+"176.title" = "新建";
+
+/* Class = "NSButtonCell"; title = "Remove"; ObjectID = "177"; */
+"177.title" = "移除";
+
+/* Class = "NSButtonCell"; title = "OK"; ObjectID = "178"; */
+"178.title" = "好";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "179"; */
+"179.title" = "取消";
+
+/* Class = "NSButtonCell"; title = ">>"; ObjectID = "182"; */
+"182.title" = ">>";
+
+/* Class = "NSTextFieldCell"; title = "Name:"; ObjectID = "183"; */
+"183.title" = "名称：";
+
+/* Class = "NSTextFieldCell"; title = "Match none"; ObjectID = "IC9-7o-Jmg"; */
+"IC9-7o-Jmg.title" = "全不匹配";
+
+/* Class = "NSTextFieldCell"; title = "Match any"; ObjectID = "K2j-w8-a6Z"; */
+"K2j-w8-a6Z.title" = "匹配任一";
+

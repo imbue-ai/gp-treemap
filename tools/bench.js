@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Synthetic benchmark for the raised-treemap data pipeline.
+// Synthetic benchmark for the gp-treemap data pipeline.
 // Generates configurable random trees, then times each phase:
 //   generate → buildFromTabular → binary encode → binary decode + JSON.parse
 //
@@ -83,7 +83,7 @@ function generateTree(n, maxDepth) {
 const { buildFromTabular } = await import(path.join(__dirname, '../src/builder.js'));
 
 // ---- Setup ------------------------------------------------------------------
-console.log(`\nraised-treemap benchmark  n=${N.toLocaleString()}  maxDepth=${MAX_DEPTH}  time=${TIME_MS}ms/bench\n`);
+console.log(`\ngp-treemap benchmark  n=${N.toLocaleString()}  maxDepth=${MAX_DEPTH}  time=${TIME_MS}ms/bench\n`);
 process.stdout.write('Generating tree data... ');
 const t0 = performance.now();
 const data = generateTree(N, MAX_DEPTH);

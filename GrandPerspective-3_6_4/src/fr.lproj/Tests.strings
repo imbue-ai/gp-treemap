@@ -1,0 +1,90 @@
+/* AND-test with 1: sub test, and 2: another sub test */
+"(%@) and (%@)" = "(%1$@) et (%2$@)";
+
+/* AND-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) and %@" = "(%1$@) et %2$@";
+
+/* OR-test with 1: sub test, and 2: another sub test */
+"(%@) or (%@)" = "(%1$@) ou (%2$@)";
+
+/* OR-test with 1: sub test, and 2: two or more other sub tests */
+"(%@) or %@" = "(%1$@) ou %2$@";
+
+/* AND-test for flags sub tests with 1: subtest, 2: one or more sub tests */
+"%@ and %@" = "%1$@ et %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ contains %@" = "%1$@ contient %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ conTains %@" = "%1$@ conTient %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ ends with %@" = "%1$@ se termine par %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ enDs with %@" = "%1$@ se teRmine par %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ equals %@" = "%1$@ est égal à %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ eQuals %@" = "%1$@ est éGale à %2$@";
+
+/* Pair of match targets with 1: a target match, and 2: another target match */
+"%@ or %@" = "%1$@ ou %2$@";
+
+/* String test with 1: subject, and 2: match targets */
+"%@ starts with %@" = "%1$@ commence par %2$@";
+
+/* Case-sensitive string test with 1: subject, and 2: match targets */
+"%@ starTs with %@" = "%1$@ comMence par %2$@";
+
+/* Three or more match targets with 1: a target match, and 2: two or more other target matches */
+"%@, %@" = "%1$@, %2$@";
+
+/* Size test without any bounds */
+"any size" = "n'importe quelle taille";
+
+/* Selective test with 1: sub test */
+"files: %@" = "fichiers: %@";
+
+/* Selective test with 1: sub test */
+"folders: %@" = "dossiers: %@";
+
+/* File/folder flags sub test */
+"item is a package" = "élément est un paquet";
+
+/* File/folder flags sub test */
+"item is hard-linked" = "élément est lié en dur";
+
+/* File/folder flags sub test */
+"item is not a package" = "élément n'est pas un paquet";
+
+/* File/folder flags sub test */
+"item is not hard-linked" = "élément n'est pas lié en dur";
+
+/* A filename as the subject of a string test */
+"name" = "nom";
+
+/* NOT-test with 1: sub test */
+"not (%@)" = "n'est pas (%@)";
+
+/* A pathname as the subject of a string test */
+"path" = "chemin";
+
+/* Size test with 1: lower bound, and 2: upper bound */
+"size is between %@ and %@" = "taille comprise entre %1$@ et %2$@";
+
+/* Size test with 1: lower bound */
+"size is larger than %@" = "taille plus grande que %@";
+
+/* Size test with 1: upper bound */
+"size is smaller than %@" = "taille plus petite que %@";
+
+/* Filetype test with 1: match targets */
+"type conforms to %@" = "type est conforme à %@";
+
+/* Filetype test with 1: match targets */
+"type equals %@" = "type est égal à %@";
+
