@@ -7,16 +7,37 @@
   html, body { margin:0; padding:0; height:100%; font-family: system-ui,-apple-system,Segoe UI,sans-serif;
     background: var(--page-bg, #fafafa); color: var(--page-fg, #111); transition: background .15s, color .15s; }
   body { display:flex; flex-direction:column; }
-  header { padding: 8px 14px; border-bottom: 1px solid var(--page-border, #0002);
+  .title-row { padding: 8px 14px; border-bottom: 1px solid var(--page-border, #0002);
+    display:flex; gap: 16px; align-items: baseline; flex-wrap: wrap;
+    background: var(--page-surface, #fff); transition: background .15s; }
+  .title-row h1 { margin:0; font-size:14px; font-weight:600; font-family: ui-monospace, SF Mono, Menlo, monospace;
+    color: var(--page-fg, #222); min-width:0; overflow:hidden; text-overflow:ellipsis; }
+  .app-toolbar { padding: 4px 14px; border-bottom: 1px solid var(--page-border, #0002);
     display:flex; gap: 12px 18px; align-items:center; flex-wrap:wrap;
     background: var(--page-surface, #fff); transition: background .15s; }
-  header h1 { margin:0; font-size:14px; font-weight:600; font-family: ui-monospace, SF Mono, Menlo, monospace;
-    color: var(--page-fg, #222); min-width:0; overflow:hidden; text-overflow:ellipsis; }
+  .app-toolbar .spacer { flex: 1; }
   .ctl { display:flex; align-items:center; gap:6px; font-size:12px; color: var(--page-fg-muted, #666); }
   .ctl label { color: var(--page-fg-muted, #666); }
   select, button { font-size:12px; padding:2px 6px; border-radius:4px;
     background: var(--page-bg, #fff); color: var(--page-fg, #333);
     border: 1px solid var(--page-border, #ccc); cursor:pointer; }
+  .help-btn { font-size: 12px; width: 22px; height: 22px; line-height: 20px; text-align: center;
+    border-radius: 50%; padding: 0; font-weight: 600; }
+  .help-btn:hover { background: var(--page-border, #eee); }
+  .help-modal-backdrop { position: fixed; inset: 0; background: #0007; z-index: 999; display: none;
+    align-items: center; justify-content: center; }
+  .help-modal-backdrop.open { display: flex; }
+  .help-modal { background: var(--page-surface, #fff); color: var(--page-fg, #111);
+    border: 1px solid var(--page-border, #333); border-radius: 8px; padding: 20px 24px;
+    max-width: 620px; max-height: 80vh; overflow: auto; box-shadow: 0 8px 40px #000a;
+    font-size: 13px; line-height: 1.5; }
+  .help-modal h2 { margin: 0 0 10px; font-size: 16px; }
+  .help-modal h3 { margin: 14px 0 4px; font-size: 13px; font-weight: 600; }
+  .help-modal ul { margin: 4px 0 0 0; padding-left: 20px; }
+  .help-modal .close { float: right; background: none; border: none; color: inherit;
+    font-size: 18px; cursor: pointer; margin: -4px -8px 0 0; padding: 0; }
+  .help-modal code, .help-modal kbd { background: var(--page-border, #eee); color: inherit;
+    padding: 1px 4px; border-radius: 3px; font-size: 12px; }
   gp-treemap { display:flex; flex:1; min-height:0; }
   #bottom-bar { display:flex; align-items:center; gap:16px; padding: 3px 14px;
     font-size:12px; min-height:18px; color: var(--page-fg-muted, #888);
@@ -47,8 +68,10 @@
 </style>
 </head>
 <body>
-<header>
+<div class="title-row">
   <h1>US federal outlays FY2024 — colored by YoY % change</h1>
+</div>
+<div class="app-toolbar">
   <div class="ctl"><label>Size</label><select id="size-sel"></select></div>
   <div class="ctl"><label>Color</label><select id="color-sel"></select></div>
   <div class="ctl" id="chips-wrap">
@@ -59,7 +82,9 @@
       <div id="path-menu-pop"></div>
     </div>
   </div>
-  <div class="ctl" style="margin-left:auto;">
+  <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
+  <span class="spacer"></span>
+  <div class="ctl">
     <label>Theme</label>
     <select id="theme-sel">
       <option value="">Default (light)</option>
@@ -73,7 +98,48 @@
       <option value="viridis">Viridis</option><option value="plasma">Plasma</option><option value="inferno">Inferno</option><option value="magma">Magma</option><option value="turbo">Turbo</option><option value="heatmap">Heatmap</option><option value="coolwarm">Cool–Warm</option><option value="rainbow">Rainbow</option><option value="gp-default">Default 8-hue</option>
     </select>
   </div>
-</header>
+</div>
+<div id="help-modal" class="help-modal-backdrop">
+  <div class="help-modal" role="dialog" aria-label="Help">
+    <button class="close" aria-label="close">×</button>
+    <h2>gp-treemap — tabular viewer</h2>
+    <p>Cells are sized by the <b>Size</b> column, colored by the <b>Color</b>
+      column, and nested by the <b>Path</b> columns (group-by order).</p>
+    <h3>Path chips</h3>
+    <ul>
+      <li><b>Drag</b> a chip left/right to reorder the group-by hierarchy;
+        the treemap re-lays out on the fly.</li>
+      <li><b>&times;</b> on a chip removes that column from the path.</li>
+      <li><b>+</b> opens a checklist of every column so you can add more
+        levels (e.g. the synthetic <code>_row</code> which puts every
+        source row into its own leaf sliver).</li>
+    </ul>
+    <h3>Mouse</h3>
+    <ul>
+      <li><b>Hover</b>: full path + size tooltip.</li>
+      <li><b>Click</b> a cell to select it; the breadcrumb lights up.</li>
+      <li><b>Scroll wheel</b> over a selected cell moves the highlight up or
+        down the ancestor chain.</li>
+      <li><b>Double-click</b> a cell to zoom in. The depth budget re-applies
+        from the new root, so you can drill in and keep your bearings.</li>
+    </ul>
+    <h3>Breadcrumb</h3>
+    <ul>
+      <li><b>Click</b> a segment to focus that ancestor;
+        <b>double-click</b> to zoom to it. The home icon jumps to the root.</li>
+    </ul>
+    <h3>Component toolbar</h3>
+    <ul>
+      <li><b>Depth</b>: levels below the current zoom. <kbd>+</kbd>/<kbd>&minus;</kbd>
+        or type a number; snaps to <b>&infin;</b> once you reach the deepest level.</li>
+      <li><b>Labels</b>: draw each leaf's full path inside its cell when it fits.</li>
+    </ul>
+    <h3>URL</h3>
+    <p>All state (Size / Color / Path / zoom / theme / palette / depth &hellip;)
+      is URL-encoded into the hash as a single JSON blob, so any view is
+      a copy-paste away.</p>
+  </div>
+</div>
 <gp-treemap id="tm"
   color-mode="categorical"
   palette="tokyo-night"
@@ -3072,6 +3138,21 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
   paletteSel.addEventListener('change', function () { applyPalette(paletteSel.value); writeHash(); });
   sizeSel.addEventListener('change', function () { state.size = sizeSel.value; rebuild(); writeHash(); });
   colorSel.addEventListener('change', function () { state.color = colorSel.value; rebuild(); writeHash(); });
+
+  // Help modal: open on ?-button, close on backdrop / close button / Esc.
+  var helpBtn = document.getElementById('help-btn');
+  var helpModal = document.getElementById('help-modal');
+  if (helpBtn && helpModal) {
+    helpBtn.addEventListener('click', function () { helpModal.classList.add('open'); });
+    helpModal.addEventListener('click', function (e) {
+      if (e.target === helpModal || (e.target instanceof Element && e.target.classList.contains('close'))) {
+        helpModal.classList.remove('open');
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') helpModal.classList.remove('open');
+    });
+  }
 
   // ---- URL hash sync. ----
   // Format: a single URL-encoded JSON blob under the key "s" (#s={...}).

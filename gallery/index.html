@@ -80,12 +80,14 @@
   <section class="entry">
     <h2>gp-treemap source tree — disk usage</h2>
     <p>
-      The gp-treemap repository looking at itself. Produced by running
-      <code>gpdu</code> (aka <code>tools/gpdu-scan.js</code>) over the
-      working tree, <code>.git</code> and <code>node_modules</code>
-      included. Cells are sized by bytes on disk and colored by file
-      extension; hover for exact sizes, click to zoom.
+      The gp-treemap repository looking at itself — the working tree plus
+      <code>.git</code> and <code>node_modules</code>. Cells are sized by
+      bytes on disk and colored by file extension; hover for exact sizes,
+      click to select, scroll-wheel to focus an ancestor, double-click to
+      zoom. To scan any directory on your own machine and get a
+      self-contained HTML like this one:
     </p>
+    <pre style="background: var(--border, #f0f0f0); padding: 8px 12px; border-radius: 4px; font-size: 12px; overflow-x: auto; margin: 0 0 1rem;"><code>npx -p @imbue-ai/gp-treemap gpdu ~/path/to/dir</code></pre>
     <div class="frame-wrap">
       <iframe
         src="gp-treemap-source-tree-disk-usage.html"

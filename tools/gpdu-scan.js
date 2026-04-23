@@ -459,12 +459,37 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
   html, body { margin: 0; padding: 0; height: 100%; font-family: system-ui, -apple-system, Segoe UI, sans-serif;
     background: var(--page-bg, #fafafa); color: var(--page-fg, #111); transition: background .15s, color .15s; }
   body { display: flex; flex-direction: column; }
-  header { padding: 8px 14px; border-bottom: 1px solid var(--page-border, #0002); display: flex; gap: 16px;
-    align-items: baseline; flex-wrap: wrap; background: var(--page-surface, #fff); transition: background .15s; }
-  header h1 { margin:0; font-size:14px; font-weight:600; font-family: ui-monospace, SF Mono, Menlo, monospace;
+  .title-row { padding: 8px 14px; border-bottom: 1px solid var(--page-border, #0002);
+    display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap;
+    background: var(--page-surface, #fff); transition: background .15s; }
+  .title-row h1 { margin:0; font-size:14px; font-weight:600; font-family: ui-monospace, SF Mono, Menlo, monospace;
     color: var(--page-fg, #222); }
-  header .stat { color: var(--page-fg-muted, #555); font-size:13px; font-variant-numeric: tabular-nums; }
-  header .stat b { color: var(--page-fg, #000); font-weight:600; }
+  .title-row .stat { color: var(--page-fg-muted, #555); font-size:13px; font-variant-numeric: tabular-nums; }
+  .title-row .stat b { color: var(--page-fg, #000); font-weight:600; }
+  .app-toolbar { padding: 4px 14px; border-bottom: 1px solid var(--page-border, #0002);
+    display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+    background: var(--page-surface, #fff); font-size: 12px; color: var(--page-fg-muted, #666);
+    transition: background .15s; }
+  .app-toolbar .spacer { flex: 1; }
+  .help-btn { font-size: 12px; width: 22px; height: 22px; line-height: 20px; text-align: center;
+    border-radius: 50%; background: var(--page-bg, #fff); color: var(--page-fg, #333);
+    border: 1px solid var(--page-border, #ccc); cursor: pointer; padding: 0;
+    font-family: inherit; font-weight: 600; }
+  .help-btn:hover { background: var(--page-border, #eee); }
+  .help-modal-backdrop { position: fixed; inset: 0; background: #0007; z-index: 999; display: none;
+    align-items: center; justify-content: center; }
+  .help-modal-backdrop.open { display: flex; }
+  .help-modal { background: var(--page-surface, #fff); color: var(--page-fg, #111);
+    border: 1px solid var(--page-border, #333); border-radius: 8px; padding: 20px 24px;
+    max-width: 560px; max-height: 80vh; overflow: auto; box-shadow: 0 8px 40px #000a;
+    font-size: 13px; line-height: 1.5; }
+  .help-modal h2 { margin: 0 0 10px; font-size: 16px; }
+  .help-modal h3 { margin: 14px 0 4px; font-size: 13px; font-weight: 600; }
+  .help-modal ul { margin: 4px 0 0 0; padding-left: 20px; }
+  .help-modal .close { float: right; background: none; border: none; color: inherit;
+    font-size: 18px; cursor: pointer; margin: -4px -8px 0 0; }
+  .help-modal code, .help-modal kbd { background: var(--page-border, #eee); color: inherit;
+    padding: 1px 4px; border-radius: 3px; font-size: 12px; }
   gp-treemap { display:flex; flex: 1; min-height: 0; }
   #bottom-bar { display:flex; align-items:center; gap: 16px; padding: 3px 14px;
     font-size: 12px; font-variant-numeric: tabular-nums; min-height: 18px;
@@ -478,13 +503,15 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
 </style>
 </head>
 <body>
-<header>
+<div class="title-row">
   <h1>${escapeHtml(target)}</h1>
   <span class="stat"><b>${stats.files.toLocaleString()}</b> files</span>
   <span class="stat"><b>${stats.dirs.toLocaleString()}</b> directories</span>
   <span class="stat"><b>${stats.humanSize}</b> total</span>
   ${stats.unreadable ? `<span class="stat">(${stats.unreadable.toLocaleString()} unreadable)</span>` : ''}
-  <span class="stat" style="color: var(--page-fg-muted, #888);">color
+</div>
+<div class="app-toolbar">
+  <span>color
     <select id="color-sel">
       <option value="extension">extension</option>
       <option value="kind">file kind</option>
@@ -494,19 +521,57 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
       <option value="atime">accessed</option>
     </select>
   </span>
-  <span class="stat" style="margin-left:auto;">theme
+  <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
+  <span class="spacer"></span>
+  <span>theme
     <select id="theme-sel">
       <option value="">Default (light)</option>
       ${themeOptions}
     </select>
   </span>
-  <span class="stat">palette
+  <span>palette
     <select id="palette-sel">
       <option value="">(theme default)</option>
       ${paletteOptions}
     </select>
   </span>
-</header>
+</div>
+<div id="help-modal" class="help-modal-backdrop">
+  <div class="help-modal" role="dialog" aria-label="Help">
+    <button class="close" aria-label="close">\xD7</button>
+    <h2>gp-treemap &mdash; disk usage</h2>
+    <p>Cell area is bytes on disk. Cells are colored by the <b>color</b> mode
+      above. Each folder's pixels are subdivided among its children, so the
+      shape of the tree is visible in the layout.</p>
+    <h3>Mouse</h3>
+    <ul>
+      <li><b>Hover</b>: see full path + size in the tooltip.</li>
+      <li><b>Click</b> a cell: select it; the breadcrumb lights up.</li>
+      <li><b>Scroll wheel</b> while a cell is selected: move the highlight up
+        or down the ancestor chain.</li>
+      <li><b>Double-click</b> a cell: zoom into it. Double-click a parent in
+        the breadcrumb to zoom back to that ancestor.</li>
+    </ul>
+    <h3>Breadcrumb (the path row)</h3>
+    <ul>
+      <li><b>Click</b> a segment to focus that ancestor.</li>
+      <li><b>Double-click</b> to zoom to it. The home icon on the left jumps
+        to the tree root.</li>
+    </ul>
+    <h3>Component toolbar</h3>
+    <ul>
+      <li><b>Depth</b>: how many levels below the current zoom to draw.
+        <kbd>+</kbd>/<kbd>&minus;</kbd>, or type a number. Snaps to <b>&infin;</b>
+        once you reach the tree's deepest level.</li>
+      <li><b>Labels</b>: show each leaf's full path from the zoom root inside
+        its cell, when it fits.</li>
+    </ul>
+    <h3>URL</h3>
+    <p>All state (zoom / focus / theme / palette / depth &hellip;) is
+      serialized into the URL hash as a single JSON blob, so you can copy a
+      link to any view.</p>
+  </div>
+</div>
 <gp-treemap id="tm"
   color-mode="${tmColorMode}"
   palette="${tmPalette}"
@@ -927,6 +992,19 @@ window._bootReady.then(function () {
   themeSel.addEventListener('change', function () { applyPageTheme(themeSel.value); writeHash(); });
   paletteSel.addEventListener('change', function () { applyPalette(paletteSel.value); writeHash(); });
   colorSel.addEventListener('change', function () { applyColor(colorSel.value); writeHash(); });
+
+  // Help modal: open on ?-button, close on backdrop click / ESC / \xD7 button.
+  var helpBtn = document.getElementById('help-btn');
+  var helpModal = document.getElementById('help-modal');
+  if (helpBtn && helpModal) {
+    helpBtn.addEventListener('click', function () { helpModal.classList.add('open'); });
+    helpModal.addEventListener('click', function (e) {
+      if (e.target === helpModal || e.target.classList.contains('close')) helpModal.classList.remove('open');
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') helpModal.classList.remove('open');
+    });
+  }
 
   // Node IDs inside the component are integer row indices — stable and
   // compact for Map keys. For the URL hash, though, we want something a
