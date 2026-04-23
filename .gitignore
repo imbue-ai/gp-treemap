@@ -9,4 +9,4 @@ test-results/
 *.swo
 
 # Scan-tool outputs that sometimes land in the working tree
-gp-treemap-*.html
+/gp-treemap-*.html

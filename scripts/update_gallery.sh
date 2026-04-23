@@ -18,7 +18,7 @@ if [ ! -d node_modules ]; then
 fi
 
 # Self-scan: the repo looking at itself, .git and node_modules included.
-node tools/scan.js --no-open --color=extension "$ROOT" "$ROOT/gallery/self.html"
+node tools/scan.js --no-open --color=extension "$ROOT" "$ROOT/gallery/gp-treemap-source-tree-disk-usage.html"
 
 echo ""
 echo "gallery/ updated:"
