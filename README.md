@@ -76,6 +76,61 @@ wrote /tmp/raised-treemap-Pictures-1776569124346.html  (5.1 MB)
 
 Symlinks are not followed and unreadable entries are counted and skipped.
 
+## Profiling an HTML file's load
+
+Large `raised-treemap` outputs (or any local HTML page) can be profiled
+headlessly using Chromium's V8 CPU profiler, then visualized as a treemap
+of CPU time bucketed by thread and call stack.
+
+Two tools, both runnable via `npx`:
+
+```sh
+# 1. Capture a standard Chrome DevTools .cpuprofile for the page load.
+npx -p github:imbue-ai/raised-treemap raised-treemap-profile-load \
+    ~/big-scan.html  ~/big-scan.cpuprofile
+
+# 2. Convert that .cpuprofile into a self-contained treemap HTML.
+npx -p github:imbue-ai/raised-treemap raised-treemap-profile-to-html \
+    ~/big-scan.cpuprofile  ~/big-scan.profile.html
+```
+
+The first command launches headless Chromium, opens the HTML under `file://`,
+records a CPU profile across the whole load, and waits for `window._allBlocksReady`
+(the signal `tools/scan.js` exports) before stopping — falling back to
+document `load` + a short settle window for arbitrary pages. Useful flags:
+`--sampling-us=N` (default 100), `--extra-wait-ms=N` (default 500),
+`--timeout-ms=N` (default 600000), `--wait-for=<js-expr>` to override the gate.
+
+The resulting `.cpuprofile` is Chrome's canonical JSON format — you can also
+drag it into DevTools → Performance, or load it in
+[speedscope](https://www.speedscope.app/), pprof, etc.
+
+The second command reads the profile and writes a self-contained treemap
+HTML. The hierarchy is:
+
+```
+profile
+  └── Renderer Main (thread)
+        └── (program) / (idle) / (garbage collector) / your JS ...
+              └── call-stack descendants ...
+```
+
+Value = CPU microseconds (self-time at leaves, aggregated up to ancestors).
+Color = function name (the "deepest function" at each cell) — same function
+across the tree shares a color, so hot paths pop visually.
+
+Running both from a clone of the repo works the same:
+
+```sh
+node tools/profile-load.js     ~/big-scan.html
+node tools/profile-to-html.js  ~/big-scan.cpuprofile
+```
+
+Playwright with Chromium must be installed for `profile-load.js`
+(`npm install && npx playwright install chromium`). `profile-to-html.js`
+has no runtime dependencies and just needs `dist/raised-treemap.bundle.js`
+from `node tools/build.js`.
+
 ## Repo layout
 
 ```
@@ -116,6 +171,9 @@ tests/                  Playwright suite (Chromium)
 tools/
   build.js                concatenates src/ → dist/raised-treemap.bundle.js
   server.js               tiny static server (used by Playwright & local dev)
+  scan.js                 recursive directory scan → self-contained treemap HTML
+  profile-load.js         Playwright+CDP CPU profile capture → .cpuprofile
+  profile-to-html.js      .cpuprofile → treemap HTML (thread / call-stack)
 ```
 
 ## Tests
