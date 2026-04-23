@@ -76,6 +76,7 @@
     </p>
   </header>
 
+
   <section class="entry">
     <h2>gp-treemap source tree — disk usage</h2>
     <p>
@@ -116,6 +117,82 @@
       <a href="table-treemap-energy-fuel.html">Open full-page →</a>
       &nbsp;·&nbsp;
       Source: <a href="https://ember-energy.org/data/yearly-electricity-data/" target="_blank" rel="noopener">Ember — Yearly Electricity Data</a>
+    </div>
+  </section>
+
+  <section class="entry">
+    <h2>California city wages 2024 — where do city payrolls go?</h2>
+    <p>
+      Every California city employee with reported wages in 2024 — about
+      334,000 rows from the state's
+      <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">
+      Government Compensation in California</a> raw export, cell size =
+      <code>TotalWages</code>. Grouped by
+      department → county → city → position → <code>_row</code>, but
+      with <code>depth = 1</code> at first so only the top-level
+      Department bucket is drawn — a cleaner first read of where the
+      money goes. Police and Fire dominate; Parks &amp; Rec, Public
+      Works and Transportation come next. Click the <b>+</b> in the
+      component toolbar to reveal another level, or double-click any
+      cell to zoom in — the depth budget re-applies from the new root,
+      so you can drill in without losing your orientation.
+    </p>
+    <p style="font-size: 0.875rem; font-style: italic;">
+      Trivia: <code>DepartmentOrSubdivision</code> is a free-text field
+      with no normalization, so each spelling is a separate top-level
+      cell. Police alone shows up as <code>Police</code>,
+      <code>Police Department</code>, <code>Police Services Agency</code>,
+      <code>Police Administration</code>, and <code>Police Field Services</code>.
+      Fire is <code>Fire</code>, <code>Fire Department</code>,
+      <code>Fire-Rescue</code>, <code>Fire Operations</code>,
+      <code>Fire Suppression</code>, and
+      <code>Fire Suppression &amp; Rescue</code>. Parks &amp; Rec is
+      <code>Recreation And Parks</code>,
+      <code>Recreation and Park Commission</code>,
+      <code>Parks and Recreation</code>, <code>Parks &amp; Recreation</code>,
+      and <code>Parks &amp; Recreation Administration</code>. And
+      <code>Airports</code> and <code>Airport Commission</code> are two
+      different cells too.
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-ca-city.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22DepartmentOrSubdivision%22%2C%22path%22%3A%5B%22DepartmentOrSubdivision%22%2C%22EmployerCounty%22%2C%22EmployerName%22%2C%22Position%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22one-dark%22%2C%22depth%22%3A1%2C%22showLabels%22%3Atrue%7D%7D"
+        title="California city wages 2024 — intro (depth 1 + labels)"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-ca-city.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22DepartmentOrSubdivision%22%2C%22path%22%3A%5B%22DepartmentOrSubdivision%22%2C%22EmployerCounty%22%2C%22EmployerName%22%2C%22Position%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22one-dark%22%2C%22depth%22%3A1%2C%22showLabels%22%3Atrue%7D%7D">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_City.zip</a>
+    </div>
+  </section>
+
+  <section class="entry">
+    <h2>California city wages 2024 — one cell per employee</h2>
+    <p>
+      Same file as above, but with the depth budget lifted so every one
+      of the 334k rows gets its own pixel-sliver cell inside its
+      position / city / county / department grouping. Color is still the
+      department — so bands of one shade within a cell reveal groups of
+      individuals sharing a pay scale. Zoom into, say, Police or a big
+      city and you can see clusters of higher-paid commanders at the
+      top of each block and long tails of entry-level staff beneath
+      them.
+    </p>
+    <p style="font-size: 0.875rem; font-style: italic;">
+      (See the intro above for the Police / Fire / Parks &amp; Rec
+      spelling carnival.)
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-ca-city.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22DepartmentOrSubdivision%22%2C%22path%22%3A%5B%22DepartmentOrSubdivision%22%2C%22EmployerCounty%22%2C%22EmployerName%22%2C%22Position%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22one-dark%22%7D%7D"
+        title="California city government wages 2024"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-ca-city.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22DepartmentOrSubdivision%22%2C%22path%22%3A%5B%22DepartmentOrSubdivision%22%2C%22EmployerCounty%22%2C%22EmployerName%22%2C%22Position%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22one-dark%22%7D%7D">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_City.zip</a>
     </div>
   </section>
 
@@ -213,81 +290,6 @@
     </div>
   </section>
 
-  <section class="entry">
-    <h2>California city wages 2024 — where do city payrolls go?</h2>
-    <p>
-      Every California city employee with reported wages in 2024 — about
-      334,000 rows from the state's
-      <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">
-      Government Compensation in California</a> raw export, cell size =
-      <code>TotalWages</code>. Grouped by
-      department → county → city → position → <code>_row</code>, but
-      with <code>depth = 1</code> at first so only the top-level
-      Department bucket is drawn — a cleaner first read of where the
-      money goes. Police and Fire dominate; Parks &amp; Rec, Public
-      Works and Transportation come next. Click the <b>+</b> in the
-      component toolbar to reveal another level, or double-click any
-      cell to zoom in — the depth budget re-applies from the new root,
-      so you can drill in without losing your orientation.
-    </p>
-    <p style="font-size: 0.875rem; font-style: italic;">
-      Trivia: <code>DepartmentOrSubdivision</code> is a free-text field
-      with no normalization, so each spelling is a separate top-level
-      cell. Police alone shows up as <code>Police</code>,
-      <code>Police Department</code>, <code>Police Services Agency</code>,
-      <code>Police Administration</code>, and <code>Police Field Services</code>.
-      Fire is <code>Fire</code>, <code>Fire Department</code>,
-      <code>Fire-Rescue</code>, <code>Fire Operations</code>,
-      <code>Fire Suppression</code>, and
-      <code>Fire Suppression &amp; Rescue</code>. Parks &amp; Rec is
-      <code>Recreation And Parks</code>,
-      <code>Recreation and Park Commission</code>,
-      <code>Parks and Recreation</code>, <code>Parks &amp; Recreation</code>,
-      and <code>Parks &amp; Recreation Administration</code>. And
-      <code>Airports</code> and <code>Airport Commission</code> are two
-      different cells too.
-    </p>
-    <div class="frame-wrap">
-      <iframe
-        src="table-treemap-ca-city.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22DepartmentOrSubdivision%22%2C%22path%22%3A%5B%22DepartmentOrSubdivision%22%2C%22EmployerCounty%22%2C%22EmployerName%22%2C%22Position%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22one-dark%22%2C%22depth%22%3A1%2C%22showLabels%22%3Atrue%7D%7D"
-        title="California city wages 2024 — intro (depth 1 + labels)"
-        loading="lazy"></iframe>
-    </div>
-    <div class="links">
-      <a href="table-treemap-ca-city.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22DepartmentOrSubdivision%22%2C%22path%22%3A%5B%22DepartmentOrSubdivision%22%2C%22EmployerCounty%22%2C%22EmployerName%22%2C%22Position%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22one-dark%22%2C%22depth%22%3A1%2C%22showLabels%22%3Atrue%7D%7D">Open full-page →</a>
-      &nbsp;·&nbsp;
-      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_City.zip</a>
-    </div>
-  </section>
-
-  <section class="entry">
-    <h2>California city wages 2024 — one cell per employee</h2>
-    <p>
-      Same file as above, but with the depth budget lifted so every one
-      of the 334k rows gets its own pixel-sliver cell inside its
-      position / city / county / department grouping. Color is still the
-      department — so bands of one shade within a cell reveal groups of
-      individuals sharing a pay scale. Zoom into, say, Police or a big
-      city and you can see clusters of higher-paid commanders at the
-      top of each block and long tails of entry-level staff beneath
-      them.
-    </p>
-    <p style="font-size: 0.875rem; font-style: italic;">
-      (See the intro above for the Police / Fire / Parks &amp; Rec
-      spelling carnival.)
-    </p>
-    <div class="frame-wrap">
-      <iframe
-        src="table-treemap-ca-city.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22DepartmentOrSubdivision%22%2C%22path%22%3A%5B%22DepartmentOrSubdivision%22%2C%22EmployerCounty%22%2C%22EmployerName%22%2C%22Position%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22one-dark%22%7D%7D"
-        title="California city government wages 2024"
-        loading="lazy"></iframe>
-    </div>
-    <div class="links">
-      <a href="table-treemap-ca-city.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22DepartmentOrSubdivision%22%2C%22path%22%3A%5B%22DepartmentOrSubdivision%22%2C%22EmployerCounty%22%2C%22EmployerName%22%2C%22Position%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22one-dark%22%7D%7D">Open full-page →</a>
-      &nbsp;·&nbsp;
-      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_City.zip</a>
-    </div>
-  </section>
 </main>
 </body>
 </html>
