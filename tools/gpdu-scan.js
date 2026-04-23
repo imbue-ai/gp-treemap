@@ -509,6 +509,8 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
   <span class="stat"><b>${stats.dirs.toLocaleString()}</b> directories</span>
   <span class="stat"><b>${stats.humanSize}</b> total</span>
   ${stats.unreadable ? `<span class="stat">(${stats.unreadable.toLocaleString()} unreadable)</span>` : ''}
+  <span class="spacer" style="flex:1"></span>
+  <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
 </div>
 <div class="app-toolbar">
   <span>color
@@ -534,7 +536,6 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
       ${paletteOptions}
     </select>
   </span>
-  <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
 </div>
 <div id="help-modal" class="help-modal-backdrop">
   <div class="help-modal" role="dialog" aria-label="Help">

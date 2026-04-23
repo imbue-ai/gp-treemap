@@ -342,6 +342,8 @@ function buildHtml(outPath, title, columns, info, rows, defaults, flags) {
 <body>
 <div class="title-row">
   <h1>${escapeHtml(title)}</h1>
+  <span class="spacer" style="flex:1"></span>
+  <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
 </div>
 <div class="app-toolbar">
   <div class="ctl"><label>Size</label><select id="size-sel"></select></div>
@@ -369,7 +371,6 @@ function buildHtml(outPath, title, columns, info, rows, defaults, flags) {
       ${paletteOptions}
     </select>
   </div>
-  <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
 </div>
 <div id="help-modal" class="help-modal-backdrop">
   <div class="help-modal" role="dialog" aria-label="Help">
