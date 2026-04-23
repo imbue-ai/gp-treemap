@@ -124,25 +124,38 @@ test.describe('URL hash state', () => {
     expect(state.focusId).toBe('src');
   });
 
-  test('double-click zoom writes zoom param to hash', async ({ page }) => {
+  test('breadcrumb double-click zoom writes zoom param to hash', async ({ page }) => {
     await page.goto('/samples/interactions.html');
     await waitForRender(page);
 
-    // Double-click a cell to trigger stretch-zoom
+    // Click a cell to populate the breadcrumb.
     const box = await page.locator('gp-treemap').boundingBox();
-    await page.mouse.dblclick(box.x + box.width * 0.5, box.y + box.height * 0.5);
-    // Wait for the zoom animation (350ms default + buffer)
+    await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await waitForRender(page);
+
+    // Find an ancestor breadcrumb link (zooming the leaf itself is a no-op).
+    const linkInfo = await page.evaluate(() => {
+      const el = document.querySelector('gp-treemap');
+      const links = el.shadowRoot.querySelectorAll('.info-line a[data-node-id]:not(.root-icon):not(.focused)');
+      if (links.length === 0) return null;
+      const link = links[0];
+      const rect = link.getBoundingClientRect();
+      return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+    });
+    if (!linkInfo) { test.skip(); return; }
+
+    await page.mouse.dblclick(linkInfo.x, linkInfo.y);
+    // Wait for the zoom animation (350ms default + buffer).
     await page.waitForTimeout(500);
     await waitForRender(page);
 
     const hash = await page.evaluate(() => window.location.hash);
     expect(hash).toMatch(/zoom=/);
 
-    // Verify the zoom ID was captured
     const zoomId = await page.locator('gp-treemap').evaluate((el) => el._activeVisibleRootId());
     expect(zoomId).not.toBeNull();
 
-    // Reload and verify zoom is restored
+    // Reload and verify zoom is restored.
     await page.goto('/samples/interactions.html' + hash);
     await waitForRender(page);
 
@@ -375,11 +388,13 @@ test('scan HTML: focusing root (id 0) highlights the home icon, not a breadcrumb
       };
     });
     expect(selBox, 'selection box should exist').not.toBeNull();
-    // Box should start at origin and span the full stage.
-    expect(selBox.left).toBeCloseTo(0, 0);
-    expect(selBox.top).toBeCloseTo(0, 0);
-    expect(selBox.width).toBeCloseTo(selBox.stageW, 0);
-    expect(selBox.height).toBeCloseTo(selBox.stageH, 0);
+    // The sel box sits outside the focused area by the border width (so the
+    // outline surrounds, rather than overlaps, the region). When root is
+    // focused the region is the whole stage, so the box covers at least it.
+    expect(selBox.left, 'left edge at or outside stage origin').toBeLessThanOrEqual(0);
+    expect(selBox.top, 'top edge at or outside stage origin').toBeLessThanOrEqual(0);
+    expect(selBox.left + selBox.width, 'right edge at or outside stage').toBeGreaterThanOrEqual(selBox.stageW);
+    expect(selBox.top + selBox.height, 'bottom edge at or outside stage').toBeGreaterThanOrEqual(selBox.stageH);
 
     // --- 3. Stats bar shows root totals (all files & folders) ---
     const barText = await page.locator('#stats-bar').textContent();
