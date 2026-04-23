@@ -22,7 +22,7 @@ great for any time you have hierarchical counts to wrap your head around!
 * Spending reports (they never looked so beautiful!)
 * Budgets
 * Profiling data
-* Resource usage (Disk, RAM, inference tokens, electricity)
+* Resource usage (Disk, RAM, inference tokens, electricity, ...)
 
 Don't forget that lots of tabular data can be made hierarchical with GROUP BY on a list of columns.
 
