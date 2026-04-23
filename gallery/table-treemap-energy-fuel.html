@@ -1500,11 +1500,11 @@ const STYLE = `
 .overlay .sel, .overlay .loc { position:absolute; box-sizing:border-box; pointer-events:none; }
 .overlay .sel { border:2px solid var(--gp-selected); box-sizing:border-box; }
 .overlay .loc { border:2px solid var(--gp-located); box-shadow: 0 0 0 1px #fff8; }
-.overlay .lbl { position:absolute; font-size:11px; font-weight:500; line-height:1; padding:1px 3px;
+.overlay .lbl { position:absolute; font-size:10px; font-weight:500; line-height:1.15; padding:1px 3px;
   color: var(--gp-fg, #111);
   text-shadow: 0 0 2px var(--gp-bg, #ffffffcc), 0 0 2px var(--gp-bg, #ffffffcc);
-  white-space:nowrap; pointer-events:none; transform: translate(-50%, -50%);
-  overflow:hidden; text-overflow:ellipsis; }
+  pointer-events:none; transform: translate(-50%, -50%);
+  overflow:hidden; overflow-wrap:anywhere; text-align:center; }
 .tooltip { position:fixed; pointer-events:none; padding:6px 10px;
   background: var(--gp-surface, #111d); color: var(--gp-fg, #fff);
   border:1px solid var(--gp-border, transparent);
