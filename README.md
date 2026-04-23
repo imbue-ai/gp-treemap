@@ -24,7 +24,7 @@ great for any time you have hierarchical counts to wrap your head around!
 * Profiling data
 * Resource usage (Disk, RAM, inference tokens, electricity, ...)
 
-Don't forget that lots of tabular data can be made hierarchical with GROUP BY on a list of columns.
+Don't forget that lots of tabular data can be made hierarchical using GROUP BY on a list of columns.
 
 Check out the [gallery of more examples](https://imbue-ai.github.io/gp-treemap/gallery/).
 
