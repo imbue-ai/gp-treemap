@@ -11,11 +11,11 @@ With this package, you can run:
 npx -p @imbue-ai/gp-treemap gpdu .
 ```
 
-And see this visualization:
+And see this visualization (click for the interactive version):
 
-[![gpdu scan of the gp-treemap source tree](tests/screenshots/gallery-source-tree.png)](https://imbue-ai.github.io/gp-treemap/gallery/gp-treemap-source-tree-disk-usage.html)
+[![gpdu scan of the gp-treemap source tree](tests/screenshots/gallery-source-tree.png)](https://imbue-ai.github.io/gp-treemap/gallery/)
 
-Check out the [gallery of more examples](https://imbue-ai.github.io/gp-treemap/gallery/gp-treemap-source-tree-disk-usage.html).
+Check out the [gallery of more examples](https://imbue-ai.github.io/gp-treemap/gallery/).
 
 ## A hat tip to GrandPerspective
 
