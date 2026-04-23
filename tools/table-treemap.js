@@ -266,6 +266,7 @@ function buildHtml(outPath, title, columns, info, rows, defaults, flags) {
     path: defaults.pathCols,
     theme: flags.theme || 'tokyo-night',
     palette: flags.palette || '',
+    colorScale: flags['color-scale'] || 'linear',
   });
 
   const html = `<!doctype html>
@@ -397,6 +398,7 @@ ${bundle}
     path: DEFAULTS.path.slice(),
     theme: DEFAULTS.theme,
     palette: DEFAULTS.palette,
+    colorScale: DEFAULTS.colorScale,
     zoom: null, target: null, focus: null, zoomPath: null, depth: null,
   };
 
@@ -571,19 +573,36 @@ ${bundle}
 
     tree = { labels: labels, parents: parents, values: values, ids: ids, color: color };
 
-    // Adjust color-mode attribute before setting data.
+    // Adjust color-mode + scale before setting data. For the diverging scale
+    // we clip to the 2nd..98th percentile of aggregated color values so a
+    // single outlier doesn't compress the useful range into one palette stop.
     tm.setAttribute('color-mode', cIsNum ? 'quantitative' : 'categorical');
     if (cIsNum) {
-      var lo = Infinity, hi = -Infinity;
+      var cscale = state.colorScale || DEFAULTS.colorScale || 'linear';
+      tm.setAttribute('color-scale', cscale);
+      var nums = [];
       for (var j = 0; j < color.length; j++) {
         var v = color[j];
-        if (typeof v === 'number' && Number.isFinite(v)) {
-          if (v < lo) lo = v;
-          if (v > hi) hi = v;
-        }
+        if (typeof v === 'number' && Number.isFinite(v)) nums.push(v);
       }
-      tm.colorDomain = (lo !== Infinity && lo < hi) ? [lo, hi] : undefined;
+      nums.sort(function (a, b) { return a - b; });
+      if (nums.length === 0) {
+        tm.colorDomain = undefined;
+      } else if (cscale === 'diverging') {
+        var pLo = nums[Math.floor(nums.length * 0.02)];
+        var pHi = nums[Math.min(nums.length - 1, Math.floor(nums.length * 0.98))];
+        // Center on zero when data straddles it, otherwise on the midpoint.
+        var mid = (pLo < 0 && pHi > 0) ? 0 : (pLo + pHi) / 2;
+        // Diverging needs [min, mid, max] with min<mid<max.
+        if (pLo >= mid) pLo = mid - Math.max(1e-9, Math.abs(mid - pHi));
+        if (pHi <= mid) pHi = mid + Math.max(1e-9, Math.abs(mid - pLo));
+        tm.colorDomain = [pLo, mid, pHi];
+      } else {
+        var lo = nums[0], hi = nums[nums.length - 1];
+        tm.colorDomain = lo < hi ? [lo, hi] : undefined;
+      }
     } else {
+      tm.setAttribute('color-scale', 'linear');
       tm.colorDomain = undefined;
     }
 
@@ -665,6 +684,7 @@ ${bundle}
       state.path = pth ? pth.split(',').filter(Boolean) : DEFAULTS.path.slice();
       state.theme = p.has('theme') ? p.get('theme') : '';
       state.palette = p.has('palette') ? p.get('palette') : '';
+      state.colorScale = p.has('colorScale') ? p.get('colorScale') : DEFAULTS.colorScale;
       state.zoom = p.get('zoom') || null;
       state.target = p.get('target') || null;
       state.focus = p.get('focus') || null;
@@ -684,6 +704,7 @@ ${bundle}
       p.set('path', state.path.join(','));
       if (state.theme) p.set('theme', state.theme);
       if (state.palette) p.set('palette', state.palette);
+      if (state.colorScale && state.colorScale !== 'linear') p.set('colorScale', state.colorScale);
       if (state.zoom) p.set('zoom', state.zoom);
       if (state.zoomPath && state.zoomPath.length) p.set('zoomPath', state.zoomPath.join(','));
       if (state.target) p.set('target', state.target);

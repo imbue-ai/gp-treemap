@@ -2546,7 +2546,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
 <script>
 (function () {
   'use strict';
-  var DEFAULTS = {"size":"Gross_Outlays","color":"YoY_Change_Pct","path":["Category","Agency"],"theme":"tokyo-night","palette":"coolwarm"};
+  var DEFAULTS = {"size":"Gross_Outlays","color":"YoY_Change_Pct","path":["Category","Agency"],"theme":"tokyo-night","palette":"coolwarm","colorScale":"diverging"};
   var THEMES = {"nord":{"label":"Nord","bg":"#2e3440","surface":"#3b4252","border":"#4c566a","fg":"#d8dee9","fgMuted":"#81a1c1","accent":"#88c0d0"},"solarized":{"label":"Solarized Dark","bg":"#002b36","surface":"#073642","border":"#586e75","fg":"#839496","fgMuted":"#657b83","accent":"#268bd2"},"dracula":{"label":"Dracula","bg":"#282a36","surface":"#44475a","border":"#6272a4","fg":"#f8f8f2","fgMuted":"#6272a4","accent":"#bd93f9"},"catppuccin":{"label":"Catppuccin Mocha","bg":"#1e1e2e","surface":"#313244","border":"#45475a","fg":"#cdd6f4","fgMuted":"#a6adc8","accent":"#cba6f7"},"gruvbox":{"label":"Gruvbox Dark","bg":"#282828","surface":"#3c3836","border":"#504945","fg":"#ebdbb2","fgMuted":"#a89984","accent":"#fabd2f"},"tokyo-night":{"label":"Tokyo Night","bg":"#1a1b26","surface":"#16161e","border":"#0f0f14","fg":"#c0caf5","fgMuted":"#787c99","accent":"#7aa2f7"},"rose-pine":{"label":"Rosé Pine","bg":"#191724","surface":"#1f1d2e","border":"#26233a","fg":"#e0def4","fgMuted":"#908caa","accent":"#c4a7e7"},"one-dark":{"label":"One Dark","bg":"#282c34","surface":"#2c313a","border":"#3e4452","fg":"#abb2bf","fgMuted":"#828997","accent":"#61afef"}};
   var ALL_COLS = ["Category","Agency","Bureau","Program","Gross_Outlays","Net_Outlays","Prior_Year_Outlays","YoY_Change_Pct","Fiscal_Year","_row"];
   var NUMERIC_NONNEG = ["Gross_Outlays","Net_Outlays","Prior_Year_Outlays","Fiscal_Year","_row"];
@@ -2589,6 +2589,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
     path: DEFAULTS.path.slice(),
     theme: DEFAULTS.theme,
     palette: DEFAULTS.palette,
+    colorScale: DEFAULTS.colorScale,
     zoom: null, target: null, focus: null, zoomPath: null, depth: null,
   };
 
@@ -2763,19 +2764,36 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
 
     tree = { labels: labels, parents: parents, values: values, ids: ids, color: color };
 
-    // Adjust color-mode attribute before setting data.
+    // Adjust color-mode + scale before setting data. For the diverging scale
+    // we clip to the 2nd..98th percentile of aggregated color values so a
+    // single outlier doesn't compress the useful range into one palette stop.
     tm.setAttribute('color-mode', cIsNum ? 'quantitative' : 'categorical');
     if (cIsNum) {
-      var lo = Infinity, hi = -Infinity;
+      var cscale = state.colorScale || DEFAULTS.colorScale || 'linear';
+      tm.setAttribute('color-scale', cscale);
+      var nums = [];
       for (var j = 0; j < color.length; j++) {
         var v = color[j];
-        if (typeof v === 'number' && Number.isFinite(v)) {
-          if (v < lo) lo = v;
-          if (v > hi) hi = v;
-        }
+        if (typeof v === 'number' && Number.isFinite(v)) nums.push(v);
       }
-      tm.colorDomain = (lo !== Infinity && lo < hi) ? [lo, hi] : undefined;
+      nums.sort(function (a, b) { return a - b; });
+      if (nums.length === 0) {
+        tm.colorDomain = undefined;
+      } else if (cscale === 'diverging') {
+        var pLo = nums[Math.floor(nums.length * 0.02)];
+        var pHi = nums[Math.min(nums.length - 1, Math.floor(nums.length * 0.98))];
+        // Center on zero when data straddles it, otherwise on the midpoint.
+        var mid = (pLo < 0 && pHi > 0) ? 0 : (pLo + pHi) / 2;
+        // Diverging needs [min, mid, max] with min<mid<max.
+        if (pLo >= mid) pLo = mid - Math.max(1e-9, Math.abs(mid - pHi));
+        if (pHi <= mid) pHi = mid + Math.max(1e-9, Math.abs(mid - pLo));
+        tm.colorDomain = [pLo, mid, pHi];
+      } else {
+        var lo = nums[0], hi = nums[nums.length - 1];
+        tm.colorDomain = lo < hi ? [lo, hi] : undefined;
+      }
     } else {
+      tm.setAttribute('color-scale', 'linear');
       tm.colorDomain = undefined;
     }
 
@@ -2857,6 +2875,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
       state.path = pth ? pth.split(',').filter(Boolean) : DEFAULTS.path.slice();
       state.theme = p.has('theme') ? p.get('theme') : '';
       state.palette = p.has('palette') ? p.get('palette') : '';
+      state.colorScale = p.has('colorScale') ? p.get('colorScale') : DEFAULTS.colorScale;
       state.zoom = p.get('zoom') || null;
       state.target = p.get('target') || null;
       state.focus = p.get('focus') || null;
@@ -2876,6 +2895,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
       p.set('path', state.path.join(','));
       if (state.theme) p.set('theme', state.theme);
       if (state.palette) p.set('palette', state.palette);
+      if (state.colorScale && state.colorScale !== 'linear') p.set('colorScale', state.colorScale);
       if (state.zoom) p.set('zoom', state.zoom);
       if (state.zoomPath && state.zoomPath.length) p.set('zoomPath', state.zoomPath.join(','));
       if (state.target) p.set('target', state.target);

@@ -2546,7 +2546,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
 <script>
 (function () {
   'use strict';
-  var DEFAULTS = {"size":"Generation_TWh","color":"Fuel","path":["Continent","Country","Fuel"],"theme":"tokyo-night","palette":"turbo"};
+  var DEFAULTS = {"size":"Generation_TWh","color":"Fuel","path":["Fuel","Continent","Country"],"theme":"catppuccin","palette":""};
   var THEMES = {"nord":{"label":"Nord","bg":"#2e3440","surface":"#3b4252","border":"#4c566a","fg":"#d8dee9","fgMuted":"#81a1c1","accent":"#88c0d0"},"solarized":{"label":"Solarized Dark","bg":"#002b36","surface":"#073642","border":"#586e75","fg":"#839496","fgMuted":"#657b83","accent":"#268bd2"},"dracula":{"label":"Dracula","bg":"#282a36","surface":"#44475a","border":"#6272a4","fg":"#f8f8f2","fgMuted":"#6272a4","accent":"#bd93f9"},"catppuccin":{"label":"Catppuccin Mocha","bg":"#1e1e2e","surface":"#313244","border":"#45475a","fg":"#cdd6f4","fgMuted":"#a6adc8","accent":"#cba6f7"},"gruvbox":{"label":"Gruvbox Dark","bg":"#282828","surface":"#3c3836","border":"#504945","fg":"#ebdbb2","fgMuted":"#a89984","accent":"#fabd2f"},"tokyo-night":{"label":"Tokyo Night","bg":"#1a1b26","surface":"#16161e","border":"#0f0f14","fg":"#c0caf5","fgMuted":"#787c99","accent":"#7aa2f7"},"rose-pine":{"label":"Rosé Pine","bg":"#191724","surface":"#1f1d2e","border":"#26233a","fg":"#e0def4","fgMuted":"#908caa","accent":"#c4a7e7"},"one-dark":{"label":"One Dark","bg":"#282c34","surface":"#2c313a","border":"#3e4452","fg":"#abb2bf","fgMuted":"#828997","accent":"#61afef"}};
   var ALL_COLS = ["Continent","Country","Year","Fuel","Generation_TWh","_row"];
   var NUMERIC_NONNEG = ["Year","Generation_TWh","_row"];

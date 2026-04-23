@@ -97,14 +97,14 @@
   </section>
 
   <section class="entry">
-    <h2>Global electricity generation — path: continent → country → fuel</h2>
+    <h2>Global electricity generation — path: fuel → continent → country</h2>
     <p>
       Ember's <a href="https://ember-energy.org/data/">Yearly Electricity Data</a>
       (2023, TWh by country and fuel). Built with
       <code>tools/table-treemap.js</code> from tabular JSONL: use the Size,
       Color and Path controls in the header to re-group on the fly — drag the
-      Path chips to reorder the hierarchy. Colored by fuel, <b>Turbo</b>
-      categorical palette.
+      Path chips to reorder the hierarchy. Colored by fuel, <b>Catppuccin
+      Mocha</b> theme.
     </p>
     <div class="frame-wrap">
       <iframe
@@ -120,23 +120,52 @@
   </section>
 
   <section class="entry">
-    <h2>Global electricity generation — path: fuel → continent → country</h2>
+    <h2>UC wages — position → campus → individual (<b>Nord</b> theme)</h2>
     <p>
-      Same dataset, re-rooted on fuel: each top-level cell is one fuel and
-      contains all countries generating it. Colored by continent, <b>Plasma</b>
-      categorical palette — shows how little of the world's coal generation
-      comes from outside Asia.
+      Public-record compensation for every UC employee paid at least $1,000
+      in 2024 (~334k rows). Group by position first, then by campus, then
+      by individual — makes it easy to compare who pays more for the same
+      title (e.g. clinical nurses at UCSD vs UCLA vs UCSF).
     </p>
     <div class="frame-wrap">
       <iframe
-        src="table-treemap-energy-by-fuel.html"
-        title="Global electricity generation 2023 — by fuel, colored by continent"
+        src="table-treemap-ca-uc.html#size=TotalWages&amp;color=Position&amp;path=Position,EmployerName,_row&amp;theme=nord"
+        title="UC wages — by position → campus"
         loading="lazy"></iframe>
     </div>
     <div class="links">
-      <a href="table-treemap-energy-by-fuel.html">Open full-page →</a>
+      <a href="table-treemap-ca-uc.html#size=TotalWages&amp;color=Position&amp;path=Position,EmployerName,_row&amp;theme=nord">Open full-page →</a>
       &nbsp;·&nbsp;
-      Source: <a href="https://ember-energy.org/data/yearly-electricity-data/" target="_blank" rel="noopener">Ember — Yearly Electricity Data</a>
+      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_UniversityOfCalifornia.zip</a>
+    </div>
+  </section>
+
+  <section class="entry">
+    <h2>UC wages — campus → position → individual (<b>Nord</b> theme)</h2>
+    <p>
+      Same dataset, regrouped to show the fine structure of each campus.
+      Path: campus → position → <code>_row</code>. Each leaf sliver is one
+      employee; wider bands are more populous titles within a campus. The
+      synthetic <code>_row</code> column is injected by
+      <code>table-treemap.js</code> into every dataset so you can always
+      drill down to individual source rows.
+    </p>
+    <p style="font-size: 0.875rem; font-style: italic;">
+      Trivia: the state's raw export has <code>EmployerName</code> and
+      <code>DepartmentOrSubdivision</code> hold the same 11 campuses, just
+      spelled differently — and one campus is listed as
+      "Univeristy of California - Santa Cruz". Hi, Santa Cruz!
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-ca-uc.html#size=TotalWages&amp;color=EmployerName&amp;path=EmployerName,Position,_row&amp;theme=nord"
+        title="UC wages — by campus → position"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-ca-uc.html#size=TotalWages&amp;color=EmployerName&amp;path=EmployerName,Position,_row&amp;theme=nord">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_UniversityOfCalifornia.zip</a>
     </div>
   </section>
 
@@ -181,72 +210,6 @@
       <a href="table-treemap-us-outlays-yoy.html">Open full-page →</a>
       &nbsp;·&nbsp;
       Source: <a href="https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/outlays-of-the-u-s-government" target="_blank" rel="noopener">U.S. Treasury Fiscal Data — MTS Table 5</a>
-    </div>
-  </section>
-
-  <section class="entry">
-    <h2>University of California employee wages 2024 — by campus</h2>
-    <p>
-      Public-record compensation for every UC employee paid at least $1,000
-      in 2024 (~334k rows), from California's
-      <a href="https://gcc.sco.ca.gov/">Government Compensation in
-      California</a> dataset. Path: campus → department. Colored
-      categorically by campus with the <b>Turbo</b> palette. Click a campus
-      to zoom into its departments.
-    </p>
-    <div class="frame-wrap">
-      <iframe
-        src="table-treemap-ca-uc.html"
-        title="UC employee wages 2024 — by campus"
-        loading="lazy"></iframe>
-    </div>
-    <div class="links">
-      <a href="table-treemap-ca-uc.html">Open full-page →</a>
-      &nbsp;·&nbsp;
-      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_UniversityOfCalifornia.zip</a>
-    </div>
-  </section>
-
-  <section class="entry">
-    <h2>UC wages — department → position → individual (<b>Nord</b> theme)</h2>
-    <p>
-      Same dataset, regrouped to show the fine structure. Path:
-      department → position → <code>_row</code>. Each leaf sliver is one
-      employee; wider bands are more populous titles within a department.
-      The synthetic <code>_row</code> column is injected by
-      <code>table-treemap.js</code> into every dataset so you can always
-      drill down to individual source rows.
-    </p>
-    <div class="frame-wrap">
-      <iframe
-        src="table-treemap-ca-uc.html#size=TotalWages&amp;color=DepartmentOrSubdivision&amp;path=DepartmentOrSubdivision,Position,_row&amp;theme=nord"
-        title="UC wages — by department → position"
-        loading="lazy"></iframe>
-    </div>
-    <div class="links">
-      <a href="table-treemap-ca-uc.html#size=TotalWages&amp;color=DepartmentOrSubdivision&amp;path=DepartmentOrSubdivision,Position,_row&amp;theme=nord">Open full-page →</a>
-      &nbsp;·&nbsp;
-      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_UniversityOfCalifornia.zip</a>
-    </div>
-  </section>
-
-  <section class="entry">
-    <h2>UC wages — position → campus → individual (<b>Nord</b> theme)</h2>
-    <p>
-      One more rearrangement of the same file: group by position first, then
-      by campus, then by individual. Makes it easy to compare who pays more
-      for the same title — e.g. clinical nurses at UCSD vs UCLA vs UCSF.
-    </p>
-    <div class="frame-wrap">
-      <iframe
-        src="table-treemap-ca-uc.html#size=TotalWages&amp;color=Position&amp;path=Position,EmployerName,_row&amp;theme=nord"
-        title="UC wages — by position → campus"
-        loading="lazy"></iframe>
-    </div>
-    <div class="links">
-      <a href="table-treemap-ca-uc.html#size=TotalWages&amp;color=Position&amp;path=Position,EmployerName,_row&amp;theme=nord">Open full-page →</a>
-      &nbsp;·&nbsp;
-      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_UniversityOfCalifornia.zip</a>
     </div>
   </section>
 
