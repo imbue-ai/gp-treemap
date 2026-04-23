@@ -185,6 +185,17 @@
       (See the intro above for the Police / Fire / Parks &amp; Rec
       spelling carnival.)
     </p>
+    <p>
+      To reproduce this plot from scratch, grab the raw GCC zip and pipe
+      its CSV into <code>gp-treemap-table</code>:
+    </p>
+    <pre style="background: var(--border, #f0f0f0); padding: 8px 12px; border-radius: 4px; font-size: 12px; overflow-x: auto; margin: 0 0 1rem;"><code>curl -LO https://github.com/imbue-ai/gp-treemap/raw/main/samples/data/table/ca-raw/2024_City.zip
+unzip 2024_City.zip
+npx -p @imbue-ai/gp-treemap gp-treemap-table \
+  --size=TotalWages --color=DepartmentOrSubdivision \
+  --path=DepartmentOrSubdivision,EmployerCounty,EmployerName,Position,_row \
+  --theme=one-dark \
+  2024_City.csv</code></pre>
     <div class="frame-wrap">
       <iframe
         src="table-treemap-ca-city.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22DepartmentOrSubdivision%22%2C%22path%22%3A%5B%22DepartmentOrSubdivision%22%2C%22EmployerCounty%22%2C%22EmployerName%22%2C%22Position%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22target%22%3A%22Recreation%20And%20Parks%5Cu0000Los%20Angeles%5Cu0000Los%20Angeles%5Cu0000Recreation%20Assistant%5Cu0000151271%22%2C%22focus%22%3A%22Recreation%20And%20Parks%5Cu0000Los%20Angeles%5Cu0000Los%20Angeles%5Cu0000Recreation%20Assistant%22%2C%22theme%22%3A%22one-dark%22%7D%7D"
