@@ -225,9 +225,12 @@ test('scan HTML: numeric IDs round-trip through URL hash', async ({ page }) => {
     const targetId = await page.locator('gp-treemap').evaluate((el) => el._targetId);
     expect(typeof targetId).toBe('number');
 
-    // Read the hash — it should contain the numeric target as a string.
+    // Read the hash — it should be the URL-encoded JSON blob containing a
+    // numeric target inside viewer: { target: N }.
     const hash = await page.evaluate(() => window.location.hash);
-    expect(hash).toMatch(/target=\d+/);
+    expect(hash).toMatch(/^#s=/);
+    const parsed = JSON.parse(decodeURIComponent(hash.replace(/^#s=/, '')));
+    expect(parsed.viewer && typeof parsed.viewer.target).toBe('number');
 
     // Reload with the same hash and verify the target is restored as a number.
     await page.goto('file://' + out + hash);

@@ -263,15 +263,19 @@ test('color-by dropdown switches between all modes without errors', async ({ pag
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
   // Verify the URL hash recorded the last switch back to the default.
-  // (extension is the default so 'color' param should be absent)
+  // (extension is the default so 'color' should be absent in the JSON blob)
   const hash = await page.evaluate(() => location.hash);
-  expect(hash).not.toContain('color=');
+  const parseHash = (h) => {
+    if (!h || !h.startsWith('#s=')) return {};
+    try { return JSON.parse(decodeURIComponent(h.slice(3))); } catch { return {}; }
+  };
+  expect(parseHash(hash).color).toBeUndefined();
 
-  // Switch to folder and verify hash contains color=folder.
+  // Switch to folder and verify hash carries color=folder.
   await colorSel.selectOption('folder');
   await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
   const hash2 = await page.evaluate(() => location.hash);
-  expect(hash2).toContain('color=folder');
+  expect(parseHash(hash2).color).toBe('folder');
 
   // Click a cell to focus a leaf node and verify the status bar shows metadata.
   const tmEl = page.locator('gp-treemap');
@@ -379,7 +383,11 @@ test('zoom restores from URL hash in lazy tree', async ({ page }) => {
   expect(info.activeRoot).not.toBe(info.treeRoot);
   expect(info.zoomPath).toBeTruthy();
   expect(info.zoomPath.length).toBeGreaterThan(1);
-  expect(info.hash).toContain('zoomPath=');
+  const parsedZoomHash = (() => {
+    try { return JSON.parse(decodeURIComponent(info.hash.replace(/^#s=/, ''))); }
+    catch { return {}; }
+  })();
+  expect(Array.isArray(parsedZoomHash.viewer && parsedZoomHash.viewer.zoomPath)).toBe(true);
 
   // Second load: reload with the same hash — zoom should restore.
   const url = 'file://' + out + info.hash;

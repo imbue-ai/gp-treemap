@@ -446,7 +446,7 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
     .map(([k, v]) => `<option value="${k}">${escapeHtml(v.label)}</option>`)
     .join('');
   const paletteOptions = Object.entries(palettePicks)
-    .map(([k, v]) => `<option value="palette:${k}">${escapeHtml(v)}</option>`)
+    .map(([k, v]) => `<option value="${k}">${escapeHtml(v)}</option>`)
     .join('');
 
   // --- Write the HTML, streaming the large data section ---
@@ -472,7 +472,7 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
     border-top: 1px solid var(--page-border, #0002); transition: background .15s, color .15s; }
   #stats-bar { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   #scanned-note { flex-shrink: 0; color: var(--page-fg-muted, #888); }
-  #theme-sel, #color-sel { font-size: 12px; padding: 2px 4px; border-radius: 4px;
+  #theme-sel, #palette-sel, #color-sel { font-size: 12px; padding: 2px 4px; border-radius: 4px;
     background: var(--page-bg, #fff); color: var(--page-fg, #333);
     border: 1px solid var(--page-border, #ccc); cursor: pointer; }
 </style>
@@ -494,11 +494,16 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
       <option value="atime">accessed</option>
     </select>
   </span>
-  <span class="stat" style="margin-left:auto;">
+  <span class="stat" style="margin-left:auto;">theme
     <select id="theme-sel">
       <option value="">Default (light)</option>
-      <optgroup label="Themes">${themeOptions}</optgroup>
-      <optgroup label="Palettes">${paletteOptions}</optgroup>
+      ${themeOptions}
+    </select>
+  </span>
+  <span class="stat">palette
+    <select id="palette-sel">
+      <option value="">(theme default)</option>
+      ${paletteOptions}
     </select>
   </span>
 </header>
@@ -860,28 +865,23 @@ window._bootReady.then(function () {
   requestAnimationFrame(function () { setTimeout(update, 0); });
 });
 // Color-by switcher + theme/palette switcher + URL hash sync.
-// The theme dropdown is a single <select> with two optgroups.
-// Themes (plain values like "nord") set page chrome + treemap palette.
-// Palettes ("palette:viridis") override only the treemap palette, keeping
-// the current page chrome. Both are persisted separately in the URL hash
-// so the combination survives reloads.
+// Theme drives page chrome + the default categorical palette. The
+// Palette dropdown is an independent override applied on top. Both are
+// persisted in a single URL-encoded JSON blob under the key "s"; legacy
+// key=value params are still read for backwards compatibility.
 window._bootReady.then(function () {
   var themes = ${themesJson};
   var themeSel = document.getElementById('theme-sel');
+  var paletteSel = document.getElementById('palette-sel');
   var colorSel = document.getElementById('color-sel');
   var tm = document.getElementById('tm');
   var htmlRoot = document.documentElement;
   var DEFAULT_THEME = 'tokyo-night';
   var DEFAULT_COLOR = '${colorBy}';
   var DEFAULT_PALETTE = '';
-  var currentTheme = DEFAULT_THEME;   // page chrome theme key
+  var currentTheme = DEFAULT_THEME;
   var currentColor = DEFAULT_COLOR;
-  var currentPalette = DEFAULT_PALETTE; // palette override ('' = use theme default)
-
-  // Sync the <select> to reflect the combined theme+palette state.
-  function syncDropdown() {
-    themeSel.value = currentPalette ? 'palette:' + currentPalette : (currentTheme || '');
-  }
+  var currentPalette = DEFAULT_PALETTE;
 
   function applyPageTheme(name) {
     currentTheme = name || '';
@@ -898,56 +898,66 @@ window._bootReady.then(function () {
         .forEach(function (v) { htmlRoot.style.removeProperty(v); });
     }
     tm.setAttribute('theme', name || '');
-    // Re-apply palette override (theme change resets palette to theme default).
-    if (currentPalette) applyPalette(currentPalette);
-    syncDropdown();
+    applyPalette(currentPalette);
+    themeSel.value = currentTheme;
   }
   function applyPalette(name) {
     currentPalette = name || '';
     window._currentPalette = currentPalette;
-    if (name) {
-      tm._props._userPalette = name;
-      tm.setAttribute('palette', name);
-      tm._props.palette = name;
-    } else {
-      // Revert to whatever the active theme provides.
-      var th = currentTheme || '';
-      tm._props._userPalette = th || 'gp-default';
-      tm.setAttribute('palette', th || 'gp-default');
-      tm._props.palette = th || 'gp-default';
-    }
+    var effective = name || currentTheme || 'gp-default';
+    tm._props._userPalette = effective;
+    tm.setAttribute('palette', effective);
+    tm._props.palette = effective;
     tm._queueRender();
-    syncDropdown();
+    paletteSel.value = currentPalette;
   }
   function applyColor(mode) {
     currentColor = mode || DEFAULT_COLOR;
     window._applyColorBy(currentColor);
     colorSel.value = currentColor;
-    // Re-apply palette override since _applyColorBy may reset it.
     if (currentPalette) applyPalette(currentPalette);
   }
-  themeSel.addEventListener('change', function () {
-    var val = themeSel.value;
-    if (val.indexOf('palette:') === 0) {
-      applyPalette(val.slice(8));
-    } else {
-      currentPalette = '';
-      window._currentPalette = '';
-      applyPageTheme(val);
-    }
-    writeHash();
-  });
+  themeSel.addEventListener('change', function () { applyPageTheme(themeSel.value); writeHash(); });
+  paletteSel.addEventListener('change', function () { applyPalette(paletteSel.value); writeHash(); });
   colorSel.addEventListener('change', function () { applyColor(colorSel.value); writeHash(); });
 
   function coerceId(s) { return /^\\d+$/.test(s) ? Number(s) : s; }
   function readHash() {
     try {
-      var p = new URLSearchParams(location.hash.slice(1));
-      var z = p.get('zoom');   if (z) tm._internalVisibleRootId = coerceId(z);
-      var zp = p.get('zoomPath'); if (zp) tm._visibleRootPath = zp.split(',').map(coerceId);
-      var d = p.get('depth');  if (d != null) tm.displayDepth = d === 'Infinity' ? Infinity : Number(d);
-      var t = p.get('target'); if (t) { tm._targetId = coerceId(t); tm._selectionLocked = true; }
-      var f = p.get('focus');  if (f) tm._focusId = coerceId(f);
+      if (location.hash.length <= 1) return;
+      var raw = location.hash.slice(1);
+      if (raw.charAt(0) === 's' && raw.charAt(1) === '=') {
+        var obj = null;
+        try { obj = JSON.parse(decodeURIComponent(raw.slice(2))); } catch (_) { obj = null; }
+        if (obj) {
+          applyPageTheme('theme' in obj ? (obj.theme || '') : DEFAULT_THEME);
+          applyPalette('palette' in obj ? (obj.palette || '') : '');
+          applyColor(obj.color || DEFAULT_COLOR);
+          var v = obj.viewer || obj;
+          tm.viewerState = {
+            zoom: v.zoom != null ? coerceId(v.zoom) : undefined,
+            zoomPath: Array.isArray(v.zoomPath) ? v.zoomPath.map(coerceId) : undefined,
+            depth: v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : undefined),
+            target: v.target != null ? coerceId(v.target) : undefined,
+            focus: v.focus != null ? coerceId(v.focus) : undefined,
+          };
+          return;
+        }
+      }
+      // Legacy fallback: individual key=value params.
+      var p = new URLSearchParams(raw);
+      var z = p.get('zoom');
+      var zp = p.get('zoomPath');
+      var d = p.get('depth');
+      var t = p.get('target');
+      var f = p.get('focus');
+      tm.viewerState = {
+        zoom: z ? coerceId(z) : undefined,
+        zoomPath: zp ? zp.split(',').map(coerceId) : undefined,
+        depth: d == null ? undefined : (d === 'Infinity' ? Infinity : Number(d)),
+        target: t ? coerceId(t) : undefined,
+        focus: f ? coerceId(f) : undefined,
+      };
       var th = p.get('theme'); applyPageTheme(th != null ? th : DEFAULT_THEME);
       var pl = p.get('palette'); if (pl != null) applyPalette(pl);
       var cb = p.get('color'); if (cb) applyColor(cb);
@@ -955,22 +965,26 @@ window._bootReady.then(function () {
   }
   function writeHash() {
     try {
-      var p = new URLSearchParams();
-      var z = tm._activeVisibleRootId(); if (z) p.set('zoom', z);
-      var zp = tm._visibleRootPath;     if (zp && zp.length) p.set('zoomPath', zp.join(','));
-      var d = tm.displayDepth;           if (d !== Infinity) p.set('depth', String(d));
-      var t = tm._targetId;              if (t) p.set('target', t);
-      var f = tm._focusId;               var root = tm._tree && tm._tree.roots[0];
-                                         if (f && f !== t && f !== root) p.set('focus', f);
-      if (currentTheme !== DEFAULT_THEME) p.set('theme', currentTheme);
-      if (currentPalette !== DEFAULT_PALETTE) p.set('palette', currentPalette);
-      if (currentColor !== DEFAULT_COLOR) p.set('color', currentColor);
-      var s = p.toString();
+      var v = tm.viewerState || {};
+      var out = {};
+      if (currentColor !== DEFAULT_COLOR) out.color = currentColor;
+      if (currentTheme !== DEFAULT_THEME) out.theme = currentTheme;
+      if (currentPalette !== DEFAULT_PALETTE) out.palette = currentPalette;
+      // Component-level state (zoom/target/focus/depth/etc.)
+      if (Object.keys(v).length) out.viewer = v;
+      var s = Object.keys(out).length ? 's=' + encodeURIComponent(JSON.stringify(out)) : '';
       history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
     } catch (_) {}
   }
   colorSel.value = DEFAULT_COLOR;
   readHash();
+  // Always establish the theme/palette/color so the page chrome CSS vars
+  // and the treemap's color pipeline are live even when the URL has no
+  // hash. (readHash is a no-op on an empty hash.)
+  if (location.hash.length <= 1) {
+    applyPageTheme(DEFAULT_THEME);
+    applyColor(DEFAULT_COLOR);
+  }
   if (location.hash.length > 1) tm._queueRender();
   tm.addEventListener('gp-zoom-change', writeHash);
   tm.addEventListener('gp-depth-change', writeHash);

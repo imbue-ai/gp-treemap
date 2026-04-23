@@ -60,10 +60,17 @@
     </div>
   </div>
   <div class="ctl" style="margin-left:auto;">
+    <label>Theme</label>
     <select id="theme-sel">
       <option value="">Default (light)</option>
-      <optgroup label="Themes"><option value="nord">Nord</option><option value="solarized">Solarized Dark</option><option value="dracula">Dracula</option><option value="catppuccin">Catppuccin Mocha</option><option value="gruvbox">Gruvbox Dark</option><option value="tokyo-night">Tokyo Night</option><option value="rose-pine">Rosé Pine</option><option value="one-dark">One Dark</option></optgroup>
-      <optgroup label="Palettes"><option value="palette:viridis">Viridis</option><option value="palette:plasma">Plasma</option><option value="palette:inferno">Inferno</option><option value="palette:magma">Magma</option><option value="palette:turbo">Turbo</option><option value="palette:heatmap">Heatmap</option><option value="palette:coolwarm">Cool–Warm</option><option value="palette:rainbow">Rainbow</option><option value="palette:gp-default">Default 8-hue</option></optgroup>
+      <option value="nord">Nord</option><option value="solarized">Solarized Dark</option><option value="dracula">Dracula</option><option value="catppuccin">Catppuccin Mocha</option><option value="gruvbox">Gruvbox Dark</option><option value="tokyo-night">Tokyo Night</option><option value="rose-pine">Rosé Pine</option><option value="one-dark">One Dark</option>
+    </select>
+  </div>
+  <div class="ctl">
+    <label>Palette</label>
+    <select id="palette-sel">
+      <option value="">(theme default)</option>
+      <option value="viridis">Viridis</option><option value="plasma">Plasma</option><option value="inferno">Inferno</option><option value="magma">Magma</option><option value="turbo">Turbo</option><option value="heatmap">Heatmap</option><option value="coolwarm">Cool–Warm</option><option value="rainbow">Rainbow</option><option value="gp-default">Default 8-hue</option>
     </select>
   </div>
 </header>
@@ -2363,6 +2370,74 @@ class GpTreemap extends HTMLElement {
     }
   }
 
+  // ----- viewerState: a JSON-shaped snapshot of the user-facing visual
+  // state (zoom / target / focus / depth / theme / palette / showLabels).
+  // Pages use this to serialize/restore component state as a whole — they
+  // still own the URL hash, but the component provides the object.
+  //
+  // Shape:
+  //   {
+  //     zoom?: NodeId,         // currently zoomed-into node (null → tree root)
+  //     zoomPath?: NodeId[],   // ancestor chain for lazy restore; optional
+  //     target?: NodeId,       // clicked cell
+  //     focus?: NodeId,        // breadcrumb-focused ancestor
+  //     depth?: number|'Infinity',
+  //     theme?: string,        // page-chrome theme key ('' = default light)
+  //     palette?: string,      // explicit palette override (empty → theme default)
+  //     showLabels?: boolean,
+  //   }
+  //
+  // Any field that is null/undefined on set is treated as "no opinion" and
+  // the component keeps its current value. Setting a field to an explicit
+  // null clears it.
+  get viewerState() {
+    const p = this._props;
+    const state = {};
+    const zoom = this._stretchZoomId != null ? this._stretchZoomId
+      : (p.visibleRootId != null ? p.visibleRootId : this._internalVisibleRootId);
+    if (zoom != null) state.zoom = zoom;
+    if (this._visibleRootPath && this._visibleRootPath.length) {
+      state.zoomPath = this._visibleRootPath.slice();
+    }
+    if (this._targetId != null) state.target = this._targetId;
+    if (this._focusId != null && this._focusId !== this._targetId) state.focus = this._focusId;
+    if (p.displayDepth !== Infinity) state.depth = p.displayDepth;
+    const theme = this.getAttribute('theme');
+    if (theme) state.theme = theme;
+    if (p.palette && p.palette !== theme) state.palette = p.palette;
+    if (p.showLabels) state.showLabels = true;
+    return state;
+  }
+  set viewerState(obj) {
+    if (obj == null) obj = {};
+    // Theme + palette first (affects color LUT before paint).
+    if ('theme' in obj) this.setAttribute('theme', obj.theme || '');
+    if ('palette' in obj) {
+      if (obj.palette) { this.setAttribute('palette', obj.palette); this._props.palette = obj.palette; }
+    }
+    if ('showLabels' in obj) {
+      this._props.showLabels = !!obj.showLabels;
+      if (obj.showLabels) this.setAttribute('show-labels', 'true');
+      else this.removeAttribute('show-labels');
+    }
+    if ('depth' in obj) {
+      const d = obj.depth;
+      this._props.displayDepth = d === 'Infinity' || d == null ? Infinity : Number(d);
+    }
+    // Zoom state — set path first so lazy restore has the chain available.
+    if ('zoomPath' in obj) this._visibleRootPath = obj.zoomPath ? obj.zoomPath.slice() : null;
+    if ('zoom' in obj) {
+      if (this._props.visibleRootId != null) this._props.visibleRootId = obj.zoom;
+      else this._internalVisibleRootId = obj.zoom == null ? null : obj.zoom;
+    }
+    if ('target' in obj) {
+      this._targetId = obj.target == null ? null : obj.target;
+      this._selectionLocked = this._targetId != null;
+    }
+    if ('focus' in obj) this._focusId = obj.focus == null ? null : obj.focus;
+    this._queueRender();
+  }
+
   _setVisibleRoot(id, path) {
     if (this._props.visibleRootId != null) {
       this._dispatch('gp-zoom-change', id, { intendedRoot: true });
@@ -2546,7 +2621,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
 <script>
 (function () {
   'use strict';
-  var DEFAULTS = {"size":"Generation_TWh","color":"Fuel","path":["Fuel","Continent","Country"],"theme":"catppuccin","palette":""};
+  var DEFAULTS = {"size":"Generation_TWh","color":"Fuel","path":["Fuel","Continent","Country"],"theme":"catppuccin","palette":"","colorScale":"linear"};
   var THEMES = {"nord":{"label":"Nord","bg":"#2e3440","surface":"#3b4252","border":"#4c566a","fg":"#d8dee9","fgMuted":"#81a1c1","accent":"#88c0d0"},"solarized":{"label":"Solarized Dark","bg":"#002b36","surface":"#073642","border":"#586e75","fg":"#839496","fgMuted":"#657b83","accent":"#268bd2"},"dracula":{"label":"Dracula","bg":"#282a36","surface":"#44475a","border":"#6272a4","fg":"#f8f8f2","fgMuted":"#6272a4","accent":"#bd93f9"},"catppuccin":{"label":"Catppuccin Mocha","bg":"#1e1e2e","surface":"#313244","border":"#45475a","fg":"#cdd6f4","fgMuted":"#a6adc8","accent":"#cba6f7"},"gruvbox":{"label":"Gruvbox Dark","bg":"#282828","surface":"#3c3836","border":"#504945","fg":"#ebdbb2","fgMuted":"#a89984","accent":"#fabd2f"},"tokyo-night":{"label":"Tokyo Night","bg":"#1a1b26","surface":"#16161e","border":"#0f0f14","fg":"#c0caf5","fgMuted":"#787c99","accent":"#7aa2f7"},"rose-pine":{"label":"Rosé Pine","bg":"#191724","surface":"#1f1d2e","border":"#26233a","fg":"#e0def4","fgMuted":"#908caa","accent":"#c4a7e7"},"one-dark":{"label":"One Dark","bg":"#282c34","surface":"#2c313a","border":"#3e4452","fg":"#abb2bf","fgMuted":"#828997","accent":"#61afef"}};
   var ALL_COLS = ["Continent","Country","Year","Fuel","Generation_TWh","_row"];
   var NUMERIC_NONNEG = ["Year","Generation_TWh","_row"];
@@ -2570,6 +2645,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
   var pathMenuBtn = document.getElementById('path-menu-btn');
   var pathMenuPop = document.getElementById('path-menu-pop');
   var themeSel = document.getElementById('theme-sel');
+  var paletteSel = document.getElementById('palette-sel');
   var statsBar = document.getElementById('stats-bar');
 
   // Populate size / color dropdowns.
@@ -2589,6 +2665,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
     path: DEFAULTS.path.slice(),
     theme: DEFAULTS.theme,
     palette: DEFAULTS.palette,
+    colorScale: DEFAULTS.colorScale,
     zoom: null, target: null, focus: null, zoomPath: null, depth: null,
   };
 
@@ -2763,19 +2840,36 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
 
     tree = { labels: labels, parents: parents, values: values, ids: ids, color: color };
 
-    // Adjust color-mode attribute before setting data.
+    // Adjust color-mode + scale before setting data. For the diverging scale
+    // we clip to the 2nd..98th percentile of aggregated color values so a
+    // single outlier doesn't compress the useful range into one palette stop.
     tm.setAttribute('color-mode', cIsNum ? 'quantitative' : 'categorical');
     if (cIsNum) {
-      var lo = Infinity, hi = -Infinity;
+      var cscale = state.colorScale || DEFAULTS.colorScale || 'linear';
+      tm.setAttribute('color-scale', cscale);
+      var nums = [];
       for (var j = 0; j < color.length; j++) {
         var v = color[j];
-        if (typeof v === 'number' && Number.isFinite(v)) {
-          if (v < lo) lo = v;
-          if (v > hi) hi = v;
-        }
+        if (typeof v === 'number' && Number.isFinite(v)) nums.push(v);
       }
-      tm.colorDomain = (lo !== Infinity && lo < hi) ? [lo, hi] : undefined;
+      nums.sort(function (a, b) { return a - b; });
+      if (nums.length === 0) {
+        tm.colorDomain = undefined;
+      } else if (cscale === 'diverging') {
+        var pLo = nums[Math.floor(nums.length * 0.02)];
+        var pHi = nums[Math.min(nums.length - 1, Math.floor(nums.length * 0.98))];
+        // Center on zero when data straddles it, otherwise on the midpoint.
+        var mid = (pLo < 0 && pHi > 0) ? 0 : (pLo + pHi) / 2;
+        // Diverging needs [min, mid, max] with min<mid<max.
+        if (pLo >= mid) pLo = mid - Math.max(1e-9, Math.abs(mid - pHi));
+        if (pHi <= mid) pHi = mid + Math.max(1e-9, Math.abs(mid - pLo));
+        tm.colorDomain = [pLo, mid, pHi];
+      } else {
+        var lo = nums[0], hi = nums[nums.length - 1];
+        tm.colorDomain = lo < hi ? [lo, hi] : undefined;
+      }
     } else {
+      tm.setAttribute('color-scale', 'linear');
       tm.colorDomain = undefined;
     }
 
@@ -2790,6 +2884,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
   }
 
   function applyPageTheme(name) {
+    state.theme = name || '';
     var t = name ? THEMES[name] : null;
     var r = document.documentElement;
     if (t) {
@@ -2804,85 +2899,89 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
         .forEach(function (v) { r.style.removeProperty(v); });
     }
     tm.setAttribute('theme', name || '');
-    if (state.palette) applyPalette(state.palette);
-    syncThemeDropdown();
+    // Re-apply palette override since setting theme resets it.
+    applyPalette(state.palette);
+    themeSel.value = state.theme;
   }
   function applyPalette(name) {
     state.palette = name || '';
-    if (name) {
-      tm._props._userPalette = name;
-      tm.setAttribute('palette', name);
-      tm._props.palette = name;
-    } else {
-      var th = state.theme || '';
-      tm._props._userPalette = th || 'gp-default';
-      tm.setAttribute('palette', th || 'gp-default');
-      tm._props.palette = th || 'gp-default';
-    }
+    var effective = name || state.theme || 'gp-default';
+    tm._props.palette = effective;
+    tm.setAttribute('palette', effective);
     tm._queueRender && tm._queueRender();
-    syncThemeDropdown();
-  }
-  function syncThemeDropdown() {
-    themeSel.value = state.palette ? 'palette:' + state.palette : (state.theme || '');
+    paletteSel.value = state.palette;
   }
 
-  themeSel.addEventListener('change', function () {
-    var v = themeSel.value;
-    if (v.indexOf('palette:') === 0) {
-      state.palette = v.slice(8);
-      applyPalette(state.palette);
-    } else {
-      state.palette = '';
-      state.theme = v;
-      applyPageTheme(v);
-    }
-    writeHash();
-  });
+  themeSel.addEventListener('change', function () { applyPageTheme(themeSel.value); writeHash(); });
+  paletteSel.addEventListener('change', function () { applyPalette(paletteSel.value); writeHash(); });
   sizeSel.addEventListener('change', function () { state.size = sizeSel.value; rebuild(); writeHash(); });
   colorSel.addEventListener('change', function () { state.color = colorSel.value; rebuild(); writeHash(); });
 
   // ---- URL hash sync. ----
-  function coerceId(s) { return s; } // path IDs are strings
+  // Format: single URL-encoded JSON blob under the key "s". Previous
+  // versions used individual key=value params (size=...&color=...&theme=...);
+  // we still read that format for backwards compatibility with old URLs.
   function readHash() {
     try {
       if (location.hash.length <= 1) return false;
-      // A populated hash is the single source of truth: any param that is
-      // absent is treated as "not set", NOT as "fall back to the build-time
-      // default". Otherwise a URL like #theme=nord would silently inherit
-      // the CLI --palette override that was baked into DEFAULTS.
-      var p = new URLSearchParams(location.hash.slice(1));
-      state.size = p.get('size') || DEFAULTS.size;
-      state.color = p.get('color') || DEFAULTS.color;
-      var pth = p.get('path');
-      state.path = pth ? pth.split(',').filter(Boolean) : DEFAULTS.path.slice();
-      state.theme = p.has('theme') ? p.get('theme') : '';
-      state.palette = p.has('palette') ? p.get('palette') : '';
-      state.zoom = p.get('zoom') || null;
-      state.target = p.get('target') || null;
-      state.focus = p.get('focus') || null;
-      var depth = p.get('depth');
-      state.depth = depth ? (depth === 'Infinity' ? Infinity : Number(depth)) : null;
-      var zp = p.get('zoomPath');
-      state.zoomPath = zp ? zp.split(',') : null;
+      var raw = location.hash.slice(1);
+      var obj = null;
+      if (raw.charAt(0) === 's' && raw.charAt(1) === '=') {
+        try { obj = JSON.parse(decodeURIComponent(raw.slice(2))); } catch (_) { obj = null; }
+      }
+      if (obj) {
+        // New JSON-blob format.
+        if (obj.size) state.size = obj.size;
+        if (obj.color) state.color = obj.color;
+        if (Array.isArray(obj.path)) state.path = obj.path.slice();
+        if ('colorScale' in obj) state.colorScale = obj.colorScale || DEFAULTS.colorScale;
+        var v = obj.viewer || {};
+        state.theme = 'theme' in v ? (v.theme || '') : '';
+        state.palette = 'palette' in v ? (v.palette || '') : '';
+        state.zoom = v.zoom != null ? v.zoom : null;
+        state.zoomPath = Array.isArray(v.zoomPath) ? v.zoomPath.slice() : null;
+        state.target = v.target != null ? v.target : null;
+        state.focus = v.focus != null ? v.focus : null;
+        state.depth = v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : null);
+      } else {
+        // Legacy key=value format.
+        var p = new URLSearchParams(raw);
+        state.size = p.get('size') || DEFAULTS.size;
+        state.color = p.get('color') || DEFAULTS.color;
+        var pth = p.get('path');
+        state.path = pth ? pth.split(',').filter(Boolean) : DEFAULTS.path.slice();
+        state.theme = p.has('theme') ? p.get('theme') : '';
+        state.palette = p.has('palette') ? p.get('palette') : '';
+        state.colorScale = p.has('colorScale') ? p.get('colorScale') : DEFAULTS.colorScale;
+        state.zoom = p.get('zoom') || null;
+        state.target = p.get('target') || null;
+        state.focus = p.get('focus') || null;
+        var depth = p.get('depth');
+        state.depth = depth ? (depth === 'Infinity' ? Infinity : Number(depth)) : null;
+        var zp = p.get('zoomPath');
+        state.zoomPath = zp ? zp.split(',') : null;
+      }
       return true;
     } catch (_) { return false; }
   }
   function writeHash() {
     try {
-      var p = new URLSearchParams();
-      // Always emit everything so the URL captures the complete state.
-      p.set('size', state.size);
-      p.set('color', state.color);
-      p.set('path', state.path.join(','));
-      if (state.theme) p.set('theme', state.theme);
-      if (state.palette) p.set('palette', state.palette);
-      if (state.zoom) p.set('zoom', state.zoom);
-      if (state.zoomPath && state.zoomPath.length) p.set('zoomPath', state.zoomPath.join(','));
-      if (state.target) p.set('target', state.target);
-      if (state.focus && state.focus !== state.target) p.set('focus', state.focus);
-      if (state.depth != null && state.depth !== Infinity) p.set('depth', String(state.depth));
-      var s = p.toString();
-      history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+      // Pull the component's state via the new viewerState API and merge
+      // with the page-level fields (size/color/path) into a single blob.
+      var v = tm.viewerState || {};
+      // Page-side theme/palette take precedence (we're authoritative over
+      // page chrome; the component only mirrors them for its own painting).
+      if (state.theme) v.theme = state.theme; else delete v.theme;
+      if (state.palette) v.palette = state.palette; else delete v.palette;
+      var out = {
+        size: state.size,
+        color: state.color,
+        path: state.path.slice(),
+        viewer: v,
+      };
+      if (state.colorScale && state.colorScale !== 'linear') out.colorScale = state.colorScale;
+      var s = 's=' + encodeURIComponent(JSON.stringify(out));
+      history.replaceState(null, '', '#' + s);
     } catch (_) {}
   }
 
@@ -2943,19 +3042,22 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
     colorSel.value = state.color;
     renderChips();
     applyPageTheme(state.theme);
-    if (state.palette) applyPalette(state.palette);
+    applyPalette(state.palette);
 
     rebuild();
 
+    // Restore the component-level state (zoom/target/focus/depth/etc.)
+    // via the component's viewerState setter — single JSON-shaped restore.
+    tm.viewerState = {
+      zoom: state.zoom || undefined,
+      zoomPath: state.zoomPath || undefined,
+      target: state.target || undefined,
+      focus: state.focus || undefined,
+      depth: state.depth != null ? state.depth : undefined,
+    };
+
     // If no hash was present, populate it with the current defaults.
     if (!hadHash) writeHash();
-
-    // Restore zoom/target from hash after the first render.
-    if (state.zoomPath && state.zoomPath.length) tm._visibleRootPath = state.zoomPath.slice();
-    if (state.zoom) tm._internalVisibleRootId = state.zoom;
-    if (state.target) { tm._targetId = state.target; tm._selectionLocked = true; }
-    if (state.focus) tm._focusId = state.focus;
-    if (state.zoom || state.target) tm._queueRender && tm._queueRender();
 
     // Stats bar.
     var bar = statsBar;

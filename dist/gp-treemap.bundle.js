@@ -2282,6 +2282,74 @@ class GpTreemap extends HTMLElement {
     }
   }
 
+  // ----- viewerState: a JSON-shaped snapshot of the user-facing visual
+  // state (zoom / target / focus / depth / theme / palette / showLabels).
+  // Pages use this to serialize/restore component state as a whole — they
+  // still own the URL hash, but the component provides the object.
+  //
+  // Shape:
+  //   {
+  //     zoom?: NodeId,         // currently zoomed-into node (null → tree root)
+  //     zoomPath?: NodeId[],   // ancestor chain for lazy restore; optional
+  //     target?: NodeId,       // clicked cell
+  //     focus?: NodeId,        // breadcrumb-focused ancestor
+  //     depth?: number|'Infinity',
+  //     theme?: string,        // page-chrome theme key ('' = default light)
+  //     palette?: string,      // explicit palette override (empty → theme default)
+  //     showLabels?: boolean,
+  //   }
+  //
+  // Any field that is null/undefined on set is treated as "no opinion" and
+  // the component keeps its current value. Setting a field to an explicit
+  // null clears it.
+  get viewerState() {
+    const p = this._props;
+    const state = {};
+    const zoom = this._stretchZoomId != null ? this._stretchZoomId
+      : (p.visibleRootId != null ? p.visibleRootId : this._internalVisibleRootId);
+    if (zoom != null) state.zoom = zoom;
+    if (this._visibleRootPath && this._visibleRootPath.length) {
+      state.zoomPath = this._visibleRootPath.slice();
+    }
+    if (this._targetId != null) state.target = this._targetId;
+    if (this._focusId != null && this._focusId !== this._targetId) state.focus = this._focusId;
+    if (p.displayDepth !== Infinity) state.depth = p.displayDepth;
+    const theme = this.getAttribute('theme');
+    if (theme) state.theme = theme;
+    if (p.palette && p.palette !== theme) state.palette = p.palette;
+    if (p.showLabels) state.showLabels = true;
+    return state;
+  }
+  set viewerState(obj) {
+    if (obj == null) obj = {};
+    // Theme + palette first (affects color LUT before paint).
+    if ('theme' in obj) this.setAttribute('theme', obj.theme || '');
+    if ('palette' in obj) {
+      if (obj.palette) { this.setAttribute('palette', obj.palette); this._props.palette = obj.palette; }
+    }
+    if ('showLabels' in obj) {
+      this._props.showLabels = !!obj.showLabels;
+      if (obj.showLabels) this.setAttribute('show-labels', 'true');
+      else this.removeAttribute('show-labels');
+    }
+    if ('depth' in obj) {
+      const d = obj.depth;
+      this._props.displayDepth = d === 'Infinity' || d == null ? Infinity : Number(d);
+    }
+    // Zoom state — set path first so lazy restore has the chain available.
+    if ('zoomPath' in obj) this._visibleRootPath = obj.zoomPath ? obj.zoomPath.slice() : null;
+    if ('zoom' in obj) {
+      if (this._props.visibleRootId != null) this._props.visibleRootId = obj.zoom;
+      else this._internalVisibleRootId = obj.zoom == null ? null : obj.zoom;
+    }
+    if ('target' in obj) {
+      this._targetId = obj.target == null ? null : obj.target;
+      this._selectionLocked = this._targetId != null;
+    }
+    if ('focus' in obj) this._focusId = obj.focus == null ? null : obj.focus;
+    this._queueRender();
+  }
+
   _setVisibleRoot(id, path) {
     if (this._props.visibleRootId != null) {
       this._dispatch('gp-zoom-change', id, { intendedRoot: true });

@@ -258,7 +258,7 @@ function buildHtml(outPath, title, columns, info, rows, defaults, flags) {
     'gp-default': 'Default 8-hue',
   };
   const themeOptions = Object.entries(themes).map(([k,v])=>`<option value="${k}">${escapeHtml(v.label)}</option>`).join('');
-  const paletteOptions = Object.entries(palettes).map(([k,v])=>`<option value="palette:${k}">${escapeHtml(v)}</option>`).join('');
+  const paletteOptions = Object.entries(palettes).map(([k,v])=>`<option value="${k}">${escapeHtml(v)}</option>`).join('');
 
   const DEFAULTS_JS = JSON.stringify({
     size: defaults.size,
@@ -331,10 +331,17 @@ function buildHtml(outPath, title, columns, info, rows, defaults, flags) {
     </div>
   </div>
   <div class="ctl" style="margin-left:auto;">
+    <label>Theme</label>
     <select id="theme-sel">
       <option value="">Default (light)</option>
-      <optgroup label="Themes">${themeOptions}</optgroup>
-      <optgroup label="Palettes">${paletteOptions}</optgroup>
+      ${themeOptions}
+    </select>
+  </div>
+  <div class="ctl">
+    <label>Palette</label>
+    <select id="palette-sel">
+      <option value="">(theme default)</option>
+      ${paletteOptions}
     </select>
   </div>
 </header>
@@ -379,6 +386,7 @@ ${bundle}
   var pathMenuBtn = document.getElementById('path-menu-btn');
   var pathMenuPop = document.getElementById('path-menu-pop');
   var themeSel = document.getElementById('theme-sel');
+  var paletteSel = document.getElementById('palette-sel');
   var statsBar = document.getElementById('stats-bar');
 
   // Populate size / color dropdowns.
@@ -617,6 +625,7 @@ ${bundle}
   }
 
   function applyPageTheme(name) {
+    state.theme = name || '';
     var t = name ? THEMES[name] : null;
     var r = document.documentElement;
     if (t) {
@@ -631,87 +640,89 @@ ${bundle}
         .forEach(function (v) { r.style.removeProperty(v); });
     }
     tm.setAttribute('theme', name || '');
-    if (state.palette) applyPalette(state.palette);
-    syncThemeDropdown();
+    // Re-apply palette override since setting theme resets it.
+    applyPalette(state.palette);
+    themeSel.value = state.theme;
   }
   function applyPalette(name) {
     state.palette = name || '';
-    if (name) {
-      tm._props._userPalette = name;
-      tm.setAttribute('palette', name);
-      tm._props.palette = name;
-    } else {
-      var th = state.theme || '';
-      tm._props._userPalette = th || 'gp-default';
-      tm.setAttribute('palette', th || 'gp-default');
-      tm._props.palette = th || 'gp-default';
-    }
+    var effective = name || state.theme || 'gp-default';
+    tm._props.palette = effective;
+    tm.setAttribute('palette', effective);
     tm._queueRender && tm._queueRender();
-    syncThemeDropdown();
-  }
-  function syncThemeDropdown() {
-    themeSel.value = state.palette ? 'palette:' + state.palette : (state.theme || '');
+    paletteSel.value = state.palette;
   }
 
-  themeSel.addEventListener('change', function () {
-    var v = themeSel.value;
-    if (v.indexOf('palette:') === 0) {
-      state.palette = v.slice(8);
-      applyPalette(state.palette);
-    } else {
-      state.palette = '';
-      state.theme = v;
-      applyPageTheme(v);
-    }
-    writeHash();
-  });
+  themeSel.addEventListener('change', function () { applyPageTheme(themeSel.value); writeHash(); });
+  paletteSel.addEventListener('change', function () { applyPalette(paletteSel.value); writeHash(); });
   sizeSel.addEventListener('change', function () { state.size = sizeSel.value; rebuild(); writeHash(); });
   colorSel.addEventListener('change', function () { state.color = colorSel.value; rebuild(); writeHash(); });
 
   // ---- URL hash sync. ----
-  function coerceId(s) { return s; } // path IDs are strings
+  // Format: single URL-encoded JSON blob under the key "s". Previous
+  // versions used individual key=value params (size=...&color=...&theme=...);
+  // we still read that format for backwards compatibility with old URLs.
   function readHash() {
     try {
       if (location.hash.length <= 1) return false;
-      // A populated hash is the single source of truth: any param that is
-      // absent is treated as "not set", NOT as "fall back to the build-time
-      // default". Otherwise a URL like #theme=nord would silently inherit
-      // the CLI --palette override that was baked into DEFAULTS.
-      var p = new URLSearchParams(location.hash.slice(1));
-      state.size = p.get('size') || DEFAULTS.size;
-      state.color = p.get('color') || DEFAULTS.color;
-      var pth = p.get('path');
-      state.path = pth ? pth.split(',').filter(Boolean) : DEFAULTS.path.slice();
-      state.theme = p.has('theme') ? p.get('theme') : '';
-      state.palette = p.has('palette') ? p.get('palette') : '';
-      state.colorScale = p.has('colorScale') ? p.get('colorScale') : DEFAULTS.colorScale;
-      state.zoom = p.get('zoom') || null;
-      state.target = p.get('target') || null;
-      state.focus = p.get('focus') || null;
-      var depth = p.get('depth');
-      state.depth = depth ? (depth === 'Infinity' ? Infinity : Number(depth)) : null;
-      var zp = p.get('zoomPath');
-      state.zoomPath = zp ? zp.split(',') : null;
+      var raw = location.hash.slice(1);
+      var obj = null;
+      if (raw.charAt(0) === 's' && raw.charAt(1) === '=') {
+        try { obj = JSON.parse(decodeURIComponent(raw.slice(2))); } catch (_) { obj = null; }
+      }
+      if (obj) {
+        // New JSON-blob format.
+        if (obj.size) state.size = obj.size;
+        if (obj.color) state.color = obj.color;
+        if (Array.isArray(obj.path)) state.path = obj.path.slice();
+        if ('colorScale' in obj) state.colorScale = obj.colorScale || DEFAULTS.colorScale;
+        var v = obj.viewer || {};
+        state.theme = 'theme' in v ? (v.theme || '') : '';
+        state.palette = 'palette' in v ? (v.palette || '') : '';
+        state.zoom = v.zoom != null ? v.zoom : null;
+        state.zoomPath = Array.isArray(v.zoomPath) ? v.zoomPath.slice() : null;
+        state.target = v.target != null ? v.target : null;
+        state.focus = v.focus != null ? v.focus : null;
+        state.depth = v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : null);
+      } else {
+        // Legacy key=value format.
+        var p = new URLSearchParams(raw);
+        state.size = p.get('size') || DEFAULTS.size;
+        state.color = p.get('color') || DEFAULTS.color;
+        var pth = p.get('path');
+        state.path = pth ? pth.split(',').filter(Boolean) : DEFAULTS.path.slice();
+        state.theme = p.has('theme') ? p.get('theme') : '';
+        state.palette = p.has('palette') ? p.get('palette') : '';
+        state.colorScale = p.has('colorScale') ? p.get('colorScale') : DEFAULTS.colorScale;
+        state.zoom = p.get('zoom') || null;
+        state.target = p.get('target') || null;
+        state.focus = p.get('focus') || null;
+        var depth = p.get('depth');
+        state.depth = depth ? (depth === 'Infinity' ? Infinity : Number(depth)) : null;
+        var zp = p.get('zoomPath');
+        state.zoomPath = zp ? zp.split(',') : null;
+      }
       return true;
     } catch (_) { return false; }
   }
   function writeHash() {
     try {
-      var p = new URLSearchParams();
-      // Always emit everything so the URL captures the complete state.
-      p.set('size', state.size);
-      p.set('color', state.color);
-      p.set('path', state.path.join(','));
-      if (state.theme) p.set('theme', state.theme);
-      if (state.palette) p.set('palette', state.palette);
-      if (state.colorScale && state.colorScale !== 'linear') p.set('colorScale', state.colorScale);
-      if (state.zoom) p.set('zoom', state.zoom);
-      if (state.zoomPath && state.zoomPath.length) p.set('zoomPath', state.zoomPath.join(','));
-      if (state.target) p.set('target', state.target);
-      if (state.focus && state.focus !== state.target) p.set('focus', state.focus);
-      if (state.depth != null && state.depth !== Infinity) p.set('depth', String(state.depth));
-      var s = p.toString();
-      history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+      // Pull the component's state via the new viewerState API and merge
+      // with the page-level fields (size/color/path) into a single blob.
+      var v = tm.viewerState || {};
+      // Page-side theme/palette take precedence (we're authoritative over
+      // page chrome; the component only mirrors them for its own painting).
+      if (state.theme) v.theme = state.theme; else delete v.theme;
+      if (state.palette) v.palette = state.palette; else delete v.palette;
+      var out = {
+        size: state.size,
+        color: state.color,
+        path: state.path.slice(),
+        viewer: v,
+      };
+      if (state.colorScale && state.colorScale !== 'linear') out.colorScale = state.colorScale;
+      var s = 's=' + encodeURIComponent(JSON.stringify(out));
+      history.replaceState(null, '', '#' + s);
     } catch (_) {}
   }
 
@@ -772,19 +783,22 @@ ${bundle}
     colorSel.value = state.color;
     renderChips();
     applyPageTheme(state.theme);
-    if (state.palette) applyPalette(state.palette);
+    applyPalette(state.palette);
 
     rebuild();
 
+    // Restore the component-level state (zoom/target/focus/depth/etc.)
+    // via the component's viewerState setter — single JSON-shaped restore.
+    tm.viewerState = {
+      zoom: state.zoom || undefined,
+      zoomPath: state.zoomPath || undefined,
+      target: state.target || undefined,
+      focus: state.focus || undefined,
+      depth: state.depth != null ? state.depth : undefined,
+    };
+
     // If no hash was present, populate it with the current defaults.
     if (!hadHash) writeHash();
-
-    // Restore zoom/target from hash after the first render.
-    if (state.zoomPath && state.zoomPath.length) tm._visibleRootPath = state.zoomPath.slice();
-    if (state.zoom) tm._internalVisibleRootId = state.zoom;
-    if (state.target) { tm._targetId = state.target; tm._selectionLocked = true; }
-    if (state.focus) tm._focusId = state.focus;
-    if (state.zoom || state.target) tm._queueRender && tm._queueRender();
 
     // Stats bar.
     var bar = statsBar;
