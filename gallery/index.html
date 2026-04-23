@@ -197,41 +197,26 @@
   </section>
 
   <section class="entry">
-    <h2>UC wages — position → campus → individual (<b>Nord</b> theme)</h2>
+    <h2>UC wages 2024 — campus → position → individual (<b>Nord</b> theme)</h2>
     <p>
-      Public-record compensation for every UC employee paid at least $1,000
-      in 2024 (~334k rows). Group by position first, then by campus, then
-      by individual — makes it easy to compare who pays more for the same
-      title (e.g. clinical nurses at UCSD vs UCLA vs UCSF).
-    </p>
-    <div class="frame-wrap">
-      <iframe
-        src="table-treemap-ca-uc.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22Position%22%2C%22path%22%3A%5B%22Position%22%2C%22EmployerName%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22nord%22%7D%7D"
-        title="UC wages — by position → campus"
-        loading="lazy"></iframe>
-    </div>
-    <div class="links">
-      <a href="table-treemap-ca-uc.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22Position%22%2C%22path%22%3A%5B%22Position%22%2C%22EmployerName%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22nord%22%7D%7D">Open full-page →</a>
-      &nbsp;·&nbsp;
-      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_UniversityOfCalifornia.zip</a>
-    </div>
-  </section>
-
-  <section class="entry">
-    <h2>UC wages — campus → position → individual (<b>Nord</b> theme)</h2>
-    <p>
-      Same dataset, regrouped to show the fine structure of each campus.
-      Path: campus → position → <code>_row</code>. Each leaf sliver is one
-      employee; wider bands are more populous titles within a campus. The
-      synthetic <code>_row</code> column is injected by
-      <code>table-treemap.js</code> into every dataset so you can always
-      drill down to individual source rows.
+      Public-record compensation for every University of California
+      employee paid at least $1,000 in 2024 (~334k rows). Each top-level
+      cell is one of the 11 campuses, sized by total wages and colored by
+      campus; zoom into one to see its positions, and zoom again to see
+      individual employees. UCLA and UCSF (both home to big medical
+      centers) dominate; the Office of the President is the smallest.
     </p>
     <p style="font-size: 0.875rem; font-style: italic;">
-      Trivia: the state's raw export has <code>EmployerName</code> and
-      <code>DepartmentOrSubdivision</code> hold the same 11 campuses, just
-      spelled differently — and one campus is listed as
+      Trivia: the state's raw export lists one of the campuses as
       "Univeristy (sic) of California - Santa Cruz". Hi, Santa Cruz!
+      Also, thousands of UCLA employees — including some of the highest
+      earners at ~$3–4M — are filed under placeholder titles like
+      <code>Blank Assistant 1</code>/<code>2</code>/<code>3</code>. "Blank" is
+      UC's generic title series, used when a role doesn't map onto a
+      specific academic/staff code; at the compensation extremes it's
+      mostly Athletics head coaches and medical-center specialists whose
+      real titles have been redacted into the catch-all. Decidedly not
+      entry-level assistants.
     </p>
     <div class="frame-wrap">
       <iframe
@@ -241,6 +226,31 @@
     </div>
     <div class="links">
       <a href="table-treemap-ca-uc.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22EmployerName%22%2C%22path%22%3A%5B%22EmployerName%22%2C%22Position%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22nord%22%7D%7D">Open full-page →</a>
+      &nbsp;·&nbsp;
+      Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_UniversityOfCalifornia.zip</a>
+    </div>
+  </section>
+
+  <section class="entry">
+    <h2>UC wages 2024 — position → campus → individual (<b>Nord</b> theme)</h2>
+    <p>
+      Same dataset as above, regrouped the other way: each top-level
+      cell is now one job title, and inside that cell you see how that
+      title's payroll divides among the 11 campuses. Where the previous
+      view let you compare "what does a campus do?", this one lets you
+      compare "who pays more for the same title?" — e.g. clinical
+      nurses at UCSF vs. UCLA vs. UCSD, or the mutual-fund-like
+      Professor series versus the Athletics coaches hiding inside
+      <code>Blank Assistant</code>.
+    </p>
+    <div class="frame-wrap">
+      <iframe
+        src="table-treemap-ca-uc.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22Position%22%2C%22path%22%3A%5B%22Position%22%2C%22EmployerName%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22nord%22%7D%7D"
+        title="UC wages — by position → campus"
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="table-treemap-ca-uc.html#s=%7B%22size%22%3A%22TotalWages%22%2C%22color%22%3A%22Position%22%2C%22path%22%3A%5B%22Position%22%2C%22EmployerName%22%2C%22_row%22%5D%2C%22viewer%22%3A%7B%22theme%22%3A%22nord%22%7D%7D">Open full-page →</a>
       &nbsp;·&nbsp;
       Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_UniversityOfCalifornia.zip</a>
     </div>
