@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
-# Regenerate the files under gallery/.
+# Regenerate every file under gallery/.
 #
-# Each gallery entry is a self-contained HTML file produced by tools/gpdu-scan.js —
-# open it in any browser (or host it on GitHub Pages) and the treemap renders
-# with no server, no CORS, no bundler.
+# Each gallery entry is a self-contained HTML file produced by one of our
+# tools (gpdu-scan.js for the disk-usage entry, table-treemap.js for the
+# tabular entries) — open it in any browser (or host it on GitHub Pages)
+# and the treemap renders with no server, no CORS, no bundler.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 ROOT=$(pwd)
+DATA="$ROOT/samples/data/table"
 
-# Make sure the bundle is current; gpdu-scan.js inlines it into the output.
+# Make sure the bundle is current; the tools inline it into their output.
 node tools/build.js
 
 # If node_modules is missing, install so the self-scan includes the npm deps.
@@ -17,8 +19,51 @@ if [ ! -d node_modules ]; then
   npm install
 fi
 
-# Self-scan: the repo looking at itself, .git and node_modules included.
+# --- Disk-usage entry: self-scan of the repo.
 node tools/gpdu-scan.js --no-open --color=extension "$ROOT" "$ROOT/gallery/gp-treemap-source-tree-disk-usage.html"
+
+# --- Table-treemap entries. Each line pairs a dataset with the defaults
+# baked into its viewer HTML.
+node tools/table-treemap.js --no-open \
+  --size=Generation_TWh --color=Fuel --path=Fuel,Continent,Country \
+  --theme=catppuccin \
+  --title="Global electricity generation (2023, TWh) — colored by fuel" \
+  "$DATA/energy-2023.jsonl" \
+  "$ROOT/gallery/table-treemap-energy-fuel.html"
+
+node tools/table-treemap.js --no-open \
+  --size=Gross_Outlays --color=Category --path=Category,Agency,Bureau \
+  --palette=viridis \
+  --title="US federal outlays FY2024 — Treasury MTS (USD)" \
+  "$DATA/us-outlays-fy2024.jsonl" \
+  "$ROOT/gallery/table-treemap-us-outlays.html"
+
+node tools/table-treemap.js --no-open \
+  --size=Gross_Outlays --color=YoY_Change_Pct --path=Category,Agency \
+  --palette=coolwarm --color-scale=diverging \
+  --title="US federal outlays FY2024 — colored by YoY % change" \
+  "$DATA/us-outlays-fy2024.jsonl" \
+  "$ROOT/gallery/table-treemap-us-outlays-yoy.html"
+
+# UC + city wages need the large JSONLs that are gitignored — regenerate
+# from samples/data/table/ca-{uc,city}-salaries-2024.jsonl if present.
+if [ -f "$DATA/ca-uc-salaries-2024.jsonl" ]; then
+  node tools/table-treemap.js --no-open \
+    --size=TotalWages --color=EmployerName --path=EmployerName,DepartmentOrSubdivision \
+    --palette=turbo \
+    --title="UC employee wages 2024 (California)" \
+    "$DATA/ca-uc-salaries-2024.jsonl" \
+    "$ROOT/gallery/table-treemap-ca-uc.html"
+fi
+if [ -f "$DATA/ca-city-salaries-2024.jsonl" ]; then
+  node tools/table-treemap.js --no-open \
+    --size=TotalWages --color=DepartmentOrSubdivision \
+    --path=DepartmentOrSubdivision,EmployerCounty,EmployerName,Position,_row \
+    --theme=one-dark \
+    --title="California city government wages 2024" \
+    "$DATA/ca-city-salaries-2024.jsonl" \
+    "$ROOT/gallery/table-treemap-ca-city.html"
+fi
 
 # Regenerate the README screenshot from the gallery HTML.
 # Spin up the local static server in the background, screenshot via headless
