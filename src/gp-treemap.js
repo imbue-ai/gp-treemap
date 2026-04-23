@@ -71,6 +71,8 @@ const STYLE = `
 .info-line a:hover { text-decoration:underline; }
 .info-line a.focused { font-weight:700; color: var(--gp-fg, #000); text-decoration:underline; text-underline-offset:2px; }
 .info-line .sep-slash { color: var(--gp-fg-muted, #999); padding:0 1px; }
+.info-line .sep-zoom { color: var(--gp-accent, #0645ad); padding:0 3px; display:inline-flex; align-items:center; }
+.info-line .sep-zoom svg { display:block; }
 .info-line .val { color: var(--gp-fg-muted, #555); margin-left:6px; }
 .stage { position:relative; flex:1; overflow:hidden; background: var(--gp-stage-bg, #0b0b0b); cursor: default; outline: none;
   padding: var(--gp-stage-margin, 4px); }
@@ -904,6 +906,22 @@ export class GpTreemap extends HTMLElement {
     const focusId = this._focusId != null ? this._focusId : this._targetId;
     if (rootId != null && focusId === rootId) rootIcon.classList.add('focused');
     this._infoEl.appendChild(rootIcon);
+    // If the user is zoomed in, the separator after the zoom-anchor
+    // segment becomes a magnifying glass, signalling "everything to the
+    // right of this point is drawn relative to here".
+    const zoomId = this._activeVisibleRootId();
+    const makeZoomSep = () => {
+      const s = document.createElement('span');
+      s.className = 'sep-zoom';
+      s.title = 'zoomed — paths below are relative to this node';
+      s.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">'
+        + '<circle cx="7" cy="7" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/>'
+        + '<line x1="10.3" y1="10.3" x2="14" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
+        + '</svg>';
+      return s;
+    };
+    // Zoom indicator immediately after the home icon (tree root is the zoom anchor).
+    if (zoomId != null && zoomId === rootId) this._infoEl.appendChild(makeZoomSep());
     chain.forEach((node, i) => {
       if (i > 0) {
         const slash = document.createElement('span');
@@ -917,6 +935,9 @@ export class GpTreemap extends HTMLElement {
       a.dataset.nodeId = node.id;
       if (node.id === focusId) a.classList.add('focused');
       this._infoEl.appendChild(a);
+      if (zoomId != null && zoomId !== rootId && node.id === zoomId) {
+        this._infoEl.appendChild(makeZoomSep());
+      }
     });
     // Show value for the focused node (if set), otherwise the target/hovered node.
     const valNode = (focusId != null && this._tree.nodes.get(focusId)) || n;
