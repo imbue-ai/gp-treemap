@@ -109,6 +109,15 @@
       Path chips to reorder the hierarchy. Colored by fuel, <b>Catppuccin
       Mocha</b> theme.
     </p>
+    <p>
+      Reproduce it from the pre-filtered JSONL in this repo:
+    </p>
+    <pre style="background: var(--border, #f0f0f0); padding: 8px 12px; border-radius: 4px; font-size: 12px; overflow-x: auto; margin: 0 0 1rem;"><code>curl -LO https://github.com/imbue-ai/gp-treemap/raw/main/samples/data/table/energy-2023.jsonl
+npx -p @imbue-ai/gp-treemap gp-treemap-table \
+  --size=Generation_TWh --color=Fuel \
+  --path=Fuel,Continent,Country \
+  --theme=catppuccin \
+  energy-2023.jsonl</code></pre>
     <div class="frame-wrap">
       <iframe
         src="table-treemap-energy-fuel.html"
