@@ -13,9 +13,9 @@ npx -p @imbue-ai/gp-treemap gpdu .
 
 And see this visualization:
 
-![gpdu scan of the gp-treemap source tree](tests/screenshots/gallery-source-tree.png)
+[![gpdu scan of the gp-treemap source tree](tests/screenshots/gallery-source-tree.png)](https://imbue-ai.github.io/gp-treemap/gallery/gp-treemap-source-tree-disk-usage.html)
 
-Check out the [gallery of more examples](https://htmlpreview.github.io/?https://github.com/imbue-ai/gp-treemap/blob/main/gallery/gp-treemap-source-tree-disk-usage.html).
+Check out the [gallery of more examples](https://imbue-ai.github.io/gp-treemap/gallery/gp-treemap-source-tree-disk-usage.html).
 
 ## A hat tip to GrandPerspective
 
