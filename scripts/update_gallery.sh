@@ -26,7 +26,7 @@ node tools/gpdu-scan.js --no-open --color=extension "$ROOT" "$ROOT/gallery/gp-tr
 # baked into its viewer HTML.
 node tools/table-treemap.js --no-open \
   --size=Generation_TWh --color=Fuel --path=Fuel,Continent,Country \
-  --theme=catppuccin --show-labels \
+  --theme=catppuccin \
   --title="Global electricity generation (2023, TWh) — colored by fuel" \
   "$DATA/energy-2023.jsonl" \
   "$ROOT/gallery/table-treemap-energy-fuel.html"

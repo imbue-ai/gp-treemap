@@ -1452,7 +1452,7 @@ const DEFAULT_PROPS = {
   colorMap: {}, colorFn: null,
   palette: 'tokyo-night', gradientIntensity: 0.5,
   visibleRootId: null, displayDepth: Infinity, locatedNodeIds: [],
-  minCellArea: 16, showLabels: false, groupPadding: 0,
+  minCellArea: 16, showLabels: true, groupPadding: 0,
   valueFormat: null, valueFormatter: null,
   toolbar: true, zoomDuration: 350, tooltip: true, tooltipInToolbar: true,
   background: '#111',
@@ -2541,7 +2541,8 @@ class GpTreemap extends HTMLElement {
     const theme = this.getAttribute('theme');
     if (theme) state.theme = theme;
     if (p.palette && p.palette !== theme) state.palette = p.palette;
-    if (p.showLabels) state.showLabels = true;
+    // Labels are on by default now — only record an explicit off.
+    if (!p.showLabels) state.showLabels = false;
     return state;
   }
   set viewerState(obj) {
@@ -2771,7 +2772,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
 <script>
 (function () {
   'use strict';
-  var DEFAULTS = {"size":"Gross_Outlays","color":"Category","path":["Category","Agency","Bureau"],"theme":"tokyo-night","palette":"viridis","colorScale":"linear","showLabels":false};
+  var DEFAULTS = {"size":"Gross_Outlays","color":"Category","path":["Category","Agency","Bureau"],"theme":"tokyo-night","palette":"viridis","colorScale":"linear"};
   var THEMES = {"nord":{"label":"Nord","bg":"#2e3440","surface":"#3b4252","border":"#4c566a","fg":"#d8dee9","fgMuted":"#81a1c1","accent":"#88c0d0"},"solarized":{"label":"Solarized Dark","bg":"#002b36","surface":"#073642","border":"#586e75","fg":"#839496","fgMuted":"#657b83","accent":"#268bd2"},"dracula":{"label":"Dracula","bg":"#282a36","surface":"#44475a","border":"#6272a4","fg":"#f8f8f2","fgMuted":"#6272a4","accent":"#bd93f9"},"catppuccin":{"label":"Catppuccin Mocha","bg":"#1e1e2e","surface":"#313244","border":"#45475a","fg":"#cdd6f4","fgMuted":"#a6adc8","accent":"#cba6f7"},"gruvbox":{"label":"Gruvbox Dark","bg":"#282828","surface":"#3c3836","border":"#504945","fg":"#ebdbb2","fgMuted":"#a89984","accent":"#fabd2f"},"tokyo-night":{"label":"Tokyo Night","bg":"#1a1b26","surface":"#16161e","border":"#0f0f14","fg":"#c0caf5","fgMuted":"#787c99","accent":"#7aa2f7"},"rose-pine":{"label":"Rosé Pine","bg":"#191724","surface":"#1f1d2e","border":"#26233a","fg":"#e0def4","fgMuted":"#908caa","accent":"#c4a7e7"},"one-dark":{"label":"One Dark","bg":"#282c34","surface":"#2c313a","border":"#3e4452","fg":"#abb2bf","fgMuted":"#828997","accent":"#61afef"}};
   var ALL_COLS = ["Category","Agency","Bureau","Program","Gross_Outlays","Net_Outlays","Prior_Year_Outlays","YoY_Change_Pct","Fiscal_Year","_row"];
   var NUMERIC_NONNEG = ["Gross_Outlays","Net_Outlays","Prior_Year_Outlays","Fiscal_Year","_row"];
@@ -3158,11 +3159,6 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
 
     rebuild();
 
-    // If the URL had no hash, seed the component slice with the baked
-    // defaults (e.g. --show-labels sets showLabels=true at build time).
-    if (!hadHash && !('showLabels' in state.viewer) && DEFAULTS.showLabels) {
-      state.viewer.showLabels = true;
-    }
     // Hand the component's slice of state back to it in one shot.
     tm.viewerState = state.viewer;
 

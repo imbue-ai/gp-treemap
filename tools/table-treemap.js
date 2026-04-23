@@ -14,7 +14,6 @@
 //   --theme=NAME        initial page theme (e.g. tokyo-night)
 //   --palette=NAME      palette override (viridis, plasma, …)
 //   --title=STR         header title
-//   --show-labels       render labels on leaf cells by default (off by default)
 //   --keep-cols=A,B,C   keep only these columns from the input (plus _row)
 //   --no-open           don't auto-open the result
 //   --max-rows=N        truncate input to N rows (default: unlimited)
@@ -35,7 +34,6 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--no-open') { out.flags.noOpen = true; continue; }
-    if (a === '--show-labels') { out.flags['show-labels'] = true; continue; }
     if (a.startsWith('--')) {
       const eq = a.indexOf('=');
       if (eq > 0) out.flags[a.slice(2, eq)] = a.slice(eq + 1);
@@ -270,7 +268,6 @@ function buildHtml(outPath, title, columns, info, rows, defaults, flags) {
     theme: flags.theme || 'tokyo-night',
     palette: flags.palette || '',
     colorScale: flags['color-scale'] || 'linear',
-    showLabels: !!flags['show-labels'],
   });
 
   const html = `<!doctype html>
@@ -753,11 +750,6 @@ ${bundle}
 
     rebuild();
 
-    // If the URL had no hash, seed the component slice with the baked
-    // defaults (e.g. --show-labels sets showLabels=true at build time).
-    if (!hadHash && !('showLabels' in state.viewer) && DEFAULTS.showLabels) {
-      state.viewer.showLabels = true;
-    }
     // Hand the component's slice of state back to it in one shot.
     tm.viewerState = state.viewer;
 

@@ -1364,7 +1364,7 @@ const DEFAULT_PROPS = {
   colorMap: {}, colorFn: null,
   palette: 'tokyo-night', gradientIntensity: 0.5,
   visibleRootId: null, displayDepth: Infinity, locatedNodeIds: [],
-  minCellArea: 16, showLabels: false, groupPadding: 0,
+  minCellArea: 16, showLabels: true, groupPadding: 0,
   valueFormat: null, valueFormatter: null,
   toolbar: true, zoomDuration: 350, tooltip: true, tooltipInToolbar: true,
   background: '#111',
@@ -2453,7 +2453,8 @@ class GpTreemap extends HTMLElement {
     const theme = this.getAttribute('theme');
     if (theme) state.theme = theme;
     if (p.palette && p.palette !== theme) state.palette = p.palette;
-    if (p.showLabels) state.showLabels = true;
+    // Labels are on by default now — only record an explicit off.
+    if (!p.showLabels) state.showLabels = false;
     return state;
   }
   set viewerState(obj) {
