@@ -214,22 +214,35 @@
   </section>
 
   <section class="entry">
-    <h2>California city government wages 2024</h2>
+    <h2>California city government wages 2024 — department first (<b>One Dark</b> theme)</h2>
     <p>
       Every California city employee with reported wages in 2024 (~334k
-      rows). Path: county → city → department. Colored categorically by
-      county with the <b>Viridis</b> palette. LA County and the Bay Area
-      dominate — use the Path chips to re-group by department first to see
-      which functions drive the biggest payrolls statewide.
+      rows). Path: department → county → city → position → <code>_row</code>.
+      Re-grouping by department first makes it clear how much of every
+      city's payroll is Police + Fire.
+    </p>
+    <p style="font-size: 0.875rem; font-style: italic;">
+      Trivia: <code>DepartmentOrSubdivision</code> is a free-text field with
+      no normalization. Police alone shows up as <code>Police</code>,
+      <code>Police Department</code>, <code>Police Services Agency</code>,
+      <code>Police Administration</code>, and <code>Police Field Services</code>.
+      Fire is <code>Fire</code>, <code>Fire Department</code>, <code>Fire-Rescue</code>,
+      <code>Fire Operations</code>, <code>Fire Suppression</code>, and
+      <code>Fire Suppression &amp; Rescue</code>. Parks & Rec is
+      <code>Recreation And Parks</code>, <code>Recreation and Park Commission</code>,
+      <code>Parks and Recreation</code>, <code>Parks &amp; Recreation</code>, and
+      <code>Parks &amp; Recreation Administration</code>. And <code>Airports</code>
+      and <code>Airport Commission</code> are two different cells too. Each
+      spelling is a separate top-level slot in this view.
     </p>
     <div class="frame-wrap">
       <iframe
-        src="table-treemap-ca-city.html"
+        src="table-treemap-ca-city.html#size=TotalWages&amp;color=DepartmentOrSubdivision&amp;path=DepartmentOrSubdivision,EmployerCounty,EmployerName,Position,_row&amp;theme=one-dark"
         title="California city government wages 2024"
         loading="lazy"></iframe>
     </div>
     <div class="links">
-      <a href="table-treemap-ca-city.html">Open full-page →</a>
+      <a href="table-treemap-ca-city.html#size=TotalWages&amp;color=DepartmentOrSubdivision&amp;path=DepartmentOrSubdivision,EmployerCounty,EmployerName,Position,_row&amp;theme=one-dark">Open full-page →</a>
       &nbsp;·&nbsp;
       Source: <a href="https://publicpay.ca.gov/Reports/RawExport.aspx" target="_blank" rel="noopener">Government Compensation in California — 2024_City.zip</a>
     </div>
