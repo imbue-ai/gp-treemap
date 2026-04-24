@@ -95,7 +95,6 @@ OUT=/tmp/pictures.html
 deno run \
   --allow-read="$SCAN","$HOME/.cache/deno" \
   --allow-write="$(dirname "$OUT")" \
-  --allow-env \
   npm:@imbue-ai/gp-treemap/tools/gpdu-scan.js --no-open "$SCAN" "$OUT" \
   && open "$OUT"
 ```
