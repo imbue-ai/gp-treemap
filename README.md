@@ -9,6 +9,8 @@ With this package, you can run:
 
 ```sh
 npx -p @imbue-ai/gp-treemap gpdu .
+# or, with Bun:
+bunx -p @imbue-ai/gp-treemap gpdu .
 ```
 
 And see this visualization (click for the interactive version):
@@ -74,11 +76,34 @@ npm install -g @imbue-ai/gp-treemap
 gpdu ~/Downloads
 ```
 
-Or run from the GitHub source without publishing:
+`bunx` works the same way:
 
 ```sh
-npx -p github:imbue-ai/gp-treemap gpdu ~/Downloads
+bunx -p @imbue-ai/gp-treemap gpdu ~/Downloads
 ```
+
+### Sandboxed scan: only the tree being scanned
+
+`gpdu` only needs to read the scanned tree and write the output HTML. Deno's
+per-path permissions let you enforce exactly that — the process can't read
+`~/.ssh`, `/etc`, or anything outside the scan root:
+
+```sh
+SCAN=~/Pictures
+OUT=/tmp/pictures.html
+
+deno run \
+  --allow-read="$SCAN","$HOME/.cache/deno" \
+  --allow-write="$(dirname "$OUT")" \
+  --allow-env \
+  npm:@imbue-ai/gp-treemap/tools/gpdu-scan.js --no-open "$SCAN" "$OUT" \
+  && open "$OUT"
+```
+
+`$HOME/.cache/deno` is needed so Deno can load its own npm cache (which
+holds the bundled `dist/gp-treemap.bundle.js`). `--no-open` keeps the
+sandboxed process from needing `--allow-run`; the trailing `open` (use
+`xdg-open` on Linux) runs outside the sandbox and launches your browser.
 
 ## Viewing the samples
 
