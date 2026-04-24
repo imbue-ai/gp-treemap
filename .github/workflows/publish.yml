@@ -1,3 +1,22 @@
+# Publishes @imbue-ai/gp-treemap to npm when a v* tag is pushed.
+#
+# To cut a release:
+#   npm version patch -m "release: %s"   # or minor / major
+#   git push --follow-tags
+#
+# The tag push fires this workflow, which builds, publishes to npm with
+# provenance, and creates a GitHub Release with auto-generated notes.
+#
+# Auth: uses npm Trusted Publishing (OIDC) — no NPM_TOKEN secret needed.
+# The trust relationship is configured on npmjs.com under the package's
+# Settings → Trusted Publisher, bound to this repo + workflow file +
+# the "npm" GitHub environment below. If you rename this file, move
+# the job to a different environment, or fork the repo, update the
+# Trusted Publisher config to match or publishes will 404.
+#
+# id-token: write  — required for OIDC token exchange with npm.
+# contents: write  — required for softprops/action-gh-release to create the release.
+
 name: Publish to npm
 
 on:
@@ -37,9 +56,10 @@ jobs:
         run: node tools/build.js
 
       - name: Publish to npm
+        # Auth comes from OIDC via Trusted Publishing — no NODE_AUTH_TOKEN.
+        # --provenance attaches a signed attestation linking the tarball
+        # to this exact workflow run (visible on the npm package page).
         run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
