@@ -13,6 +13,26 @@ npx -p @imbue-ai/gp-treemap gpdu .
 bunx -p @imbue-ai/gp-treemap gpdu .
 ```
 
+Or, if you'd like the scanner to only be able to read the tree you're
+scanning — no `~/.ssh`, no `/etc`, nothing else — run it under Deno's
+per-path permission sandbox:
+
+```sh
+SCAN=~/Pictures
+OUT=/tmp/pictures.html
+
+deno run \
+  --allow-read="$SCAN","$HOME/.cache/deno" \
+  --allow-write="$(dirname "$OUT")" \
+  npm:@imbue-ai/gp-treemap/tools/gpdu-scan.js --no-open "$SCAN" "$OUT" \
+  && open "$OUT"
+```
+
+(`$HOME/.cache/deno` lets Deno load its own npm cache, which holds the
+bundled `dist/gp-treemap.bundle.js`. `--no-open` keeps the sandboxed
+process from needing `--allow-run`; the trailing `open` — `xdg-open` on
+Linux — runs outside the sandbox and launches your browser.)
+
 And see this visualization (click for the interactive version):
 
 [![gpdu scan of the gp-treemap source tree](tests/screenshots/gallery-source-tree.png)](https://imbue-ai.github.io/gp-treemap/gallery/)
@@ -82,27 +102,8 @@ gpdu ~/Downloads
 bunx -p @imbue-ai/gp-treemap gpdu ~/Downloads
 ```
 
-### Sandboxed scan: only the tree being scanned
-
-`gpdu` only needs to read the scanned tree and write the output HTML. Deno's
-per-path permissions let you enforce exactly that — the process can't read
-`~/.ssh`, `/etc`, or anything outside the scan root:
-
-```sh
-SCAN=~/Pictures
-OUT=/tmp/pictures.html
-
-deno run \
-  --allow-read="$SCAN","$HOME/.cache/deno" \
-  --allow-write="$(dirname "$OUT")" \
-  npm:@imbue-ai/gp-treemap/tools/gpdu-scan.js --no-open "$SCAN" "$OUT" \
-  && open "$OUT"
-```
-
-`$HOME/.cache/deno` is needed so Deno can load its own npm cache (which
-holds the bundled `dist/gp-treemap.bundle.js`). `--no-open` keeps the
-sandboxed process from needing `--allow-run`; the trailing `open` (use
-`xdg-open` on Linux) runs outside the sandbox and launches your browser.
+For a sandboxed run under Deno — scanner restricted to just the scan tree
+and output directory — see the `deno run` example at the top of this README.
 
 ## Viewing the samples
 
