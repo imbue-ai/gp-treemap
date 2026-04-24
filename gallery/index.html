@@ -32,8 +32,12 @@
   main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
   header { margin-bottom: 2.5rem; }
   header h1 { margin: 0 0 0.5rem; font-size: 2rem; }
-  header p { margin: 0; color: var(--muted); }
+  header p { margin: 0 0 1rem; color: var(--muted); }
+  header p:last-child { margin-bottom: 0; }
+  header ul { margin: 0 0 1rem; padding-left: 1.25rem; color: var(--muted); }
+  header li { margin-bottom: 0.4rem; }
   header a { color: inherit; }
+  header svg { vertical-align: -2px; }
   .entry {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -73,6 +77,79 @@
       Each entry below is a self-contained HTML file — bundle and dataset
       are inlined, so they render from any URL (or <code>file://</code>)
       with no server.
+    </p>
+    <p>
+      A <a href="https://en.wikipedia.org/wiki/Treemapping" target="_blank" rel="noopener">treemap</a>
+      displays a hierarchy as nested rectangles, each sized in proportion to
+      a numeric value so the whole distribution — and the relative weight of
+      every part — is visible at a glance. A hat tip to
+      <a href="https://grandperspectiv.sourceforge.net/" target="_blank" rel="noopener">GrandPerspective</a>,
+      the classic macOS disk-usage viewer whose dense, label-free mosaic
+      inspired gp-treemap's visual style.
+    </p>
+    <p>Features you'll find in every view below:</p>
+    <ul>
+      <li>
+        <b>Breadcrumb bar</b> along the top, showing the ancestor chain from
+        the root down to the currently clicked cell:
+        <ul>
+          <li>
+            The
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 1.5L1 7h2.5v6.5h4V10h1v3.5h4V7H15z" fill="currentColor"/></svg>
+            home icon on the far left is the tree root — click it to focus
+            the root, double-click to zoom back out all the way.
+          </li>
+          <li>
+            Each segment after the home is a clickable ancestor; single-click
+            focuses it (highlights its subtree), double-click zooms in so
+            that node becomes the new root.
+          </li>
+          <li>
+            A
+            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><circle cx="7" cy="7" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="10.3" y1="10.3" x2="14" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            magnifying glass marks the current zoom anchor — everything to
+            its right lives inside the zoomed-in subtree.
+          </li>
+        </ul>
+      </li>
+      <li>
+        <b>Mouse-wheel focusing</b>: with a cell clicked, scroll the wheel
+        to walk focus up and down its ancestor chain — scroll down toward
+        the root (shallower), scroll up toward the clicked leaf (deeper).
+        It's the fastest way to see where a cell sits in the hierarchy.
+      </li>
+      <li>
+        <b>Depth truncation</b> via the −/+ depth stepper in the toolbar.
+        Capping the depth prunes levels below the budget and rolls their
+        contents up into the parent, which makes those parent cells big
+        enough to actually carry a readable label. Lift the cap back to
+        <code>∞</code> to see every leaf. The budget re-applies from the
+        current zoom root, so you can drill in and still get a labelled,
+        uncluttered view at each level.
+      </li>
+      <li>
+        Plus the usual: hover for exact values, click to select, double-click
+        to zoom, and Size / Color / Path controls in the header of the
+        tabular views.
+      </li>
+    </ul>
+    <p>
+      Several entries below use the <b>path / tabular</b> treemap
+      (<code>gp-treemap-table</code>), which builds the hierarchy on the fly
+      from a flat table of rows. The <b>Path</b> control in the header lists
+      the columns used to group the data, from outermost to innermost:
+    </p>
+    <p style="margin: 0 0 1rem;">
+      <img src="path-chips.png" alt="Path control with draggable Fuel, Continent, Country chips" style="max-width: 100%; height: auto; border-radius: 6px;">
+    </p>
+    <p>
+      Drag the chips to reorder them and the nesting re-computes immediately:
+      with <code>Fuel</code> first (as above) you get one cell per fuel with
+      continents inside; drag <code>Continent</code> to the front instead
+      and the same rows re-tile as one cell per continent with fuels inside.
+      Same data, totally different story — and no re-export, just a drag.
+      Click the <code>×</code> on a chip to drop that column from the
+      hierarchy entirely, or the <code>+</code> to add another.
     </p>
   </header>
 
