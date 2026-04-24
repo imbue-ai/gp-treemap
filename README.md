@@ -9,8 +9,6 @@ With this package, you can run:
 
 ```sh
 npx -p @imbue-ai/gp-treemap gpdu .
-# or, with Bun:
-bunx -p @imbue-ai/gp-treemap gpdu .
 ```
 
 Or, if you'd like the scanner to only be able to read the tree you're
@@ -94,12 +92,6 @@ To install globally instead:
 ```sh
 npm install -g @imbue-ai/gp-treemap
 gpdu ~/Downloads
-```
-
-`bunx` works the same way:
-
-```sh
-bunx -p @imbue-ai/gp-treemap gpdu ~/Downloads
 ```
 
 For a sandboxed run under Deno — scanner restricted to just the scan tree
