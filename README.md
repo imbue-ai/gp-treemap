@@ -38,9 +38,10 @@ per-path permission sandbox:
 ```sh
 SCAN=~/Downloads
 OUT=/tmp/disk_usage.html
+DENO_CACHE="$(deno info --json | jq -r .denoDir)"
 
 deno run \
-  --allow-read="$SCAN","$(dirname "$OUT")" \
+  --allow-read="$SCAN","$DENO_CACHE","$(dirname "$OUT")" \
   --allow-write="$OUT" \
   --allow-sys --deny-env \
   npm:@imbue-ai/gp-treemap/tools/gpdu-scan.js --no-open "$SCAN" "$OUT" \
