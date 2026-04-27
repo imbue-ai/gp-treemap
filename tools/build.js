@@ -55,5 +55,15 @@ parts.push('})();');
 
 fs.mkdirSync(DIST, { recursive: true });
 const outPath = path.join(DIST, 'gp-treemap.bundle.js');
-fs.writeFileSync(outPath, parts.join('\n'));
+const bundleSrc = parts.join('\n');
+fs.writeFileSync(outPath, bundleSrc);
 console.log('wrote ' + path.relative(ROOT, outPath) + ' (' + fs.statSync(outPath).size + ' bytes)');
+
+// Also emit an ESM module that re-exports the bundle source as a string,
+// so tools (gpdu-scan.js) can `import` it instead of fs.readFileSync — that
+// way Deno's module loader handles the read and no --allow-read is needed
+// on the npm cache directory.
+const embedPath = path.join(DIST, 'gp-treemap.bundle.embed.js');
+const escaped = bundleSrc.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+fs.writeFileSync(embedPath, 'export const BUNDLE = `' + escaped + '`;\n');
+console.log('wrote ' + path.relative(ROOT, embedPath) + ' (' + fs.statSync(embedPath).size + ' bytes)');
