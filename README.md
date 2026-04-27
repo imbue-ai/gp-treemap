@@ -8,28 +8,9 @@ For example, they're great for interactive visualizions of disk usage.
 With this package, you can run:
 
 ```sh
-npx -p @imbue-ai/gp-treemap gpdu .
+# Opens browswer with a treemap of disk usage under ~/Downloads.
+npx -p @imbue-ai/gp-treemap gpdu ~/Downloads
 ```
-
-Or, if you'd like the scanner to only be able to read the tree you're
-scanning — no `~/.ssh`, no `/etc`, nothing else — run it under Deno's
-per-path permission sandbox:
-
-```sh
-SCAN=~/Pictures
-OUT=/tmp/pictures.html
-
-deno run \
-  --allow-read="$SCAN","$HOME/.cache/deno" \
-  --allow-write="$(dirname "$OUT")" \
-  npm:@imbue-ai/gp-treemap/tools/gpdu-scan.js --no-open "$SCAN" "$OUT" \
-  && open "$OUT"
-```
-
-(`$HOME/.cache/deno` lets Deno load its own npm cache, which holds the
-bundled `dist/gp-treemap.bundle.js`. `--no-open` keeps the sandboxed
-process from needing `--allow-run`; the trailing `open` — `xdg-open` on
-Linux — runs outside the sandbox and launches your browser.)
 
 And see this visualization (click for the interactive version):
 
@@ -47,6 +28,25 @@ great for any time you have hierarchical counts to wrap your head around!
 Don't forget that lots of tabular data can be made hierarchical using GROUP BY on a list of columns.
 
 Check out the [gallery of more examples](https://imbue-ai.github.io/gp-treemap/gallery/).
+
+## Sandboxed usage
+
+If you'd like the scanner to only be able to read the tree you're
+scanning — no `~/.ssh`, no `/etc`, nothing else — run it under Deno's
+per-path permission sandbox:
+
+```sh
+SCAN=~/Downloads
+OUT=/tmp/disk_usage.html
+
+deno run \
+  --allow-read="$SCAN","$(dirname "$OUT")" \
+  --allow-write="$OUT" \
+  --allow-sys --deny-env \
+  npm:@imbue-ai/gp-treemap/tools/gpdu-scan.js --no-open "$SCAN" "$OUT" \
+  && open "$OUT"  # Use xdg-open on Linux.
+```
+
 
 ## A hat tip to GrandPerspective
 
