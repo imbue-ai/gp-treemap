@@ -44,7 +44,7 @@ deno run \
   --allow-read="$SCAN","$DENO_CACHE","$OUT" \
   --allow-write="$OUT" \
   --deny-env \
-  npm:@imbue-ai/gp-treemap/tools/gpdu-scan.js --no-open "$SCAN" "$OUT" \
+  npm:@imbue-ai/gp-treemap@0.3.3/tools/gpdu-scan.js --no-open "$SCAN" "$OUT" \
   && open "$OUT"
 ```
 
