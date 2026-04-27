@@ -12,6 +12,19 @@ to rebuild, your changes won't appear in scanned HTML output.
 
 A test (`tests/bundle-freshness.spec.js`) will catch a stale bundle.
 
+## Releases & the README's deno command
+
+When you bump the package version (e.g. `npm version patch`), update the
+pinned version in the README's "Sandboxed usage" block too —
+`npm:@imbue-ai/gp-treemap@X.Y.Z/tools/gpdu-scan.js`. Deno caches npm:
+specifiers indefinitely, so an unpinned spec keeps running the first
+version it ever resolved, masking newer releases.
+
+`tests/readme-deno-command.spec.js` checks that (a) the README pin
+matches `package.json`, and (b) the documented `--allow-*` flags are
+still sufficient for the script as it stands today (so adding a syscall
+that needs new perms breaks the test before publish).
+
 ## URL hash state
 
 UI state is persisted in the URL hash **at the page level**, not inside the

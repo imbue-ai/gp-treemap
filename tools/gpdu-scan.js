@@ -12,12 +12,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import url from 'node:url';
 import zlib from 'node:zlib';
-
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
-const BUNDLE_PATH = path.join(ROOT, 'dist', 'gp-treemap.bundle.js');
+import { BUNDLE } from '../dist/gp-treemap.bundle.embed.js';
 
 const COLOR_MODES = ['extension', 'kind', 'folder', 'ctime', 'mtime', 'atime'];
 
@@ -26,10 +22,12 @@ async function main() {
   const noOpen = argv.includes('--no-open');
   let colorBy = 'extension';
   let blockSize = 500000;
+  let workers = 16;
   const args = [];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--no-open') continue;
     if (argv[i].startsWith('--block-size=')) { blockSize = Number(argv[i].split('=')[1]) || 500000; continue; }
+    if (argv[i].startsWith('--workers=')) { workers = Math.max(1, Number(argv[i].split('=')[1]) || 16); continue; }
     if (argv[i] === '--color' || argv[i] === '--color-by') {
       colorBy = argv[++i];
       if (!COLOR_MODES.includes(colorBy)) {
@@ -64,13 +62,8 @@ async function main() {
     console.error(target + ' is not a directory');
     process.exit(1);
   }
-  if (!fs.existsSync(BUNDLE_PATH)) {
-    console.error('bundle not found at ' + BUNDLE_PATH + '\nRun `node tools/build.js` first.');
-    process.exit(1);
-  }
-
   const t0 = Date.now();
-  const scan = await walk(target);
+  const scan = await walk(target, workers);
   const elapsed = Date.now() - t0;
   buildHtml(out, target, scan, colorBy, blockSize);
 
@@ -91,10 +84,34 @@ async function main() {
   }
 }
 
-async function walk(rootPath) {
+// Worker source, inlined so it runs via `{ eval: true }` instead of a file
+// read — keeps the Deno sandbox from needing --allow-read on the npm cache.
+const WORKER_SRC = `
+const { parentPort } = require('node:worker_threads');
+const fs = require('node:fs');
+const path = require('node:path');
+parentPort.on('message', ({ dirPath, dirRow }) => {
+  let entries; const results = []; let unreadable = 0;
+  try { entries = fs.readdirSync(dirPath, { withFileTypes: true }); }
+  catch { parentPort.postMessage({ dirRow, dirPath, results, unreadable: 1 }); return; }
+  for (const ent of entries) {
+    if (ent.isSymbolicLink()) { unreadable++; continue; }
+    if (ent.isDirectory()) {
+      results.push({ name: ent.name, isDir: true });
+    } else if (ent.isFile()) {
+      let st;
+      try { st = fs.statSync(path.join(dirPath, ent.name)); }
+      catch { unreadable++; continue; }
+      results.push({ name: ent.name, isDir: false, size: st.size,
+        ts: { ctime: st.ctimeMs, mtime: st.mtimeMs, atime: st.atimeMs } });
+    } else { unreadable++; }
+  }
+  parentPort.postMessage({ dirRow, dirPath, results, unreadable });
+});
+`;
+
+async function walk(rootPath, NWORKERS) {
   const { Worker } = await import('node:worker_threads');
-  const NWORKERS = Math.max(2, Math.min(os.cpus().length, 16));
-  const workerPath = path.join(__dirname, 'scan-worker.js');
 
   const labels = [], parentIndices = [], values = [];
   const rawExtColor = [];   // raw lowercased extension per node
@@ -141,7 +158,7 @@ async function walk(rootPath) {
 
     for (let i = 0; i < NWORKERS; i++) {
       const wi = i;
-      const w = new Worker(workerPath);
+      const w = new Worker(WORKER_SRC, { eval: true });
       w.on('message', (result) => {
         pending--;
         idle.push(wi);
@@ -382,7 +399,7 @@ function encodeBlock(scan, block, aggValue, aggFiles, aggDirs) {
 // Streaming HTML builder — writes directly to a file descriptor to avoid
 // hitting V8's ~512 MB string limit on large scans (8M+ files).
 function buildHtml(outPath, target, scan, colorBy, blockSize) {
-  const bundle = fs.readFileSync(BUNDLE_PATH, 'utf8');
+  const bundle = BUNDLE;
   const fd = fs.openSync(outPath, 'w');
   const w = (s) => fs.writeSync(fd, s);
 

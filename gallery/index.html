@@ -32,6 +32,10 @@
   main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
   header { margin-bottom: 2.5rem; }
   header h1 { margin: 0 0 0.5rem; font-size: 2rem; }
+  header h1 a { color: #0969da; text-decoration: underline; }
+  @media (prefers-color-scheme: dark) {
+    header h1 a { color: #58a6ff; }
+  }
   header p { margin: 0 0 1rem; color: var(--muted); }
   header p:last-child { margin-bottom: 0; }
   header ul { margin: 0 0 1rem; padding-left: 1.25rem; color: var(--muted); }
@@ -72,7 +76,7 @@
 <body>
 <main>
   <header>
-    <h1>gp-treemap gallery</h1>
+    <h1><a href="https://github.com/imbue-ai/gp-treemap">gp-treemap</a> gallery</h1>
     <h2 class="section">Introduction</h2>
     <p>
       Think of a
@@ -139,25 +143,6 @@
         tabular views.
       </li>
     </ul>
-    <h2 class="section">Trees from Tables</h2>
-    <p>
-      Several entries below use the <b>path / tabular</b> treemap
-      (<code>gp-treemap-table</code>), which builds the hierarchy on the fly
-      from a flat table of rows. The <b>Path</b> control in the header lists
-      the columns used to group the data, from outermost to innermost:
-    </p>
-    <p style="margin: 0 0 1rem;">
-      <img src="path-chips.png" alt="Path control with draggable Fuel, Continent, Country chips" style="max-width: 100%; height: auto; border-radius: 6px;">
-    </p>
-    <p>
-      Drag the chips to reorder them and the nesting re-computes immediately:
-      with <code>Fuel</code> first (as above) you get one cell per fuel with
-      continents inside; drag <code>Continent</code> to the front instead
-      and the same rows re-tile as one cell per continent with fuels inside.
-      Same data, totally different story — and no re-export, just a drag.
-      Click the <code>×</code> on a chip to drop that column from the
-      hierarchy entirely, or the <code>+</code> to add another.
-    </p>
     <h2 class="section">Examples</h2>
   </header>
 
@@ -183,6 +168,26 @@
       <a href="gp-treemap-source-tree-disk-usage.html">Open full-page →</a>
     </div>
   </section>
+
+  <h2 class="section" style="margin: 2rem 0 1rem;">Trees from Tables</h2>
+  <p style="color: var(--muted); margin: 0 0 1rem;">
+    The entries below use the <b>path / tabular</b> treemap
+    (<code>gp-treemap-table</code>), which builds the hierarchy on the fly
+    from a flat table of rows. The <b>Path</b> control in the header lists
+    the columns used to group the data, from outermost to innermost:
+  </p>
+  <p style="margin: 0 0 1rem;">
+    <img src="path-chips.png" alt="Path control with draggable Fuel, Continent, Country chips" style="max-width: 100%; height: auto; border-radius: 6px;">
+  </p>
+  <p style="color: var(--muted); margin: 0 0 1.5rem;">
+    Drag the chips to reorder them and the nesting re-computes immediately:
+    with <code>Fuel</code> first (as above) you get one cell per fuel with
+    continents inside; drag <code>Continent</code> to the front instead
+    and the same rows re-tile as one cell per continent with fuels inside.
+    Same data, totally different story — and no re-export, just a drag.
+    Click the <code>×</code> on a chip to drop that column from the
+    hierarchy entirely, or the <code>+</code> to add another.
+  </p>
 
   <section class="entry">
     <h2>Global electricity generation — path: fuel → continent → country</h2>

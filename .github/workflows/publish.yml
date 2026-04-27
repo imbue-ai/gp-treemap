@@ -40,6 +40,11 @@ jobs:
           node-version: "20"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Upgrade npm for Trusted Publishing
+        # Trusted Publishing (OIDC) requires npm >= 11.5.1; Node 20 ships
+        # with npm 10.x, which falls back to token auth and 404s on PUT.
+        run: npm install -g npm@latest
+
       - name: Verify tag matches package.json version
         run: |
           TAG="${GITHUB_REF#refs/tags/v}"
