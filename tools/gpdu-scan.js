@@ -26,10 +26,12 @@ async function main() {
   const noOpen = argv.includes('--no-open');
   let colorBy = 'extension';
   let blockSize = 500000;
+  let workers = 16;
   const args = [];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--no-open') continue;
     if (argv[i].startsWith('--block-size=')) { blockSize = Number(argv[i].split('=')[1]) || 500000; continue; }
+    if (argv[i].startsWith('--workers=')) { workers = Math.max(1, Number(argv[i].split('=')[1]) || 16); continue; }
     if (argv[i] === '--color' || argv[i] === '--color-by') {
       colorBy = argv[++i];
       if (!COLOR_MODES.includes(colorBy)) {
@@ -70,7 +72,7 @@ async function main() {
   }
 
   const t0 = Date.now();
-  const scan = await walk(target);
+  const scan = await walk(target, workers);
   const elapsed = Date.now() - t0;
   buildHtml(out, target, scan, colorBy, blockSize);
 
@@ -91,9 +93,8 @@ async function main() {
   }
 }
 
-async function walk(rootPath) {
+async function walk(rootPath, NWORKERS) {
   const { Worker } = await import('node:worker_threads');
-  const NWORKERS = Math.max(2, Math.min(os.cpus().length, 16));
   const workerPath = path.join(__dirname, 'scan-worker.js');
 
   const labels = [], parentIndices = [], values = [];

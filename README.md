@@ -43,7 +43,7 @@ DENO_CACHE="$(deno info --json | jq -r .denoDir)"
 deno run \
   --allow-read="$SCAN","$DENO_CACHE","$OUT" \
   --allow-write="$OUT" \
-  --allow-sys --deny-env \
+  --deny-env \
   npm:@imbue-ai/gp-treemap/tools/gpdu-scan.js --no-open "$SCAN" "$OUT" \
   && open "$OUT"
 ```
