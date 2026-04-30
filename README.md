@@ -154,6 +154,16 @@ its flags and output format in detail.
   and triggers are shown alongside (views & triggers as 0-byte cells). Color
   modes: kind / parent-table / value-type. Requires `better-sqlite3` (an
   `optionalDependency`).
+- **`gpdu-s3 <s3://bucket[/prefix]>... [output.html]`** —
+  [`tools/gpdu-s3.js`](tools/gpdu-s3.js). Visualizes an S3 bucket or prefix as
+  a treemap. Recursively enumerates objects via `ListObjectsV2` (or
+  `ListObjectVersions` if `--include-versions`), fans out by `Delimiter=/`
+  with an async Promise pool of `--workers=16` workers (S3 is I/O-bound; no
+  worker_threads). Synthesizes a folder hierarchy from `/`-separated keys.
+  Auth via the default AWS credential chain; `--region` overrides; pass
+  `--no-sign-request` for public buckets. Color modes: extension / storage
+  class / last-modified. Requires `@aws-sdk/client-s3` (an
+  `optionalDependency`).
 
 ## Repo layout
 

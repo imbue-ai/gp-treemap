@@ -10,3 +10,6 @@ test-results/
 
 # Scan-tool outputs that sometimes land in the working tree
 /gp-treemap-*.html
+
+# gpdu-s3 test runner writes per-test launcher .mjs files here
+tests/_tmp_s3_launchers/

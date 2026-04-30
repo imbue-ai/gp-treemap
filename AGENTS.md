@@ -121,6 +121,22 @@ gates its top-level call on
 `import.meta.url === url.pathToFileURL(process.argv[1]).href`. Apply the
 same pattern in any future `gpdu-*` tool that wants to export helpers.
 
+### `gpdu-s3`
+
+Visualizes an S3 bucket or prefix via `@aws-sdk/client-s3`
+(`optionalDependency`). The walker is an async Promise pool on the
+**main thread** — *not* `worker_threads` like gpdu/gpdu-scan. S3 is
+I/O-bound; threads buy nothing. Each task expands one prefix via
+`ListObjectsV2` (or `ListObjectVersions` if `--include-versions`) with
+`Delimiter=/`, enqueues sub-prefixes for other workers, and emits leaves
+for objects. The visible tree synthesizes a folder hierarchy from
+`/`-separated keys (mirroring gpdu's mental model).
+
+Tests are mocked with `aws-sdk-client-mock`; no live S3 in CI. The test
+runner writes a per-test launcher `.mjs` into
+`tests/_tmp_s3_launchers/` (gitignored) — that directory has to live
+inside the project so node_modules resolution finds the mock package.
+
 ## Tests
 
     npx playwright test          # all tests

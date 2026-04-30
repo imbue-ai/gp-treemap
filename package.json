@@ -55,11 +55,14 @@
     "prepublishOnly": "node tools/build.js"
   },
   "optionalDependencies": {
+    "@aws-sdk/client-s3": "^3.1039.0",
     "better-sqlite3": "^12.9.0",
     "playwright": "^1.47.0"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1039.0",
     "@playwright/test": "^1.47.0",
+    "aws-sdk-client-mock": "^4.1.0",
     "better-sqlite3": "^12.9.0",
     "tinybench": "^6.0.0"
   },
