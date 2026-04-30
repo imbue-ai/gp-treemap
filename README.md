@@ -117,7 +117,7 @@ npm run serve
 
 ## CLI tools
 
-Three bin scripts ship with the package; each file's header comment documents
+A few bin scripts ship with the package; each file's header comment documents
 its flags and output format in detail.
 
 - **`gpdu <dir> [output.html]`** — [`tools/gpdu-scan.js`](tools/gpdu-scan.js). Recursive
@@ -132,6 +132,18 @@ its flags and output format in detail.
   [`tools/profile-to-html.js`](tools/profile-to-html.js). Renders a
   `.cpuprofile` as a self-contained treemap of CPU time, bucketed by thread and
   call stack.
+
+### Other gpdu-* tools (in development — invoke via `node tools/gpdu-*.js`)
+
+- **`gpdu-json <input.json5> [output.html]`** —
+  [`tools/gpdu-json.js`](tools/gpdu-json.js). Visualizes a JSON or JSON5 file
+  as a treemap. Each cell's area is the byte size of that node's serialized
+  form in the source file. Internal nodes (objects, arrays) carry a synthetic
+  `(leftover)` leaf that absorbs structural-overhead bytes (braces, brackets,
+  commas, whitespace, comments), so the tree's total reconciles to the source
+  file size exactly. Color modes: type / depth / key. Pruning: `--min-bytes=N`,
+  `--max-array-children=N`. Accepts JSON5 (comments, trailing commas, unquoted
+  keys, single-quoted strings).
 
 ## Repo layout
 

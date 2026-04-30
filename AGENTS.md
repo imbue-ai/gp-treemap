@@ -87,6 +87,19 @@ mode, which modes are categorical vs. quantitative, themes, etc.).
 `tools/gpdu-scan.js` is the canonical example; the other `gpdu-*` tools
 follow the same template.
 
+### `gpdu-json`
+
+Visualizes a JSON5 file. Cell area is the byte size of that node's
+serialized form in the source. Internal nodes carry a synthetic
+`(leftover)` leaf to absorb structural-overhead bytes (braces, commas,
+whitespace, comments), so `parent.value === sum(child.value)` at every
+level and the tree's total reconciles to the source file size — see
+`tests/gpdu-json.spec.js` for the invariant. Tricky bit: parsing is via
+`@babel/parser`'s `parseExpression` and there's no JSON5-grammar
+enforcement — whatever Babel parses, we render (single-quoted strings,
+unquoted keys, trailing commas, comments all just work because they're
+valid JS expression syntax).
+
 ## Tests
 
     npx playwright test          # all tests

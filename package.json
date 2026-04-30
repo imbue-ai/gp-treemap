@@ -65,6 +65,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@babel/parser": "^7.29.2",
     "csv-parse": "^6.2.1"
   }
 }
