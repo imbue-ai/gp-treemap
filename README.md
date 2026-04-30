@@ -144,6 +144,16 @@ its flags and output format in detail.
   file size exactly. Color modes: type / depth / key. Pruning: `--min-bytes=N`,
   `--max-array-children=N`. Accepts JSON5 (comments, trailing commas, unquoted
   keys, single-quoted strings).
+- **`gpdu-sqlite <db.sqlite> [output.html]`** —
+  [`tools/gpdu-sqlite.js`](tools/gpdu-sqlite.js). Visualizes a SQLite file as
+  a treemap. Hierarchy: db → table → [column-1, ..., index-1, ...]. Per-column
+  byte sizes are estimated by sampling rows (default 10 000, override with
+  `--sample-rows=N`) and applying SQLite's serial-type encoding rules JS-side.
+  Pass `--include-row-elements-for-all-columns` for an exact count via a full
+  table scan, with each (row, column) becoming a leaf. System tables, views,
+  and triggers are shown alongside (views & triggers as 0-byte cells). Color
+  modes: kind / parent-table / value-type. Requires `better-sqlite3` (an
+  `optionalDependency`).
 
 ## Repo layout
 

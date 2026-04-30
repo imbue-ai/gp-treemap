@@ -55,10 +55,12 @@
     "prepublishOnly": "node tools/build.js"
   },
   "optionalDependencies": {
+    "better-sqlite3": "^12.9.0",
     "playwright": "^1.47.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.47.0",
+    "better-sqlite3": "^12.9.0",
     "tinybench": "^6.0.0"
   },
   "engines": {

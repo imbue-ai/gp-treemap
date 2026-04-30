@@ -100,6 +100,27 @@ enforcement — whatever Babel parses, we render (single-quoted strings,
 unquoted keys, trailing commas, comments all just work because they're
 valid JS expression syntax).
 
+### `gpdu-sqlite`
+
+Visualizes a SQLite database via `better-sqlite3` (`optionalDependency`).
+Hierarchy is `db → <table> → [<column>..., <index>...]`; system tables,
+views, and triggers appear at the top level alongside user tables (views
+& triggers as 0-byte cells). Total bytes per table/index come from the
+`dbstat` virtual table (sum of `payload` over all pages of that name).
+Per-column byte estimates use a JS-side reimplementation of SQLite's
+serial-type encoding rules (`serialBytes` in `tools/gpdu-sqlite.js`) over
+sampled rows, scaled up by row count. The
+`--include-row-elements-for-all-columns` flag forces a full table scan
+and emits one leaf per (row, column) — slow on big DBs but exact.
+
+### `gpdu-sqlite` testability gotcha
+
+`tools/gpdu-sqlite.js` exports `serialBytes` so unit tests can exercise
+the encoder. To prevent `main()` from running at import time, the file
+gates its top-level call on
+`import.meta.url === url.pathToFileURL(process.argv[1]).href`. Apply the
+same pattern in any future `gpdu-*` tool that wants to export helpers.
+
 ## Tests
 
     npx playwright test          # all tests
