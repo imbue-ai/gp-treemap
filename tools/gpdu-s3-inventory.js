@@ -37,15 +37,20 @@ function usage(exitCode) {
   console.error(
     'Usage: node tools/gpdu-s3-inventory.js [--no-open] [--color=' + COLOR_MODES.join('|') + ']\n' +
     '                                       [--region=REGION] [--no-sign-request]\n' +
-    '                                       [--min-fraction=F] [--block-size=N]\n' +
+    '                                       [--min-fraction=F] [--max-depth=D]\n' +
+    '                                       [--block-size=N]\n' +
     '                                       <s3://meta-bucket/.../manifest.json | local-manifest.json>\n' +
     '                                       [output.html]\n' +
     '\n' +
-    '  --min-fraction=F   prune subtrees whose aggregated size is less than\n' +
-    '                     F * total. Default 0.00001 (0.001%). Pass 0 to disable.\n' +
-    '                     Pruned subtrees are rolled up into a single\n' +
-    '                     "(N small)" leaf per parent, so total bytes are\n' +
-    '                     preserved.'
+    '  --min-fraction=F   keep individual objects only if their size is at\n' +
+    '                     least F * total. Default 0.00001 (0.001%). Pass 0\n' +
+    '                     to keep every object. Smaller objects are rolled\n' +
+    '                     up into a single "(N small)" leaf per parent\n' +
+    '                     directory, so total bytes are preserved.\n' +
+    '  --max-depth=D      cap path depth at which "(N small)" rollups land,\n' +
+    '                     so very deep paths don\'t blow up the tree. Default\n' +
+    '                     8. Big-leaf objects are emitted at their full path\n' +
+    '                     regardless.'
   );
   process.exit(exitCode);
 }
@@ -58,6 +63,7 @@ async function main() {
   let region;
   let noSign = false;
   let minFraction = 0.00001;  // 0.001% of total; prune subtrees below this
+  let maxDepth = 8;            // max '/' depth at which "(N small)" rollups land
   const positionals = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -68,6 +74,11 @@ async function main() {
     if (a.startsWith('--min-fraction=')) {
       const v = Number(a.split('=')[1]);
       minFraction = (Number.isFinite(v) && v >= 0) ? v : 0.00001;
+      continue;
+    }
+    if (a.startsWith('--max-depth=')) {
+      const v = Number(a.split('=')[1]);
+      maxDepth = (Number.isInteger(v) && v >= 1) ? v : 8;
       continue;
     }
     if (a.startsWith('--region=')) { region = a.split('=')[1]; continue; }
@@ -181,30 +192,74 @@ async function main() {
     parquetPaths = fileEntries.map(e => path.join(manifestPrefix, e.key));
   }
   let readElapsed = 0;
-  try {
-    process.stderr.write('  running duckdb on ' + parquetPaths.length + ' parquet file(s)\n');
-    const t0 = Date.now();
 
-    // For s3:// reads, prelude installs httpfs and binds AWS credentials via
-    // the standard credential chain (env / ~/.aws/credentials / IAM role).
-    const prelude = manifestArg.startsWith('s3://')
-      ? "INSTALL httpfs; LOAD httpfs;\n" +
-        (region ? "SET s3_region = '" + region.replace(/'/g, "''") + "';\n" : "") +
-        "CREATE OR REPLACE PERSISTENT SECRET aws_chain (TYPE S3, PROVIDER credential_chain);\n"
-      : "";
-    const filesArg = parquetPaths.map(p => `'${p.replace(/'/g, "''")}'`).join(',');
+  // SQL prelude: for s3:// reads, install httpfs and bind AWS credentials
+  // via the standard credential chain (env / ~/.aws/credentials / IAM role).
+  const prelude = manifestArg.startsWith('s3://')
+    ? "INSTALL httpfs; LOAD httpfs;\n" +
+      (region ? "SET s3_region = '" + region.replace(/'/g, "''") + "';\n" : "") +
+      "CREATE OR REPLACE PERSISTENT SECRET aws_chain (TYPE S3, PROVIDER credential_chain);\n"
+    : "";
+  const filesArg = parquetPaths.map(p => `'${p.replace(/'/g, "''")}'`).join(',');
+
+  try {
+    // ----- Pass 1: total bytes -----
+    process.stderr.write('  duckdb pass 1: total bytes...\n');
+    const tTotal0 = Date.now();
+    const totalSql = prelude +
+      `SET variable FILES = [${filesArg}];\n` +
+      "COPY (SELECT SUM(size) FROM read_parquet(getvariable('FILES')))" +
+      "  TO '/dev/stdout' (FORMAT 'CSV', HEADER FALSE);";
+    const totalBytesAtRoot = await runDuckSqlScalar(spawn, totalSql);
+    process.stderr.write('  total bytes  ' + humanBytes(totalBytesAtRoot) +
+      '  (' + totalBytesAtRoot.toLocaleString() + ' B)  in ' + (Date.now() - tTotal0) + ' ms\n');
+
+    // Compute the threshold here so DuckDB can do the leaf/rollup split in
+    // one pass; we still let pruneByThreshold run later as a safety net for
+    // intermediate-prefix subtrees that fall under threshold.
+    const threshold = minFraction > 0 ? totalBytesAtRoot * minFraction : 0;
+    if (threshold > 0) {
+      process.stderr.write('  keeping objects >= ' + humanBytes(threshold) +
+        '  (' + (minFraction * 100).toFixed(4) + '% of total)\n');
+    }
+
+    // ----- Pass 2: big leaves UNION small-rollups -----
+    // Big leaves: emit verbatim.
+    // Small rollups: group by parent directory truncated to --max-depth.
+    //   Result kind column distinguishes 'leaf' (full key) vs 'small'
+    //   (directory prefix; Node synthesizes a "(N small)" leaf under it).
+    process.stderr.write('  duckdb pass 2: big leaves + per-prefix small rollups (max depth ' + maxDepth + ')...\n');
+    const t0 = Date.now();
+    // Build a SQL expression for "the parent prefix of `key`, truncated to D
+    // segments". Used for the GROUP BY of the small-rollup branch.
+    const truncExpr =
+      "array_to_string(string_split(key, '/')[1:LEAST(len(string_split(key, '/')) - 1, " + maxDepth + ")], '/')";
     const fullSql = prelude +
       `SET variable FILES = [${filesArg}];\n` +
-      "COPY (SELECT key, size, last_modified_date, storage_class " +
-      "      FROM read_parquet(getvariable('FILES'))) " +
-      "TO '/dev/stdout' (FORMAT 'CSV', HEADER FALSE);";
+      `SET variable T = ${threshold};\n` +
+      "COPY (\n" +
+      "  WITH inv AS (\n" +
+      "    SELECT key, size, last_modified_date, storage_class\n" +
+      "    FROM read_parquet(getvariable('FILES'))\n" +
+      "  )\n" +
+      "  SELECT 'leaf'   AS kind, key AS path, 1::BIGINT AS small_count,\n" +
+      "         size, last_modified_date, storage_class\n" +
+      "  FROM inv\n" +
+      "  WHERE size >= getvariable('T')\n" +
+      "  UNION ALL\n" +
+      "  SELECT 'small'  AS kind, " + truncExpr + " AS path, COUNT(*)::BIGINT AS small_count,\n" +
+      "         SUM(size) AS size, MAX(last_modified_date) AS last_modified_date,\n" +
+      "         any_value(storage_class) AS storage_class\n" +
+      "  FROM inv\n" +
+      "  WHERE size < getvariable('T')\n" +
+      "  GROUP BY " + truncExpr + "\n" +
+      ") TO '/dev/stdout' (FORMAT 'CSV', HEADER FALSE);";
 
     await new Promise((resolve, reject) => {
       const proc = spawn('duckdb', ['-c', fullSql], { stdio: ['ignore', 'pipe', 'pipe'] });
       let stderrAll = '';
       proc.stderr.on('data', (d) => {
         stderrAll += d.toString();
-        // Stream stderr to console so the user sees what duckdb is doing.
         process.stderr.write(d);
       });
       proc.on('error', reject);
@@ -212,16 +267,13 @@ async function main() {
         if (code !== 0) reject(new Error('duckdb exited with code ' + code + (stderrAll ? '\n' + stderrAll.slice(-2000) : '')));
       });
 
-      // Stream the CSV stdout line-by-line. DuckDB quotes fields containing
-      // commas / quotes per RFC4180. Use a small inline parser tuned for
-      // four-column rows; csv-parse is also fine but adds a dependency
-      // hop and we know our schema is simple.
+      // Stream CSV: kind, path, small_count, size, last_modified_date, storage_class
       let buf = '';
       let lastPrint = 0;
+      let leafCount = 0, rollupCount = 0;
       proc.stdout.setEncoding('utf8');
       proc.stdout.on('data', (chunk) => {
         buf += chunk;
-        // Process complete lines.
         let nl;
         while ((nl = buf.indexOf('\n')) >= 0) {
           const line = buf.slice(0, nl);
@@ -232,58 +284,39 @@ async function main() {
         const now = Date.now();
         if (now - lastPrint > 250) {
           lastPrint = now;
-          process.stderr.write('\r  parsed ' + builder.counts.object.toLocaleString() + ' rows         ');
+          process.stderr.write('\r  parsed ' + leafCount.toLocaleString() + ' leaves + ' +
+            rollupCount.toLocaleString() + ' rollups          ');
         }
       });
       proc.stdout.on('end', () => {
         if (buf.length > 0) parseAndAdd(buf);
-        process.stderr.write('\r  parsed ' + builder.counts.object.toLocaleString() + ' rows in ' + (Date.now() - t0) + ' ms      \n');
+        process.stderr.write('\r  parsed ' + leafCount.toLocaleString() + ' leaves + ' +
+          rollupCount.toLocaleString() + ' rollups in ' + (Date.now() - t0) + ' ms      \n');
         resolve();
       });
 
       function parseAndAdd(line) {
-        // RFC4180-ish row parser: 4 columns. Fields are either quoted ("...")
-        // with internal quotes doubled ("") or bare (no commas / quotes /
-        // newlines). DuckDB's default writer follows these rules.
-        const fields = [];
-        let i = 0, n = line.length;
-        while (i < n) {
-          if (fields.length > 0) {
-            if (line.charCodeAt(i) !== 44 /* , */) break;
-            i++;
-          }
-          if (line.charCodeAt(i) === 34 /* " */) {
-            // Quoted field.
-            i++;
-            let s = '';
-            while (i < n) {
-              const c = line.charCodeAt(i);
-              if (c === 34) {
-                if (i + 1 < n && line.charCodeAt(i + 1) === 34) {
-                  s += '"'; i += 2;
-                } else { i++; break; }
-              } else { s += line.charAt(i); i++; }
-            }
-            fields.push(s);
-          } else {
-            const start = i;
-            while (i < n && line.charCodeAt(i) !== 44) i++;
-            fields.push(line.slice(start, i));
-          }
+        const fields = parseCsvLine(line);
+        if (fields.length < 6) return;
+        const kind = fields[0];
+        const path = fields[1];
+        if (!path) return;
+        const smallCount = Number(fields[2]) || 0;
+        const size = Number(fields[3]) || 0;
+        const mtime = fields[4] ? Date.parse(fields[4]) || 0 : 0;
+        const sc = fields[5] || 'STANDARD';
+        if (kind === 'leaf') {
+          builder.addObject(path, size, sc, mtime);
+          leafCount++;
+        } else {
+          builder.addRollupSmall(path, smallCount, size, sc, mtime);
+          rollupCount++;
         }
-        if (fields.length < 4) return;
-        const key = fields[0];
-        if (!key) return;
-        const size = Number(fields[1]) || 0;
-        // last_modified_date: DuckDB renders TIMESTAMP_MILLIS as ISO 8601.
-        // Number()-coerce after parsing as Date.
-        const mtime = fields[2] ? Date.parse(fields[2]) || 0 : 0;
-        const sc = fields[3] || 'STANDARD';
-        builder.addObject(key, size, sc, mtime);
       }
     });
     readElapsed = Date.now() - t0;
-    process.stderr.write('  built tree from ' + builder.counts.object.toLocaleString() + ' objects in ' + readElapsed + ' ms\n');
+    process.stderr.write('  built tree (' + builder.counts.object.toLocaleString() + ' objects, ' +
+      builder.counts.prefix.toLocaleString() + ' prefixes) in ' + readElapsed + ' ms\n');
   } finally {}
 
   let scan = builder.finish();
@@ -327,6 +360,56 @@ function numCoerce(v) {
   if (typeof v === 'bigint') return Number(v);
   if (typeof v === 'number') return v;
   return Number(v) || 0;
+}
+
+// Run a DuckDB SQL that emits a single scalar (single row × single column)
+// to stdout in CSV form, return it as a Number.
+async function runDuckSqlScalar(spawnFn, sql) {
+  return await new Promise((resolve, reject) => {
+    const proc = spawnFn('duckdb', ['-c', sql], { stdio: ['ignore', 'pipe', 'pipe'] });
+    let out = '', errAll = '';
+    proc.stdout.setEncoding('utf8');
+    proc.stdout.on('data', (d) => { out += d; });
+    proc.stderr.on('data', (d) => { errAll += d.toString(); process.stderr.write(d); });
+    proc.on('error', reject);
+    proc.on('close', (code) => {
+      if (code !== 0) return reject(new Error('duckdb exited with code ' + code + (errAll ? '\n' + errAll.slice(-2000) : '')));
+      const v = Number(out.trim().split('\n')[0]);
+      resolve(Number.isFinite(v) ? v : 0);
+    });
+  });
+}
+
+// RFC4180 CSV row parser (single line, 6 columns). DuckDB's default writer
+// quotes fields that contain commas / quotes / newlines, doubling internal
+// quotes. We don't handle embedded newlines (no field in this schema can
+// contain them).
+function parseCsvLine(line) {
+  const fields = [];
+  let i = 0, n = line.length;
+  while (i < n) {
+    if (fields.length > 0) {
+      if (line.charCodeAt(i) !== 44 /* , */) break;
+      i++;
+    }
+    if (line.charCodeAt(i) === 34 /* " */) {
+      i++;
+      let s = '';
+      while (i < n) {
+        const c = line.charCodeAt(i);
+        if (c === 34) {
+          if (i + 1 < n && line.charCodeAt(i + 1) === 34) { s += '"'; i += 2; }
+          else { i++; break; }
+        } else { s += line.charAt(i); i++; }
+      }
+      fields.push(s);
+    } else {
+      const start = i;
+      while (i < n && line.charCodeAt(i) !== 44) i++;
+      fields.push(line.slice(start, i));
+    }
+  }
+  return fields;
 }
 
 async function fetchS3ToBuffer(s3, GetObjectCommand, Bucket, Key) {
@@ -388,7 +471,15 @@ function newScanBuilder(sourceBucket) {
   return {
     counts,
     addObject(key, size, sc, mtime) {
-      if (!key || key.endsWith('/')) return; // skip directory markers
+      if (!key) return;
+      // S3 "directory marker" objects have keys ending in '/'. Strip the
+      // trailing slash and label them so we account for their bytes (they
+      // can be ~MB in some buckets) without producing an empty filename.
+      let dirMarker = false;
+      if (key.charCodeAt(key.length - 1) === 47 /* / */) {
+        key = key.slice(0, -1);
+        dirMarker = true;
+      }
       // Find / build ancestor prefix nodes; iterate in-place to avoid an
       // intermediate split() allocation per key.
       let parent = ROOT;
@@ -416,7 +507,34 @@ function newScanBuilder(sourceBucket) {
         }
       }
       const fileName = lastSlash >= 0 ? key.slice(lastSlash + 1) : key;
-      add(fileName, parent, size, rawExt(fileName), sc, mtime, 'object');
+      const label = dirMarker ? fileName + '/ (dir marker)' : fileName;
+      add(label, parent, size, dirMarker ? '(dir-marker)' : rawExt(fileName), sc, mtime, 'object');
+      totalBytes += size;
+    },
+    // Add a "(N small)" rollup leaf under the given directory prefix
+    // (without a trailing slash). The directory's ancestor prefix nodes
+    // are created on demand, just like in addObject.
+    addRollupSmall(dirPath, smallCount, size, sc, mtime) {
+      let parent = ROOT;
+      if (dirPath && dirPath.length > 0) {
+        let segStart = 0;
+        let acc = '';
+        const n = dirPath.length;
+        for (let i = 0; i <= n; i++) {
+          if (i === n || dirPath.charCodeAt(i) === 47 /* / */) {
+            if (i > segStart) {
+              const seg = dirPath.slice(segStart, i);
+              acc += seg + '/';
+              let id = prefixGet(acc);
+              if (id == null) { id = add(seg, parent, 0, '', '', 0, 'prefix'); prefixSet(acc, id); }
+              parent = id;
+            }
+            segStart = i + 1;
+          }
+        }
+      }
+      const label = '(' + smallCount.toLocaleString() + ' small)';
+      add(label, parent, size, '(small)', sc || '(rolled-up)', mtime, 'object');
       totalBytes += size;
     },
     finish() {
