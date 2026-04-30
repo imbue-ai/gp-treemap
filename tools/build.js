@@ -67,3 +67,14 @@ const embedPath = path.join(DIST, 'gp-treemap.bundle.embed.js');
 const escaped = bundleSrc.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
 fs.writeFileSync(embedPath, 'export const BUNDLE = `' + escaped + '`;\n');
 console.log('wrote ' + path.relative(ROOT, embedPath) + ' (' + fs.statSync(embedPath).size + ' bytes)');
+
+// Emit dist/scan-loader.embed.js — the browser-side IIFE shared across the
+// gpdu-* CLI family. Source lives in tools/scan-loader.source.js; we read
+// it here and re-export as a string constant so each gpdu-* tool can import
+// LOADER_JS without doing fs.readFileSync (which would need --allow-read on
+// the npm cache directory under Deno).
+const loaderSrc = fs.readFileSync(path.join(ROOT, 'tools', 'scan-loader.source.js'), 'utf8');
+const loaderEscaped = loaderSrc.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+const loaderEmbedPath = path.join(DIST, 'scan-loader.embed.js');
+fs.writeFileSync(loaderEmbedPath, 'export const LOADER_JS = `' + loaderEscaped + '`;\n');
+console.log('wrote ' + path.relative(ROOT, loaderEmbedPath) + ' (' + fs.statSync(loaderEmbedPath).size + ' bytes)');

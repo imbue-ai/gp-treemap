@@ -28,9 +28,11 @@ function parseScanHtml(htmlPath) {
   }
   const piBuf = Buffer.from(raw.piB64, 'base64');
   const parentIndices = Array.from(new Int32Array(piBuf.buffer, piBuf.byteOffset, piBuf.byteLength / 4));
-  const cBuf = Buffer.from(raw.extB64, 'base64');
+  // The 'kind' attribute carries the bucketed file kind (used to be 'extColor').
+  const kindAttr = raw.attributes.kind;
+  const cBuf = Buffer.from(kindAttr.b64, 'base64');
   const colorIdx = new Uint16Array(cBuf.buffer, cBuf.byteOffset, cBuf.byteLength / 2);
-  const color = Array.from(colorIdx).map(i => raw.extNames[i]);
+  const color = Array.from(colorIdx).map(i => kindAttr.names[i]);
   return { labels: raw.labels, values: raw.values, parentIndices, color };
 }
 

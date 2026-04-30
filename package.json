@@ -32,8 +32,11 @@
   "files": [
     "dist/gp-treemap.bundle.js",
     "dist/gp-treemap.bundle.embed.js",
+    "dist/scan-loader.embed.js",
     "src/",
     "tools/gpdu-scan.js",
+    "tools/scan-core.js",
+    "tools/scan-loader.source.js",
     "tools/profile-load.js",
     "tools/profile-to-html.js",
     "tools/table-treemap.js",

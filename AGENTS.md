@@ -59,6 +59,34 @@ null checks instead: `id == null`, `id != null`, `node._item == null`.
 This has caused bugs where the root node was silently skipped (e.g. the zoom
 path expansion skipping the root because `!0` is `true`).
 
+## CLIs
+
+The `gpdu-*` family of CLI tools (`tools/gpdu-*.js`) all share the same
+plumbing in `tools/scan-core.js`:
+
+- `partitionBlocks(scan, targetSize)` — splits a flat `(labels,
+  parentIndices, values)` scan into block-partition structures, with
+  oversized subtrees becoming "stubs" (leaf placeholders) whose real
+  children live in a child block, inflated lazily in the browser.
+- `encodeBlock(scan, block, ctx)` — encodes one block to a JSON envelope
+  with categorical attributes packed as enum-indexed `Uint16Array` and
+  numeric attributes as `Float64Array`, both base64-encoded.
+- `LOADER_JS` — a string containing the browser-side IIFE that decompresses
+  blocks, builds the in-memory node store, exposes `<gp-treemap>` accessor
+  functions, and handles theme/palette/`#s=...` URL-hash sync. Source
+  lives in `tools/scan-loader.source.js`; the build step (`tools/build.js`)
+  emits `dist/scan-loader.embed.js` exporting it as a string constant so
+  Deno doesn't need `--allow-read` on its npm cache directory.
+
+Each tool writes its own complete HTML — title row, app toolbar, stats
+bar, help modal, page-script — calling `partitionBlocks` / `encodeBlock`
+for the heavy mechanics and inlining `LOADER_JS` once. The shared loader
+expects `window._gpduConfig` to be set before it runs (default color
+mode, which modes are categorical vs. quantitative, themes, etc.).
+
+`tools/gpdu-scan.js` is the canonical example; the other `gpdu-*` tools
+follow the same template.
+
 ## Tests
 
     npx playwright test          # all tests
