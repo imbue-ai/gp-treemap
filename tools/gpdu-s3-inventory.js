@@ -341,7 +341,7 @@ async function main() {
   console.log('inventory of bucket ' + (manifest.sourceBucket || bucketName));
   console.log('  manifest      ' + manifestArg);
   console.log('  parquet files ' + fileEntries.length.toLocaleString());
-  console.log('  objects       ' + scan.counts.object.toLocaleString());
+  console.log('  objects       ' + (scan.totalObjects || scan.counts.object).toLocaleString());
   console.log('  prefixes      ' + scan.counts.prefix.toLocaleString());
   console.log('  total bytes   ' + humanBytes(scan.totalBytes) + '  (' + scan.totalBytes.toLocaleString() + ' B)');
   console.log('  duckdb decode ' + readElapsed + ' ms');
@@ -434,10 +434,12 @@ function newScanBuilder(sourceBucket) {
   const storageClasses = [];
   const lastModified = [];
   const kinds = [];
+  const objectCounts = [];   // 1 for normal object leaves, N for rollups, 0 elsewhere
   const counts = { object: 0, prefix: 0 };
+  let totalObjects = 0;       // total real S3 objects (rollups count as small_count, not 1)
   let totalBytes = 0;
 
-  function add(label, parentIdx, value, ext, sc, mtime, kind) {
+  function add(label, parentIdx, value, ext, sc, mtime, kind, objectCount) {
     const idx = labels.length;
     labels.push(label);
     parentIndices.push(parentIdx);
@@ -446,11 +448,12 @@ function newScanBuilder(sourceBucket) {
     storageClasses.push(sc);
     lastModified.push(mtime);
     kinds.push(kind);
+    objectCounts.push(objectCount || 0);
     if (counts[kind] != null) counts[kind]++;
     return idx;
   }
 
-  const ROOT = add('s3://' + sourceBucket, -1, 0, '', '', 0, 'root');
+  const ROOT = add('s3://' + sourceBucket, -1, 0, '', '', 0, 'root', 0);
 
   // Sharded prefix lookup: a single JS Map caps at 2^24 (~16.7M) entries,
   // which is too small for inventory-scale buckets. Split across SHARDS
@@ -491,7 +494,7 @@ function newScanBuilder(sourceBucket) {
           const seg = key.slice(segStart, i);
           acc += seg + '/';
           let id = prefixGet(acc);
-          if (id == null) { id = add(seg, parent, 0, '', '', 0, 'prefix'); prefixSet(acc, id); }
+          if (id == null) { id = add(seg, parent, 0, '', '', 0, 'prefix', 0); prefixSet(acc, id); }
           parent = id;
           segStart = i + 1;
         }
@@ -502,14 +505,15 @@ function newScanBuilder(sourceBucket) {
         if (seg.length > 0) {
           acc += seg + '/';
           let id = prefixGet(acc);
-          if (id == null) { id = add(seg, parent, 0, '', '', 0, 'prefix'); prefixSet(acc, id); }
+          if (id == null) { id = add(seg, parent, 0, '', '', 0, 'prefix', 0); prefixSet(acc, id); }
           parent = id;
         }
       }
       const fileName = lastSlash >= 0 ? key.slice(lastSlash + 1) : key;
       const label = dirMarker ? fileName + '/ (dir marker)' : fileName;
-      add(label, parent, size, dirMarker ? '(dir-marker)' : rawExt(fileName), sc, mtime, 'object');
+      add(label, parent, size, dirMarker ? '(dir-marker)' : rawExt(fileName), sc, mtime, 'object', 1);
       totalBytes += size;
+      totalObjects++;
     },
     // Add a "(N small)" rollup leaf under the given directory prefix
     // (without a trailing slash). The directory's ancestor prefix nodes
@@ -526,7 +530,7 @@ function newScanBuilder(sourceBucket) {
               const seg = dirPath.slice(segStart, i);
               acc += seg + '/';
               let id = prefixGet(acc);
-              if (id == null) { id = add(seg, parent, 0, '', '', 0, 'prefix'); prefixSet(acc, id); }
+              if (id == null) { id = add(seg, parent, 0, '', '', 0, 'prefix', 0); prefixSet(acc, id); }
               parent = id;
             }
             segStart = i + 1;
@@ -534,11 +538,13 @@ function newScanBuilder(sourceBucket) {
         }
       }
       const label = '(' + smallCount.toLocaleString() + ' small)';
-      add(label, parent, size, '(small)', sc || '(rolled-up)', mtime, 'object');
+      add(label, parent, size, '(small)', sc || '(rolled-up)', mtime, 'object', smallCount);
       totalBytes += size;
+      totalObjects += smallCount;
     },
+    get totalObjects() { return totalObjects; },
     finish() {
-      return { labels, parentIndices, values, exts, storageClasses, lastModified, kinds, counts, totalBytes };
+      return { labels, parentIndices, values, exts, storageClasses, lastModified, kinds, objectCounts, counts, totalBytes, totalObjects };
     },
   };
 }
@@ -569,12 +575,12 @@ function pruneByThreshold(scan, threshold) {
     if (childIds[i]) for (const c of childIds[i]) aggValue[i] += aggValue[c];
   }
 
-  // Aggregate object-leaf count per subtree (so the rollup label can say
-  // "(N small)" — N = how many real S3 objects we collapsed).
-  const aggObjects = new Int32Array(n);
+  // Aggregate underlying-S3-object count per subtree, using each leaf's
+  // recorded objectCount (1 for normal leaves, smallCount for "(N small)"
+  // rollups already produced by SQL).
+  const aggObjects = new Float64Array(n);
   for (let i = n - 1; i >= 0; i--) {
-    if (scan.kinds[i] === 'object') aggObjects[i] = 1;
-    else aggObjects[i] = 0;
+    aggObjects[i] = scan.objectCounts ? (scan.objectCounts[i] || 0) : (scan.kinds[i] === 'object' ? 1 : 0);
     if (childIds[i]) for (const c of childIds[i]) aggObjects[i] += aggObjects[c];
   }
 
@@ -586,7 +592,8 @@ function pruneByThreshold(scan, threshold) {
   const newStorage = [];
   const newMtime = [];
   const newKinds = [];
-  function emit(label, parent, value, ext, sc, mt, kind) {
+  const newObjectCounts = [];
+  function emit(label, parent, value, ext, sc, mt, kind, objectCount) {
     const idx = newLabels.length;
     newLabels.push(label);
     newParents.push(parent);
@@ -595,11 +602,13 @@ function pruneByThreshold(scan, threshold) {
     newStorage.push(sc);
     newMtime.push(mt);
     newKinds.push(kind);
+    newObjectCounts.push(objectCount || 0);
     return idx;
   }
 
   // Emit the root.
-  const newRoot = emit(scan.labels[0], -1, scan.values[0], scan.exts[0], scan.storageClasses[0], scan.lastModified[0], scan.kinds[0]);
+  const newRoot = emit(scan.labels[0], -1, scan.values[0], scan.exts[0], scan.storageClasses[0], scan.lastModified[0], scan.kinds[0],
+                       scan.objectCounts ? scan.objectCounts[0] : 0);
 
   // DFS over the original tree; each entry is [oldIdx, newIdx].
   const stack = [[0, newRoot]];
@@ -611,7 +620,8 @@ function pruneByThreshold(scan, threshold) {
     for (const c of cs) {
       if (aggValue[c] >= threshold) {
         const ni = emit(scan.labels[c], newIdx, scan.values[c], scan.exts[c],
-                        scan.storageClasses[c], scan.lastModified[c], scan.kinds[c]);
+                        scan.storageClasses[c], scan.lastModified[c], scan.kinds[c],
+                        scan.objectCounts ? scan.objectCounts[c] : 0);
         stack.push([c, ni]);
       } else {
         smallSum += aggValue[c];
@@ -619,8 +629,9 @@ function pruneByThreshold(scan, threshold) {
       }
     }
     if (smallSum > 0) {
-      // Rollup leaf for this parent's pruned subtrees.
-      emit('(' + smallCount.toLocaleString() + ' small)', newIdx, smallSum, '(small)', '(rolled-up)', 0, 'object');
+      // Rollup leaf for this parent's pruned subtrees. objectCount is the
+      // sum of every real S3 object that fell under this rollup.
+      emit('(' + smallCount.toLocaleString() + ' small)', newIdx, smallSum, '(small)', '(rolled-up)', 0, 'object', smallCount);
     }
   }
 
@@ -638,8 +649,10 @@ function pruneByThreshold(scan, threshold) {
     storageClasses: newStorage,
     lastModified: newMtime,
     kinds: newKinds,
+    objectCounts: newObjectCounts,
     counts: newCounts,
     totalBytes: scan.totalBytes,
+    totalObjects: scan.totalObjects,
   };
 }
 
@@ -776,7 +789,7 @@ function buildHtml(outPath, manifestArg, bucketName, scan, colorBy, blockSize) {
 <body>
 <div class="title-row">
   <h1>${escapeHtml(titleStr)}</h1>
-  <span class="stat"><b>${scan.counts.object.toLocaleString()}</b> objects</span>
+  <span class="stat"><b>${(scan.totalObjects || scan.counts.object).toLocaleString()}</b> objects</span>
   <span class="stat"><b>${scan.counts.prefix.toLocaleString()}</b> "folders"</span>
   <span class="stat"><b>${humanBytes(scan.totalBytes)}</b> total</span>
   <span class="spacer" style="flex:1"></span>
@@ -833,6 +846,7 @@ function buildHtml(outPath, manifestArg, bucketName, scan, colorBy, blockSize) {
       'storage-class': { kind: 'categorical', values: scan.storageClasses },
       'last-modified': { kind: 'numeric',     values: scan.lastModified },
       kind:            { kind: 'categorical', values: scan.kinds },
+      objectCount:     { kind: 'numeric',     values: scan.objectCounts || scan.kinds.map(k => k === 'object' ? 1 : 0) },
     },
   };
 
@@ -894,6 +908,10 @@ window._bootReady.then(function () {
       ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
   }
   function subtreeStats(nodeId) {
+    // c.object counts the underlying S3 objects: 1 per normal leaf, but
+    // the rollup's stored objectCount (the "(N small)" count) for any
+    // rollup leaf — so the displayed total reflects the real bucket, not
+    // just the visible cells.
     var c = { object: 0, prefix: 0, bytes: 0 };
     var stack = [nodeId];
     while (stack.length) {
@@ -901,7 +919,7 @@ window._bootReady.then(function () {
       var n = store.get(id);
       if (!n) continue;
       var k = n.kind;
-      if (k === 'object') { c.object++; c.bytes += n.value || 0; }
+      if (k === 'object') { c.object += (n.objectCount || 1); c.bytes += n.value || 0; }
       else if (k === 'prefix') c.prefix++;
       if (n.childIds && n.childIds.length > 0) {
         for (var i = 0; i < n.childIds.length; i++) stack.push(n.childIds[i]);

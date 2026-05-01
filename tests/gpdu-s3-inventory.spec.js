@@ -81,6 +81,10 @@ function parseScanHtml(htmlPath) {
     const idx = new Uint16Array(buf.buffer, buf.byteOffset, buf.byteLength / 2);
     return Array.from(idx).map((i) => attr.names[i]);
   }
+  function decodeNum(attr) {
+    const buf = Buffer.from(attr.b64, 'base64');
+    return Array.from(new Float64Array(buf.buffer, buf.byteOffset, buf.byteLength / 8));
+  }
   return {
     labels: raw.labels,
     values: raw.values,
@@ -88,6 +92,7 @@ function parseScanHtml(htmlPath) {
     kinds: decodeCat(raw.attributes.kind),
     exts: decodeCat(raw.attributes.extension),
     storageClasses: decodeCat(raw.attributes['storage-class']),
+    objectCounts: raw.attributes.objectCount ? decodeNum(raw.attributes.objectCount) : null,
     totalBytes: envelope.totalBytes,
   };
 }
@@ -254,6 +259,46 @@ test('directory-marker objects (key ending with /) are accounted for', () => {
     const dmIdx = scan.labels.findIndex((l) => l.includes('dir marker'));
     expect(dmIdx).toBeGreaterThan(0);
     expect(scan.values[dmIdx]).toBe(500);
+  } finally { cleanup(dir); }
+});
+
+test('rollup leaves carry the underlying object count, not 1', () => {
+  test.skip(!duckPath, 'duckdb not on PATH — skipping');
+  const dir = tmpDir();
+  try {
+    const parquet = path.join(dir, 'data.parquet');
+    const manifest = path.join(dir, 'manifest.json');
+    const out = path.join(dir, 'out.html');
+    const rows = [];
+    rows.push({ key: 'big/giant.bin', size: 100000000 });   // 100 MB — kept as leaf
+    // 250 small files in a single directory; should roll up into one
+    // "(250 small)" leaf carrying objectCount=250.
+    for (let i = 0; i < 250; i++) {
+      rows.push({ key: 'mass/' + i + '.txt', size: 100 });
+    }
+    writeParquetFixture(parquet, rows);
+    writeManifest(manifest, parquet);
+
+    const res = runTool(manifest, out, ['--min-fraction=0.05', '--max-depth=4']);
+    expect(res.status, res.stderr).toBe(0);
+    const scan = parseScanHtml(out);
+
+    expect(scan.objectCounts).not.toBeNull();
+    // Find the (250 small) rollup; its objectCount must be 250 (not 1).
+    const rollupIdx = scan.labels.findIndex((l) => /\(250 small\)/.test(l));
+    expect(rollupIdx).toBeGreaterThan(0);
+    expect(scan.objectCounts[rollupIdx]).toBe(250);
+
+    // The big leaf carries objectCount = 1.
+    const bigIdx = scan.labels.findIndex((l) => l === 'giant.bin');
+    expect(scan.objectCounts[bigIdx]).toBe(1);
+
+    // Sum of all leaf objectCounts equals the total real S3 object count.
+    let totalObjs = 0;
+    for (let i = 0; i < scan.kinds.length; i++) {
+      if (scan.kinds[i] === 'object') totalObjs += scan.objectCounts[i];
+    }
+    expect(totalObjs).toBe(rows.length);
   } finally { cleanup(dir); }
 });
 
