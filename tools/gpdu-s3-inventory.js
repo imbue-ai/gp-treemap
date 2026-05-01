@@ -299,13 +299,13 @@ async function main() {
         const fields = parseCsvLine(line);
         if (fields.length < 6) return;
         const kind = fields[0];
-        const path = fields[1];
-        if (!path) return;
+        const path = fields[1] || '';   // empty path = root for 'small' rollups
         const smallCount = Number(fields[2]) || 0;
         const size = Number(fields[3]) || 0;
         const mtime = fields[4] ? Date.parse(fields[4]) || 0 : 0;
         const sc = fields[5] || 'STANDARD';
         if (kind === 'leaf') {
+          if (!path) return;            // skip null/empty-key leaf rows
           builder.addObject(path, size, sc, mtime);
           leafCount++;
         } else {
