@@ -104,7 +104,11 @@ async function main() {
     process.exit(1);
   }
 
-  const clientOpts = {};
+  // followRegionRedirects: when the bucket is in a different region than
+  // the configured client (common with public buckets — e.g. commoncrawl
+  // is us-east-1 but a us-west-2 user gets a PermanentRedirect 301
+  // otherwise), auto-redirect instead of hard-failing.
+  const clientOpts = { followRegionRedirects: true };
   if (region) clientOpts.region = region;
   if (noSign) {
     // Anonymous mode: stub-credentials provider so SigV4 signs with empty

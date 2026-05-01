@@ -115,7 +115,10 @@ async function main() {
       console.error('gpdu-s3-inventory: @aws-sdk/client-s3 not installed.\nInstall with: npm install @aws-sdk/client-s3');
       process.exit(1);
     }
-    const opts = {};
+    // followRegionRedirects: cross-region buckets auto-redirect rather than
+    // 301-fail (common when a us-west-2 user reads an inventory in
+    // us-east-1, etc.).
+    const opts = { followRegionRedirects: true };
     if (region) opts.region = region;
     if (noSign) {
       opts.credentials = async () => ({ accessKeyId: '', secretAccessKey: '' });
