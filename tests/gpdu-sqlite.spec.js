@@ -164,26 +164,44 @@ test('default scan produces tables, indices, columns; views/triggers visible', (
   expect(triggerLabels).toContain('trg_no_delete');
 });
 
-test('users table has columns nested under it, plus its indices', () => {
+test('users table has Columns/Indices buckets, with the right children under each', () => {
   const { res, outPath } = runSqlite();
   expect(res.status, res.stderr).toBe(0);
   const scan = parseScanHtml(outPath);
 
-  // Find users table index
   const usersIdx = scan.labels.findIndex((l, i) => scan.kinds[i] === 'table' && l === 'users');
   expect(usersIdx).toBeGreaterThan(0);
 
-  // Children: columns + indices
-  const childIds = [];
+  // Direct children of the users table are exactly the two synthetic buckets.
+  const tableChildren = [];
   for (let i = 0; i < scan.labels.length; i++) {
-    if (scan.parentIndices[i] === usersIdx) childIds.push(i);
+    if (scan.parentIndices[i] === usersIdx) tableChildren.push(i);
   }
-  const childKinds = childIds.map(i => scan.kinds[i]);
-  expect(childKinds.filter(k => k === 'column').length).toBe(4);    // id, name, email, age
-  expect(childKinds.filter(k => k === 'index').length).toBe(2);     // idx_users_name, idx_users_email
+  const tableChildLabels = tableChildren.map(i => scan.labels[i]).sort();
+  expect(tableChildLabels).toEqual(['Columns', 'Indices']);
+
+  // Columns bucket contains 4 columns (id, name, email, age).
+  const colsBucket = tableChildren.find(i => scan.labels[i] === 'Columns');
+  expect(scan.kinds[colsBucket]).toBe('bucket');
+  const colsChildren = [];
+  for (let i = 0; i < scan.labels.length; i++) {
+    if (scan.parentIndices[i] === colsBucket) colsChildren.push(i);
+  }
+  expect(colsChildren.length).toBe(4);
+  expect(colsChildren.every(i => scan.kinds[i] === 'column')).toBe(true);
+
+  // Indices bucket contains 2 indices.
+  const ixBucket = tableChildren.find(i => scan.labels[i] === 'Indices');
+  expect(scan.kinds[ixBucket]).toBe('bucket');
+  const ixChildren = [];
+  for (let i = 0; i < scan.labels.length; i++) {
+    if (scan.parentIndices[i] === ixBucket) ixChildren.push(i);
+  }
+  expect(ixChildren.length).toBe(2);
+  expect(ixChildren.every(i => scan.kinds[i] === 'index')).toBe(true);
 
   // Column 'name' should have value-type 'text'.
-  const nameColIdx = scan.labels.findIndex((l, i) => i === childIds.find(c => scan.labels[c] === 'name'));
+  const nameColIdx = colsChildren.find(c => scan.labels[c] === 'name');
   expect(scan.valueTypes[nameColIdx]).toBe('text');
 });
 
@@ -202,15 +220,14 @@ test('without --include-row-elements, columns are leaves', () => {
   expect(res.status, res.stderr).toBe(0);
   const scan = parseScanHtml(outPath);
 
-  // Find a 'name' column under 'users' — should have no children.
+  // Find users → Columns → name; should have no children.
   const usersIdx = scan.labels.findIndex((l, i) => scan.kinds[i] === 'table' && l === 'users');
-  const childIds = [];
-  for (let i = 0; i < scan.labels.length; i++) {
-    if (scan.parentIndices[i] === usersIdx && scan.labels[i] === 'name') childIds.push(i);
-  }
-  expect(childIds.length).toBe(1);
-  const nameColIdx = childIds[0];
-  // No grandchildren under this column.
+  const colsBucket = scan.labels.findIndex(
+    (l, i) => l === 'Columns' && scan.parentIndices[i] === usersIdx);
+  expect(colsBucket).toBeGreaterThan(0);
+  const nameColIdx = scan.labels.findIndex(
+    (l, i) => l === 'name' && scan.parentIndices[i] === colsBucket);
+  expect(nameColIdx).toBeGreaterThan(0);
   const hasGrandkids = scan.parentIndices.some(p => p === nameColIdx);
   expect(hasGrandkids).toBe(false);
 });

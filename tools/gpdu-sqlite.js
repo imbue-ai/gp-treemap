@@ -218,7 +218,9 @@ function buildScan(db, sampleRows, includeRowElements) {
     indicesByTable.get(ix.tbl_name).push(ix);
   }
 
-  // Tables with their columns + indices.
+  // Tables with their columns + indices, grouped under synthetic "Columns"
+  // and "Indices" buckets so the treemap visually groups them. Buckets are
+  // skipped when there's nothing to put in them.
   for (const t of tables) {
     const tableBytes = dbstatTotalsByName.get(t.name) || 0;
     const tableIdx = add(t.name, ROOT, 0, 'table', t.name, '(n/a)');
@@ -228,20 +230,24 @@ function buildScan(db, sampleRows, includeRowElements) {
     catch (e) { cols = []; }
 
     const colNames = cols.map(c => c.name);
+    const tIxs = indicesByTable.get(t.name) || [];
 
-    // Estimate per-column bytes by sampling.
-    let perColBytes = new Array(colNames.length).fill(0);
-    let perColType = new Array(colNames.length).fill('(n/a)');
-    let rowsScanned = 0, totalRows = 0;
+    // ---- Columns bucket ----
     if (colNames.length > 0) {
+      const colsBucketIdx = add('Columns', tableIdx, 0, 'bucket', t.name, '(n/a)');
+
+      // Estimate per-column bytes by sampling.
+      let perColBytes = new Array(colNames.length).fill(0);
+      let perColType = new Array(colNames.length).fill('(n/a)');
+      let rowsScanned = 0, totalRows = 0;
       try { totalRows = db.prepare('SELECT COUNT(*) AS n FROM ' + qIdent(t.name)).get().n; }
       catch (e) { totalRows = 0; }
 
       const sampleN = includeRowElements ? totalRows : Math.min(sampleRows, totalRows);
       if (sampleN > 0) {
-        // Pick the first sampleN rows for determinism. (For very-large tables a
-        // random TABLESAMPLE-style approach would be more accurate, but this is
-        // simple and enough for visualization.)
+        // Pick the first sampleN rows for determinism. (For very-large tables
+        // a random TABLESAMPLE-style approach would be more accurate, but
+        // this is simple and enough for visualization.)
         const cols_q = colNames.map(qIdent).join(', ');
         const rowidColumn = pickRowidLabelColumn(cols);
         const stmt = db.prepare('SELECT ' + (rowidColumn ? qIdent(rowidColumn) + ' AS __rowid_label, ' : 'rowid AS __rowid_label, ') + cols_q + ' FROM ' + qIdent(t.name) + ' LIMIT ?');
@@ -288,36 +294,37 @@ function buildScan(db, sampleRows, includeRowElements) {
           else perColType[c] = 'mixed';
         }
 
-        // Children: one column entry per column, plus per-row leaves under
-        // each column when --include-row-elements-for-all-columns is on.
+        // One column entry per column, plus per-row leaves under each column
+        // when --include-row-elements-for-all-columns is on.
         for (let c = 0; c < colNames.length; c++) {
           if (includeRowElements && rowsScanned > 0) {
-            const colIdx = add(colNames[c], tableIdx, 0, 'column', t.name, perColType[c]);
+            const colIdx = add(colNames[c], colsBucketIdx, 0, 'column', t.name, perColType[c]);
             for (let r = 0; r < rowsScanned; r++) {
               const lb = rowLabels[r];
               add(lb, colIdx, perRowPerCol[r][c], 'row', t.name, perColType[c]);
             }
           } else {
-            add(colNames[c], tableIdx, perColBytes[c], 'column', t.name, perColType[c]);
+            add(colNames[c], colsBucketIdx, perColBytes[c], 'column', t.name, perColType[c]);
           }
         }
       } else {
         // Empty table: still emit columns with zero bytes.
         for (let c = 0; c < colNames.length; c++) {
-          add(colNames[c], tableIdx, 0, 'column', t.name, '(n/a)');
+          add(colNames[c], colsBucketIdx, 0, 'column', t.name, '(n/a)');
         }
       }
     }
 
-    // Indices for this table.
-    const tIxs = indicesByTable.get(t.name) || [];
-    for (const ix of tIxs) {
-      const ixBytes = dbstatTotalsByName.get(ix.name) || 0;
-      add(ix.name, tableIdx, ixBytes, 'index', t.name, '(n/a)');
+    // ---- Indices bucket ----
+    if (tIxs.length > 0) {
+      const ixBucketIdx = add('Indices', tableIdx, 0, 'bucket', t.name, '(n/a)');
+      for (const ix of tIxs) {
+        const ixBytes = dbstatTotalsByName.get(ix.name) || 0;
+        add(ix.name, ixBucketIdx, ixBytes, 'index', t.name, '(n/a)');
+      }
     }
 
-    // Leftover for the table: dbstat-total - sum-of-known-children's-aggregated-values.
-    // Compute once we know what we've added; descend the children we just inserted.
+    // Leftover for the table: dbstat-total - sum of buckets' aggregates.
     const childrenBytes = sumChildrenAggregates(parentIndices, values, kinds, tableIdx);
     if (tableBytes > childrenBytes) {
       add('(leftover)', tableIdx, tableBytes - childrenBytes, 'leftover', t.name, '(n/a)');
@@ -426,6 +433,7 @@ const KIND_COLORMAP = {
   table:    'hsl(211, 70%, 52%)',  // blue
   view:     'hsl(188, 70%, 48%)',  // cyan
   trigger:  'hsl(26,  85%, 55%)',  // orange
+  bucket:   'hsl(220, 10%, 30%)',  // dark slate (for synthetic Columns/Indices)
   column:   'hsl(138, 55%, 45%)',  // green
   index:    'hsl(348, 70%, 50%)',  // red
   row:      'hsl(48,  85%, 55%)',  // yellow
