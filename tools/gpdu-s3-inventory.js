@@ -203,16 +203,18 @@ async function main() {
   const filesArg = parquetPaths.map(p => `'${p.replace(/'/g, "''")}'`).join(',');
 
   try {
-    // ----- Pass 1: total bytes -----
-    process.stderr.write('  duckdb pass 1: total bytes...\n');
+    // ----- Pass 1: total bytes + object count -----
+    process.stderr.write('  duckdb pass 1: totals...\n');
     const tTotal0 = Date.now();
     const totalSql = prelude +
       `SET variable FILES = [${filesArg}];\n` +
-      "COPY (SELECT SUM(size) FROM read_parquet(getvariable('FILES')))" +
+      "COPY (SELECT SUM(size), COUNT(*) FROM read_parquet(getvariable('FILES')))" +
       "  TO '/dev/stdout' (FORMAT 'CSV', HEADER FALSE);";
-    const totalBytesAtRoot = await runDuckSqlScalar(spawn, totalSql);
-    process.stderr.write('  total bytes  ' + humanBytes(totalBytesAtRoot) +
-      '  (' + totalBytesAtRoot.toLocaleString() + ' B)  in ' + (Date.now() - tTotal0) + ' ms\n');
+    const [totalBytesAtRoot, totalObjectCount] = await runDuckSqlRow(spawn, totalSql);
+    process.stderr.write('  total bytes    ' + humanBytes(totalBytesAtRoot) +
+      '  (' + totalBytesAtRoot.toLocaleString() + ' B)\n');
+    process.stderr.write('  total objects  ' + totalObjectCount.toLocaleString() +
+      '  (in ' + (Date.now() - tTotal0) + ' ms)\n');
 
     // Compute the threshold here so DuckDB can do the leaf/rollup split in
     // one pass; we still let pruneByThreshold run later as a safety net for
@@ -365,6 +367,13 @@ function numCoerce(v) {
 // Run a DuckDB SQL that emits a single scalar (single row × single column)
 // to stdout in CSV form, return it as a Number.
 async function runDuckSqlScalar(spawnFn, sql) {
+  const row = await runDuckSqlRow(spawnFn, sql);
+  return row[0] || 0;
+}
+
+// Run a DuckDB SQL that emits a single row of N scalars to stdout in CSV
+// form, return it as an array of Numbers.
+async function runDuckSqlRow(spawnFn, sql) {
   return await new Promise((resolve, reject) => {
     const proc = spawnFn('duckdb', ['-c', sql], { stdio: ['ignore', 'pipe', 'pipe'] });
     let out = '', errAll = '';
@@ -374,8 +383,9 @@ async function runDuckSqlScalar(spawnFn, sql) {
     proc.on('error', reject);
     proc.on('close', (code) => {
       if (code !== 0) return reject(new Error('duckdb exited with code ' + code + (errAll ? '\n' + errAll.slice(-2000) : '')));
-      const v = Number(out.trim().split('\n')[0]);
-      resolve(Number.isFinite(v) ? v : 0);
+      const line = out.trim().split('\n')[0] || '';
+      const fields = parseCsvLine(line);
+      resolve(fields.map((s) => { const n = Number(s); return Number.isFinite(n) ? n : 0; }));
     });
   });
 }
