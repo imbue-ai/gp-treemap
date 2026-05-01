@@ -262,6 +262,97 @@ test('directory-marker objects (key ending with /) are accounted for', () => {
   } finally { cleanup(dir); }
 });
 
+test('big leaf nested deep inside a depth-truncated rollup is not double-counted', () => {
+  test.skip(!duckPath, 'duckdb not on PATH — skipping');
+  const dir = tmpDir();
+  try {
+    const parquet = path.join(dir, 'data.parquet');
+    const manifest = path.join(dir, 'manifest.json');
+    const out = path.join(dir, 'out.html');
+
+    // Construct a fixture where:
+    //   - One big file lives at depth 7 ("deep/a/b/c/d/e/giant.bin"),
+    //     above the threshold so it's kept as a leaf.
+    //   - 500 tiny files share various deeper prefixes ALSO under
+    //     "deep/a/b/...", below the threshold so they're aggregated.
+    //   - --max-depth=3 means small rollups truncate to depth 3.
+    //
+    // The big leaf must (a) appear once as a leaf at its full path, and
+    // (b) NOT have its bytes also baked into any small rollup's value or
+    // its objectCount baked into any rollup's count.
+    const rows = [];
+    rows.push({ key: 'deep/a/b/c/d/e/giant.bin', size: 10_000_000 });
+    for (let i = 0; i < 500; i++) {
+      // Small files at varying depths under deep/a/b/
+      const subdir = i % 5 === 0 ? 'deep/a/b/c/d/'
+                   : i % 5 === 1 ? 'deep/a/b/c/d/e/'
+                   : i % 5 === 2 ? 'deep/a/b/c/'
+                   : i % 5 === 3 ? 'deep/a/b/'
+                                 : 'deep/a/b/c/d/e/f/';
+      rows.push({ key: subdir + 'tiny-' + i + '.txt', size: 50 });
+    }
+    // Plus some unrelated content so threshold pruning doesn't degenerate.
+    rows.push({ key: 'unrelated/file.bin', size: 5_000_000 });
+
+    writeParquetFixture(parquet, rows);
+    writeManifest(manifest, parquet);
+
+    // 1% threshold ⇒ keep files >= ~250 KB. Only the two "big" files survive
+    // as leaves; all 500 tiny files roll up.
+    const res = runTool(manifest, out, ['--min-fraction=0.01', '--max-depth=3']);
+    expect(res.status, res.stderr).toBe(0);
+    const scan = parseScanHtml(out);
+
+    // ---- Bytes ----
+    const expectedBytes = rows.reduce((s, r) => s + r.size, 0);
+    expect(scan.totalBytes).toBe(expectedBytes);
+    expect(scan.values[0]).toBe(expectedBytes);
+
+    // ---- Object counts ----
+    expect(scan.objectCounts).not.toBeNull();
+    let totalObjs = 0;
+    for (let i = 0; i < scan.kinds.length; i++) {
+      if (scan.kinds[i] === 'object') totalObjs += scan.objectCounts[i];
+    }
+    expect(totalObjs).toBe(rows.length);  // 502 — every input row counted exactly once
+
+    // ---- Big leaf is its own cell at the full deep path ----
+    const giantIdx = scan.labels.findIndex((l) => l === 'giant.bin');
+    expect(giantIdx).toBeGreaterThan(0);
+    expect(scan.values[giantIdx]).toBe(10_000_000);
+    expect(scan.objectCounts[giantIdx]).toBe(1);
+    // Walk up: must reach root via a/b/c/d/e/deep, no rollup in between.
+    const pathFromRoot = [];
+    let cur = giantIdx;
+    while (cur > 0) {
+      pathFromRoot.unshift(scan.labels[cur]);
+      cur = scan.parentIndices[cur];
+    }
+    expect(pathFromRoot).toEqual(['deep', 'a', 'b', 'c', 'd', 'e', 'giant.bin']);
+
+    // ---- Sum-invariant must hold including the big leaf and the rollup
+    // sharing an ancestor ("deep/a/b") ----
+    assertSumInvariant(scan);
+
+    // ---- The rollup's recorded bytes/count must be exactly the small-file
+    // contributions, not including any of giant.bin or unrelated ----
+    const childIds = buildChildIds(scan);
+    // Locate "deep/a/b" — its children include the rollup leaf for tiny
+    // files plus the prefix subtree containing giant.bin.
+    const deepIdx = scan.labels.findIndex(
+      (l, i) => l === 'deep' && scan.parentIndices[i] === 0);
+    const aIdx = childIds[deepIdx].find(i => scan.labels[i] === 'a');
+    const bIdx = childIds[aIdx].find(i => scan.labels[i] === 'b');
+    expect(bIdx).toBeDefined();
+    const bChildren = childIds[bIdx];
+    const rollupChild = bChildren.find(i => /\(\d+ small\)/.test(scan.labels[i]));
+    expect(rollupChild).toBeDefined();
+    // Every tiny file contributes 50 bytes, count = 500.
+    expect(scan.values[rollupChild]).toBe(500 * 50);
+    expect(scan.objectCounts[rollupChild]).toBe(500);
+  } finally { cleanup(dir); }
+});
+
 test('rollup leaves carry the underlying object count, not 1', () => {
   test.skip(!duckPath, 'duckdb not on PATH — skipping');
   const dir = tmpDir();
