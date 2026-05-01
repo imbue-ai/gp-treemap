@@ -29,6 +29,62 @@ Don't forget that lots of tabular data can be made hierarchical using GROUP BY o
 
 Check out the [gallery of more examples](https://imbue-ai.github.io/gp-treemap/gallery/).
 
+## CLI tools
+
+Each tool runs straight from `npx`, with no install. File-header
+comments document flags and output format in detail.
+
+- **`gpdu <dir> [output.html]`** — [`tools/gpdu-scan.js`](tools/gpdu-scan.js). Recursive
+  directory scan; writes a single self-contained HTML file with the bundle and
+  dataset inlined. Symlinks are not followed.
+- **`gpdu-json <input.json5> [output.html]`** —
+  [`tools/gpdu-json.js`](tools/gpdu-json.js). Visualizes a JSON or JSON5 file
+  as a treemap. Each cell's area is the byte size of that node's serialized
+  form in the source file. Internal nodes (objects, arrays) carry a synthetic
+  `(leftover)` leaf that absorbs structural-overhead bytes (braces, brackets,
+  commas, whitespace, comments), so the tree's total reconciles to the source
+  file size exactly. Color modes: type / depth / key. Pruning: `--min-bytes=N`,
+  `--max-array-children=N`. Accepts JSON5 (comments, trailing commas, unquoted
+  keys, single-quoted strings).
+- **`gpdu-sqlite <db.sqlite> [output.html]`** —
+  [`tools/gpdu-sqlite.js`](tools/gpdu-sqlite.js). Visualizes a SQLite file as
+  a treemap. Hierarchy: db → table → [column-1, ..., index-1, ...]. Per-column
+  byte sizes are estimated by sampling rows (default 10 000, override with
+  `--sample-rows=N`) and applying SQLite's serial-type encoding rules JS-side.
+  Pass `--include-row-elements-for-all-columns` for an exact count via a full
+  table scan, with each (row, column) becoming a leaf. System tables, views,
+  and triggers are shown alongside (views & triggers as 0-byte cells). Color
+  modes: kind / parent-table / value-type. Requires `better-sqlite3` (an
+  `optionalDependency`).
+- **`gpdu-s3 <s3://bucket[/prefix]>... [output.html]`** —
+  [`tools/gpdu-s3.js`](tools/gpdu-s3.js). Visualizes an S3 bucket or prefix as
+  a treemap. Recursively enumerates objects via `ListObjectsV2` (or
+  `ListObjectVersions` if `--include-versions`), fans out by `Delimiter=/`
+  with an async Promise pool of `--workers=16` workers (S3 is I/O-bound; no
+  worker_threads). Synthesizes a folder hierarchy from `/`-separated keys.
+  Auth via the default AWS credential chain; `--region` overrides; pass
+  `--no-sign-request` for public buckets. Color modes: extension / storage
+  class / last-modified. Requires `@aws-sdk/client-s3` (an
+  `optionalDependency`).
+- **`gpdu-s3-inventory <s3://.../manifest.json> [output.html | s3://...]`** —
+  [`tools/gpdu-s3-inventory.js`](tools/gpdu-s3-inventory.js). Way faster than
+  `gpdu-s3` for large buckets — reads the daily S3 Inventory parquet report
+  via DuckDB instead of paginating through `ListObjectsV2`. Two-pass SQL
+  computes the total then partitions rows into "big leaves" (kept verbatim)
+  and "(N small)" rollups (grouped by directory at `--max-depth`).
+  `--min-fraction=F` (default 0.001%) controls the keep-vs-rollup threshold.
+  Output can be `s3://bucket/key.html` to upload directly. Requires `duckdb`
+  on `PATH` and `@aws-sdk/client-s3` (an `optionalDependency`).
+- **`gp-treemap-profile-load <input.html> [out.cpuprofile]`** —
+  [`tools/profile-load.js`](tools/profile-load.js). Launches headless Chromium,
+  records a V8 CPU profile across page load, and writes a standard Chrome
+  DevTools `.cpuprofile`. Requires Playwright + Chromium
+  (`npx playwright install chromium`).
+- **`gp-treemap-profile-to-html <input.cpuprofile> [out.html]`** —
+  [`tools/profile-to-html.js`](tools/profile-to-html.js). Renders a
+  `.cpuprofile` as a self-contained treemap of CPU time, bucketed by thread and
+  call stack.
+
 ## Sandboxed usage
 
 If you'd like the scanner to only be able to read the tree you're
@@ -116,68 +172,6 @@ If you prefer to serve over HTTP:
 npm run serve
 # → http://localhost:4173/samples/index.html
 ```
-
-## CLI tools
-
-A few bin scripts ship with the package; each file's header comment documents
-its flags and output format in detail.
-
-- **`gpdu <dir> [output.html]`** — [`tools/gpdu-scan.js`](tools/gpdu-scan.js). Recursive
-  directory scan; writes a single self-contained HTML file with the bundle and
-  dataset inlined. Symlinks are not followed.
-- **`gp-treemap-profile-load <input.html> [out.cpuprofile]`** —
-  [`tools/profile-load.js`](tools/profile-load.js). Launches headless Chromium,
-  records a V8 CPU profile across page load, and writes a standard Chrome
-  DevTools `.cpuprofile`. Requires Playwright + Chromium
-  (`npx playwright install chromium`).
-- **`gp-treemap-profile-to-html <input.cpuprofile> [out.html]`** —
-  [`tools/profile-to-html.js`](tools/profile-to-html.js). Renders a
-  `.cpuprofile` as a self-contained treemap of CPU time, bucketed by thread and
-  call stack.
-
-### Other gpdu-* tools
-
-The same `npx -p @imbue-ai/gp-treemap <tool> ...` pattern works for all
-of these — they ship as `bin` scripts.
-
-- **`gpdu-json <input.json5> [output.html]`** —
-  [`tools/gpdu-json.js`](tools/gpdu-json.js). Visualizes a JSON or JSON5 file
-  as a treemap. Each cell's area is the byte size of that node's serialized
-  form in the source file. Internal nodes (objects, arrays) carry a synthetic
-  `(leftover)` leaf that absorbs structural-overhead bytes (braces, brackets,
-  commas, whitespace, comments), so the tree's total reconciles to the source
-  file size exactly. Color modes: type / depth / key. Pruning: `--min-bytes=N`,
-  `--max-array-children=N`. Accepts JSON5 (comments, trailing commas, unquoted
-  keys, single-quoted strings).
-- **`gpdu-sqlite <db.sqlite> [output.html]`** —
-  [`tools/gpdu-sqlite.js`](tools/gpdu-sqlite.js). Visualizes a SQLite file as
-  a treemap. Hierarchy: db → table → [column-1, ..., index-1, ...]. Per-column
-  byte sizes are estimated by sampling rows (default 10 000, override with
-  `--sample-rows=N`) and applying SQLite's serial-type encoding rules JS-side.
-  Pass `--include-row-elements-for-all-columns` for an exact count via a full
-  table scan, with each (row, column) becoming a leaf. System tables, views,
-  and triggers are shown alongside (views & triggers as 0-byte cells). Color
-  modes: kind / parent-table / value-type. Requires `better-sqlite3` (an
-  `optionalDependency`).
-- **`gpdu-s3 <s3://bucket[/prefix]>... [output.html]`** —
-  [`tools/gpdu-s3.js`](tools/gpdu-s3.js). Visualizes an S3 bucket or prefix as
-  a treemap. Recursively enumerates objects via `ListObjectsV2` (or
-  `ListObjectVersions` if `--include-versions`), fans out by `Delimiter=/`
-  with an async Promise pool of `--workers=16` workers (S3 is I/O-bound; no
-  worker_threads). Synthesizes a folder hierarchy from `/`-separated keys.
-  Auth via the default AWS credential chain; `--region` overrides; pass
-  `--no-sign-request` for public buckets. Color modes: extension / storage
-  class / last-modified. Requires `@aws-sdk/client-s3` (an
-  `optionalDependency`).
-- **`gpdu-s3-inventory <s3://.../manifest.json> [output.html | s3://...]`** —
-  [`tools/gpdu-s3-inventory.js`](tools/gpdu-s3-inventory.js). Way faster than
-  `gpdu-s3` for large buckets — reads the daily S3 Inventory parquet report
-  via DuckDB instead of paginating through `ListObjectsV2`. Two-pass SQL
-  computes the total then partitions rows into "big leaves" (kept verbatim)
-  and "(N small)" rollups (grouped by directory at `--max-depth`).
-  `--min-fraction=F` (default 0.001%) controls the keep-vs-rollup threshold.
-  Output can be `s3://bucket/key.html` to upload directly. Requires `duckdb`
-  on `PATH` and `@aws-sdk/client-s3` (an `optionalDependency`).
 
 ## Repo layout
 
