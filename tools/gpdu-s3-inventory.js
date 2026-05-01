@@ -1002,6 +1002,16 @@ window._bootReady.then(function () {
 `);
 }
 
-if (import.meta.url === url.pathToFileURL(process.argv[1] || '').href) {
+if (isEntryPoint(import.meta.url)) {
   main().catch(e => { console.error(e); process.exit(1); });
+}
+
+function isEntryPoint(metaUrl) {
+  if (!process.argv[1]) return false;
+  try {
+    const real = fs.realpathSync(process.argv[1]);
+    return metaUrl === url.pathToFileURL(real).href;
+  } catch {
+    return metaUrl === url.pathToFileURL(process.argv[1]).href;
+  }
 }

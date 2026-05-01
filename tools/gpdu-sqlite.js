@@ -711,7 +711,19 @@ window._bootReady.then(function () {
 }
 
 // Run main() only when this file is the entry point — not when imported as
-// a module by tests for the serialBytes helper.
-if (import.meta.url === url.pathToFileURL(process.argv[1] || '').href) {
+// a module by tests for the serialBytes helper. Use realpath on
+// process.argv[1] so the comparison works when the script is invoked via
+// a bin symlink (e.g. node_modules/.bin/gpdu-sqlite -> tools/gpdu-sqlite.js).
+if (isEntryPoint(import.meta.url)) {
   main();
+}
+
+function isEntryPoint(metaUrl) {
+  if (!process.argv[1]) return false;
+  try {
+    const real = fs.realpathSync(process.argv[1]);
+    return metaUrl === url.pathToFileURL(real).href;
+  } catch {
+    return metaUrl === url.pathToFileURL(process.argv[1]).href;
+  }
 }
