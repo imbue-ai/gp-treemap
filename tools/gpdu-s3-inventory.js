@@ -40,7 +40,7 @@ function usage(exitCode) {
     '                                       [--min-fraction=F] [--max-depth=D]\n' +
     '                                       [--block-size=N]\n' +
     '                                       <s3://meta-bucket/.../manifest.json | local-manifest.json>\n' +
-    '                                       [output.html]\n' +
+    '                                       [output.html | s3://bucket/output.html]\n' +
     '\n' +
     '  --min-fraction=F   keep individual objects only if their size is at\n' +
     '                     least F * total. Default 0.00001 (0.001%). Pass 0\n' +
@@ -97,18 +97,20 @@ async function main() {
   const outArg = positionals[1];
 
   const slug = manifestArg.replace(/^s3:\/\//, '').replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80);
-  const out = outArg
-    ? path.resolve(outArg)
-    : path.join(os.tmpdir(), 'gpdu-s3-inventory-' + slug + '-' + Date.now() + '.html');
+  const outIsS3 = !!(outArg && outArg.startsWith('s3://'));
+  const out = !outArg
+    ? path.join(os.tmpdir(), 'gpdu-s3-inventory-' + slug + '-' + Date.now() + '.html')
+    : (outIsS3 ? outArg : path.resolve(outArg));
 
-  // Lazy-import the AWS SDK (only needed for s3:// inputs).
-  let s3 = null, GetObjectCommand = null;
-  if (manifestArg.startsWith('s3://')) {
+  // Lazy-import the AWS SDK if either input or output is s3://.
+  let s3 = null, GetObjectCommand = null, PutObjectCommand = null;
+  if (manifestArg.startsWith('s3://') || outIsS3) {
     let S3Client;
     try {
       const sdk = await import('@aws-sdk/client-s3');
       S3Client = sdk.S3Client;
       GetObjectCommand = sdk.GetObjectCommand;
+      PutObjectCommand = sdk.PutObjectCommand;
     } catch (_) {
       console.error('gpdu-s3-inventory: @aws-sdk/client-s3 not installed.\nInstall with: npm install @aws-sdk/client-s3');
       process.exit(1);
@@ -337,7 +339,33 @@ async function main() {
       ' nodes; tree now ' + scan.labels.length.toLocaleString() +
       ' (' + (Date.now() - t2) + ' ms)\n');
   }
-  buildHtml(out, manifestArg, bucketName, scan, colorBy, blockSize);
+  // For S3 output, buffer in memory and upload after buildHtml. The
+  // typical post-pruning HTML is < 50 MB, so memory is fine; for true
+  // streaming we'd reach for @aws-sdk/lib-storage's Upload.
+  const chunks = outIsS3 ? [] : null;
+  const fd = outIsS3 ? null : fs.openSync(out, 'w');
+  const sink = outIsS3
+    ? (s) => chunks.push(s)
+    : (s) => fs.writeSync(fd, s);
+  buildHtml(sink, manifestArg, bucketName, scan, colorBy, blockSize);
+  if (fd != null) fs.closeSync(fd);
+
+  let outSize;
+  if (outIsS3) {
+    const m = /^s3:\/\/([^/]+)\/(.+)$/.exec(out);
+    if (!m) { console.error('bad s3:// output URI: ' + out); process.exit(2); }
+    const buf = Buffer.from(chunks.join(''), 'utf8');
+    outSize = buf.length;
+    process.stderr.write('  uploading ' + humanBytes(outSize) + ' to ' + out + '\n');
+    await s3.send(new PutObjectCommand({
+      Bucket: m[1],
+      Key: m[2],
+      Body: buf,
+      ContentType: 'text/html; charset=utf-8',
+    }));
+  } else {
+    outSize = fs.statSync(out).size;
+  }
 
   console.log('');
   console.log('inventory of bucket ' + (manifest.sourceBucket || bucketName));
@@ -348,9 +376,9 @@ async function main() {
   console.log('  total bytes   ' + humanBytes(scan.totalBytes) + '  (' + scan.totalBytes.toLocaleString() + ' B)');
   console.log('  duckdb decode ' + readElapsed + ' ms');
   console.log('');
-  console.log('wrote ' + out + '  (' + humanBytes(fs.statSync(out).size) + ')');
+  console.log('wrote ' + out + '  (' + humanBytes(outSize) + ')');
 
-  if (!noOpen) {
+  if (!noOpen && !outIsS3) {
     const { execSync } = await import('node:child_process');
     const openCmd = process.platform === 'win32' ? 'start ""' : process.platform === 'darwin' ? 'open' : 'xdg-open';
     try { execSync(openCmd + ' ' + JSON.stringify(out)); } catch { console.log('open it with:  open "' + out + '"'); }
@@ -761,9 +789,8 @@ const PAGE_CSS = `
     border: 1px solid var(--page-border, #ccc); cursor: pointer; }
 `;
 
-function buildHtml(outPath, manifestArg, bucketName, scan, colorBy, blockSize) {
-  const fd = fs.openSync(outPath, 'w');
-  const w = (s) => fs.writeSync(fd, s);
+function buildHtml(sink, manifestArg, bucketName, scan, colorBy, blockSize) {
+  const w = sink;
 
   const isCategorical = CATEGORICAL_MODES.includes(colorBy);
   const tmColorMode = isCategorical ? 'categorical' : 'quantitative';
@@ -962,8 +989,6 @@ window._bootReady.then(function () {
 </body>
 </html>
 `);
-
-  fs.closeSync(fd);
 }
 
 if (import.meta.url === url.pathToFileURL(process.argv[1] || '').href) {
