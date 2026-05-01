@@ -621,6 +621,15 @@ function pruneByThreshold(scan, threshold) {
     aggObjects[i] = scan.objectCounts ? (scan.objectCounts[i] || 0) : (scan.kinds[i] === 'object' ? 1 : 0);
     if (childIds[i]) for (const c of childIds[i]) aggObjects[i] += aggObjects[c];
   }
+  // Max last-modified per subtree, so a "(N small)" rollup created at this
+  // level can show the most recent thing it absorbed.
+  const aggMtime = new Float64Array(n);
+  for (let i = n - 1; i >= 0; i--) {
+    aggMtime[i] = scan.lastModified[i] || 0;
+    if (childIds[i]) for (const c of childIds[i]) {
+      if (aggMtime[c] > aggMtime[i]) aggMtime[i] = aggMtime[c];
+    }
+  }
 
   // Emit a new flat tree, copying only kept nodes (and their kept ancestors).
   const newLabels = [];
@@ -654,7 +663,7 @@ function pruneByThreshold(scan, threshold) {
     const [oldIdx, newIdx] = stack.pop();
     const cs = childIds[oldIdx];
     if (!cs) continue;
-    let smallSum = 0, smallCount = 0;
+    let smallSum = 0, smallCount = 0, smallMaxMtime = 0;
     for (const c of cs) {
       if (aggValue[c] >= threshold) {
         const ni = emit(scan.labels[c], newIdx, scan.values[c], scan.exts[c],
@@ -664,12 +673,14 @@ function pruneByThreshold(scan, threshold) {
       } else {
         smallSum += aggValue[c];
         smallCount += aggObjects[c];
+        if (aggMtime[c] > smallMaxMtime) smallMaxMtime = aggMtime[c];
       }
     }
     if (smallSum > 0) {
       // Rollup leaf for this parent's pruned subtrees. objectCount is the
-      // sum of every real S3 object that fell under this rollup.
-      emit('(' + smallCount.toLocaleString() + ' small)', newIdx, smallSum, '(small)', '(rolled-up)', 0, 'object', smallCount);
+      // sum of every real S3 object absorbed; mtime is the max of theirs,
+      // so the cell can advertise the most recent thing it represents.
+      emit('(' + smallCount.toLocaleString() + ' small)', newIdx, smallSum, '(small)', '(rolled-up)', smallMaxMtime, 'object', smallCount);
     }
   }
 
