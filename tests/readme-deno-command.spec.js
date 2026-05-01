@@ -63,7 +63,9 @@ test('README deno command runs cleanly with only the flags it documents', () => 
   let cmd = block;
   cmd = cmd.replace(/^SCAN=.*$/m, `SCAN=${JSON.stringify(SCAN)}`);
   cmd = cmd.replace(/^OUT=.*$/m, `OUT=${JSON.stringify(OUT)}`);
-  cmd = cmd.replace(/npm:@imbue-ai\/gp-treemap@[\w.-]+\/tools\/gpdu-scan\.js/,
+  // Substitute the npm: specifier (any path — `gpdu` bin alias, or
+  // tools/gpdu-scan.js, etc.) with the local tool path.
+  cmd = cmd.replace(/npm:@imbue-ai\/gp-treemap@[\w.-]+\/[^\s]+/,
                     JSON.stringify(path.join(ROOT, 'tools', 'gpdu-scan.js')));
   cmd = cmd.replace(/&&\s*open\s+"\$OUT"\s*$/m, '');
 

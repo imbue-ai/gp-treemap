@@ -25,6 +25,10 @@
   ],
   "bin": {
     "gpdu": "tools/gpdu-scan.js",
+    "gpdu-json": "tools/gpdu-json.js",
+    "gpdu-sqlite": "tools/gpdu-sqlite.js",
+    "gpdu-s3": "tools/gpdu-s3.js",
+    "gpdu-s3-inventory": "tools/gpdu-s3-inventory.js",
     "gp-treemap-profile-load": "tools/profile-load.js",
     "gp-treemap-profile-to-html": "tools/profile-to-html.js",
     "gp-treemap-table": "tools/table-treemap.js"
@@ -35,6 +39,10 @@
     "dist/scan-loader.embed.js",
     "src/",
     "tools/gpdu-scan.js",
+    "tools/gpdu-json.js",
+    "tools/gpdu-sqlite.js",
+    "tools/gpdu-s3.js",
+    "tools/gpdu-s3-inventory.js",
     "tools/scan-core.js",
     "tools/scan-loader.source.js",
     "tools/profile-load.js",

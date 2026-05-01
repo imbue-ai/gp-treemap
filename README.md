@@ -43,7 +43,7 @@ deno run \
   --allow-read="$SCAN","$OUT" \
   --allow-write="$OUT" \
   --deny-env \
-  npm:@imbue-ai/gp-treemap@0.3.4/gpdu --no-open "$SCAN" "$OUT" \
+  npm:@imbue-ai/gp-treemap@0.4.0/gpdu --no-open "$SCAN" "$OUT" \
   && open "$OUT"
 ```
 
@@ -133,7 +133,10 @@ its flags and output format in detail.
   `.cpuprofile` as a self-contained treemap of CPU time, bucketed by thread and
   call stack.
 
-### Other gpdu-* tools (in development — invoke via `node tools/gpdu-*.js`)
+### Other gpdu-* tools
+
+The same `npx -p @imbue-ai/gp-treemap <tool> ...` pattern works for all
+of these — they ship as `bin` scripts.
 
 - **`gpdu-json <input.json5> [output.html]`** —
   [`tools/gpdu-json.js`](tools/gpdu-json.js). Visualizes a JSON or JSON5 file
@@ -164,6 +167,15 @@ its flags and output format in detail.
   `--no-sign-request` for public buckets. Color modes: extension / storage
   class / last-modified. Requires `@aws-sdk/client-s3` (an
   `optionalDependency`).
+- **`gpdu-s3-inventory <s3://.../manifest.json> [output.html | s3://...]`** —
+  [`tools/gpdu-s3-inventory.js`](tools/gpdu-s3-inventory.js). Way faster than
+  `gpdu-s3` for large buckets — reads the daily S3 Inventory parquet report
+  via DuckDB instead of paginating through `ListObjectsV2`. Two-pass SQL
+  computes the total then partitions rows into "big leaves" (kept verbatim)
+  and "(N small)" rollups (grouped by directory at `--max-depth`).
+  `--min-fraction=F` (default 0.001%) controls the keep-vs-rollup threshold.
+  Output can be `s3://bucket/key.html` to upload directly. Requires `duckdb`
+  on `PATH` and `@aws-sdk/client-s3` (an `optionalDependency`).
 
 ## Repo layout
 
