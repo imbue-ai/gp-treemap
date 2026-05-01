@@ -47,6 +47,8 @@ deno run \
   && open "$OUT"
 ```
 
+* On Linux, use `xdg-open` instead of `open`.
+
 
 ## A hat tip to GrandPerspective
 
