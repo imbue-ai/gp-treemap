@@ -115,6 +115,19 @@ npx -p @imbue-ai/gp-treemap gpdu-s3-inventory \
   s3://my-meta-bucket/my-source-bucket/inv-config-id/2026-04-29T01-00Z/manifest.json
 ```
 
+### `gp-columnar-treemap` — CSV / JSONL tabular data
+
+[`tools/table-treemap.js`](tools/table-treemap.js). General-purpose
+viewer for columnar data — accepts CSV, TSV, or JSONL (NDJSON). The
+generated HTML lets you pick Size and Color columns and drag chips to
+reorder the Path (group-by) hierarchy on the fly; state is persisted in
+the URL hash. Initial selection can be seeded with `--size=COL`,
+`--color=COL`, `--path=A,B,C`. Powers several of the gallery examples.
+
+```sh
+npx -p @imbue-ai/gp-treemap gp-columnar-treemap ./spending.csv
+```
+
 ### `gp-treemap-profile-load` — capture a Chrome DevTools `.cpuprofile`
 
 [`tools/profile-load.js`](tools/profile-load.js). Launches headless
@@ -150,7 +163,7 @@ deno run \
   --allow-read="$SCAN","$OUT" \
   --allow-write="$OUT" \
   --deny-env \
-  npm:@imbue-ai/gp-treemap@0.4.2/gpdu --no-open "$SCAN" "$OUT" \
+  npm:@imbue-ai/gp-treemap@0.5.0/gpdu --no-open "$SCAN" "$OUT" \
   && open "$OUT"
 ```
 

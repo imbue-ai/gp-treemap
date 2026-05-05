@@ -1,6 +1,6 @@
 {
   "name": "@imbue-ai/gp-treemap",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "GrandPerspective-lineage <gp-treemap> Web Component, plus CLI tools for scanning directories and profiling HTML page loads into treemap visualizations.",
   "type": "module",
   "license": "GPL-2.0-only",
@@ -31,7 +31,7 @@
     "gpdu-s3-inventory": "tools/gpdu-s3-inventory.js",
     "gp-treemap-profile-load": "tools/profile-load.js",
     "gp-treemap-profile-to-html": "tools/profile-to-html.js",
-    "gp-treemap-table": "tools/table-treemap.js"
+    "gp-columnar-treemap": "tools/table-treemap.js"
   },
   "files": [
     "dist/gp-treemap.bundle.js",
@@ -44,6 +44,7 @@
     "tools/gpdu-s3.js",
     "tools/gpdu-s3-inventory.js",
     "tools/scan-core.js",
+    "tools/cli-command.js",
     "tools/scan-loader.source.js",
     "tools/profile-load.js",
     "tools/profile-to-html.js",

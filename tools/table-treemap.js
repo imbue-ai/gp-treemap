@@ -24,6 +24,7 @@ import os from 'node:os';
 import url from 'node:url';
 import zlib from 'node:zlib';
 import { parse as parseCsvSync } from 'csv-parse/sync';
+import { buildCliCommand, COPY_BTN_HTML, COPY_BTN_CSS, copyButtonScript } from './cli-command.js';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -337,10 +338,12 @@ function buildHtml(outPath, title, columns, info, rows, defaults, flags) {
   #path-menu-pop label { display:flex; align-items:center; gap:8px; padding: 3px 12px;
     font-size:12px; cursor:pointer; white-space:nowrap; }
   #path-menu-pop label:hover { background: var(--page-border, #0001); }
+${COPY_BTN_CSS}
 </style>
 </head>
 <body>
 <div class="title-row">
+  ${COPY_BTN_HTML}
   <h1>${escapeHtml(title)}</h1>
   <span class="spacer" style="flex:1"></span>
   <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
@@ -864,6 +867,7 @@ ${bundle}
     window._allBlocksReady = Promise.resolve();
   });
 })();
+${copyButtonScript(buildCliCommand('gp-columnar-treemap'))}
 </script>
 </body>
 </html>

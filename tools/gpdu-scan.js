@@ -16,6 +16,7 @@ import os from 'node:os';
 import zlib from 'node:zlib';
 import { BUNDLE } from '../dist/gp-treemap.bundle.embed.js';
 import { partitionBlocks, encodeBlock, humanBytes, escapeHtml, LOADER_JS } from './scan-core.js';
+import { buildCliCommand, COPY_BTN_HTML, COPY_BTN_CSS, copyButtonScript } from './cli-command.js';
 
 const COLOR_MODES = ['extension', 'kind', 'folder', 'ctime', 'mtime', 'atime'];
 const CATEGORICAL_MODES = ['extension', 'kind', 'folder'];
@@ -405,10 +406,11 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
 <head>
 <meta charset="utf-8">
 <title>treemap \xb7 ${escapeHtml(target)}</title>
-<style>${PAGE_CSS}</style>
+<style>${PAGE_CSS}${COPY_BTN_CSS}</style>
 </head>
 <body>
 <div class="title-row">
+  ${COPY_BTN_HTML}
   <h1>${escapeHtml(target)}</h1>
   <span class="stat"><b>${scan.files.toLocaleString()}</b> files</span>
   <span class="stat"><b>${scan.dirs.toLocaleString()}</b> directories</span>
@@ -536,6 +538,9 @@ ${BUNDLE}
 <\/script>
 <script>
 ${LOADER_JS}
+<\/script>
+<script>
+${copyButtonScript(buildCliCommand('gpdu'))}
 <\/script>
 <script>
 // Stats bar: subtree counts + per-node metadata for the focused node.

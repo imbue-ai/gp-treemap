@@ -172,7 +172,7 @@
   <h2 class="section" style="margin: 2rem 0 1rem;">Trees from Tables</h2>
   <p style="color: var(--muted); margin: 0 0 1rem;">
     The entries below use the <b>path / tabular</b> treemap
-    (<code>gp-treemap-table</code>), which builds the hierarchy on the fly
+    (<code>gp-columnar-treemap</code>), which builds the hierarchy on the fly
     from a flat table of rows. The <b>Path</b> control in the header lists
     the columns used to group the data, from outermost to innermost:
   </p>
@@ -203,7 +203,7 @@
       Reproduce it from the pre-filtered JSONL in this repo:
     </p>
     <pre style="background: var(--border, #f0f0f0); padding: 8px 12px; border-radius: 4px; font-size: 12px; overflow-x: auto; margin: 0 0 1rem;"><code>curl -LO https://github.com/imbue-ai/gp-treemap/raw/main/samples/data/table/energy-2023.jsonl
-npx -p @imbue-ai/gp-treemap gp-treemap-table \
+npx -p @imbue-ai/gp-treemap gp-columnar-treemap \
   --size=Generation_TWh --color=Fuel \
   --path=Fuel,Continent,Country \
   --theme=catppuccin \
@@ -286,11 +286,11 @@ npx -p @imbue-ai/gp-treemap gp-treemap-table \
     </p>
     <p>
       To reproduce this plot from scratch, grab the raw GCC zip and pipe
-      its CSV into <code>gp-treemap-table</code>:
+      its CSV into <code>gp-columnar-treemap</code>:
     </p>
     <pre style="background: var(--border, #f0f0f0); padding: 8px 12px; border-radius: 4px; font-size: 12px; overflow-x: auto; margin: 0 0 1rem;"><code>curl -LO https://github.com/imbue-ai/gp-treemap/raw/main/samples/data/table/ca-raw/2024_City.zip
 unzip 2024_City.zip
-npx -p @imbue-ai/gp-treemap gp-treemap-table \
+npx -p @imbue-ai/gp-treemap gp-columnar-treemap \
   --size=TotalWages --color=DepartmentOrSubdivision \
   --path=DepartmentOrSubdivision,EmployerCounty,EmployerName,Position,_row \
   --theme=one-dark \

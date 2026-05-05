@@ -19,6 +19,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
 import os from 'node:os';
+import { buildCliCommand, COPY_BTN_HTML, COPY_BTN_CSS, copyButtonScript } from './cli-command.js';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -306,10 +307,12 @@ async function main() {
   #theme-sel { font-size: 12px; padding: 2px 4px; border-radius: 4px;
     background: var(--page-bg, #fff); color: var(--page-fg, #333);
     border: 1px solid var(--page-border, #ccc); cursor: pointer; }
+${COPY_BTN_CSS}
 </style>
 </head>
 <body>
 <header>
+  ${COPY_BTN_HTML}
   <h1>${escapeHtml(path.basename(inputPath))}</h1>
   <span class="stat"><b>${escapeHtml(stats.thread)}</b></span>
   <span class="stat"><b>${stats.totalHuman}</b> total CPU</span>
@@ -426,6 +429,7 @@ ${bundle}
   tm.addEventListener('gp-target', updateBar);
   requestAnimationFrame(function () { setTimeout(updateBar, 0); });
 })();
+${copyButtonScript(buildCliCommand('gp-treemap-profile-to-html'))}
 </script>
 </body>
 </html>

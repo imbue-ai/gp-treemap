@@ -65,10 +65,21 @@
   #path-menu-pop label { display:flex; align-items:center; gap:8px; padding: 3px 12px;
     font-size:12px; cursor:pointer; white-space:nowrap; }
   #path-menu-pop label:hover { background: var(--page-border, #0001); }
+
+  .copy-cli-btn { display:inline-flex; align-items:center; justify-content:center;
+    width: 22px; height: 22px; padding: 0; border-radius: 4px;
+    background: var(--page-bg, #fff); color: var(--page-fg, #555);
+    border: 1px solid var(--page-border, #ccc); cursor: pointer;
+    flex-shrink: 0; margin-right: 4px; }
+  .copy-cli-btn:hover { background: var(--page-border, #eee); color: var(--page-fg, #111); }
+  .copy-cli-btn.copied { background: #16a34a; color: #fff; border-color: #16a34a; }
+  .copy-cli-btn svg { display: block; }
+
 </style>
 </head>
 <body>
 <div class="title-row">
+  <button id="copy-cli-btn" class="copy-cli-btn" type="button" title="copy CLI command to clipboard" aria-label="copy CLI command to clipboard"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" focusable="false"><rect x="4.5" y="4.5" width="8" height="9.5" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M3.5 11V3a1 1 0 0 1 1-1h7" fill="none" stroke="currentColor" stroke-width="1.3"/></svg></button>
   <h1>Global electricity generation (2023, TWh) — colored by fuel</h1>
   <span class="spacer" style="flex:1"></span>
   <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
@@ -3297,6 +3308,43 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
     window._allBlocksReady = Promise.resolve();
   });
 })();
+
+(function () {
+  var btn = document.getElementById('copy-cli-btn');
+  if (!btn) return;
+  var cmd = "npx -p @imbue-ai/gp-treemap gp-columnar-treemap --no-open --size=Generation_TWh --color=Fuel --path=Fuel,Continent,Country --theme=catppuccin '--title=Global electricity generation (2023, TWh) — colored by fuel' /Users/thad/.sculptor/workspaces/66edd043bf8747fbb443ed267f7ee294/code/samples/data/table/energy-2023.jsonl /Users/thad/.sculptor/workspaces/66edd043bf8747fbb443ed267f7ee294/code/gallery/table-treemap-energy-fuel.html";
+  var origHtml = btn.innerHTML;
+  var resetTimer = null;
+  btn.addEventListener('click', function () {
+    var done = function () {
+      btn.classList.add('copied');
+      btn.innerHTML = '✓';
+      if (resetTimer) clearTimeout(resetTimer);
+      resetTimer = setTimeout(function () {
+        btn.classList.remove('copied');
+        btn.innerHTML = origHtml;
+      }, 1200);
+    };
+    var fail = function () {
+      btn.title = 'clipboard unavailable — see console';
+      console.log('CLI command:\n' + cmd);
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(cmd).then(done, fail);
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = cmd; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (_) {}
+        document.body.removeChild(ta);
+        ok ? done() : fail();
+      }
+    } catch (e) { fail(); }
+  });
+})();
+
 </script>
 </body>
 </html>

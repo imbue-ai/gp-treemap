@@ -28,6 +28,7 @@ import zlib from 'node:zlib';
 import { Buffer } from 'node:buffer';
 import { BUNDLE } from '../dist/gp-treemap.bundle.embed.js';
 import { partitionBlocks, encodeBlock, humanBytes, escapeHtml, LOADER_JS } from './scan-core.js';
+import { buildCliCommand, COPY_BTN_HTML, COPY_BTN_CSS, copyButtonScript } from './cli-command.js';
 
 const COLOR_MODES = ['extension', 'storage-class', 'last-modified'];
 const CATEGORICAL_MODES = ['extension', 'storage-class'];
@@ -835,10 +836,11 @@ function buildHtml(sink, manifestArg, bucketName, scan, colorBy, blockSize) {
 <head>
 <meta charset="utf-8">
 <title>treemap \xb7 ${escapeHtml(bucketName)}</title>
-<style>${PAGE_CSS}</style>
+<style>${PAGE_CSS}${COPY_BTN_CSS}</style>
 </head>
 <body>
 <div class="title-row">
+  ${COPY_BTN_HTML}
   <h1>${escapeHtml(titleStr)}</h1>
   <span class="stat"><b>${(scan.totalObjects || scan.counts.object).toLocaleString()}</b> objects</span>
   <span class="stat"><b>${scan.counts.prefix.toLocaleString()}</b> "folders"</span>
@@ -940,6 +942,9 @@ ${BUNDLE}
 <\/script>
 <script>
 ${LOADER_JS}
+<\/script>
+<script>
+${copyButtonScript(buildCliCommand('gpdu-s3-inventory'))}
 <\/script>
 <script>
 window._bootReady.then(function () {
