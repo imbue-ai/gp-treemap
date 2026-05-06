@@ -124,3 +124,104 @@ test('fnv1a: deterministic and bounded', async ({ page }) => {
   expect(res.a).not.toBe(res.c);
   expect(res.a).toBeGreaterThanOrEqual(0);
 });
+
+// Regression: clicking a parent in the breadcrumb must draw the focused-cell
+// overlay box. Earlier the click handler unconditionally coerced numeric-
+// looking id strings to Number(), so when a caller passed string ids like
+// '0','1','2' (e.g. from buildToGptm in scripts/build-comparison.mjs) the
+// resulting Map.get(numberKey) missed and no rect was drawn.
+// Mount a small tree using string ids ('0','1','2',...) wired through the
+// labels/parents API \u2014 the path that hit the breadcrumb-coercion bug.
+async function mountGptmStrings(page) {
+  await page.goto('/tests/unit-fixture.html');
+  await page.evaluate(() => {
+    const tm = document.createElement('gp-treemap');
+    tm.id = 'tm';
+    tm.style.cssText = 'display:block; width:600px; height:400px;';
+    document.body.appendChild(tm);
+    tm.ids     = ['0','1','2','3','4','5','6','7','8'];
+    tm.labels  = ['root','A','B','a1','a2','a3','b1','b2','b3'];
+    tm.parents = ['','0','0','1','1','1','2','2','2'];
+    tm.values  = [0, 0, 0, 10, 20, 30, 15, 25, 35];
+  });
+  await page.waitForFunction(() => {
+    const tm = document.getElementById('tm');
+    return tm && tm._tree && tm._nodeRects && tm._nodeRects.size > 0;
+  });
+}
+
+// Same shape but via parentIndices \u2014 the fast path that uses integer
+// row indices as tree node ids.
+async function mountGptmIntegers(page) {
+  await page.goto('/tests/unit-fixture.html');
+  await page.evaluate(() => {
+    const tm = document.createElement('gp-treemap');
+    tm.id = 'tm';
+    tm.style.cssText = 'display:block; width:600px; height:400px;';
+    document.body.appendChild(tm);
+    tm.labels         = ['root','A','B','a1','a2','a3','b1','b2','b3'];
+    tm.parentIndices  = [-1, 0, 0, 1, 1, 1, 2, 2, 2];
+    tm.values         = [0, 0, 0, 10, 20, 30, 15, 25, 35];
+  });
+  await page.waitForFunction(() => {
+    const tm = document.getElementById('tm');
+    return tm && tm._tree && tm._nodeRects && tm._nodeRects.size > 0;
+  });
+}
+
+test('breadcrumb: clicking a parent draws the focus overlay (string ids)', async ({ page }) => {
+  await mountGptmStrings(page);
+  // Simulate clicking a leaf so the breadcrumb populates its ancestor chain.
+  await page.locator('gp-treemap').evaluate((tm) => {
+    tm._targetId = '3'; tm._focusId = '3'; tm._updateToolbarInfo();
+  });
+  // Now click the parent ('A' = id '1') in the breadcrumb.
+  const r = await page.locator('gp-treemap').evaluate((tm) => {
+    tm.shadowRoot.querySelector('a[data-node-id="1"]').click();
+    return {
+      focusId: tm._focusId,
+      hasOverlayBox: !!tm.shadowRoot.querySelector('.overlay .sel'),
+      breadcrumbFocused: !!tm.shadowRoot.querySelector('a[data-node-id="1"].focused'),
+    };
+  });
+  expect(r.focusId).toBe('1');
+  expect(r.hasOverlayBox).toBe(true);
+  expect(r.breadcrumbFocused).toBe(true);
+});
+
+test('breadcrumb: clicking a parent draws the focus overlay (parentIndices/integer ids)', async ({ page }) => {
+  await mountGptmIntegers(page);
+  await page.locator('gp-treemap').evaluate((tm) => {
+    tm._targetId = 3; tm._focusId = 3; tm._updateToolbarInfo();
+  });
+  const r = await page.locator('gp-treemap').evaluate((tm) => {
+    tm.shadowRoot.querySelector('a[data-node-id="1"]').click();
+    return {
+      focusId: tm._focusId,
+      hasOverlayBox: !!tm.shadowRoot.querySelector('.overlay .sel'),
+      breadcrumbFocused: !!tm.shadowRoot.querySelector('a[data-node-id="1"].focused'),
+    };
+  });
+  // With integer-id tree, _coerceTreeId resolves '1' back to 1.
+  expect(r.focusId).toBe(1);
+  expect(r.hasOverlayBox).toBe(true);
+  expect(r.breadcrumbFocused).toBe(true);
+});
+
+test('_coerceTreeId: prefers the type the tree actually uses', async ({ page }) => {
+  await mountGptmStrings(page);
+  const stringCase = await page.locator('gp-treemap').evaluate((tm) => ({
+    coerced: tm._coerceTreeId('1'),
+    type: typeof tm._coerceTreeId('1'),
+  }));
+  expect(stringCase.coerced).toBe('1');
+  expect(stringCase.type).toBe('string');
+
+  await mountGptmIntegers(page);
+  const numericCase = await page.locator('gp-treemap').evaluate((tm) => ({
+    coerced: tm._coerceTreeId('1'),
+    type: typeof tm._coerceTreeId('1'),
+  }));
+  expect(numericCase.coerced).toBe(1);
+  expect(numericCase.type).toBe('number');
+});

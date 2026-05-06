@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Treemap libraries compared · gp-treemap</title>
+<style>
+  :root { --bg:#1a1b26; --surface:#16161e; --border:#2a2b3a; --fg:#c0caf5;
+    --muted:#787c99; --accent:#7aa2f7; --warn:#e0af68; }
+  html,body { margin:0; padding:0; background:var(--bg); color:var(--fg);
+    font: 15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 28px; margin: 16px 0 8px; }
+  h2 { font-size: 19px; margin: 32px 0 8px; border-top: 1px solid var(--border); padding-top: 24px; }
+  h3 { font-size: 14px; margin: 16px 0 6px; color: var(--muted); font-weight:600;
+    text-transform: uppercase; letter-spacing: .04em; }
+  p { margin: 8px 0; }
+  a { color: var(--accent); }
+  .lede { color: var(--muted); font-size: 16px; }
+  .grid { display: grid; gap: 12px; grid-template-columns: 1fr; margin: 14px 0 0; }
+  @media (min-width: 880px) { .grid { grid-template-columns: 1fr 1fr 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden; display: flex; flex-direction: column; }
+  .card .label { padding: 6px 10px; font-size: 12px; font-weight: 600;
+    color: var(--fg); background: #0f0f14; border-bottom: 1px solid var(--border);
+    display:flex; gap:8px; align-items:center; }
+  .card .label .tag { color: var(--muted); font-weight: 400; }
+  .card iframe { width: 100%; border: 0; height: 360px; background:#0a0a10; }
+  .card .open { margin-left:auto; font-size:11px; color: var(--accent); text-decoration: none; }
+  .card .ours { background: var(--accent); color: #0a0a10; padding: 1px 6px;
+    border-radius: 3px; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+  .card .counter { padding: 6px 10px; font-size: 12px; color: var(--muted);
+    background: #0a0a10; border-top: 1px solid var(--border);
+    font-family: ui-monospace,SF Mono,Menlo,monospace; font-variant-numeric: tabular-nums;
+    display: flex; align-items: center; gap: 8px; }
+  .card .counter .label { color: var(--muted); }
+  .card .counter[data-state="running"] .label { color: var(--accent); }
+  .card .counter .val { margin-left: auto; color: var(--muted); }
+  .card .counter[data-state="running"] .val { color: var(--fg); }
+  .card .counter[data-state="done"] .val { color: var(--accent); font-weight: 600; }
+  .card .counter[data-state="failed"] .val { color: var(--warn); font-weight: 600; }
+  .card .counter[data-state="running"] .label::before {
+    content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px;
+    border-radius: 50%; background: var(--accent); vertical-align: middle;
+    animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+  .note { background: var(--surface); border-left: 3px solid var(--warn); padding: 10px 14px;
+    border-radius: 4px; margin: 12px 0; font-size: 14px; color: var(--fg); }
+  .note b { color: var(--warn); }
+  ul { padding-left: 22px; }
+  li { margin: 4px 0; }
+  code, kbd { background: #0f0f14; color: var(--fg); padding: 1px 5px; border-radius: 3px;
+    font-size: 12px; font-family: ui-monospace,SF Mono,Menlo,monospace; }
+  .nav { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+  .nav a { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+<div class="nav"><a href="./index.html">← gallery</a></div>
+<h1>Three treemap libraries, side by side</h1>
+<p class="lede">
+  Same data, three renderers: <a href="https://plotly.com/javascript/treemaps/">Plotly.js</a>,
+  <a href="https://d3js.org/d3-hierarchy/treemap">D3</a>, and
+  <a href="https://github.com/imbue-ai/gp-treemap">gp-treemap</a>.
+  Each section walks the same canonical hierarchy and translates it into
+  whatever each library wants (labels/parents/values arrays for Plotly
+  and gp-treemap; a nested object for D3). No re-walking, no separate
+  data pipelines — just three different renderings.
+</p>
+<p class="lede" style="margin-top: 12px;">
+  Up front: <b>we love Plotly</b>. It's our go-to for everything else,
+  and its treemap defaults are some of the nicest out of the box. This
+  comparison is about scale, not quality.
+</p>
+
+<h2>1. A 24-row toy dataset</h2>
+<p>
+  Coffee-shop sales by region → category → product. Tiny enough that
+  every library renders comfortably; useful as a baseline for visual
+  style and default behavior.
+</p>
+<div class="grid">
+  <div class="card"><div class="label">gp-treemap <span class="ours">Ours</span> <span class="tag">canvas</span><a class="open" href="comparison/gptm-toy.html" target="_blank">open ↗</a></div><iframe data-src="comparison/gptm-toy.html" data-tool="gptm-toy"></iframe><div class="counter" data-state="queued"><span class="label" data-label-for="gptm-toy">queued</span><span class="val" data-time-for="gptm-toy">—</span></div></div>
+  <div class="card"><div class="label">Plotly.js <span class="tag">treemap</span><a class="open" href="comparison/plotly-toy.html" target="_blank">open ↗</a></div><iframe data-src="comparison/plotly-toy.html" data-tool="plotly-toy"></iframe><div class="counter" data-state="queued"><span class="label" data-label-for="plotly-toy">queued</span><span class="val" data-time-for="plotly-toy">—</span></div></div>
+  <div class="card"><div class="label">D3 <span class="tag">d3-hierarchy + SVG</span><a class="open" href="comparison/d3-toy.html" target="_blank">open ↗</a></div><iframe data-src="comparison/d3-toy.html" data-tool="d3-toy"></iframe><div class="counter" data-state="queued"><span class="label" data-label-for="d3-toy">queued</span><span class="val" data-time-for="d3-toy">—</span></div></div>
+</div>
+
+<h3>What's different at this scale</h3>
+<ul>
+  <li><b>Plotly</b> ships click-to-zoom and a path bar by default. Each
+    node — leaf <i>and</i> parent — gets its own bordered rect with a
+    label, so you can hover or click any level of the hierarchy.</li>
+  <li><b>D3</b> is a layout primitive, not a widget — you draw the rects
+    yourself. The version here uses <code>paddingTop</code> for parent
+    label gutters, hover tooltips, and depth-shaded colors; out of the
+    box it's just a layout function and an empty <code>&lt;svg&gt;</code>.</li>
+  <li><b>gp-treemap</b> renders the
+    <a href="https://grandperspectiv.sourceforge.net/">GrandPerspective</a>
+    raised-tile shading on a single canvas. Cell shading shows the tree
+    structure without label gutters, so the data gets every pixel.</li>
+</ul>
+
+<p class="note">
+  <b>The gp-treemap tradeoff:</b> only nodes with their own pixel area
+  get an explicit rect. Interior nodes (folders, categories) don't get
+  a separate "container" rect or a top-strip label — their boundary
+  is implied by the seam-and-shading between children. That means
+  there's no parent rect to click on. Instead, gp-treemap surfaces
+  parents through the <b>breadcrumb at the bottom</b>: hover or click
+  any leaf and the full ancestor path lights up, with the stats bar
+  showing each ancestor's aggregate. Click a breadcrumb segment to
+  focus that ancestor; double-click to zoom to it. (Outside an iframe
+  the mouse wheel also walks the focus up and down the ancestor chain
+  — try the full-page versions linked above.)
+</p>
+<p class="note">
+  <b>Their tradeoff in return:</b> every parent strip Plotly and D3
+  reserve for a label is pixels that <i>came out of that parent's
+  area</i>. The children inside still fill the rectangle, but the
+  rectangle itself is smaller than the parent's true share of the
+  total. The distortion compounds with depth — at five levels of
+  nesting, a leaf's visible area can be noticeably smaller than its
+  proportional value. gp-treemap doesn't reserve gutters, so cell
+  area is exactly proportional to leaf size all the way down.
+</p>
+
+<h2>2. Disk usage of this repo</h2>
+<p>
+  9,353 files and folders,
+  283 MB total — including <code>.git</code>,
+  which dominates by byte count. Same hierarchy in all three frames.
+</p>
+<div class="grid">
+  <div class="card"><div class="label">gp-treemap <span class="ours">Ours</span> <span class="tag">canvas</span><a class="open" href="comparison/gptm-repo.html" target="_blank">open ↗</a></div><iframe data-src="comparison/gptm-repo.html" data-tool="gptm-repo"></iframe><div class="counter" data-state="queued"><span class="label" data-label-for="gptm-repo">queued</span><span class="val" data-time-for="gptm-repo">—</span></div></div>
+  <div class="card"><div class="label">Plotly.js <span class="tag">treemap</span><a class="open" href="comparison/plotly-repo.html" target="_blank">open ↗</a></div><iframe data-src="comparison/plotly-repo.html" data-tool="plotly-repo"></iframe><div class="counter" data-state="queued"><span class="label" data-label-for="plotly-repo">queued</span><span class="val" data-time-for="plotly-repo">—</span></div></div>
+  <div class="card"><div class="label">D3 <span class="tag">d3-hierarchy + SVG</span><a class="open" href="comparison/d3-repo.html" target="_blank">open ↗</a></div><iframe data-src="comparison/d3-repo.html" data-tool="d3-repo"></iframe><div class="counter" data-state="queued"><span class="label" data-label-for="d3-repo">queued</span><span class="val" data-time-for="d3-repo">—</span></div></div>
+</div>
+
+<h3>Why the gap widens</h3>
+<ul>
+  <li><b>Plotly</b> creates an SVG node per rect plus per label, and
+    runs a per-text-layout pass on initial render and on every zoom.
+    The cost grows linearly but the per-node constant is high.
+    Above ~10k nodes interaction starts to feel sluggish; above ~100k
+    it can stall the tab.</li>
+  <li><b>D3</b>'s layout itself is fast, but bare-SVG rendering bogs
+    the DOM as the rect count climbs — thousands of
+    <code>&lt;rect&gt;</code> + <code>&lt;text&gt;</code> elements add up.
+    Workarounds (Canvas, WebGL, virtualized SVG) exist, but they're
+    your code to write.</li>
+  <li><b>gp-treemap</b> draws every cell with a per-pixel raised-tile
+    painter into a single <code>&lt;canvas&gt;</code>. Paint cost scales
+    with pixels, not nodes — 8M files render in under a second.</li>
+</ul>
+
+<h2>3. A 137,262-node dataset</h2>
+<p>
+  California city-government wages, 2024
+  (<a href="https://publicpay.ca.gov/Reports/RawExport.aspx">Government Compensation in California</a>),
+  rolled up by department → county → employer → position → individual
+  row. 100,000 rows, 137,262
+  tree nodes — an order of magnitude bigger than the repo above.
+</p>
+<div class="grid">
+  <div class="card"><div class="label">gp-treemap <span class="ours">Ours</span> <span class="tag">canvas</span><a class="open" href="comparison/gptm-mega.html" target="_blank">open ↗</a></div><iframe data-src="comparison/gptm-mega.html" data-tool="gptm-mega"></iframe><div class="counter" data-state="queued"><span class="label" data-label-for="gptm-mega">queued</span><span class="val" data-time-for="gptm-mega">—</span></div></div>
+  <div class="card"><div class="label">Plotly.js <span class="tag">treemap</span><a class="open" href="comparison/plotly-mega.html" target="_blank">open ↗</a></div><iframe data-src="comparison/plotly-mega.html" data-tool="plotly-mega"></iframe><div class="counter" data-state="queued"><span class="label" data-label-for="plotly-mega">queued</span><span class="val" data-time-for="plotly-mega">—</span></div></div>
+  <div class="card"><div class="label">D3 <span class="tag">d3-hierarchy + SVG</span><a class="open" href="comparison/d3-mega.html" target="_blank">open ↗</a></div><iframe data-src="comparison/d3-mega.html" data-tool="d3-mega"></iframe><div class="counter" data-state="queued"><span class="label" data-label-for="d3-mega">queued</span><span class="val" data-time-for="d3-mega">—</span></div></div>
+</div>
+<p class="note">
+  At this scale the divergence is dramatic: Plotly and D3 may take tens
+  of seconds, freeze, or fail to load at all; gp-treemap renders the
+  whole tree in well under a second.
+</p>
+
+<h2>Takeaways</h2>
+<ul>
+  <li><b>Plotly</b> is the right choice for a small treemap embedded in
+    a dashboard with the rest of the Plotly toolkit — great defaults,
+    interactive out of the box, but not suited to large hierarchies.</li>
+  <li><b>D3</b> is the right choice when you want the layout primitive
+    and full control of the render surface. Plan to write your own
+    rendering if you need more than a few thousand cells.</li>
+  <li><b>gp-treemap</b> is the right choice when the tree is large
+    (thousands to millions of nodes) and you want
+    <a href="https://grandperspectiv.sourceforge.net/">GrandPerspective</a>-style
+    shading. It's a Web Component — drop it in, hand it labels/parents/values,
+    done.</li>
+</ul>
+
+<p style="color:var(--muted); font-size:12px; margin-top:32px;">
+  Render times are measured live in your browser — each iframe reports
+  back when its first paint completes. Regenerate everything with
+  <code>node scripts/build-comparison.mjs</code>.
+</p>
+</main>
+<script>
+// Always start at the top so the toy section renders first — otherwise
+// a reload that restores the user to the bottom of the page would gate
+// the queue on the mega iframes (the only ones visible) and the user
+// would see a long pause before anything appears.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+
+// Serialize iframe loads so each renders in isolation (concurrent loads
+// distort timing). Each iframe gets a live wall-clock counter beneath it
+// that ticks while rendering and freezes when the iframe reports back.
+// Only kick off an iframe once it has scrolled into the viewport —
+// browsers throttle rAF in offscreen frames and the timing inflates.
+(function () {
+  var queue = Array.prototype.slice.call(document.querySelectorAll('iframe[data-src]'));
+  function valFor(tool) { return document.querySelector('[data-time-for="' + tool + '"]'); }
+  function labelFor(tool) { return document.querySelector('[data-label-for="' + tool + '"]'); }
+  function counterFor(tool) { return document.querySelector('[data-time-for="' + tool + '"]').parentElement; }
+
+  var inflight = null, inflightT0 = 0, inflightVal = null, inflightLabel = null, inflightCounter = null;
+  var tickHandle = 0;
+  var timeoutHandle = null;
+  var visible = new Set();
+
+  function tick() {
+    if (!inflight) return;
+    var dt = Math.round(performance.now() - inflightT0);
+    if (inflightVal) inflightVal.textContent = dt.toLocaleString() + ' ms';
+  }
+
+  function pump() {
+    if (inflight || queue.length === 0) return;
+    var i = 0;
+    for (; i < queue.length; i++) if (visible.has(queue[i])) break;
+    if (i === queue.length) return;
+    inflight = queue.splice(i, 1)[0];
+    var tool = inflight.dataset.tool;
+    inflightVal = valFor(tool);
+    inflightLabel = labelFor(tool);
+    inflightCounter = counterFor(tool);
+    if (inflightCounter) inflightCounter.dataset.state = 'running';
+    if (inflightLabel) inflightLabel.textContent = 'rendering';
+    if (inflightVal) inflightVal.textContent = '0 ms';
+    inflightT0 = performance.now();
+    inflight.src = inflight.dataset.src;
+    tickHandle = setInterval(tick, 50);
+    timeoutHandle = setTimeout(function () {
+      if (!inflight) return;
+      clearInterval(tickHandle);
+      if (inflightCounter) inflightCounter.dataset.state = 'failed';
+      if (inflightLabel) inflightLabel.textContent = 'timed out';
+      if (inflightVal) inflightVal.textContent = '—';
+      inflight = null;
+      pump();
+    }, 60000);
+  }
+
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'render-time' || !e.data.tool) return;
+    if (!inflight || inflight.dataset.tool !== e.data.tool) return;
+    clearInterval(tickHandle);
+    if (timeoutHandle) clearTimeout(timeoutHandle);
+    if (e.data.error) {
+      if (inflightCounter) inflightCounter.dataset.state = 'failed';
+      if (inflightLabel) inflightLabel.textContent = 'failed';
+      if (inflightVal) inflightVal.textContent = '—';
+    } else {
+      var dt = Math.round(performance.now() - inflightT0);
+      if (inflightCounter) inflightCounter.dataset.state = 'done';
+      if (inflightLabel) inflightLabel.textContent = 'rendered in';
+      if (inflightVal) inflightVal.textContent = dt.toLocaleString() + ' ms';
+    }
+    inflight = null;
+    pump();
+  });
+  var io = new IntersectionObserver(function (entries) {
+    for (var i = 0; i < entries.length; i++) {
+      if (entries[i].isIntersecting) visible.add(entries[i].target);
+    }
+    pump();
+  }, { rootMargin: '0px' });
+  for (var j = 0; j < queue.length; j++) io.observe(queue[j]);
+})();
+</script>
+</body></html>

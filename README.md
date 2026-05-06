@@ -27,7 +27,9 @@ great for any time you have hierarchical counts to wrap your head around!
 
 Don't forget that lots of tabular data can be made hierarchical using GROUP BY on a list of columns.
 
-Check out the [gallery of more examples](https://imbue-ai.github.io/gp-treemap/gallery/).
+Check out the [gallery of more examples](https://imbue-ai.github.io/gp-treemap/gallery/),
+or the [side-by-side comparison](https://imbue-ai.github.io/gp-treemap/gallery/comparison.html)
+against Plotly.js and D3 on the same datasets.
 
 ## CLI tools
 
@@ -169,6 +171,14 @@ deno run \
 
 * On Linux, use `xdg-open` instead of `open`.
 
+
+## Comparison with other tools
+
+We put together a [side-by-side comparison](https://imbue-ai.github.io/gp-treemap/gallery/comparison.html)
+of gp-treemap, [Plotly.js](https://plotly.com/javascript/treemaps/), and
+[D3](https://d3js.org/d3-hierarchy/treemap) on the same datasets — toy,
+disk usage, and a 137k-node mega-treemap — with live render times
+measured in your own browser.
 
 ## A hat tip to GrandPerspective
 

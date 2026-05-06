@@ -1,0 +1,115 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Coffee-shop sales (toy) · d3</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+    background:#1a1b26;color:#c0caf5;}
+  body{display:flex;flex-direction:column;}
+  header{padding:6px 12px;border-bottom:1px solid #0f0f14;background:#16161e;
+    display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;font-size:12px;}
+  header h1{margin:0;font-size:12px;font-weight:600;font-family:ui-monospace,SF Mono,Menlo,monospace;}
+  header .stat{color:#787c99;font-size:11px;font-variant-numeric:tabular-nums;}
+  #plot,#chart,gp-treemap{flex:1;min-height:0;display:flex;}
+  #plot,#chart{overflow:auto;}
+  #status{padding:4px 12px;font-size:11px;color:#787c99;background:#16161e;
+    border-top:1px solid #0f0f14;font-variant-numeric:tabular-nums;}
+
+  svg { display: block; }
+  text { font: 11px ui-monospace, SF Mono, Menlo, monospace; pointer-events: none; }
+  .leaf rect { stroke: #1a1b26; stroke-width: 0.5; }
+  .parent rect { fill: none; stroke: #1a1b26; stroke-width: 0.75; }
+  .parent-label { fill: #c0caf5; font-weight: 600; font-size: 11px; }
+  .leaf-label { fill: #1a1b26; }
+  .tooltip { position: fixed; pointer-events: none; background: #16161e; color: #c0caf5;
+    border: 1px solid #7aa2f7; border-radius: 4px; padding: 6px 9px;
+    font: 12px ui-monospace, SF Mono, Menlo, monospace; white-space: nowrap;
+    box-shadow: 0 4px 12px #0008; opacity: 0; transition: opacity .1s; z-index: 10; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+</head><body>
+<header><h1>Coffee-shop sales (toy) — d3 v7 treemap</h1><span class="stat">37 nodes</span></header>
+<div id="chart"></div>
+<div id="tooltip" class="tooltip"></div>
+<div id="status">loading…</div>
+<script>
+  var data = JSON.parse('{"name":"All","children":[{"name":"Americas","children":[{"name":"Beverages","children":[{"name":"Espresso","value":820},{"name":"Latte","value":940},{"name":"Drip Coffee","value":610},{"name":"Tea","value":230}]},{"name":"Pastries","children":[{"name":"Croissant","value":410},{"name":"Muffin","value":330},{"name":"Scone","value":180}]},{"name":"Sandwiches","children":[{"name":"Turkey","value":520},{"name":"Caprese","value":310}]}]},{"name":"EMEA","children":[{"name":"Beverages","children":[{"name":"Espresso","value":1120},{"name":"Cappuccino","value":880},{"name":"Tea","value":640}]},{"name":"Pastries","children":[{"name":"Croissant","value":760},{"name":"Pain au Choc","value":540},{"name":"Madeleine","value":220}]},{"name":"Sandwiches","children":[{"name":"Jambon","value":470},{"name":"Caprese","value":290}]}]},{"name":"APAC","children":[{"name":"Beverages","children":[{"name":"Matcha","value":710},{"name":"Bubble Tea","value":1180},{"name":"Drip Coffee","value":340}]},{"name":"Pastries","children":[{"name":"Mochi","value":450},{"name":"Egg Tart","value":520}]},{"name":"Sandwiches","children":[{"name":"Katsu","value":390},{"name":"Banh Mi","value":610}]}]}]}');
+  var IS_BYTES = false;
+  var statusEl = document.getElementById('status');
+  var tip = document.getElementById('tooltip');
+  var t0 = performance.now();
+  statusEl.textContent = 'computing layout…';
+  function fmtBytes(v) {
+    var u = ['B','KB','MB','GB','TB']; var i = 0, n = v || 0;
+    while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+    return (n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2)) + ' ' + u[i];
+  }
+  function fmt(v) { return IS_BYTES ? fmtBytes(v) : (v || 0).toLocaleString(); }
+  requestAnimationFrame(function () {
+    try {
+      var chart = document.getElementById('chart');
+      var W = chart.clientWidth, H = chart.clientHeight;
+      var root = d3.hierarchy(data).sum(function (d) { return d.value || 0; })
+        .sort(function (a, b) { return b.value - a.value; });
+      d3.treemap().size([W, H]).tile(d3.treemapSquarify.ratio(1))
+        .paddingTop(14).paddingInner(1).paddingOuter(2).round(true)(root);
+      var topLevels = (root.children || []).map(function (n) { return n.data.name; });
+      var hue = d3.scaleOrdinal().domain(topLevels)
+        .range(['#7aa2f7','#bb9af7','#7dcfff','#9ece6a','#e0af68','#f7768e','#73daca','#c0caf5','#ff9e64','#cba6f7']);
+      function colorFor(node) {
+        var anc = node;
+        while (anc.depth > 1) anc = anc.parent;
+        var base = anc && anc.data ? hue(anc.data.name) : '#787c99';
+        var k = Math.max(0, Math.min(0.55, (node.depth - 1) * 0.10));
+        return d3.interpolateRgb(base, '#1a1b26')(k);
+      }
+      var svg = d3.select('#chart').append('svg').attr('width', W).attr('height', H);
+      var parents = root.descendants().filter(function (d) { return d.children && d.depth > 0; });
+      var pg = svg.selectAll('g.parent').data(parents).join('g').attr('class','parent')
+        .attr('transform', function (d) { return 'translate(' + d.x0 + ',' + d.y0 + ')'; });
+      pg.append('rect').attr('width', function (d) { return d.x1 - d.x0; })
+        .attr('height', function (d) { return d.y1 - d.y0; })
+        .attr('fill', function (d) { return d3.color(colorFor(d)).copy({ opacity: 0.18 }) + ''; });
+      pg.filter(function (d) { return (d.x1 - d.x0) > 40; })
+        .append('text').attr('class','parent-label').attr('x', 4).attr('y', 11)
+        .text(function (d) {
+          var maxChars = Math.floor((d.x1 - d.x0 - 6) / 6);
+          var s = d.data.name;
+          return s.length > maxChars ? s.slice(0, Math.max(1, maxChars - 1)) + '…' : s;
+        });
+      var leaves = root.leaves();
+      var lg = svg.selectAll('g.leaf').data(leaves).join('g').attr('class','leaf')
+        .attr('transform', function (d) { return 'translate(' + d.x0 + ',' + d.y0 + ')'; });
+      lg.append('rect').attr('width', function (d) { return d.x1 - d.x0; })
+        .attr('height', function (d) { return d.y1 - d.y0; }).attr('fill', colorFor);
+      lg.filter(function (d) { return (d.x1 - d.x0) > 32 && (d.y1 - d.y0) > 12; })
+        .append('text').attr('class','leaf-label').attr('x', 3).attr('y', 11)
+        .text(function (d) {
+          var maxChars = Math.floor((d.x1 - d.x0 - 6) / 6);
+          var s = d.data.name;
+          return s.length > maxChars ? s.slice(0, Math.max(1, maxChars - 1)) + '…' : s;
+        });
+      function show(e, d) {
+        var ancNames = d.ancestors().reverse().slice(1).map(function (a) { return a.data.name; }).join(' / ');
+        tip.innerHTML = (ancNames ? '<div style="opacity:.7">' + ancNames + '</div>' : '') +
+          '<b>' + d.data.name + '</b><br>' + fmt(d.value);
+        tip.style.opacity = '1';
+      }
+      function move(e) {
+        var x = Math.min(window.innerWidth - tip.offsetWidth - 10, e.clientX + 12);
+        var y = Math.min(window.innerHeight - tip.offsetHeight - 10, e.clientY + 12);
+        tip.style.left = x + 'px'; tip.style.top = y + 'px';
+      }
+      function hide() { tip.style.opacity = '0'; }
+      svg.selectAll('g.leaf, g.parent').on('mouseenter', show).on('mousemove', move).on('mouseleave', hide);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          var dt = +(performance.now() - t0).toFixed(0);
+          statusEl.textContent = 'rendered ' + leaves.length.toLocaleString() + ' leaves in ' + dt.toLocaleString() + ' ms';
+          try { window.parent.postMessage({ type: 'render-time', tool: "d3-toy", ms: dt }, '*'); } catch (_) {}
+        });
+      });
+    } catch (e) {
+      statusEl.textContent = 'd3 failed: ' + (e && e.message || e);
+      try { window.parent.postMessage({ type: 'render-time', tool: "d3-toy", error: String(e && e.message || e) }, '*'); } catch (_) {}
+    }
+  });
+</script></body></html>

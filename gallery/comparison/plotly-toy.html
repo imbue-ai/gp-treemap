@@ -1,0 +1,51 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Coffee-shop sales (toy) · plotly</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+    background:#1a1b26;color:#c0caf5;}
+  body{display:flex;flex-direction:column;}
+  header{padding:6px 12px;border-bottom:1px solid #0f0f14;background:#16161e;
+    display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;font-size:12px;}
+  header h1{margin:0;font-size:12px;font-weight:600;font-family:ui-monospace,SF Mono,Menlo,monospace;}
+  header .stat{color:#787c99;font-size:11px;font-variant-numeric:tabular-nums;}
+  #plot,#chart,gp-treemap{flex:1;min-height:0;display:flex;}
+  #plot,#chart{overflow:auto;}
+  #status{padding:4px 12px;font-size:11px;color:#787c99;background:#16161e;
+    border-top:1px solid #0f0f14;font-variant-numeric:tabular-nums;}
+</style>
+<script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
+</head><body>
+<header><h1>Coffee-shop sales (toy) — plotly.js v3</h1><span class="stat">37 nodes</span></header>
+<div id="plot"></div>
+<div id="status">loading…</div>
+<script>
+  var trace = JSON.parse('{"type":"treemap","ids":["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36"],"parents":["","0","1","2","2","2","2","1","7","7","7","1","11","11","0","14","15","15","15","14","19","19","19","14","23","23","0","26","27","27","27","26","31","31","26","34","34"],"labels":["All","Americas","Beverages","Espresso","Latte","Drip Coffee","Tea","Pastries","Croissant","Muffin","Scone","Sandwiches","Turkey","Caprese","EMEA","Beverages","Espresso","Cappuccino","Tea","Pastries","Croissant","Pain au Choc","Madeleine","Sandwiches","Jambon","Caprese","APAC","Beverages","Matcha","Bubble Tea","Drip Coffee","Pastries","Mochi","Egg Tart","Sandwiches","Katsu","Banh Mi"],"values":[13470,4350,2600,820,940,610,230,920,410,330,180,830,520,310,4920,2640,1120,880,640,1520,760,540,220,760,470,290,4200,2230,710,1180,340,970,450,520,1000,390,610],"branchvalues":"total","textinfo":"label+value+percent parent","hovertemplate":"<b>%{label}<\/b><br>%{value:,}<br>%{percentParent} of parent<extra><\/extra>","marker":{"line":{"width":1,"color":"#1a1b26"},"pad":{"l":4,"r":4,"t":22,"b":4}},"pathbar":{"visible":true,"side":"top","thickness":22,"edgeshape":">"},"tiling":{"pad":2}}');
+  var layout = {"template":"plotly_dark","margin":{"l":0,"r":0,"t":0,"b":0},"paper_bgcolor":"#1a1b26","plot_bgcolor":"#1a1b26","font":{"color":"#c0caf5","family":"system-ui,-apple-system,Segoe UI,sans-serif","size":12},"hoverlabel":{"bgcolor":"#1a1b26","bordercolor":"#7aa2f7","font":{"color":"#c0caf5","family":"ui-monospace, SF Mono, Menlo, monospace"}}};
+  var statusEl = document.getElementById('status');
+  var plotDiv = document.getElementById('plot');
+  var t0 = performance.now();
+  statusEl.textContent = 'rendering ' + trace.labels.length.toLocaleString() + ' nodes…';
+  var done = false;
+  function finish() {
+    if (done) return; done = true;
+    var dt = +(performance.now() - t0).toFixed(0);
+    statusEl.textContent = 'rendered in ' + dt.toLocaleString() + ' ms';
+    try { window.parent.postMessage({ type: 'render-time', tool: "plotly-toy", ms: dt }, '*'); } catch (_) {}
+  }
+  // plotly_afterplot fires after every render pass; wait one more so the
+  // browser actually paints before stopping the clock.
+  plotDiv.on && plotDiv.on('plotly_afterplot', function () {
+    requestAnimationFrame(function () { requestAnimationFrame(finish); });
+  });
+  Plotly.newPlot('plot', [trace], layout, { responsive: true, displaylogo: false })
+    .then(function () {
+      // Fallback if afterplot never fires.
+      setTimeout(function () {
+        if (!done) requestAnimationFrame(function () { requestAnimationFrame(finish); });
+      }, 200);
+    })
+    .catch(function (e) {
+      statusEl.textContent = 'plotly failed: ' + (e && e.message || e);
+      try { window.parent.postMessage({ type: 'render-time', tool: "plotly-toy", error: String(e && e.message || e) }, '*'); } catch (_) {}
+    });
+</script></body></html>

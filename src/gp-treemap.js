@@ -137,7 +137,7 @@ export class GpTreemap extends HTMLElement {
       if (!a) return;
       e.preventDefault();
       const nid = a.dataset.nodeId;
-      const coerced = /^\d+$/.test(nid) ? Number(nid) : nid;
+      const coerced = this._coerceTreeId(nid);
       this._lastBreadcrumbClickId = coerced;
       this._lastBreadcrumbClickTime = Date.now();
       this._lastBreadcrumbIsRoot = !!a.dataset.isRoot;
@@ -1086,6 +1086,21 @@ export class GpTreemap extends HTMLElement {
     const dpr = this._canvas.width / cssW;
     return { cssW, cssH, dpr };
   }
+  // Resolve a stringified id (from data-node-id) back to whatever key
+  // the tree's node Map actually uses. Datasets are always strings, but
+  // callers may have passed ids as numbers OR as strings, and Map keys
+  // are type-strict. Prefer the string match; fall back to numeric only
+  // if the tree doesn't have the string key but does have the number.
+  _coerceTreeId(nid) {
+    if (!this._tree || !this._tree.nodes) return nid;
+    if (this._tree.nodes.has(nid)) return nid;
+    if (/^-?\d+$/.test(nid)) {
+      const n = Number(nid);
+      if (this._tree.nodes.has(n)) return n;
+    }
+    return nid;
+  }
+
   _setFocus(id) {
     this._focusId = id;
     const { cssW, cssH, dpr } = this._canvasMetrics();
@@ -1100,7 +1115,7 @@ export class GpTreemap extends HTMLElement {
     const focusId = this._focusId != null ? this._focusId : this._targetId;
     for (const a of this._infoEl.querySelectorAll('a[data-node-id]')) {
       const nid = a.dataset.nodeId;
-      const coerced = /^\d+$/.test(nid) ? Number(nid) : nid;
+      const coerced = this._coerceTreeId(nid);
       a.classList.toggle('focused', coerced === focusId);
     }
     // Update displayed value to match focused node.

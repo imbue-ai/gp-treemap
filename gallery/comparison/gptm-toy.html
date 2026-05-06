@@ -1,0 +1,52 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Coffee-shop sales (toy) · gp-treemap</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+    background:#1a1b26;color:#c0caf5;}
+  body{display:flex;flex-direction:column;}
+  header{padding:6px 12px;border-bottom:1px solid #0f0f14;background:#16161e;
+    display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;font-size:12px;}
+  header h1{margin:0;font-size:12px;font-weight:600;font-family:ui-monospace,SF Mono,Menlo,monospace;}
+  header .stat{color:#787c99;font-size:11px;font-variant-numeric:tabular-nums;}
+  #plot,#chart,gp-treemap{flex:1;min-height:0;display:flex;}
+  #plot,#chart{overflow:auto;}
+  #status{padding:4px 12px;font-size:11px;color:#787c99;background:#16161e;
+    border-top:1px solid #0f0f14;font-variant-numeric:tabular-nums;}
+
+  gp-treemap { display:flex; flex:1; min-height:0; }
+</style>
+</head><body>
+<header><h1>Coffee-shop sales (toy) — gp-treemap</h1><span class="stat">37 nodes</span></header>
+<gp-treemap id="tm"
+  color-mode="categorical"
+  theme="tokyo-night"
+  palette="tokyo-night"
+  gradient-intensity="0.6"
+  
+  min-cell-area="20"></gp-treemap>
+<div id="status">loading…</div>
+<script src="../../dist/gp-treemap.bundle.js"></script>
+<script>
+  var t0 = performance.now();
+  var DATA = JSON.parse('{"ids":["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36"],"parents":["","0","1","2","2","2","2","1","7","7","7","1","11","11","0","14","15","15","15","14","19","19","19","14","23","23","0","26","27","27","27","26","31","31","26","34","34"],"labels":["All","Americas","Beverages","Espresso","Latte","Drip Coffee","Tea","Pastries","Croissant","Muffin","Scone","Sandwiches","Turkey","Caprese","EMEA","Beverages","Espresso","Cappuccino","Tea","Pastries","Croissant","Pain au Choc","Madeleine","Sandwiches","Jambon","Caprese","APAC","Beverages","Matcha","Bubble Tea","Drip Coffee","Pastries","Mochi","Egg Tart","Sandwiches","Katsu","Banh Mi"],"values":[0,0,0,820,940,610,230,0,410,330,180,0,520,310,0,0,1120,880,640,0,760,540,220,0,470,290,0,0,710,1180,340,0,450,520,0,390,610],"color":["root","Beverages","Beverages","Beverages","Beverages","Beverages","Beverages","Pastries","Pastries","Pastries","Pastries","Sandwiches","Sandwiches","Sandwiches","Beverages","Beverages","Beverages","Beverages","Beverages","Pastries","Pastries","Pastries","Pastries","Sandwiches","Sandwiches","Sandwiches","Beverages","Beverages","Beverages","Beverages","Beverages","Pastries","Pastries","Pastries","Sandwiches","Sandwiches","Sandwiches"],"isBytes":false}');
+  var COLOR_MAP = null;
+  var statusEl = document.getElementById('status');
+  var tm = document.getElementById('tm');
+  tm.toolbar = { controls: false }; // hide depth/labels; keep breadcrumb
+  tm.ids = DATA.ids;
+  tm.labels = DATA.labels;
+  tm.parents = DATA.parents;
+  tm.values = DATA.values;
+  tm.color = DATA.color;
+  if (COLOR_MAP) tm.colorMap = COLOR_MAP;
+  if (!DATA.isBytes) {
+    tm.valueFormatter = function (v) { return (v == null) ? '' : Math.round(v).toLocaleString(); };
+  }
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      var dt = +(performance.now() - t0).toFixed(0);
+      statusEl.textContent = 'rendered in ' + dt.toLocaleString() + ' ms';
+      try { window.parent.postMessage({ type: 'render-time', tool: "gptm-toy", ms: dt }, '*'); } catch (_) {}
+    });
+  });
+</script></body></html>
