@@ -368,12 +368,13 @@ test('show-ancestors: nested labels stack downward when upper-left corners colli
   expect(r.tops.InnerAncestorLabel).toBeLessThan(r.tops.leaf);
 });
 
-test('show-ancestors: disabled by default — no overlay added', async ({ page }) => {
+test('show-ancestors: opt-out via show-ancestors="false" removes the overlay', async ({ page }) => {
   await page.goto('/tests/unit-fixture.html');
   await page.evaluate(() => {
     const tm = document.createElement('gp-treemap');
     tm.id = 'tm';
     tm.style.cssText = 'width:600px; height:400px;';
+    tm.setAttribute('show-ancestors', 'false');
     document.body.appendChild(tm);
     tm.ids     = ['root','A','x'];
     tm.labels  = ['root','A','x'];

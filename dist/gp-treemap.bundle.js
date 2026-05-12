@@ -1364,7 +1364,7 @@ const DEFAULT_PROPS = {
   colorMap: {}, colorFn: null,
   palette: 'tokyo-night', gradientIntensity: 0.5,
   visibleRootId: null, displayDepth: Infinity, locatedNodeIds: [],
-  minCellArea: 16, showLabels: true, showAncestors: false, groupPadding: 0,
+  minCellArea: 16, showLabels: true, showAncestors: true, groupPadding: 0,
   valueFormat: null, valueFormatter: null,
   toolbar: true, zoomDuration: 350, tooltip: true, tooltipInToolbar: true,
   background: '#111',
@@ -2669,8 +2669,8 @@ class GpTreemap extends HTMLElement {
     if (p.palette && p.palette !== theme) state.palette = p.palette;
     // Labels are on by default now — only record an explicit off.
     if (!p.showLabels) state.showLabels = false;
-    // Ancestor highlight is off by default; record only an explicit on.
-    if (p.showAncestors) state.showAncestors = true;
+    // Ancestor highlight is on by default; record only an explicit off.
+    if (!p.showAncestors) state.showAncestors = false;
     return state;
   }
   set viewerState(obj) {
