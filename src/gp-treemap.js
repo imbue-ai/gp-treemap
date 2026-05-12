@@ -32,7 +32,7 @@ const DEFAULT_PROPS = {
   colorMap: {}, colorFn: null,
   palette: 'tokyo-night', gradientIntensity: 0.5,
   visibleRootId: null, displayDepth: Infinity, locatedNodeIds: [],
-  minCellArea: 16, showLabels: true, groupPadding: 0,
+  minCellArea: 16, showLabels: true, showAncestors: false, groupPadding: 0,
   valueFormat: null, valueFormatter: null,
   toolbar: true, zoomDuration: 350, tooltip: true, tooltipInToolbar: true,
   background: '#111',
@@ -79,9 +79,16 @@ const STYLE = `
 .stage canvas { position:absolute; inset: var(--gp-stage-margin, 4px); width:calc(100% - 2 * var(--gp-stage-margin, 4px)); height:calc(100% - 2 * var(--gp-stage-margin, 4px)); display:block; image-rendering: pixelated;
   transform-origin: 0 0; transition: transform var(--gp-zoom-ms, 350ms) ease; }
 .overlay { position:absolute; inset: var(--gp-stage-margin, 4px); pointer-events:none; transform-origin:0 0; overflow:visible; }
-.overlay .sel, .overlay .loc { position:absolute; box-sizing:border-box; pointer-events:none; }
+.overlay .sel, .overlay .loc, .overlay .anc { position:absolute; box-sizing:border-box; pointer-events:none; }
 .overlay .sel { border:2px solid var(--gp-selected); box-sizing:border-box; }
 .overlay .loc { border:2px solid var(--gp-located); box-shadow: 0 0 0 1px #fff8; }
+.overlay .anc { border:2px solid rgba(255,255,255,0.45); }
+.overlay .anc-lbl { position:absolute; pointer-events:none;
+  font-size:11px; font-weight:600; line-height:1.2;
+  color:#fff; padding:1px 5px; border-radius:3px;
+  background: rgba(0,0,0,0.32);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .overlay .lbl { position:absolute; font-size:10px; font-weight:500; line-height:1.15; padding:1px 3px;
   color: var(--gp-fg, #111);
   text-shadow: 0 0 2px var(--gp-bg, #ffffffcc), 0 0 2px var(--gp-bg, #ffffffcc);
@@ -103,7 +110,7 @@ export class GpTreemap extends HTMLElement {
   static get observedAttributes() {
     return [
       'color-mode','color-scale','palette','gradient-intensity','visible-root-id',
-      'display-depth','min-cell-area','show-labels','value-format','toolbar',
+      'display-depth','min-cell-area','show-labels','show-ancestors','value-format','toolbar',
       'zoom-duration','tooltip','background','group-padding','theme',
     ];
   }
@@ -227,6 +234,7 @@ export class GpTreemap extends HTMLElement {
       case 'display-depth': this._props.displayDepth = val == null ? Infinity : Number(val); break;
       case 'min-cell-area': this._props.minCellArea = Number(val); break;
       case 'show-labels': this._props.showLabels = val != null && val !== 'false'; break;
+      case 'show-ancestors': this._props.showAncestors = val != null && val !== 'false'; break;
       case 'value-format': this._props.valueFormat = val; break;
       case 'toolbar': this._props.toolbar = val === 'false' ? false : (val || true); break;
       case 'zoom-duration': this._props.zoomDuration = Number(val); break;
@@ -640,7 +648,22 @@ export class GpTreemap extends HTMLElement {
         if (nd._item != null) nd.colorValue = p.getColor(nd._item);
       }
     }
-    resolveColors(subtree, p.colorMode, {
+    // [Level 1] color mode: hash each visible node by the id of its top-most
+    // ancestor under the current zoom root, so the directly-visible children
+    // of the zoom root all get distinct colors and their descendants inherit.
+    let effectiveColorMode = p.colorMode;
+    if (p.colorMode === 'level1') {
+      for (const nd of subtree) {
+        let cur = nd;
+        while (cur && cur.id !== rootId && cur.parentId != null && cur.parentId !== rootId) {
+          cur = nodes.get(cur.parentId);
+          if (!cur) break;
+        }
+        nd.colorValue = cur ? cur.id : nd.id;
+      }
+      effectiveColorMode = 'categorical';
+    }
+    resolveColors(subtree, effectiveColorMode, {
       palette,
       colorScale: p.colorScale,
       colorDomain: p.colorDomain,
@@ -706,6 +729,9 @@ export class GpTreemap extends HTMLElement {
       }
     }
     const focusId = this._focusId != null ? this._focusId : this._targetId;
+    // Ancestor highlight overlay: render BEFORE the focused-cell .sel box so
+    // the white selection outline paints on top of the dimmer ancestor frames.
+    if (p.showAncestors) this._renderAncestorOverlay(dpr, focusId);
     if (focusId != null) {
       const bounds = this._selectionBounds(focusId);
       if (bounds) this._overlay.appendChild(overlayBox('sel', bounds, dpr));
@@ -731,6 +757,111 @@ export class GpTreemap extends HTMLElement {
         el.textContent = this._pathFromVisibleRoot(l.id, visRoot);
         this._overlay.appendChild(el);
       }
+    }
+  }
+
+  // Highlights every cell along the hover- and target-to-root chains with a
+  // dimmer outline + corner label. The focused cell itself keeps its bright
+  // `.sel` box (drawn separately by the caller). Labels stack downward when
+  // two ancestors have upper-left corners close enough that a nested label
+  // would overlap its container's label.
+  _renderAncestorOverlay(dpr, focusId) {
+    if (!this._tree || !this._nodeRects) return;
+    const nodes = this._tree.nodes;
+    const visRoot = this._activeVisibleRootId() ?? this._tree.roots[0];
+
+    // Anchors: the hovered cell (live) and the clicked target (sticky).
+    // The focus may sit anywhere along the target→root chain after wheel-up,
+    // so walking from `target` covers every cell the user might want to see
+    // (focused level + deeper cells the user has scrolled past + shallower
+    // ancestors above it).
+    const anchors = [];
+    if (this._hoverId != null) anchors.push(this._hoverId);
+    if (this._targetId != null && this._targetId !== this._hoverId) anchors.push(this._targetId);
+    if (anchors.length === 0) return;
+
+    const seen = new Set();
+    const chain = []; // entries: { id, depth }
+    for (const a of anchors) {
+      let cur = nodes.get(a);
+      while (cur && cur.id !== visRoot) {
+        if (!seen.has(cur.id)) {
+          seen.add(cur.id);
+          chain.push({ id: cur.id, depth: cur.depth });
+        }
+        if (cur.parentId == null) break;
+        cur = nodes.get(cur.parentId);
+      }
+    }
+    // Shallowest first so outer labels claim the upper-left slot before
+    // inner labels stack underneath them.
+    chain.sort((a, b) => a.depth - b.depth);
+
+    const placedLabels = []; // CSS-pixel rects of labels already positioned
+
+    for (const { id } of chain) {
+      const rect = this._nodeRects.get(id);
+      if (!rect) continue;
+      const x = rect.x / dpr, y = rect.y / dpr;
+      const w = rect.w / dpr, h = rect.h / dpr;
+      if (w < 6 || h < 6) continue;
+
+      // Outline. Skip if this cell is the currently focused one — its bright
+      // `.sel` border will be drawn on top by the caller. We still draw its
+      // label below so the user can read which level they're focused on.
+      if (id !== focusId) {
+        const box = document.createElement('div');
+        box.className = 'anc';
+        box.style.left = x + 'px';
+        box.style.top = y + 'px';
+        box.style.width = w + 'px';
+        box.style.height = h + 'px';
+        this._overlay.appendChild(box);
+      }
+
+      // Corner label, placed in the upper-left of the cell. If another label
+      // already occupies that spot (an outer ancestor's label), push this one
+      // straight down until it clears every previously-placed label.
+      const node = nodes.get(id);
+      if (!node) continue;
+      const padX = 3, padY = 3;
+      const lbl = document.createElement('div');
+      lbl.className = 'anc-lbl';
+      lbl.textContent = node.label != null ? String(node.label) : String(id);
+      // Hidden until positioned so we don't flash an unplaced label at (0,0).
+      lbl.style.visibility = 'hidden';
+      lbl.style.left = (x + padX) + 'px';
+      lbl.style.top = (y + padY) + 'px';
+      // Cap width to the cell so long labels ellipsize rather than spill.
+      lbl.style.maxWidth = Math.max(0, w - 2 * padX) + 'px';
+      this._overlay.appendChild(lbl);
+      const lw = lbl.offsetWidth;
+      const lh = lbl.offsetHeight;
+
+      let top = y + padY;
+      const left = x + padX;
+      const right = left + lw;
+      // Push past any already-placed label whose rect intersects the
+      // candidate. Pure-vertical push (per spec): "keep pushing downwards
+      // underneath the text that has already been drawn".
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        let bumped = false;
+        for (const pr of placedLabels) {
+          const horizOverlap = left < pr.right && right > pr.left;
+          const vertOverlap = top < pr.bottom && (top + lh) > pr.top;
+          if (horizOverlap && vertOverlap) {
+            top = pr.bottom + 2;
+            bumped = true;
+          }
+        }
+        if (!bumped) break;
+      }
+      // Drop the label entirely if it no longer fits inside its cell.
+      if (top + lh > y + h - 1) { lbl.remove(); continue; }
+      lbl.style.top = top + 'px';
+      lbl.style.visibility = '';
+      placedLabels.push({ left, top, right, bottom: top + lh });
     }
   }
 
@@ -774,9 +905,18 @@ export class GpTreemap extends HTMLElement {
     const labelsText = document.createTextNode('Labels');
     labelsGroup.append(labelsCb, labelsText);
 
-    this._toolbar.append(depthGroup, labelsGroup);
+    const ancestorsGroup = document.createElement('label');
+    ancestorsGroup.className = 'group';
+    ancestorsGroup.title = 'Outline + label every ancestor of the hovered and focused cells';
+    const ancestorsCb = document.createElement('input');
+    ancestorsCb.type = 'checkbox';
+    const ancestorsText = document.createTextNode('Ancestors');
+    ancestorsGroup.append(ancestorsCb, ancestorsText);
+
+    this._toolbar.append(depthGroup, labelsGroup, ancestorsGroup);
     this._depthInput = depthInput;
     this._labelsCb = labelsCb;
+    this._ancestorsCb = ancestorsCb;
 
     const setDepth = (d) => {
       this._props.displayDepth = (d === Infinity || d == null) ? Infinity : Math.max(0, Number(d) | 0);
@@ -818,6 +958,13 @@ export class GpTreemap extends HTMLElement {
       else this.removeAttribute('show-labels');
       this._queueRender();
     });
+
+    ancestorsCb.addEventListener('change', () => {
+      this._props.showAncestors = !!ancestorsCb.checked;
+      if (ancestorsCb.checked) this.setAttribute('show-ancestors', 'true');
+      else this.removeAttribute('show-ancestors');
+      this._queueRender();
+    });
   }
 
   // How many levels below the current visible root have at least one cell
@@ -846,6 +993,7 @@ export class GpTreemap extends HTMLElement {
       }
     }
     if (this._labelsCb) this._labelsCb.checked = !!this._props.showLabels;
+    if (this._ancestorsCb) this._ancestorsCb.checked = !!this._props.showAncestors;
   }
 
   _renderToolbar() {
@@ -983,6 +1131,12 @@ export class GpTreemap extends HTMLElement {
   _setHover(id) {
     if (this._hoverId === id) return;
     this._hoverId = id;
+    // Re-render the overlay so the ancestor outlines + labels track the
+    // mouse. Cheap — overlay rebuild is DOM-only, no canvas repaint.
+    if (this._props.showAncestors && this._nodeRects) {
+      const { cssW, cssH, dpr } = this._canvasMetrics();
+      this._renderOverlay(cssW, cssH, dpr);
+    }
   }
   _onClick(e) {
     const id = this._hitTest(e);
@@ -1163,6 +1317,8 @@ export class GpTreemap extends HTMLElement {
     if (p.palette && p.palette !== theme) state.palette = p.palette;
     // Labels are on by default now — only record an explicit off.
     if (!p.showLabels) state.showLabels = false;
+    // Ancestor highlight is off by default; record only an explicit on.
+    if (p.showAncestors) state.showAncestors = true;
     return state;
   }
   set viewerState(obj) {
@@ -1176,6 +1332,11 @@ export class GpTreemap extends HTMLElement {
       this._props.showLabels = !!obj.showLabels;
       if (obj.showLabels) this.setAttribute('show-labels', 'true');
       else this.removeAttribute('show-labels');
+    }
+    if ('showAncestors' in obj) {
+      this._props.showAncestors = !!obj.showAncestors;
+      if (obj.showAncestors) this.setAttribute('show-ancestors', 'true');
+      else this.removeAttribute('show-ancestors');
     }
     if ('depth' in obj) {
       const d = obj.depth;

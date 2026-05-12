@@ -223,8 +223,9 @@
     tm.getLabel = getLabel;
     tm.getColor = getColor;
 
-    var isCat = categoricalModes.indexOf(currentColorMode) >= 0;
-    tm.setAttribute('color-mode', isCat ? 'categorical' : 'quantitative');
+    var isLevel1 = currentColorMode === '[Level 1]';
+    var isCat = isLevel1 || categoricalModes.indexOf(currentColorMode) >= 0;
+    tm.setAttribute('color-mode', isLevel1 ? 'level1' : (isCat ? 'categorical' : 'quantitative'));
 
     window._store = store;
     window._currentColorMode = currentColorMode;
@@ -232,12 +233,19 @@
     window._applyColorBy = function (mode) {
       currentColorMode = mode;
       window._currentColorMode = mode;
-      var cat = categoricalModes.indexOf(mode) >= 0;
-      var newMap = cat ? (catColorMaps[mode] || {}) : {};
+      var isLevel1 = mode === '[Level 1]';
+      var cat = isLevel1 || categoricalModes.indexOf(mode) >= 0;
+      var newMap = (cat && !isLevel1) ? (catColorMaps[mode] || {}) : {};
       tm._props._userColorMap = newMap;
       tm.colorMap = tm.getAttribute('theme') ? {} : newMap;
       var paletteOverride = window._currentPalette || '';
-      if (cat) {
+      if (isLevel1) {
+        tm.setAttribute('color-mode', 'level1');
+        var l1Pal = paletteOverride || CAT_PALETTE_DEFAULT;
+        tm._props._userPalette = l1Pal;
+        if (!tm.getAttribute('theme')) tm.setAttribute('palette', l1Pal);
+        tm.colorDomain = undefined;
+      } else if (cat) {
         tm.setAttribute('color-mode', 'categorical');
         var catPal = paletteOverride || CAT_PALETTE_DEFAULT;
         tm._props._userPalette = catPal;

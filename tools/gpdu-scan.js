@@ -428,6 +428,7 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
       <option value="ctime">created</option>
       <option value="mtime">modified</option>
       <option value="atime">accessed</option>
+      <option value="[Level 1]" title="Color by the topmost visible ancestor (re-applies on zoom)">[Level 1]</option>
     </select>
   </span>
   <span class="spacer"></span>

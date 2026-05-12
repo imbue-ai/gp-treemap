@@ -139,7 +139,7 @@ function pickDefaults(columns, info, flags) {
   if (!size || !numericNonNeg.includes(size)) size = numericNonNeg[0] || columns[0];
 
   let color = flags.color;
-  if (!color || !columns.includes(color)) color = numericNonNeg[0] || categorical[0] || columns[0];
+  if (!color || (color !== '[Level 1]' && !columns.includes(color))) color = '[Level 1]';
 
   let pathCols;
   if (flags.path) {
@@ -409,6 +409,9 @@ ${COPY_BTN_CSS}
       <li><b>Depth</b>: levels below the current zoom. <kbd>+</kbd>/<kbd>&minus;</kbd>
         or type a number; snaps to <b>&infin;</b> once you reach the deepest level.</li>
       <li><b>Labels</b>: draw each leaf's full path inside its cell when it fits.</li>
+      <li><b>Ancestors</b>: outline every parent rectangle of the hovered and
+        focused cells, with a label badge in each upper-left corner. Nested
+        labels stack downward when their corners would collide.</li>
     </ul>
     <h3>URL</h3>
     <p>All state (Size / Color / Path / zoom / theme / palette / depth &hellip;)
@@ -465,6 +468,13 @@ ${bundle}
     var o = document.createElement('option'); o.value = c; o.textContent = c;
     sizeSel.appendChild(o);
   });
+  (function addLevel1Option() {
+    var o = document.createElement('option');
+    o.value = '[Level 1]';
+    o.textContent = '[Level 1]';
+    o.title = 'Color by the topmost visible ancestor (re-applies on zoom)';
+    colorSel.appendChild(o);
+  })();
   ALL_COLS.forEach(function (c) {
     var o = document.createElement('option'); o.value = c; o.textContent = c;
     colorSel.appendChild(o);
@@ -588,9 +598,11 @@ ${bundle}
   }
   function colorIsNumeric() {
     if (!state.color) return false;
+    if (state.color === '[Level 1]') return false;
     var ci = colByName[state.color];
     return !!(ci && isNumericKind(ci.kind));
   }
+  function colorIsLevel1() { return state.color === '[Level 1]'; }
 
   function rebuild() {
     if (!envelope) return;
@@ -657,7 +669,8 @@ ${bundle}
     // Adjust color-mode + scale before setting data. For the diverging scale
     // we clip to the 2nd..98th percentile of aggregated color values so a
     // single outlier doesn't compress the useful range into one palette stop.
-    tm.setAttribute('color-mode', cIsNum ? 'quantitative' : 'categorical');
+    var isLevel1 = colorIsLevel1();
+    tm.setAttribute('color-mode', isLevel1 ? 'level1' : (cIsNum ? 'quantitative' : 'categorical'));
     if (cIsNum) {
       var cscale = state.colorScale || DEFAULTS.colorScale || 'linear';
       tm.setAttribute('color-scale', cscale);
@@ -823,7 +836,7 @@ ${bundle}
     var hadHash = readHash();
     // Validate size/color/path against available columns (fall back to defaults).
     if (NUMERIC_NONNEG.indexOf(state.size) < 0) state.size = DEFAULTS.size;
-    if (ALL_COLS.indexOf(state.color) < 0) state.color = DEFAULTS.color;
+    if (state.color !== '[Level 1]' && ALL_COLS.indexOf(state.color) < 0) state.color = DEFAULTS.color;
     state.path = state.path.filter(function (c) { return ALL_COLS.indexOf(c) >= 0; });
     if (state.path.length === 0) state.path = DEFAULTS.path.slice();
 

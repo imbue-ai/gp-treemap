@@ -208,6 +208,192 @@ test('breadcrumb: clicking a parent draws the focus overlay (parentIndices/integ
   expect(r.breadcrumbFocused).toBe(true);
 });
 
+// [Level 1] color mode: every leaf inherits its top-most-ancestor's color
+// hash (relative to the current zoom root), so direct children of the zoom
+// root get distinct colors and their descendants share with their parent.
+test('color-mode level1: descendants share color with their top-level ancestor', async ({ page }) => {
+  await page.goto('/tests/unit-fixture.html');
+  const r = await page.evaluate(() => {
+    const { fnv1a } = window.__mods;
+    const tm = document.createElement('gp-treemap');
+    tm.id = 'tm';
+    tm.style.cssText = 'display:block; width:600px; height:400px;';
+    tm.setAttribute('color-mode', 'level1');
+    document.body.appendChild(tm);
+    // root → A,B; A → a1,a2; B → b1,b2
+    tm.ids     = ['root','A','B','a1','a2','b1','b2'];
+    tm.labels  = ['root','A','B','a1','a2','b1','b2'];
+    tm.parents = ['','root','root','A','A','B','B'];
+    tm.values  = [0, 0, 0, 10, 20, 15, 25];
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const get = (id) => tm._tree.nodes.get(id).colorIndex;
+        resolve({
+          aHash: fnv1a('A') % 8,
+          bHash: fnv1a('B') % 8,
+          A: get('A'), B: get('B'),
+          a1: get('a1'), a2: get('a2'),
+          b1: get('b1'), b2: get('b2'),
+        });
+      }));
+    });
+  });
+  // A and its descendants share one color; B and its descendants share another.
+  expect(r.A).toBe(r.a1);
+  expect(r.A).toBe(r.a2);
+  expect(r.B).toBe(r.b1);
+  expect(r.B).toBe(r.b2);
+  // Top-level ancestors get distinct colors (different hashes here).
+  expect(r.A).not.toBe(r.B);
+});
+
+// Re-colors on zoom: when zoomed into a subtree, the level-1 hash is computed
+// relative to the *new* zoom root, so each direct child of that root becomes
+// its own color group.
+test('color-mode level1: recolors relative to the current zoom root', async ({ page }) => {
+  await page.goto('/tests/unit-fixture.html');
+  const r = await page.evaluate(() => {
+    const tm = document.createElement('gp-treemap');
+    tm.id = 'tm';
+    tm.style.cssText = 'display:block; width:600px; height:400px;';
+    tm.setAttribute('color-mode', 'level1');
+    document.body.appendChild(tm);
+    // root → A,B; A → a1,a2; a1 → x,y; a2 → p,q
+    tm.ids     = ['root','A','B','a1','a2','x','y','p','q'];
+    tm.labels  = ['root','A','B','a1','a2','x','y','p','q'];
+    tm.parents = ['','root','root','A','A','a1','a1','a2','a2'];
+    tm.values  = [0, 0, 0, 0, 0, 10, 20, 15, 25];
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        // Zoom into A: a1 and a2 are now the top-level children.
+        tm.visibleRootId = 'A';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          const get = (id) => tm._tree.nodes.get(id).colorIndex;
+          resolve({
+            a1: get('a1'), a2: get('a2'),
+            x: get('x'), y: get('y'),
+            p: get('p'), q: get('q'),
+          });
+        }));
+      }));
+    });
+  });
+  // After zooming to A, a1 and a2 become the top-level groups.
+  expect(r.x).toBe(r.a1);
+  expect(r.y).toBe(r.a1);
+  expect(r.p).toBe(r.a2);
+  expect(r.q).toBe(r.a2);
+  expect(r.a1).not.toBe(r.a2);
+});
+
+// Ancestor highlighting: when enabled, every cell along the target→root chain
+// gets a dim outline + corner label, and the focused cell keeps its bright
+// .sel outline. Labels stack vertically when an inner ancestor's natural
+// upper-left position collides with an outer ancestor's label.
+test('show-ancestors: outlines + corner labels along target→root chain', async ({ page }) => {
+  await page.goto('/tests/unit-fixture.html');
+  await page.evaluate(() => {
+    const tm = document.createElement('gp-treemap');
+    tm.id = 'tm';
+    tm.style.cssText = 'width:600px; height:400px;';
+    tm.setAttribute('show-ancestors', 'true');
+    document.body.appendChild(tm);
+    // root -> A -> a1 -> x ; root -> B -> b1
+    tm.ids     = ['root','A','B','a1','x','b1'];
+    tm.labels  = ['root','A','B','a1','x','b1'];
+    tm.parents = ['','root','root','A','a1','B'];
+    tm.values  = [0, 0, 0, 0, 100, 50];
+  });
+  await page.waitForFunction(() => {
+    const tm = document.getElementById('tm');
+    return tm && tm._nodeRects && tm._nodeRects.size > 0;
+  });
+  const r = await page.evaluate(() => {
+    const tm = document.getElementById('tm');
+    tm._targetId = 'x'; tm._focusId = 'x';
+    const { cssW, cssH, dpr } = tm._canvasMetrics();
+    tm._renderOverlay(cssW, cssH, dpr);
+    const ancBoxes = tm.shadowRoot.querySelectorAll('.overlay .anc');
+    const ancLbls = tm.shadowRoot.querySelectorAll('.overlay .anc-lbl');
+    const lblTexts = Array.from(ancLbls).map((el) => el.textContent);
+    const selBox = tm.shadowRoot.querySelector('.overlay .sel');
+    return {
+      ancBoxCount: ancBoxes.length,
+      ancLblCount: ancLbls.length,
+      lblTexts,
+      hasFocusedSel: !!selBox,
+    };
+  });
+  // Target→root (exclusive) chain for 'x' = [x, a1, A]. Focused cell 'x' gets
+  // the white .sel and skips the dim .anc box but still gets its corner label.
+  expect(r.ancBoxCount).toBe(2);  // a1 and A
+  expect(r.ancLblCount).toBe(3);  // x, a1, A
+  expect(r.lblTexts).toEqual(expect.arrayContaining(['x', 'a1', 'A']));
+  expect(r.hasFocusedSel).toBe(true);
+});
+
+test('show-ancestors: nested labels stack downward when upper-left corners collide', async ({ page }) => {
+  await page.goto('/tests/unit-fixture.html');
+  await page.evaluate(() => {
+    const tm = document.createElement('gp-treemap');
+    tm.id = 'tm';
+    tm.style.cssText = 'width:600px; height:400px;';
+    tm.setAttribute('show-ancestors', 'true');
+    document.body.appendChild(tm);
+    // Three deeply-nested ancestors that share the upper-left corner.
+    tm.ids     = ['root','outer','mid','inner','leaf'];
+    tm.labels  = ['root','OuterAncestorLabel','MiddleAncestorLabel','InnerAncestorLabel','leaf'];
+    tm.parents = ['','root','outer','mid','inner'];
+    tm.values  = [0, 0, 0, 0, 100];
+  });
+  await page.waitForFunction(() => {
+    const tm = document.getElementById('tm');
+    return tm && tm._nodeRects && tm._nodeRects.size > 0;
+  });
+  const r = await page.evaluate(() => {
+    const tm = document.getElementById('tm');
+    tm._targetId = 'leaf'; tm._focusId = 'leaf';
+    const { cssW, cssH, dpr } = tm._canvasMetrics();
+    tm._renderOverlay(cssW, cssH, dpr);
+    const lbls = Array.from(tm.shadowRoot.querySelectorAll('.overlay .anc-lbl'));
+    const tops = {};
+    for (const l of lbls) tops[l.textContent] = parseFloat(l.style.top);
+    return { tops, count: lbls.length };
+  });
+  // With all four cells sharing the same upper-left, labels must stack
+  // strictly downward in outer-to-inner order. Outer < Middle < Inner < leaf.
+  expect(r.count).toBe(4);
+  expect(r.tops.OuterAncestorLabel).toBeLessThan(r.tops.MiddleAncestorLabel);
+  expect(r.tops.MiddleAncestorLabel).toBeLessThan(r.tops.InnerAncestorLabel);
+  expect(r.tops.InnerAncestorLabel).toBeLessThan(r.tops.leaf);
+});
+
+test('show-ancestors: disabled by default — no overlay added', async ({ page }) => {
+  await page.goto('/tests/unit-fixture.html');
+  await page.evaluate(() => {
+    const tm = document.createElement('gp-treemap');
+    tm.id = 'tm';
+    tm.style.cssText = 'width:600px; height:400px;';
+    document.body.appendChild(tm);
+    tm.ids     = ['root','A','x'];
+    tm.labels  = ['root','A','x'];
+    tm.parents = ['','root','A'];
+    tm.values  = [0, 0, 100];
+  });
+  await page.waitForFunction(() => {
+    const tm = document.getElementById('tm');
+    return tm && tm._nodeRects && tm._nodeRects.size > 0;
+  });
+  const count = await page.evaluate(() => {
+    const tm = document.getElementById('tm');
+    tm._targetId = 'x'; tm._focusId = 'x';
+    const { cssW, cssH, dpr } = tm._canvasMetrics();
+    tm._renderOverlay(cssW, cssH, dpr);
+    return tm.shadowRoot.querySelectorAll('.overlay .anc, .overlay .anc-lbl').length;
+  });
+  expect(count).toBe(0);
+});
+
 test('_coerceTreeId: prefers the type the tree actually uses', async ({ page }) => {
   await mountGptmStrings(page);
   const stringCase = await page.locator('gp-treemap').evaluate((tm) => ({
