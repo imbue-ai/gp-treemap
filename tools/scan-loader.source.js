@@ -427,6 +427,8 @@
     tm.addEventListener('gp-depth-change', writeHash);
     tm.addEventListener('gp-target', writeHash);
     tm.addEventListener('gp-focus', writeHash);
+    tm.addEventListener('gp-labels-change', writeHash);
+    tm.addEventListener('gp-ancestors-change', writeHash);
 
     // Expose for tool-side hooks.
     window._applyPageTheme = applyPageTheme;

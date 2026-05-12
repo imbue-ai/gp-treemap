@@ -804,6 +804,8 @@ ${bundle}
   tm.addEventListener('gp-target', writeHash);
   tm.addEventListener('gp-focus', writeHash);
   tm.addEventListener('gp-depth-change', writeHash);
+  tm.addEventListener('gp-labels-change', writeHash);
+  tm.addEventListener('gp-ancestors-change', writeHash);
 
   // ---- Boot: inflate envelope, set controls, render. ----
   var raw = document.getElementById('tmdata').textContent;

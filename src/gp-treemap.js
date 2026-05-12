@@ -88,7 +88,8 @@ const STYLE = `
   color:#fff; padding:1px 5px; border-radius:3px;
   background: rgba(0,0,0,0.32);
   -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  z-index: 2; }
 .overlay .lbl { position:absolute; font-size:10px; font-weight:500; line-height:1.15; padding:1px 3px;
   color: var(--gp-fg, #111);
   text-shadow: 0 0 2px var(--gp-bg, #ffffffcc), 0 0 2px var(--gp-bg, #ffffffcc);
@@ -957,6 +958,9 @@ export class GpTreemap extends HTMLElement {
       if (labelsCb.checked) this.setAttribute('show-labels', 'true');
       else this.removeAttribute('show-labels');
       this._queueRender();
+      this.dispatchEvent(new CustomEvent('gp-labels-change', {
+        detail: { showLabels: this._props.showLabels }, bubbles: true, composed: true,
+      }));
     });
 
     ancestorsCb.addEventListener('change', () => {
@@ -964,6 +968,9 @@ export class GpTreemap extends HTMLElement {
       if (ancestorsCb.checked) this.setAttribute('show-ancestors', 'true');
       else this.removeAttribute('show-ancestors');
       this._queueRender();
+      this.dispatchEvent(new CustomEvent('gp-ancestors-change', {
+        detail: { showAncestors: this._props.showAncestors }, bubbles: true, composed: true,
+      }));
     });
   }
 
