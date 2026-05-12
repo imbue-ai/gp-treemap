@@ -2433,17 +2433,38 @@ class GpTreemap extends HTMLElement {
 
   // ----- hit testing / interactions -----
   _hitTest(e) {
+    if (!this._leaves || this._leaves.length === 0) return null;
     const canvasRect = this._canvas.getBoundingClientRect();
     const cssX = e.clientX - canvasRect.left;
     const cssY = e.clientY - canvasRect.top;
     const dpr = this._canvas.width / canvasRect.width;
-    const px = cssX * dpr;
-    const py = cssY * dpr;
-    // linear scan; cells are not overlapping so first hit wins
+    let px = cssX * dpr;
+    let py = cssY * dpr;
+    // Clamp to canvas bounds so the 4px stage margin around the canvas and
+    // the right/bottom edge (where `px < l.x + l.w` flips at integer pixels)
+    // still resolve to a leaf.
+    const W = this._canvas.width;
+    const H = this._canvas.height;
+    if (px < 0) px = 0; else if (px > W - 1) px = W - 1;
+    if (py < 0) py = 0; else if (py > H - 1) py = H - 1;
+    // First pass: exact containment. Cells don't overlap so first hit wins.
     for (const l of this._leaves) {
       if (px >= l.x && px < l.x + l.w && py >= l.y && py < l.y + l.h) return l.id;
     }
-    return null;
+    // Fallback: nearest leaf by squared rect distance. With thousands of
+    // tightly-packed sub-pixel cells, float-rounded seams between adjacent
+    // leaves can leave the cursor in a hairline gap that the exact pass
+    // misses; falling back to "closest cell" means the user never has to
+    // wiggle the mouse to register a hover.
+    let bestId = null, bestDist = Infinity;
+    for (const l of this._leaves) {
+      const right = l.x + l.w, bottom = l.y + l.h;
+      const dx = px < l.x ? (l.x - px) : (px > right ? (px - right) : 0);
+      const dy = py < l.y ? (l.y - py) : (py > bottom ? (py - bottom) : 0);
+      const d = dx * dx + dy * dy;
+      if (d < bestDist) { bestDist = d; bestId = l.id; if (d === 0) break; }
+    }
+    return bestId;
   }
 
   _onStageMouse(e) {

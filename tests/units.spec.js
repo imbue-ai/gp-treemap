@@ -394,6 +394,72 @@ test('show-ancestors: disabled by default — no overlay added', async ({ page }
   expect(count).toBe(0);
 });
 
+// Hit-detection must always resolve to a cell when the cursor is inside the
+// canvas, even with thousands of tightly-packed sub-pixel cells where adjacent
+// leaves can have float-rounded seams that linear scan misses. The user
+// shouldn't have to wiggle the mouse to register a hover.
+test('hit-test: every pixel inside the canvas resolves to a cell (dense tree)', async ({ page }) => {
+  await page.goto('/tests/unit-fixture.html');
+  await page.evaluate(() => {
+    const tm = document.createElement('gp-treemap');
+    tm.id = 'tm';
+    tm.style.cssText = 'width:300px; height:200px;';
+    document.body.appendChild(tm);
+    // 5000 leaves in a flat tree with varied sizes — typical worst case for
+    // hover misses (lots of tiny cells, many shared boundaries).
+    const N = 5000;
+    const labels = ['root'];
+    const parents = [''];
+    const values = [0];
+    const ids = ['root'];
+    for (let i = 0; i < N; i++) {
+      labels.push('n' + i);
+      parents.push('root');
+      values.push(1 + (i % 17));
+      ids.push('n' + i);
+    }
+    tm.labels = labels; tm.parents = parents; tm.values = values; tm.ids = ids;
+  });
+  await page.waitForFunction(() => {
+    const tm = document.getElementById('tm');
+    return tm && tm._leaves && tm._leaves.length > 100;
+  });
+  const result = await page.evaluate(() => {
+    const tm = document.getElementById('tm');
+    const canvasRect = tm._canvas.getBoundingClientRect();
+    let misses = 0;
+    let total = 0;
+    // Sample on a 4px grid across the entire canvas surface.
+    for (let cy = 0; cy < canvasRect.height; cy += 4) {
+      for (let cx = 0; cx < canvasRect.width; cx += 4) {
+        total++;
+        const fake = { clientX: canvasRect.left + cx + 0.5, clientY: canvasRect.top + cy + 0.5 };
+        if (tm._hitTest(fake) == null) misses++;
+      }
+    }
+    // Also probe the corners and seams at sub-pixel positions where float
+    // rounding is most likely to expose gaps.
+    const probes = [];
+    for (const l of tm._leaves.slice(0, 200)) {
+      probes.push({ x: l.x, y: l.y });                          // top-left corner
+      probes.push({ x: l.x + l.w - 0.001, y: l.y });            // right edge
+      probes.push({ x: l.x, y: l.y + l.h - 0.001 });            // bottom edge
+    }
+    const dpr = tm._canvas.width / canvasRect.width;
+    let edgeMisses = 0;
+    for (const p of probes) {
+      const fake = {
+        clientX: canvasRect.left + p.x / dpr,
+        clientY: canvasRect.top + p.y / dpr,
+      };
+      total++;
+      if (tm._hitTest(fake) == null) { misses++; edgeMisses++; }
+    }
+    return { misses, edgeMisses, total };
+  });
+  expect(result.misses).toBe(0);
+});
+
 test('_coerceTreeId: prefers the type the tree actually uses', async ({ page }) => {
   await mountGptmStrings(page);
   const stringCase = await page.locator('gp-treemap').evaluate((tm) => ({
