@@ -140,7 +140,7 @@ async function main() {
     // rather than failing the whole invocation — the cache is a cold-
     // start optimization, never a correctness requirement.
     try {
-      saveScanJson(scanCachePath, scan, {
+      await saveScanJson(scanCachePath, scan, {
         type: 'directory',
         target,
         cliCommand: buildCliCommand('gpdu'),

@@ -254,7 +254,7 @@ async function main() {
     // failing the whole invocation.
     if (scan) {
       try {
-        saveScanJson(scanCachePath, scan, {
+        await saveScanJson(scanCachePath, scan, {
           type: 'llm-density',
           prompt: scanPrompt,
           modelLabel: scanModelLabel,

@@ -43,11 +43,60 @@ export function deriveScanCachePath(htmlPath) {
   return htmlPath.replace(/\.html?$/i, '') + '.scan.json.gz';
 }
 
-export function saveScanJson(filePath, scan, meta) {
-  const payload = { v: 1, type: meta.type || 'unknown', meta, scan };
-  const json = JSON.stringify(payload);
-  const compressed = zlib.gzipSync(json, { level: 6 });
-  fs.writeFileSync(filePath, compressed);
+// Streaming JSON+gzip writer. The whole stringified payload for a
+// many-million-node scan can exceed V8's ~512 MB single-string limit
+// ("Invalid string length"), so we emit the JSON in chunks via an async
+// generator → gzip → file pipeline. Big arrays are walked in fixed-size
+// slices and emitted as raw `,`-joined fragments inside their `[ ]`
+// brackets. Returns a promise; callers should `await`.
+export async function saveScanJson(filePath, scan, meta) {
+  const { pipeline } = await import('node:stream/promises');
+  const { Readable } = await import('node:stream');
+
+  const ARRAY_CHUNK = 100_000;   // ~100 K items per JSON.stringify call
+
+  async function* gen() {
+    yield '{"v":1,"type":';
+    yield JSON.stringify(meta.type || 'unknown');
+    yield ',"meta":';
+    yield JSON.stringify(meta);
+    yield ',"scan":';
+    yield* genValue(scan);
+    yield '}';
+  }
+  function* genValue(v) {
+    if (Array.isArray(v)) {
+      if (v.length === 0) { yield '[]'; return; }
+      yield '[';
+      for (let i = 0; i < v.length; i += ARRAY_CHUNK) {
+        if (i > 0) yield ',';
+        // Slice + stringify each chunk separately to keep each intermediate
+        // string well under the V8 limit. Strip the outer [ ] so we can
+        // splice fragments together inside one logical array.
+        const part = JSON.stringify(v.slice(i, i + ARRAY_CHUNK));
+        yield part.slice(1, -1);
+      }
+      yield ']';
+    } else if (v && typeof v === 'object') {
+      yield '{';
+      let first = true;
+      for (const [k, val] of Object.entries(v)) {
+        if (!first) yield ',';
+        first = false;
+        yield JSON.stringify(k) + ':';
+        yield* genValue(val);
+      }
+      yield '}';
+    } else {
+      yield JSON.stringify(v);
+    }
+  }
+
+  await pipeline(
+    Readable.from(gen()),
+    zlib.createGzip({ level: 6 }),
+    fs.createWriteStream(filePath),
+  );
 }
 
 export function loadScanJson(filePath) {
