@@ -54,19 +54,25 @@ test('scan produces correct tree structure for a known directory', () => {
   //     subB/
   //       nested/
   //         e.zip      500 B   → archive
+  // Per-test hermetic workspace. `src/` holds the directory tree the test
+  // scans; `out.html` (and its sibling `out.scan.json.gz` cache) live
+  // alongside it but outside the scan target, so the scan sees exactly
+  // the fixture files and nothing else.
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'treemap-fixture-'));
-  const out = path.join(os.tmpdir(), 'treemap-fixture-out.html');
+  const src = path.join(tmp, 'src');
+  fs.mkdirSync(src);
+  const out = path.join(tmp, 'out.html');
   try {
-    fs.writeFileSync(path.join(tmp, 'a.txt'), Buffer.alloc(100));
-    fs.writeFileSync(path.join(tmp, 'b.js'),  Buffer.alloc(200));
-    fs.mkdirSync(path.join(tmp, 'subA'));
-    fs.writeFileSync(path.join(tmp, 'subA', 'c.png'), Buffer.alloc(300));
-    fs.writeFileSync(path.join(tmp, 'subA', 'd.mp3'), Buffer.alloc(400));
-    fs.mkdirSync(path.join(tmp, 'subB'));
-    fs.mkdirSync(path.join(tmp, 'subB', 'nested'));
-    fs.writeFileSync(path.join(tmp, 'subB', 'nested', 'e.zip'), Buffer.alloc(500));
+    fs.writeFileSync(path.join(src, 'a.txt'), Buffer.alloc(100));
+    fs.writeFileSync(path.join(src, 'b.js'),  Buffer.alloc(200));
+    fs.mkdirSync(path.join(src, 'subA'));
+    fs.writeFileSync(path.join(src, 'subA', 'c.png'), Buffer.alloc(300));
+    fs.writeFileSync(path.join(src, 'subA', 'd.mp3'), Buffer.alloc(400));
+    fs.mkdirSync(path.join(src, 'subB'));
+    fs.mkdirSync(path.join(src, 'subB', 'nested'));
+    fs.writeFileSync(path.join(src, 'subB', 'nested', 'e.zip'), Buffer.alloc(500));
 
-    const res = runScan(tmp, out);
+    const res = runScan(src, out);
     expect(res.status, res.stderr).toBe(0);
 
     const { labels, values, parentIndices, color } = parseScanHtml(out);
@@ -80,7 +86,7 @@ test('scan produces correct tree structure for a known directory', () => {
     // --- root ---
     const rootRow = parentIndices.indexOf(-1);
     expect(rootRow).toBe(0);
-    expect(labels[rootRow]).toBe(path.basename(tmp));
+    expect(labels[rootRow]).toBe(path.basename(src));
 
     // helper: find the unique row with a given label
     const row = (name) => {
@@ -127,6 +133,62 @@ test('scan produces correct tree structure for a known directory', () => {
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
+
+// ---- Scan cache (.scan.json.gz) ----
+
+test('cache: first run writes <stem>.scan.json.gz; second run skips the walk', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'gpdu-scan-cache-'));
+  const dir = path.join(tmp, 'src');
+  fs.mkdirSync(dir, { recursive: true });
+  for (let i = 0; i < 5; i++) fs.writeFileSync(path.join(dir, 'f' + i + '.txt'), Buffer.alloc(100));
+  const out = path.join(tmp, 'out.html');
+  const cachePath = out.replace(/\.html$/, '.scan.json.gz');
+  try {
+    const r1 = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', dir, out], { encoding: 'utf8', timeout: 30000 });
+    expect(r1.status, r1.stderr).toBe(0);
+    expect(fs.existsSync(cachePath)).toBe(true);
+    expect(r1.stderr).toMatch(/saved scan/);
+
+    fs.rmSync(out);
+    const r2 = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', dir, out], { encoding: 'utf8', timeout: 30000 });
+    expect(r2.status, r2.stderr).toBe(0);
+    expect(r2.stderr).toMatch(/loading cached scan/);
+    expect(r2.stdout).toMatch(/cached/);
+    expect(fs.existsSync(out)).toBe(true);
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('cache: --scan-in renders HTML without a <dir> argument', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'gpdu-scan-cache-'));
+  const dir = path.join(tmp, 'src');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'only.txt'), Buffer.alloc(50));
+  const out1 = path.join(tmp, 'one.html');
+  const cachePath = out1.replace(/\.html$/, '.scan.json.gz');
+  const out2 = path.join(tmp, 'from-cache.html');
+  try {
+    spawnSync(process.execPath, [path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', dir, out1], { encoding: 'utf8', timeout: 30000 });
+    const r = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'gpdu-scan.js'), `--scan-in=${cachePath}`, '--no-open', out2], { encoding: 'utf8', timeout: 30000 });
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.stderr).toMatch(/loading cached scan/);
+    expect(fs.existsSync(out2)).toBe(true);
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('cache: --no-cache forces a fresh walk', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'gpdu-scan-cache-'));
+  const dir = path.join(tmp, 'src');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'f.txt'), Buffer.alloc(10));
+  const out = path.join(tmp, 'out.html');
+  try {
+    spawnSync(process.execPath, [path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', dir, out], { encoding: 'utf8', timeout: 30000 });
+    const r = spawnSync(process.execPath, [path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', '--no-cache', dir, out], { encoding: 'utf8', timeout: 30000 });
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.stderr).not.toMatch(/loading cached scan/);
+    expect(r.stderr).toMatch(/saved scan/);
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
 
 // Simple seeded PRNG (mulberry32) for repeatable random directory trees.
 function mulberry32(seed) {

@@ -5,17 +5,27 @@
 //
 // Usage:
 //   node tools/gpdu-scan.js [--no-open] [--color=...] [--workers=N]
-//                           [--block-size=N] <dir> [output.html]
+//                           [--block-size=N] [--no-cache]
+//                           [--scan-in=PATH] [--scan-out=PATH]
+//                           <dir> [output.html]
 //
 // Symlinks are not followed (we use lstat). Unreadable entries are counted
 // and skipped.
+//
+// Caching: every run writes a UI-independent scan JSON next to the HTML
+// output (default <stem>.scan.json.gz). If that file already exists the
+// directory walk is skipped and HTML is emitted from the cached scan,
+// so re-rendering against the same tree is essentially instant.
+// `--no-cache` forces a fresh walk; `--scan-in=PATH` renders from an
+// explicit cache without needing a `<dir>` argument.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import zlib from 'node:zlib';
 import { BUNDLE } from '../dist/gp-treemap.bundle.embed.js';
-import { partitionBlocks, encodeBlock, humanBytes, escapeHtml, LOADER_JS } from './scan-core.js';
+import { partitionBlocks, encodeBlock, humanBytes, escapeHtml, LOADER_JS,
+         deriveScanCachePath, saveScanJson, loadScanJson } from './scan-core.js';
 import { buildCliCommand, COPY_BTN_HTML, COPY_BTN_CSS, copyButtonScript } from './cli-command.js';
 
 const COLOR_MODES = ['extension', 'kind', 'folder', 'ctime', 'mtime', 'atime'];
@@ -28,11 +38,23 @@ async function main() {
   let colorBy = 'extension';
   let blockSize = 500000;
   let workers = 16;
+  let noCache = false;
+  let scanInPath = null;
+  let scanOutPath = null;
   const args = [];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--no-open') continue;
+    if (argv[i] === '--no-cache') { noCache = true; continue; }
     if (argv[i].startsWith('--block-size=')) { blockSize = Number(argv[i].split('=')[1]) || 500000; continue; }
     if (argv[i].startsWith('--workers=')) { workers = Math.max(1, Number(argv[i].split('=')[1]) || 16); continue; }
+    if (argv[i] === '--scan-in' || argv[i].startsWith('--scan-in=')) {
+      scanInPath = argv[i].includes('=') ? argv[i].split('=')[1] : argv[++i];
+      continue;
+    }
+    if (argv[i] === '--scan-out' || argv[i].startsWith('--scan-out=')) {
+      scanOutPath = argv[i].includes('=') ? argv[i].split('=')[1] : argv[++i];
+      continue;
+    }
     if (argv[i] === '--color' || argv[i] === '--color-by') {
       colorBy = argv[++i];
       if (!COLOR_MODES.includes(colorBy)) {
@@ -51,34 +73,103 @@ async function main() {
     }
     args.push(argv[i]);
   }
-  if (args.length < 1 || args[0] === '-h' || args[0] === '--help') {
-    console.error('Usage: node tools/gpdu-scan.js [--no-open] [--color=' + COLOR_MODES.join('|') + '] <dir> [output.html]');
-    process.exit(args[0] === '-h' || args[0] === '--help' ? 0 : 2);
+  if (args[0] === '-h' || args[0] === '--help') {
+    console.error('Usage: node tools/gpdu-scan.js [--no-open] [--color=' + COLOR_MODES.join('|') + ']\n' +
+      '                          [--no-cache] [--scan-in=PATH] [--scan-out=PATH]\n' +
+      '                          <dir> [output.html]');
+    process.exit(0);
   }
-  const target = path.resolve(args[0]);
-  const out = args[1]
-    ? path.resolve(args[1])
-    : path.join(os.tmpdir(), 'gpdu-scan-' + path.basename(target).replace(/[^a-zA-Z0-9._-]/g, '_') + '-' + Date.now() + '.html');
+  // `<dir>` is only required when we're not loading from an explicit scan
+  // cache. Output path may be the first positional if --scan-in was given.
+  let target = null;
+  let out;
+  if (scanInPath != null) {
+    out = args[0]
+      ? path.resolve(args[0])
+      : path.join(os.tmpdir(), 'gpdu-scan-from-cache-' + Date.now() + '.html');
+  } else {
+    if (args.length < 1) {
+      console.error('Usage: node tools/gpdu-scan.js [--no-open] [--color=' + COLOR_MODES.join('|') + ']\n' +
+        '                          [--no-cache] [--scan-in=PATH] [--scan-out=PATH]\n' +
+        '                          <dir> [output.html]');
+      process.exit(2);
+    }
+    target = path.resolve(args[0]);
+    out = args[1]
+      ? path.resolve(args[1])
+      : path.join(os.tmpdir(), 'gpdu-scan-' + path.basename(target).replace(/[^a-zA-Z0-9._-]/g, '_') + '-' + Date.now() + '.html');
+  }
 
-  let rootStat;
-  try { rootStat = fs.lstatSync(target); }
-  catch (e) { console.error('cannot stat ' + target + ': ' + e.message); process.exit(1); }
-  if (!rootStat.isDirectory()) {
-    console.error(target + ' is not a directory');
-    process.exit(1);
+  const scanCachePath = scanOutPath || scanInPath || deriveScanCachePath(out);
+  const explicitIn = scanInPath != null;
+  // Existence check is wrapped so a sandboxed environment without
+  // read-permission for the cache path (e.g. Deno's default deny) just
+  // falls through to a fresh walk instead of crashing.
+  let cacheExists = false;
+  try { cacheExists = fs.existsSync(scanCachePath); } catch (_) {}
+
+  let scan, scanTarget, elapsed, fromCache = false;
+  if (explicitIn || (cacheExists && !noCache)) {
+    if (!cacheExists) {
+      console.error('gpdu-scan: --scan-in path does not exist: ' + scanCachePath);
+      process.exit(1);
+    }
+    process.stderr.write('  loading cached scan: ' + scanCachePath + '\n');
+    const cached = loadScanJson(scanCachePath);
+    scan = cached.scan;
+    scanTarget = cached.meta.target || target || '(from cached scan)';
+    elapsed = cached.meta.scanMs || 0;
+    fromCache = true;
+  } else {
+    let rootStat;
+    try { rootStat = fs.lstatSync(target); }
+    catch (e) { console.error('cannot stat ' + target + ': ' + e.message); process.exit(1); }
+    if (!rootStat.isDirectory()) {
+      console.error(target + ' is not a directory');
+      process.exit(1);
+    }
+    const t0 = Date.now();
+    scan = await walk(target, workers);
+    elapsed = Date.now() - t0;
+    scanTarget = target;
+
+    // Persist the scan cache *before* writing HTML, so a crash during the
+    // HTML emit still leaves a usable cache for re-rendering. Wrapped in
+    // a try/catch so a sandboxed run that lacks write permission for the
+    // cache path (notably Deno's per-path sandbox) just skips caching
+    // rather than failing the whole invocation — the cache is a cold-
+    // start optimization, never a correctness requirement.
+    try {
+      saveScanJson(scanCachePath, scan, {
+        type: 'directory',
+        target,
+        cliCommand: buildCliCommand('gpdu'),
+        builtAt: new Date().toISOString(),
+        scanMs: elapsed,
+      });
+      process.stderr.write('  saved scan: ' + scanCachePath +
+        '  (' + humanBytes(fs.statSync(scanCachePath).size) + ' gz)\n');
+    } catch (e) {
+      // Quietly skip on permission errors (Deno per-path sandbox is the
+      // canonical case; the README's documented `deno run` command doesn't
+      // grant write access to the cache path). Other errors get surfaced.
+      if (/permission|access|EACCES|EPERM|NotCapable/i.test(String(e && (e.message || e)))) {
+        // silent
+      } else {
+        process.stderr.write('  (scan cache not written: ' + e.message + ')\n');
+      }
+    }
   }
-  const t0 = Date.now();
-  const scan = await walk(target, workers);
-  const elapsed = Date.now() - t0;
-  buildHtml(out, target, scan, colorBy, blockSize);
+
+  buildHtml(out, scanTarget, scan, colorBy, blockSize);
 
   console.log('');
-  console.log('scanned ' + target);
+  console.log((fromCache ? 'loaded ' : 'scanned ') + scanTarget + (fromCache ? ' (cached)' : ''));
   console.log('  files        ' + scan.files.toLocaleString());
   console.log('  directories  ' + scan.dirs.toLocaleString());
   console.log('  total size   ' + humanBytes(scan.bytes) + '  (' + scan.bytes.toLocaleString() + ' B)');
   if (scan.unreadable) console.log('  unreadable   ' + scan.unreadable.toLocaleString() + ' entries skipped');
-  console.log('  scan took    ' + elapsed + ' ms');
+  if (elapsed) console.log('  scan took    ' + elapsed + ' ms');
   console.log('');
   console.log('wrote ' + out + '  (' + humanBytes(fs.statSync(out).size) + ')');
 

@@ -25,9 +25,40 @@
 // module only for the heavy mechanics.
 
 import { Buffer } from 'node:buffer';
+import fs from 'node:fs';
+import zlib from 'node:zlib';
 import { LOADER_JS } from '../dist/scan-loader.embed.js';
 
 export { LOADER_JS };
+
+// Scan-cache JSON (gzipped). Each gpdu-* tool writes its raw scan to disk
+// alongside the HTML output so subsequent runs can re-emit HTML without
+// re-doing the slow build step (directory walk, LLM forward passes,
+// parquet read, …). Format is deliberately minimal: `{ v, type, meta,
+// scan }`. `scan` is whatever shape the tool produced — labels +
+// parentIndices + values + the tool's attribute arrays. `meta` carries
+// build metadata (target, cliCommand, builtAt, etc.) and `type` is the
+// tool's short identifier ('directory', 'llm-density', 'json', …).
+export function deriveScanCachePath(htmlPath) {
+  return htmlPath.replace(/\.html?$/i, '') + '.scan.json.gz';
+}
+
+export function saveScanJson(filePath, scan, meta) {
+  const payload = { v: 1, type: meta.type || 'unknown', meta, scan };
+  const json = JSON.stringify(payload);
+  const compressed = zlib.gzipSync(json, { level: 6 });
+  fs.writeFileSync(filePath, compressed);
+}
+
+export function loadScanJson(filePath) {
+  const compressed = fs.readFileSync(filePath);
+  const json = zlib.gunzipSync(compressed).toString();
+  const payload = JSON.parse(json);
+  if (!payload.v || !payload.scan) {
+    throw new Error('not a recognized scan-cache file (missing v / scan): ' + filePath);
+  }
+  return payload;
+}
 
 export function humanBytes(v) {
   const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];

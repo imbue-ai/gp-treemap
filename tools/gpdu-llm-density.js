@@ -63,7 +63,8 @@ import os from 'node:os';
 import zlib from 'node:zlib';
 import crypto from 'node:crypto';
 import { BUNDLE } from '../dist/gp-treemap.bundle.embed.js';
-import { partitionBlocks, partitionBlocksBFS, encodeBlock, escapeHtml, LOADER_JS } from './scan-core.js';
+import { partitionBlocks, partitionBlocksBFS, encodeBlock, escapeHtml, LOADER_JS,
+         deriveScanCachePath, saveScanJson, loadScanJson } from './scan-core.js';
 import { buildCliCommand, COPY_BTN_HTML, COPY_BTN_CSS, copyButtonScript } from './cli-command.js';
 
 const COLOR_MODES = ['[Level 1]', 'probability', 'depth', 'token-rank', 'surprisal', 'leaf-reason'];
@@ -202,7 +203,11 @@ async function main() {
 
   let scan, scanPrompt, scanModelLabel, fromCache = false;
   const explicitIn = scanInPath != null;
-  const cacheExists = fs.existsSync(scanCachePath);
+  // Wrapped so a sandboxed run without read permission for the cache path
+  // (Deno per-path sandbox) falls through to a fresh build instead of
+  // crashing.
+  let cacheExists = false;
+  try { cacheExists = fs.existsSync(scanCachePath); } catch (_) {}
 
   if (explicitIn || (cacheExists && !noCache)) {
     if (!cacheExists) {
@@ -211,7 +216,7 @@ async function main() {
     }
     process.stderr.write('  loading cached scan: ' + scanCachePath + '\n');
     const cached = loadScanJson(scanCachePath);
-    scan = { ...cached.scan, counts: cached.counts };
+    scan = cached.scan;
     scanPrompt = (prompt !== null && prompt !== '') ? prompt : cached.meta.prompt;
     scanModelLabel = cached.meta.modelLabel;
     fromCache = true;
@@ -244,18 +249,29 @@ async function main() {
     // a usable artifact for re-rendering. buildScan's SIGINT handler
     // already returns a partial-but-consistent scan, so the common case
     // (Ctrl-C during build) lands here with a valid `scan` object.
+    // Wrapped in try/catch so a sandboxed run that lacks write
+    // permission for the cache path silently skips caching rather than
+    // failing the whole invocation.
     if (scan) {
-      saveScanJson(scanCachePath, scan, {
-        type: 'llm-density',
-        prompt: scanPrompt,
-        modelLabel: scanModelLabel,
-        backend, model, opts,
-        cliCommand: buildCliCommand('gp-visualize-llm-continuation-density'),
-        builtAt: new Date().toISOString(),
-        buildMs: elapsed,
-      });
-      process.stderr.write('  saved scan: ' + scanCachePath +
-        '  (' + (fs.statSync(scanCachePath).size / 1024).toFixed(1) + ' KB gz)\n');
+      try {
+        saveScanJson(scanCachePath, scan, {
+          type: 'llm-density',
+          prompt: scanPrompt,
+          modelLabel: scanModelLabel,
+          backend, model, opts,
+          cliCommand: buildCliCommand('gp-visualize-llm-continuation-density'),
+          builtAt: new Date().toISOString(),
+          buildMs: elapsed,
+        });
+        process.stderr.write('  saved scan: ' + scanCachePath +
+          '  (' + (fs.statSync(scanCachePath).size / 1024).toFixed(1) + ' KB gz)\n');
+      } catch (e) {
+        if (/permission|access|EACCES|EPERM|NotCapable/i.test(String(e && (e.message || e)))) {
+          // silent — sandbox without write permission for the cache path
+        } else {
+          process.stderr.write('  (scan cache not written: ' + e.message + ')\n');
+        }
+      }
     }
 
     if (typeof be.dispose === 'function') { try { await be.dispose(); } catch {} }
@@ -278,45 +294,6 @@ async function main() {
     const openCmd = process.platform === 'win32' ? 'start ""' : process.platform === 'darwin' ? 'open' : 'xdg-open';
     try { execSync(openCmd + ' ' + JSON.stringify(out)); } catch { console.log('open it with:  open "' + out + '"'); }
   }
-}
-
-// ---------------------------------------------------------------------------
-// Scan cache (.scan.json.gz) — UI-independent payload that round-trips
-// through buildHtml so you can iterate on rendering without re-running the
-// model. Format intentionally close to scan-core.js's normalized scan
-// shape, plus enough metadata to label the visualization.
-// ---------------------------------------------------------------------------
-
-function deriveScanCachePath(htmlPath) {
-  return htmlPath.replace(/\.html?$/i, '') + '.scan.json.gz';
-}
-
-function saveScanJson(path, scan, meta) {
-  const payload = {
-    v: 1,
-    type: meta.type || 'llm-density',
-    meta,
-    scan: {
-      labels: scan.labels,
-      parentIndices: scan.parentIndices,
-      values: scan.values,
-      attributes: scan.attributes,
-    },
-    counts: scan.counts,
-  };
-  const json = JSON.stringify(payload);
-  const compressed = zlib.gzipSync(json, { level: 6 });
-  fs.writeFileSync(path, compressed);
-}
-
-function loadScanJson(path) {
-  const compressed = fs.readFileSync(path);
-  const json = zlib.gunzipSync(compressed).toString();
-  const payload = JSON.parse(json);
-  if (!payload.v || !payload.scan) {
-    throw new Error('not a recognized scan-cache file (missing v / scan): ' + path);
-  }
-  return payload;
 }
 
 // ---------------------------------------------------------------------------
