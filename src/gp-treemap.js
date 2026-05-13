@@ -64,6 +64,10 @@ const STYLE = `
   background: var(--gp-surface, #fafafa); font-variant-numeric: tabular-nums;
   color: var(--gp-fg, #333); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-height:22px;
   display:flex; align-items:center; gap:0; }
+.info-line .clear-target { cursor:pointer; margin-right:6px; padding:0 4px;
+  color: var(--gp-fg-muted, #999); flex-shrink:0; text-decoration:none;
+  font-size:14px; line-height:1; border-radius:3px; user-select:none; }
+.info-line .clear-target:hover { color: var(--gp-fg, #000); background: var(--gp-border, #0001); }
 .info-line .root-icon { cursor:pointer; margin-right:4px; color: var(--gp-fg-muted, #999); flex-shrink:0; text-decoration:none; }
 .info-line .root-icon:hover { color: var(--gp-accent, #0645ad); text-decoration:none; }
 .info-line .root-icon.focused { color: var(--gp-fg, #000); }
@@ -82,7 +86,7 @@ const STYLE = `
 .overlay .sel, .overlay .loc, .overlay .anc { position:absolute; box-sizing:border-box; pointer-events:none; }
 .overlay .sel { border:2px solid var(--gp-selected); box-sizing:border-box; }
 .overlay .loc { border:2px solid var(--gp-located); box-shadow: 0 0 0 1px #fff8; }
-.overlay .anc { border:2px solid rgba(255,255,255,0.45); }
+.overlay .anc { border:2px solid var(--gp-ancestor, #555); }
 .overlay .anc-lbl { position:absolute; pointer-events:none;
   font-size:11px; font-weight:600; line-height:1.2;
   color:#fff; padding:1px 5px; border-radius:3px;
@@ -810,13 +814,17 @@ export class GpTreemap extends HTMLElement {
       // Outline. Skip if this cell is the currently focused one — its bright
       // `.sel` border will be drawn on top by the caller. We still draw its
       // label below so the user can read which level they're focused on.
+      // Thickness matches the focused .sel box so both outline styles read
+      // as the same gesture (just with a different color).
       if (id !== focusId) {
+        const t = Math.max(2, Math.round(Math.max(w, h) * 0.01));
         const box = document.createElement('div');
         box.className = 'anc';
-        box.style.left = x + 'px';
-        box.style.top = y + 'px';
-        box.style.width = w + 'px';
-        box.style.height = h + 'px';
+        box.style.left = (x - t) + 'px';
+        box.style.top = (y - t) + 'px';
+        box.style.width = (w + 2 * t) + 'px';
+        box.style.height = (h + 2 * t) + 'px';
+        box.style.borderWidth = t + 'px';
         this._overlay.appendChild(box);
       }
 
@@ -1050,6 +1058,26 @@ export class GpTreemap extends HTMLElement {
       cur = cur.parentId !== null ? this._tree.nodes.get(cur.parentId) : null;
     }
     this._infoEl.innerHTML = '';
+    // Clear-target button: drops the current selection so the breadcrumb
+    // reverts to its empty state. Lives to the left of the home icon since
+    // the rest of the breadcrumb has no other way to clear the target.
+    const clearBtn = document.createElement('a');
+    clearBtn.className = 'clear-target';
+    clearBtn.title = 'Clear selection';
+    clearBtn.textContent = '\u00d7';
+    clearBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this._targetId = null;
+      this._focusId = null;
+      this._selectionLocked = false;
+      const { cssW, cssH, dpr } = this._canvasMetrics();
+      this._renderOverlay(cssW, cssH, dpr);
+      this._updateToolbarInfo();
+      this._dispatch('gp-target', null);
+      this._dispatch('gp-focus', null);
+    });
+    this._infoEl.appendChild(clearBtn);
     // Root sentinel icon — behaves like a breadcrumb element (click to focus root, dblclick to zoom).
     const rootId = this._tree.roots[0];
     const rootIcon = document.createElement('a');
