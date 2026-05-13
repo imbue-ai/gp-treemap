@@ -206,20 +206,27 @@ async function main() {
 }
 
 // ---------------------------------------------------------------------------
-// Scan builder — DFS expansion with KV-cache stack (the backend controls
-// what the cache *is*; we just save & restore around each child).
+// Scan builder — iterative-deepening "breadth-first within each depth pass,
+// DFS-tree-order within a layer". Each pass D expands every frontier node
+// at depth D-1, then snapshots. The cache cursor is repositioned per node
+// by walking to the longest common ancestor in tokens and re-folding from
+// there — for DFS-tree-order frontiers (siblings consecutive, cousins
+// LCA-deep), this approaches the cost of single-step DFS while giving us
+// per-depth complete snapshots for graceful Ctrl-C.
 //
 // Backend contract:
 //
 //   be.encodePrompt(text)                  -> number[]   (sync)
 //   be.createSequence()                    -> seq        (sync)
-//   be.advance(seq, tokens, { temperature })
+//   be.distAtPath(seq, nodeTokens, { temperature })
 //                                          -> Promise< Array<[tokenId, prob]> >
-//        Appends `tokens` to the sequence (one-token forward pass each),
-//        returns the probability distribution for the *next* token after
-//        the last appended token. Sorted descending by prob, sums to ~1.
-//   be.checkpoint(seq)                     -> number     (sync)  current position
-//   be.rewind(seq, position)               -> Promise<void>      truncate to position
+//        Re-positions the seq's KV cache so it holds `prompt + nodeTokens`,
+//        then returns the next-token distribution at that position. The
+//        backend tracks its own cursor and does LCA-rewind + forward-fold
+//        to reach the target. `nodeTokens` is the token-id path from
+//        ROOT (NOT including the prompt). `[]` returns distribution
+//        immediately after the prompt itself. Returned entries are
+//        sorted descending by prob and sum to ~1.
 //   be.eosTokenId()                        -> number|null
 //   be.decode(tokenId)                     -> string (display-safe; visible newlines etc.)
 //   be.modelLabel()                        -> string
@@ -297,30 +304,70 @@ async function buildScan(be, promptText, opts) {
       '  »' + pathStr.padEnd(MAX) + '«   ');
   }
 
-  function terminate(nodeIdx, parentJoint, reason) {
+  // Joint probability per node, kept in lock-step with the labels array.
+  // For internals we still ship value=0 to scan-core so aggValue's
+  // bottom-up sum reconstructs the joint at every internal node; this
+  // array is the cheap top-down precomputation we use locally for
+  // pruning, terminate(), and orphan fix-up.
+  const joints = [1.0];
+
+  function terminate(nodeIdx, nodeJoint, reason) {
     leafReason[nodeIdx] = reason;
-    values[nodeIdx] = parentJoint;
-    state.exploredMass += parentJoint;
+    values[nodeIdx] = nodeJoint;
+    state.exploredMass += nodeJoint;
     state.leafCount++;
     progress(false);
   }
 
-  // dist is sorted descending [[tok, p], ...]; we apply top-k / top-p / prune-probability ourselves
-  // so the residual `(other)` mass is correctly computed.
-  async function expand(nodeIdx, dist, parentJoint, d) {
-    if (interrupted) return;
-    if (d > state.deepest) state.deepest = d;
-    if (d >= maxDepth) { terminate(nodeIdx, parentJoint, 'max-depth'); return; }
-    if (state.nodeCount >= maxNodes) { terminate(nodeIdx, parentJoint, 'pruned'); return; }
-    // Periodic yield so SIGINT can fire when the backend is fully synchronous
-    // (notably the stub backend; real backend yields naturally on each
-    // controlledEvaluate await).
+  // Reconstruct token-id path from ROOT to nodeIdx (NOT including prompt).
+  function tokenPathOf(nodeIdx) {
+    if (nodeIdx === 0) return [];
+    const path = [];
+    let cur = nodeIdx;
+    while (cur !== 0) {
+      path.unshift(tokenId[cur]);
+      cur = parentIndices[cur];
+    }
+    return path;
+  }
+
+  // Cached human-readable path for the progress display.
+  function refreshCurrentPath(nodeIdx) {
+    currentPath.length = 0;
+    if (nodeIdx === 0) return;
+    const tids = tokenPathOf(nodeIdx);
+    for (const tid of tids) currentPath.push(be.decode(tid));
+  }
+
+  // Expand a single node: ask the backend for the next-token distribution at
+  // this node's prefix, apply top-k / top-p / prune-probability filters, push
+  // the surviving children + the (other) residual into the tree arrays, and
+  // return the list of newly-created non-leaf children (= next-pass frontier
+  // contribution).
+  async function expandNode(nodeIdx) {
+    if (interrupted) return [];
+    const d = depth[nodeIdx];
+    const nodeJoint = joints[nodeIdx];
+    if (d >= maxDepth) { terminate(nodeIdx, nodeJoint, 'max-depth'); return []; }
+    if (state.nodeCount >= maxNodes) { terminate(nodeIdx, nodeJoint, 'pruned'); return []; }
     if ((state.nodeCount & 1023) === 0) {
       await new Promise(setImmediate);
-      if (interrupted) return;
+      if (interrupted) return [];
     }
 
-    // Apply top-p
+    refreshCurrentPath(nodeIdx);
+    progress(false);
+
+    let dist;
+    try {
+      dist = await be.distAtPath(seq, tokenPathOf(nodeIdx), { temperature });
+    } catch (e) {
+      // Defensive: backend error (context overflow, etc.). Terminate.
+      terminate(nodeIdx, nodeJoint, 'pruned');
+      return [];
+    }
+
+    // Apply top-p.
     let cum = 0, nucleusCutoff = dist.length;
     for (let i = 0; i < dist.length; i++) {
       cum += dist[i][1];
@@ -328,98 +375,106 @@ async function buildScan(be, promptText, opts) {
     }
     const candidateCount = Math.min(Number.isFinite(topK) ? topK : dist.length, nucleusCutoff, dist.length);
 
-    const childInfos = [];
+    const newInternalChildren = [];
     let sumConditional = 0;
     for (let r = 0; r < candidateCount; r++) {
       const [tid, cond] = dist[r];
       if (!(cond > 0)) break;
-      const joint = parentJoint * cond;
-      if (joint < pruneProbability) break;
+      const childJoint = nodeJoint * cond;
+      if (childJoint < pruneProbability) break;
       if (state.nodeCount >= maxNodes) break;
       const isEos = (eosId != null && tid === eosId);
+      const isMaxDepth = !isEos && (d + 1 >= maxDepth);
       const label = isEos ? '(end)' : be.decode(tid);
       const rank = r + 1;
-      const childIdx = push(label, nodeIdx, 0, cond, d + 1, rank, isEos ? 'eos' : '(internal)', tid);
+      const reason = isEos ? 'eos' : (isMaxDepth ? 'max-depth' : '(internal)');
+      const childIdx = push(label, nodeIdx, 0, cond, d + 1, rank, reason, tid);
+      joints.push(childJoint);
       state.nodeCount++;
       sumConditional += cond;
-      childInfos.push({ idx: childIdx, tid, cond, joint, isEos });
+      if (isEos || isMaxDepth) {
+        values[childIdx] = childJoint;
+        state.exploredMass += childJoint;
+        state.leafCount++;
+        if (d + 1 > state.deepest) state.deepest = d + 1;
+      } else {
+        if (d + 1 > state.deepest) state.deepest = d + 1;
+        newInternalChildren.push(childIdx);
+      }
     }
 
+    // Residual `(other)` leaf so the parent's joint reconciles via aggValue.
     const otherCond = Math.max(0, 1 - sumConditional);
     if (otherCond > 1e-12) {
-      const otherJoint = parentJoint * otherCond;
+      const otherJoint = nodeJoint * otherCond;
       push('(other)', nodeIdx, otherJoint, otherCond, d + 1, NaN, 'other-bucket', -1);
+      joints.push(otherJoint);
       state.nodeCount++;
       state.leafCount++;
       state.exploredMass += otherJoint;
     }
-
-    if (childInfos.length === 0) return;
-
-    for (const ci of childInfos) {
-      if (interrupted) break;
-      if (ci.isEos) {
-        values[ci.idx] = ci.joint;
-        state.exploredMass += ci.joint;
-        state.leafCount++;
-        progress(false);
-        continue;
-      }
-      const checkpoint = be.checkpoint(seq);
-      const labelForPath = be.decode(ci.tid);
-      currentPath.push(labelForPath);
-      let childDist;
-      try {
-        childDist = await be.advance(seq, [ci.tid], { temperature });
-      } catch (e) {
-        // Defensive: if the model errors (e.g. context overflow), terminate this branch.
-        currentPath.pop();
-        await be.rewind(seq, checkpoint);
-        terminate(ci.idx, ci.joint, 'pruned');
-        continue;
-      }
-      await expand(ci.idx, childDist, ci.joint, d + 1);
-      currentPath.pop();
-      await be.rewind(seq, checkpoint);
-    }
+    return newInternalChildren;
   }
 
-  // Prime the cache with the entire prompt and get the distribution for the
-  // first continuation token.
+  // Iterative deepening with DFS-tree-order within each pass. Frontier is
+  // the set of nodes pending expansion. Each pass D pops every frontier
+  // node (already in DFS-tree-order from how they were pushed), expands
+  // them, and collects the next-pass frontier from the new internal
+  // children. We snapshot the array length at the end of each completed
+  // pass; if interrupted mid-pass we keep whatever partial work was done
+  // (orphan fix-up at the bottom reconciles the sum invariant either way).
+  let frontier = [ROOT];
+  let lastCompletePassDepth = 0;
+
   try {
-    const rootDist = await be.advance(seq, promptTokens, { temperature });
-    await expand(ROOT, rootDist, 1.0, 0);
+    for (let pass = 1; pass <= maxDepth; pass++) {
+      if (interrupted) break;
+      if (frontier.length === 0) break;
+
+      const nextFrontier = [];
+      for (const nodeIdx of frontier) {
+        if (interrupted) break;
+        const newKids = await expandNode(nodeIdx);
+        for (const k of newKids) nextFrontier.push(k);
+      }
+
+      if (interrupted) break;
+      lastCompletePassDepth = pass;
+      frontier = nextFrontier;
+    }
   } finally {
     process.removeListener('SIGINT', sigintHandler);
   }
   progress(true);
   process.stderr.write('\n');
 
-  // If we were interrupted (or any internal node was created but never
-  // expanded for any reason), the sum-of-children invariant at that node
-  // would be broken — its descendants don't add up to its joint. Walk the
-  // tree once and mark any orphan internal node as a 'pruned' leaf carrying
-  // its full joint. Joints are computed by a top-down sweep using each
-  // node's conditional p|parent.
+  // Orphan fix-up: any internal node that was pushed but never expanded
+  // (an interrupted pass, or the depth-limit cutoff for the deepest pass)
+  // would otherwise break the sum-of-children invariant at its parent.
+  // Mark each such orphan as a 'pruned' leaf carrying its full joint, so
+  // every internal node still aggregates to its expected mass.
   const childCount = new Array(labels.length).fill(0);
   for (let i = 1; i < parentIndices.length; i++) childCount[parentIndices[i]]++;
-  const joint = new Float64Array(labels.length);
-  joint[0] = 1.0;
-  for (let i = 1; i < parentIndices.length; i++) {
-    joint[i] = joint[parentIndices[i]] * probability[i];
-  }
   let orphanCount = 0;
   for (let i = 1; i < labels.length; i++) {
     if (leafReason[i] === '(internal)' && childCount[i] === 0) {
       leafReason[i] = 'pruned';
-      values[i] = joint[i];
-      state.exploredMass += joint[i];
+      values[i] = joints[i];
+      state.exploredMass += joints[i];
       state.leafCount++;
       orphanCount++;
     }
   }
-  if (interrupted && orphanCount > 0) {
-    process.stderr.write('  finalized ' + orphanCount.toLocaleString() + ' un-expanded internal nodes as pruned leaves\n');
+  if (interrupted) {
+    process.stderr.write('  interrupted at depth-pass ' + (lastCompletePassDepth + 1) +
+      ' (last complete depth: ' + lastCompletePassDepth + '); finalized ' +
+      orphanCount.toLocaleString() + ' un-expanded internal nodes as pruned leaves\n');
+  } else if (orphanCount > 0) {
+    // Normal completion: orphans = leaves of the deepest pass that the
+    // depth-limit prevented from being expanded. They are conceptually
+    // 'max-depth' but it's clearer to keep them as 'pruned' since they
+    // didn't reach a real max-depth check (the pass loop terminated first).
+    process.stderr.write('  finalized ' + orphanCount.toLocaleString() + ' depth-limit leaves\n');
   }
 
   return {
@@ -457,6 +512,17 @@ function distToSortedEntries(dist) {
   const entries = [];
   for (let i = 0; i < dist.length; i++) if (dist[i] > 0) entries.push([i, dist[i]]);
   entries.sort((a, b) => b[1] - a[1]);
+  return entries;
+}
+
+// Convert the `Map<Token, prob>` returned by controlledEvaluate (which
+// documents iteration order as descending probability) into an
+// [[token, prob], ...] array. Empty / missing map → [].
+function mapToSortedEntries(probs) {
+  if (!probs || probs.size === 0) return [];
+  const entries = new Array(probs.size);
+  let i = 0;
+  for (const [tok, p] of probs) entries[i++] = [tok, p];
   return entries;
 }
 
@@ -500,21 +566,24 @@ function makeStubBackend(modelArg) {
     return logits;
   }
 
+  // Stub stores its "cache" as a token array. distAtPath just sets the array
+  // to (promptTokens + nodeTokens) and computes logits from the hash. No LCA
+  // optimization needed since the hash is cheap.
   return {
+    promptTokens: null,
     encodePrompt(text) {
       const ids = [];
       for (let i = 0; i < text.length; i++) ids.push(text.charCodeAt(i) % V);
+      this.promptTokens = ids;
       return ids;
     },
     createSequence() { return { tokens: [] }; },
-    async advance(seq, tokens, { temperature }) {
-      for (const t of tokens) seq.tokens.push(t);
+    async distAtPath(seq, nodeTokens, { temperature }) {
+      seq.tokens = (this.promptTokens || []).concat(nodeTokens);
       const logits = logitsForSequence(seq.tokens);
       const dist = softmaxWithTemperature(logits, temperature);
       return distToSortedEntries(dist);
     },
-    checkpoint(seq) { return seq.tokens.length; },
-    async rewind(seq, position) { seq.tokens.length = position; },
     eosTokenId() { return EOS_ID; },
     decode(id) {
       const raw = STUB_VOCAB[id] || '?';
@@ -572,65 +641,110 @@ async function loadRealBackend(modelArg, { contextSize, prependBos }) {
   const ctx = await model.createContext({ contextSize });
   let labelStr = modelArg + ' (' + path.basename(modelPath) + ')';
 
-  function buildSeq() {
-    return ctx.getSequence();
+  // The backend keeps a cursor into the seq's KV cache, expressed as the
+  // suffix of tokens currently held *after* the prompt. `null` means the
+  // cache is uninitialized; the first distAtPath() call primes it. With
+  // DFS-tree-order iteration in buildScan, the LCA-rewind path is short
+  // for siblings (length-1 rewind + 0-token forward) and longer for
+  // cousins (LCA + a short forward fold).
+  let promptCache = null;        // Token[] — the prompt we primed with
+  let cachedNodePath = null;     // Token[] — tokens after the prompt currently in the KV cache
+
+  function tokenizePrompt(text) {
+    const tokens = model.tokenize(text);
+    if (!prependBos) return tokens;
+    const bos = model.tokens.bos;
+    return bos != null ? [bos, ...tokens] : tokens;
   }
 
   return {
     encodePrompt(text) {
-      // HuggingFace tokenizers auto-prepend BOS for Llama-family models, and
+      // HuggingFace tokenizers auto-prepend BOS for Llama-family models and
       // the next-token distribution depends on it heavily (without BOS the
-      // model is conditioned on "mid-document text", with BOS it's
-      // conditioned on "start of a new document" — a big swing for prompts
-      // like "Time flies like an arrow..."). node-llama-cpp's tokenize()
-      // doesn't auto-prepend, so we do it here. Disable with --no-prepend-bos.
-      const tokens = model.tokenize(text);
-      if (!prependBos) return tokens;
-      const bos = model.tokens.bos;
-      return bos != null ? [bos, ...tokens] : tokens;
+      // model is conditioned on "mid-document text"; with BOS, "start of a
+      // new document"). node-llama-cpp's tokenize() doesn't auto-prepend,
+      // so we do it here. Disable with --no-prepend-bos.
+      promptCache = tokenizePrompt(text);
+      return promptCache.slice();
     },
-    createSequence() { return buildSeq(); },
-    async advance(seq, tokens, { temperature }) {
-      if (tokens.length === 0) return [];
-      // Bulk-prime everything except the last token (no logits needed).
-      if (tokens.length > 1) {
-        await seq.evaluateWithoutGeneratingNewTokens(tokens.slice(0, tokens.length - 1));
+    createSequence() { return ctx.getSequence(); },
+
+    async distAtPath(seq, nodePath, { temperature }) {
+      // Walk the KV cache to `prompt + nodePath`, then re-fold the last
+      // token of (prompt + nodePath) via controlledEvaluate to obtain the
+      // next-token distribution at this position.
+      //
+      // node-llama-cpp's sampler defaults topK=40 / topP=0.95 even when
+      // we only ask for the probabilities map — that silently truncates
+      // the returned distribution. We pass topK:0 / topP:1 so the full
+      // vocabulary comes back and the `(other)` residual reflects the
+      // actual long tail.
+      const promptLen = promptCache.length;
+
+      if (cachedNodePath === null) {
+        // First call. Prime the cache with prompt + nodePath, splitting off
+        // the last token for the logits-producing controlledEvaluate call.
+        const allTokens = promptCache.concat(nodePath);
+        if (allTokens.length > 1) {
+          await seq.evaluateWithoutGeneratingNewTokens(allTokens.slice(0, allTokens.length - 1));
+        }
+        const lastTok = allTokens[allTokens.length - 1];
+        const out = await seq.controlledEvaluate([
+          [lastTok, { generateNext: { probabilities: true, options: { temperature, topK: 0, topP: 1 } } }],
+        ]);
+        cachedNodePath = nodePath.slice();
+        return mapToSortedEntries(out[0]?.next?.probabilities);
       }
-      const lastTok = tokens[tokens.length - 1];
-      // node-llama-cpp defaults topK=40 / topP=0.95 inside the sampler even
-      // when we only ask for the probabilities map, which silently truncates
-      // the distribution. We want the full vocabulary so the residual
-      // `(other)` bucket reflects the actual long tail (and so tokens like
-      // " fart" at rank ~50 show up instead of being invisibly truncated).
-      // topK=0 means unlimited; topP=1 means no nucleus filtering.
+
+      // Subsequent call. LCA of cachedNodePath and nodePath.
+      let lca = 0;
+      const maxLca = Math.min(cachedNodePath.length, nodePath.length);
+      while (lca < maxLca && cachedNodePath[lca] === nodePath[lca]) lca++;
+
+      // Rewind to (promptLen + lca) if cache has more tokens than that.
+      if (cachedNodePath.length > lca) {
+        await seq.eraseContextTokenRanges([{ start: promptLen + lca, end: promptLen + cachedNodePath.length }]);
+      }
+
+      // We now need the controlledEvaluate to fold the LAST token of
+      // `prompt + nodePath`. Three cases for what controlledEvaluate's
+      // input array should be:
+      //
+      // (a) nodePath.length > lca (target has tokens beyond LCA): feed the
+      //     middle bulk via evaluateWithoutGeneratingNewTokens, then
+      //     controlledEvaluate the final token.
+      // (b) nodePath.length === lca && nodePath.length > 0: cache is
+      //     exactly at the target. Re-fold the final token by rewinding
+      //     one more, then controlledEvaluate.
+      // (c) nodePath.length === 0 (ROOT, revisit): rewind one prompt token
+      //     and re-fold it via controlledEvaluate.
+      let lastTok;
+      if (nodePath.length > lca) {
+        const middle = nodePath.slice(lca, nodePath.length - 1);
+        if (middle.length > 0) {
+          await seq.evaluateWithoutGeneratingNewTokens(middle);
+        }
+        lastTok = nodePath[nodePath.length - 1];
+      } else if (nodePath.length > 0) {
+        // Re-fold the last node token.
+        await seq.eraseContextTokenRanges([{ start: promptLen + nodePath.length - 1, end: promptLen + nodePath.length }]);
+        lastTok = nodePath[nodePath.length - 1];
+      } else {
+        // Re-fold the last prompt token.
+        await seq.eraseContextTokenRanges([{ start: promptLen - 1, end: promptLen }]);
+        lastTok = promptCache[promptLen - 1];
+      }
+
       const out = await seq.controlledEvaluate([
-        [lastTok, {
-          generateNext: {
-            probabilities: true,
-            options: { temperature, topK: 0, topP: 1 },
-          },
-        }],
+        [lastTok, { generateNext: { probabilities: true, options: { temperature, topK: 0, topP: 1 } } }],
       ]);
-      const probs = out[0]?.next?.probabilities;
-      if (!probs || probs.size === 0) return [];
-      // Map iteration order is insertion order, which the API documents as
-      // sorted descending by probability. Convert to [[token, prob], ...].
-      const entries = new Array(probs.size);
-      let i = 0;
-      for (const [tok, p] of probs) { entries[i++] = [tok, p]; }
-      return entries;
+      cachedNodePath = nodePath.slice();
+      return mapToSortedEntries(out[0]?.next?.probabilities);
     },
-    checkpoint(seq) { return seq.nextTokenIndex; },
-    async rewind(seq, position) {
-      const end = seq.nextTokenIndex;
-      if (end > position) {
-        await seq.eraseContextTokenRanges([{ start: position, end }]);
-      }
-    },
+
     eosTokenId() { return model.tokens.eos ?? null; },
     decode(id) {
       const raw = model.detokenize([id]);
-      // Display-safe: visible newlines/tabs.
       return raw.replace(/\n/g, '⏎').replace(/\r/g, '⏎').replace(/\t/g, '⇥');
     },
     modelLabel() { return labelStr; },
