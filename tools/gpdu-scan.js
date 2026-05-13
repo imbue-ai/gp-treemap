@@ -229,13 +229,23 @@ async function walk(rootPath, NWORKERS) {
   let pending = 0;
 
   let lastPrint = 0;
+  let currentDir = '';   // most recently received dirPath, relative to rootPath
   function printProgress() {
     const now = Date.now();
     if (now - lastPrint < 150) return;
     lastPrint = now;
+    // Truncate the current directory path to keep the progress line at a
+    // sane width: keep the tail (the deepest segments are what the user
+    // actually wants to see).
+    const MAX = 60;
+    let pathStr = currentDir;
+    if (pathStr.length > MAX) pathStr = '…' + pathStr.slice(-(MAX - 1));
+    // ANSI EL ("erase to end of line") clears any leftover characters from
+    // a longer previous line; \r returns to column 0 for the next overwrite.
     process.stderr.write(
-      '\r  ' + files.toLocaleString() + ' files   ' +
-      dirs.toLocaleString() + ' dirs   ' + humanBytes(bytes) + '          '
+      '\r  ' + files.toLocaleString().padStart(8) + ' files   ' +
+      dirs.toLocaleString().padStart(7) + ' dirs   ' +
+      humanBytes(bytes).padStart(8) + '  »' + pathStr.padEnd(MAX) + '«\x1b[K'
     );
   }
 
@@ -260,6 +270,9 @@ async function walk(rootPath, NWORKERS) {
         pending--;
         idle.push(i);
         unreadable += result.unreadable;
+        // Track the just-finished directory for the progress display.
+        const rel = path.relative(rootPath, result.dirPath);
+        currentDir = rel === '' ? path.basename(rootPath) : rel;
         for (const ent of result.results) {
           if (ent.isDir) {
             const row = labels.length;
