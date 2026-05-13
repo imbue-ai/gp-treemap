@@ -137,6 +137,24 @@ runner writes a per-test launcher `.mjs` into
 `tests/_tmp_s3_launchers/` (gitignored) — that directory has to live
 inside the project so node_modules resolution finds the mock package.
 
+### `gpdu-llm-density`
+
+Each tree node is one model token; `scan.values` holds joint
+probabilities (0 on internals, the actual joint on leaves) so
+`partitionBlocks` aggregates them upward to give every internal node
+its own joint exactly — the synthetic `(other)` leaf at each parent
+absorbs `1 − Σ children` so reconciliation is exact, the same shape
+as `gpdu-json`'s `(leftover)`. Attribute arrays drive five color modes
+(`probability`, `depth`, `token-rank`, `surprisal`, `leaf-reason`).
+The tricky bit is the KV-cache stack: traversal is depth-first, each
+descent is a single-token `controlledEvaluate` call that grows the
+sequence and returns the full next-token distribution in one shot, and
+between siblings we `eraseContextTokenRanges` back to the saved
+`nextTokenIndex` — so exploring a tree costs O(nodes) forward passes
+rather than O(nodes × depth) prefix re-evaluations. Real backend is
+gated behind `node-llama-cpp` (`optionalDependency`); tests exercise a
+deterministic `--backend=stub` so CI doesn't touch the network.
+
 ## Tests
 
     npx playwright test          # all tests

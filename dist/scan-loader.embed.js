@@ -383,16 +383,23 @@ export const LOADER_JS = `// Browser-side IIFE shared by all \`gpdu-*\` CLIs. In
       } catch (_) {}
     }
     function applyViewer(v) {
-      tm.viewerState = {
-        zoom: 'zoom' in v ? pathToId(v.zoom) : undefined,
-        zoomPath: Array.isArray(v.zoomPath)
-          ? v.zoomPath.map(function (p) { return pathToId(p); }).filter(function (id) { return id != null; })
-          : undefined,
-        depth: v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : undefined),
-        target: 'target' in v ? pathToId(v.target) : undefined,
-        focus: 'focus' in v ? pathToId(v.focus) : undefined,
-        showLabels: 'showLabels' in v ? !!v.showLabels : undefined,
-      };
+      // Build a viewerState object with only the keys that are actually
+      // present in the hash. The component setter uses \`key in obj\` to
+      // decide whether to act on a field, so including a key with
+      // value=undefined would coerce that field to \`false\`/null — wrong
+      // when the URL is silent about it (we want to keep the current /
+      // default value).
+      var s = {};
+      if ('zoom' in v) s.zoom = pathToId(v.zoom);
+      if (Array.isArray(v.zoomPath)) {
+        s.zoomPath = v.zoomPath.map(function (p) { return pathToId(p); }).filter(function (id) { return id != null; });
+      }
+      if ('depth' in v) s.depth = v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : undefined);
+      if ('target' in v) s.target = pathToId(v.target);
+      if ('focus' in v) s.focus = pathToId(v.focus);
+      if ('showLabels' in v) s.showLabels = !!v.showLabels;
+      if ('showAncestors' in v) s.showAncestors = !!v.showAncestors;
+      tm.viewerState = s;
     }
     function writeHash() {
       try {
@@ -404,6 +411,7 @@ export const LOADER_JS = `// Browser-side IIFE shared by all \`gpdu-*\` CLIs. In
         if (v.focus != null) vOut.focus = idToPath(v.focus);
         if (v.depth != null) vOut.depth = v.depth === Infinity ? 'Infinity' : v.depth;
         if ('showLabels' in v) vOut.showLabels = v.showLabels;
+        if ('showAncestors' in v) vOut.showAncestors = v.showAncestors;
 
         var out = {};
         if (currentColor() !== DEFAULT_COLOR) out.color = currentColor();

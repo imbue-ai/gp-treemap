@@ -117,6 +117,34 @@ npx -p @imbue-ai/gp-treemap gpdu-s3-inventory \
   s3://my-meta-bucket/my-source-bucket/inv-config-id/2026-04-29T01-00Z/manifest.json
 ```
 
+### `gpdu-llm-density` — LLM token-continuation density
+
+[`tools/gpdu-llm-density.js`](tools/gpdu-llm-density.js). Visualizes the
+probability distribution an LLM assigns to continuations of a starter
+prompt. Each tree node is one token; cell area is the joint probability
+of the prefix from the root to that token, so sibling areas at any
+subtree sum to that subtree's joint and the whole treemap sums to 1.0.
+At every internal node, a synthetic `(other)` leaf carries the residual
+mass — long-tail tokens dropped by `--top-k`, `--top-p`, or
+`--prune-probability` all fold into it, so aggregates reconcile exactly
+at every level. Traversal is depth-first with a KV-cache stack: each
+descent is one new-token forward pass, and `eraseContextTokenRanges`
+pops the cache between siblings, so the cost of exploring a tree is
+O(nodes) forward passes instead of O(nodes × depth) prefix
+re-evaluations. Color modes: probability / depth / token-rank /
+surprisal / leaf-reason. Requires `node-llama-cpp` (an
+`optionalDependency`); `--model` accepts a local `.gguf` path or
+anything `resolveModelFile` recognizes (HF repo IDs, `hf:` URIs).
+Models cache under `~/.node-llama-cpp/models/`. Pass `--backend=stub`
+for a no-model deterministic demo distribution.
+
+```sh
+npx -p @imbue-ai/gp-treemap gp-visualize-llm-continuation-density \
+  --prompt "Time flies like an arrow. Fruit flies like a" \
+  --model hf:HuggingFaceTB/SmolLM2-135M-Instruct-GGUF:Q4_K_M \
+  --continuation-max-depth=20 --prune-probability=1e-5
+```
+
 ### `gp-columnar-treemap` — CSV / JSONL tabular data
 
 [`tools/table-treemap.js`](tools/table-treemap.js). General-purpose

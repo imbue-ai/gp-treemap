@@ -173,6 +173,91 @@
     </div>
   </section>
 
+  <section class="entry">
+    <h2>LLM continuation density — "Time flies like an arrow. Fruit flies like a"</h2>
+    <p>
+      A treemap of the joint probability distribution that a real LLM
+      assigns to continuations of a starter prompt. Each cell is one
+      token; cell <i>area</i> is the joint probability of the prefix
+      from the root to that token (so sibling areas at any subtree sum
+      to the parent's joint, and the whole tree sums to 1.0). Cell
+      <i>label</i> shows the token's conditional probability given its
+      parent — a verification handle: read off the conditionals along
+      any path and their product matches the visual area of the
+      destination cell. At every internal node, a synthetic
+      <code>(other)</code> leaf carries the residual mass not expanded
+      by <code>--top-k</code> / <code>--top-p</code> /
+      <code>--prune-probability</code>, so the aggregates reconcile
+      exactly at every level. Color: by topmost visible ancestor under
+      the current zoom root (<code>[Level 1]</code> in the dropdown),
+      so every direct child of the current view gets a distinct hue
+      and its descendants inherit it — the palette re-applies as you
+      zoom in. Generated locally with <a
+      href="https://huggingface.co/QuantFactory/Llama-3.2-1B-GGUF">Llama-3.2-1B
+      base (Q4_K_M GGUF, ~770 MB)</a> — the *base* checkpoint, no
+      instruct fine-tuning. The base model has seen the canonical
+      "fruit flies like a banana" joke in its pretraining corpus
+      verbatim, so <code>" banana"</code> sits at the top of the
+      distribution at 21.5%, followed by other natural completions:
+      <code>" rainbow"</code>, <code>" butterfly"</code>,
+      <code>" fruit"</code>, <code>" fly"</code>, <code>" bee"</code>,
+      <code>" honey"</code>, <code>" bird"</code>,
+      <code>" mosquito"</code>, <code>" grape"</code>,
+      <code>" parachute"</code>, <code>" kite"</code> — the kind of
+      shape you'd actually want from a language model that's seen real
+      English text. Note one tokenization subtlety: the prompt ends
+      with <code>"...like a"</code> (no trailing space). That matters,
+      because BPE tokenizers ship content words with their leading
+      space baked in (the token is <code>" banana"</code>, not
+      <code>"banana"</code>). Adding a trailing space to the prompt
+      forces the model to predict a token *without* a leading space,
+      which content words rarely have — and the head of the
+      distribution collapses to digits and punctuation. Same model,
+      same joke, completely different visualization.
+    </p>
+    <p style="background: var(--card-bg, #fff); border: 1px solid var(--border, #e2e2e2); border-radius: 6px; padding: 10px 14px; margin: 0 0 1rem; font-size: 13px; color: var(--muted, #555);">
+      <b style="color: var(--fg, #1a1a1a);">Aside — two things this
+      visualization is really sensitive to:</b>
+      <br><br>
+      <b>1. Trailing whitespace is poison.</b>
+      I first ran this with <code>"...Fruit flies like a "</code>
+      (trailing space) and the top of the distribution collapsed to
+      numbered-list digits and punctuation — <i>same model</i>, no
+      banana anywhere near the top. BPE tokenizers ship most content
+      words with the leading space pre-baked in (the token is
+      <code>" banana"</code>, not <code>"banana"</code>), so a prompt
+      ending in a literal space forces the model to predict a
+      no-leading-space token, which content words rarely are. Drop
+      the trailing space and banana climbs straight to rank 1.
+      <br><br>
+      <b>2. The BOS token matters &mdash; a lot.</b>
+      The HuggingFace tokenizer auto-prepends <code>&lt;|begin_of_text|&gt;</code>
+      to a Llama prompt; <code>node-llama-cpp</code>'s
+      <code>tokenize()</code> does not. Without BOS the model is
+      conditioned on "this is mid-document text" and produces a
+      flatter, weirder distribution; with BOS it's conditioned on
+      "this is the start of a new document" and the canonical joke
+      completion (which it has seen verbatim in pretraining)
+      dominates. Same model, same prompt: <b>banana goes from 9% to
+      62%</b> just by flipping the BOS prepend. The tool prepends BOS
+      by default to match HuggingFace; <code>--no-prepend-bos</code>
+      disables it for direct comparison.
+    </p>
+    <pre style="background: var(--border, #f0f0f0); padding: 8px 12px; border-radius: 4px; font-size: 12px; overflow-x: auto; margin: 0 0 1rem;"><code>npx -p @imbue-ai/gp-treemap gp-visualize-llm-continuation-density \
+  --prompt "Time flies like an arrow. Fruit flies like a" \
+  --model hf:QuantFactory/Llama-3.2-1B-GGUF:Q4_K_M \
+  --continuation-max-depth=10 --prune-probability=1e-4</code></pre>
+    <div class="frame-wrap">
+      <iframe
+        src="llm-density-fruit-flies.html"
+        title="LLM continuation density — Fruit flies like a..."
+        loading="lazy"></iframe>
+    </div>
+    <div class="links">
+      <a href="llm-density-fruit-flies.html">Open full-page →</a>
+    </div>
+  </section>
+
   <h2 class="section" style="margin: 2rem 0 1rem;">Trees from Tables</h2>
   <p style="color: var(--muted); margin: 0 0 1rem;">
     The entries below use the <b>path / tabular</b> treemap
