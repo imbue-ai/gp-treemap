@@ -63,7 +63,7 @@ import os from 'node:os';
 import zlib from 'node:zlib';
 import crypto from 'node:crypto';
 import { BUNDLE } from '../dist/gp-treemap.bundle.embed.js';
-import { partitionBlocks, encodeBlock, escapeHtml, LOADER_JS } from './scan-core.js';
+import { partitionBlocks, partitionBlocksBFS, encodeBlock, escapeHtml, LOADER_JS } from './scan-core.js';
 import { buildCliCommand, COPY_BTN_HTML, COPY_BTN_CSS, copyButtonScript } from './cli-command.js';
 
 const COLOR_MODES = ['[Level 1]', 'probability', 'depth', 'token-rank', 'surprisal', 'leaf-reason'];
@@ -1081,7 +1081,11 @@ function buildHtml(outPath, promptText, modelLabel, scan, colorBy, blockSize) {
 <script type="application/json" id="tmdata">
 `);
 
-  const { blocks, aggValue } = partitionBlocks(scan, blockSize);
+  // BFS chunking: shallow descendants of root land in block 0, which lets a
+  // layer-by-layer renderer paint the visible top of the tree before any
+  // deeper blocks are demanded. Same envelope shape as DFS chunking so the
+  // existing scan-loader inflates either flavor identically.
+  const { blocks, aggValue } = partitionBlocksBFS(scan, blockSize);
   process.stderr.write('  partitioned into ' + blocks.length + ' blocks\n');
 
   w('{"v":3,"totalProb":1,"blocks":[');

@@ -1,7 +1,7 @@
 // Unit tests for tools/scan-core.js — block partitioning, encoding round-trip,
 // and the small helper utilities. Independent of any one tool.
 import { test, expect } from '@playwright/test';
-import { partitionBlocks, encodeBlock, humanBytes, escapeHtml } from '../tools/scan-core.js';
+import { partitionBlocks, partitionBlocksBFS, encodeBlock, humanBytes, escapeHtml } from '../tools/scan-core.js';
 import { Buffer } from 'node:buffer';
 
 // ---- partitionBlocks ----
@@ -63,6 +63,86 @@ test('partitionBlocks: oversized subtree becomes a stub with a child block', () 
   expect(blocks[1].globalRows[0]).toBe(1);
   expect(blocks[1].globalRows.length).toBe(21);
   expect(blocks[1].stubs.length).toBe(0);
+});
+
+// ---- partitionBlocksBFS ----
+
+test('partitionBlocksBFS: tiny tree fits in one block, no stubs', () => {
+  const scan = {
+    labels: ['root', 'a', 'b', 'c'],
+    parentIndices: [-1, 0, 0, 0],
+    values: [0, 10, 20, 30],
+    attributes: {},
+  };
+  const { blocks } = partitionBlocksBFS(scan, 1000);
+  expect(blocks.length).toBe(1);
+  expect(blocks[0].globalRows).toEqual([0, 1, 2, 3]);
+  expect(blocks[0].stubs).toEqual([]);
+});
+
+test('partitionBlocksBFS: aggValue is identical to DFS partitioner', () => {
+  const scan = {
+    labels: ['root', 'a', 'a1', 'a2', 'b'],
+    parentIndices: [-1, 0, 1, 1, 0],
+    values: [0, 0, 100, 200, 50],
+    attributes: {},
+  };
+  const { aggValue: dfs } = partitionBlocks(scan, 1000);
+  const { aggValue: bfs } = partitionBlocksBFS(scan, 1000);
+  expect(Array.from(bfs)).toEqual(Array.from(dfs));
+});
+
+test('partitionBlocksBFS: each block is BFS-ordered (parents before children, shallow before deep)', () => {
+  // Tree: root → [a, b, c]; a → [a1, a2]; b → [b1]; c → [c1, c2, c3]
+  // BFS order: root, a, b, c, a1, a2, b1, c1, c2, c3
+  const scan = {
+    labels: ['root', 'a', 'b', 'c', 'a1', 'a2', 'b1', 'c1', 'c2', 'c3'],
+    parentIndices: [-1, 0, 0, 0, 1, 1, 2, 3, 3, 3],
+    values: [0, 0, 0, 0, 1, 1, 1, 1, 1, 1],
+    attributes: {},
+  };
+  const { blocks } = partitionBlocksBFS(scan, 1000);
+  expect(blocks.length).toBe(1);
+  // BFS order: shallow before deep.
+  expect(blocks[0].globalRows).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+});
+
+test('partitionBlocksBFS: deeper-layer overflow becomes a stub pointing to a child block rooted at the stub', () => {
+  // Tree: root → [a, b]; b → [c]; c → 8 leaves.
+  // targetSize=4 means block 0 = [root, a, b] (3 nodes), then trying to add c
+  // would push us to 4; c is added (root's grandchildren still fit — block now
+  // has 4 nodes). c's children would push us to 12, doesn't fit; c becomes a
+  // stub. A child block is built rooted at c, containing c + its 8 leaves.
+  const labels = ['root', 'a', 'b', 'c'];
+  const parentIndices = [-1, 0, 0, 2];
+  const values = [0, 1, 0, 0];
+  for (let i = 0; i < 8; i++) { labels.push('leaf-' + i); parentIndices.push(3); values.push(1); }
+  const scan = { labels, parentIndices, values, attributes: {} };
+  const { blocks } = partitionBlocksBFS(scan, 4);
+  expect(blocks.length).toBe(2);
+
+  // Block 0 holds shallow BFS: [root, a, b, c] with c marked as a stub.
+  expect(blocks[0].globalRows).toEqual([0, 1, 2, 3]);
+  expect(blocks[0].stubs.length).toBe(1);
+  expect(blocks[0].stubs[0].gi).toBe(3);
+  expect(blocks[0].stubs[0].childBlockId).toBe(1);
+
+  // Block 1 = c (as block-root) + 8 leaves.
+  expect(blocks[1].globalRows[0]).toBe(3);
+  expect(blocks[1].globalRows.length).toBe(9);
+});
+
+test('partitionBlocksBFS: block-root with more children than targetSize still fits (avoids infinite recursion)', () => {
+  // Root has 100 direct children, targetSize=10. The block-root's child-set
+  // is always admitted, even if oversized.
+  const labels = ['root'];
+  const parentIndices = [-1];
+  const values = [0];
+  for (let i = 0; i < 100; i++) { labels.push('c' + i); parentIndices.push(0); values.push(1); }
+  const scan = { labels, parentIndices, values, attributes: {} };
+  const { blocks } = partitionBlocksBFS(scan, 10);
+  expect(blocks.length).toBe(1);   // Only one block; no further recursion.
+  expect(blocks[0].globalRows.length).toBe(101);
 });
 
 // ---- encodeBlock round-trip ----
