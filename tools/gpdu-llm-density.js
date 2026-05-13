@@ -269,7 +269,7 @@ async function buildScan(be, promptText, opts) {
   const { maxDepth, pruneProbability, topK, topP, temperature, maxNodes } = opts;
   const eosId = be.eosTokenId();
 
-  const state = { nodeCount: 1, leafCount: 0, exploredMass: 0, deepest: 0, lastProgressAt: 0 };
+  const state = { nodeCount: 1, leafCount: 0, exploredMass: 0, deepest: 0, lastProgressAt: 0, pass: 0 };
 
   // Track the current root-to-cursor path for the progress display. Pushed
   // every time we descend into a child, popped on return.
@@ -298,8 +298,12 @@ async function buildScan(be, promptText, opts) {
     let pathStr = currentPath.join('');
     const MAX = 50;
     if (pathStr.length > MAX) pathStr = '…' + pathStr.slice(-(MAX - 1));
+    // Show iterative-deepening pass we're inside (pass D expands depth-(D-1)
+    // nodes to create depth-D children), plus the depth of the current node
+    // being expanded (= currentPath.length, matches what's in the » … «).
+    const passStr = 'pass ' + state.pass + '/' + maxDepth;
     process.stderr.write('\r  nodes ' + state.nodeCount.toLocaleString().padStart(8) +
-      '  depth ' + String(state.deepest).padStart(2) +
+      '  ' + passStr.padEnd(10) +
       '  explored ' + pct.padStart(6) + '%' +
       '  »' + pathStr.padEnd(MAX) + '«   ');
   }
@@ -430,6 +434,7 @@ async function buildScan(be, promptText, opts) {
     for (let pass = 1; pass <= maxDepth; pass++) {
       if (interrupted) break;
       if (frontier.length === 0) break;
+      state.pass = pass;
 
       const nextFrontier = [];
       for (const nodeIdx of frontier) {
