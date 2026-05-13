@@ -204,6 +204,93 @@ test('leaf-reasons include exactly the expected set', () => {
   } finally { cleanup(tmp); }
 });
 
+// ---- Scan cache (.scan.json.gz) ----
+
+test('cache: first run writes <stem>.scan.json.gz; second run skips LLM and produces identical scan', () => {
+  const { tmp, out } = mkOut();
+  const cachePath = out.replace(/\.html$/, '.scan.json.gz');
+  try {
+    // First run builds and caches.
+    const r1 = runTool([
+      '--backend=stub', '--model=test',
+      '--prompt=Fruit flies like a',
+      '--continuation-max-depth=4', '--prune-probability=1e-4', '--top-k=8',
+      out,
+    ]);
+    expect(r1.status, r1.stderr).toBe(0);
+    expect(fs.existsSync(cachePath)).toBe(true);
+    const cacheSize = fs.statSync(cachePath).size;
+    expect(cacheSize).toBeGreaterThan(0);
+    const scan1 = parseScanHtml(out);
+
+    // Second run: cache exists → skip LLM, emit HTML from cache.
+    fs.rmSync(out);
+    const r2 = runTool([
+      '--backend=stub', '--model=test',
+      '--prompt=Fruit flies like a',
+      '--continuation-max-depth=4', '--prune-probability=1e-4', '--top-k=8',
+      out,
+    ]);
+    expect(r2.status, r2.stderr).toBe(0);
+    expect(r2.stderr).toMatch(/loading cached scan/);
+    const scan2 = parseScanHtml(out);
+
+    // The encoded scan in both HTMLs should be bit-identical (same labels /
+    // parents / values), confirming the cache round-trips losslessly.
+    expect(scan2.labels).toEqual(scan1.labels);
+    expect(scan2.parentIndices).toEqual(scan1.parentIndices);
+    expect(scan2.values).toEqual(scan1.values);
+    assertSumInvariant(scan2);
+  } finally { cleanup(tmp); }
+});
+
+test('cache: --scan-in renders HTML without --model', () => {
+  const { tmp, out } = mkOut();
+  const cachePath = out.replace(/\.html$/, '.scan.json.gz');
+  const outFromCache = path.join(tmp, 'from-cache.html');
+  try {
+    // First, build a cache.
+    const r1 = runTool([
+      '--backend=stub', '--model=test',
+      '--prompt=Fruit flies like a',
+      '--continuation-max-depth=4', '--prune-probability=1e-4', '--top-k=8',
+      out,
+    ]);
+    expect(r1.status, r1.stderr).toBe(0);
+
+    // Now render from cache, with NO --model / --prompt.
+    const r2 = runTool([`--scan-in=${cachePath}`, outFromCache]);
+    expect(r2.status, r2.stderr).toBe(0);
+    expect(r2.stderr).toMatch(/loading cached scan/);
+    const scan = parseScanHtml(outFromCache);
+    assertSumInvariant(scan);
+    expect(scan.values[0]).toBeCloseTo(1, 9);
+  } finally { cleanup(tmp); }
+});
+
+test('cache: --no-cache forces rebuild even when cache exists', () => {
+  const { tmp, out } = mkOut();
+  const cachePath = out.replace(/\.html$/, '.scan.json.gz');
+  try {
+    const r1 = runTool([
+      '--backend=stub', '--model=test',
+      '--prompt=Fruit flies like a',
+      '--continuation-max-depth=4', '--prune-probability=1e-4', '--top-k=8',
+      out,
+    ]);
+    expect(r1.status, r1.stderr).toBe(0);
+    const r2 = runTool([
+      '--backend=stub', '--model=test',
+      '--prompt=Fruit flies like a',
+      '--continuation-max-depth=4', '--prune-probability=1e-4', '--top-k=8',
+      '--no-cache', out,
+    ]);
+    expect(r2.status, r2.stderr).toBe(0);
+    expect(r2.stderr).not.toMatch(/loading cached scan/);
+    expect(r2.stderr).toMatch(/saved scan/);
+  } finally { cleanup(tmp); }
+});
+
 // ---- Rendered HTML smoke test ----
 
 test('generated HTML loads under file:// and renders cells', async ({ page }) => {

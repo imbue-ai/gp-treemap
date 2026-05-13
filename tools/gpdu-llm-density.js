@@ -23,8 +23,22 @@
 //     [--no-prepend-bos]                (default: prepend the model's BOS
 //                                        token, matching HuggingFace
 //                                        tokenizer behavior)
+//     [--scan-in=PATH]                  (skip the LLM; render HTML from a
+//                                        cached scan)
+//     [--scan-out=PATH]                 (explicit cache path; default is
+//                                        <output-stem>.scan.json.gz next
+//                                        to the HTML file)
+//     [--no-cache]                      (force re-running the LLM even if
+//                                        a cached scan exists)
 //     [--block-size=N]       [--no-open]
 //     [output.html]
+//
+// Caching: every run also writes a UI-independent scan JSON next to the
+// HTML output (default: <stem>.scan.json.gz). If that file already exists
+// the LLM step is skipped and HTML is emitted from the cached scan — so
+// iterating on rendering changes against a slow-to-generate tree only
+// costs an HTML write. SIGINT during the build saves whatever was
+// explored so far before exiting.
 //
 // Backends:
 //   * real (default; requires `node-llama-cpp` as an optionalDependency).
@@ -109,6 +123,9 @@ async function main() {
   let blockSize = 500000;
   let noOpen = false;
   let prependBos = true;
+  let noCache = false;
+  let scanInPath = null;
+  let scanOutPath = null;
   const positional = [];
 
   for (let i = 0; i < argv.length; i++) {
@@ -117,6 +134,15 @@ async function main() {
     if (a === '--no-open') { noOpen = true; continue; }
     if (a === '--prepend-bos')    { prependBos = true;  continue; }
     if (a === '--no-prepend-bos') { prependBos = false; continue; }
+    if (a === '--no-cache')       { noCache = true; continue; }
+    if (a === '--scan-in' || a.startsWith('--scan-in=')) {
+      scanInPath = a.includes('=') ? a.slice('--scan-in='.length) : argv[++i];
+      continue;
+    }
+    if (a === '--scan-out' || a.startsWith('--scan-out=')) {
+      scanOutPath = a.includes('=') ? a.slice('--scan-out='.length) : argv[++i];
+      continue;
+    }
     if (a === '--prompt' || a.startsWith('--prompt=')) {
       const v = a.includes('=') ? a.slice('--prompt='.length) : argv[++i];
       if (v === undefined) { console.error('gpdu-llm-density: --prompt requires a value'); process.exit(2); }
@@ -155,46 +181,95 @@ async function main() {
     positional.push(a);
   }
 
-  if (!model) { console.error('gpdu-llm-density: --model is required'); usage(2); }
-
   if (prompt === '-' || (prompt === null && !process.stdin.isTTY)) {
     try { prompt = fs.readFileSync(0, 'utf8'); } catch (e) { console.error('gpdu-llm-density: failed to read stdin: ' + e.message); process.exit(1); }
   }
-  if (prompt === null || prompt === '') {
-    console.error('gpdu-llm-density: --prompt is required (or pipe text via stdin)');
-    usage(2);
-  }
 
-  const modelSlug = model.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 40);
+  const modelSlug = (model || 'cached').replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 40);
   const out = positional[0]
     ? path.resolve(positional[0])
     : path.join(os.tmpdir(), 'gpdu-llm-density-' + modelSlug + '-' + Date.now() + '.html');
 
+  // Cached scan path: explicit --scan-out wins; otherwise derive from the
+  // HTML output path. The cache file is a gzipped JSON blob containing the
+  // normalized scan + the prompt + model + opts metadata, independent of any
+  // UI choices (color mode, theme, etc.). If it already exists, we skip the
+  // LLM entirely and emit HTML from the cached scan — handy for iterating on
+  // the rendering pipeline without paying the 11-minute model cost again.
+  const scanCachePath = scanOutPath || scanInPath || deriveScanCachePath(out);
+
   const opts = { maxDepth, pruneProbability, topK, topP, temperature, maxNodes };
 
-  process.stderr.write('  loading backend: ' + backend + '\n');
-  const be = backend === 'stub'
-    ? makeStubBackend(model)
-    : await loadRealBackend(model, { contextSize, prependBos });
+  let scan, scanPrompt, scanModelLabel, fromCache = false;
+  const explicitIn = scanInPath != null;
+  const cacheExists = fs.existsSync(scanCachePath);
 
-  process.stderr.write('  prompt: ' + JSON.stringify(prompt.length > 80 ? prompt.slice(0, 40) + '…' + prompt.slice(-40) : prompt) + '\n');
+  if (explicitIn || (cacheExists && !noCache)) {
+    if (!cacheExists) {
+      console.error('gpdu-llm-density: --scan-in path does not exist: ' + scanCachePath);
+      process.exit(1);
+    }
+    process.stderr.write('  loading cached scan: ' + scanCachePath + '\n');
+    const cached = loadScanJson(scanCachePath);
+    scan = { ...cached.scan, counts: cached.counts };
+    scanPrompt = (prompt !== null && prompt !== '') ? prompt : cached.meta.prompt;
+    scanModelLabel = cached.meta.modelLabel;
+    fromCache = true;
+  } else {
+    if (!model) { console.error('gpdu-llm-density: --model is required (no cached scan found at ' + scanCachePath + ')'); usage(2); }
+    if (prompt === null || prompt === '') {
+      console.error('gpdu-llm-density: --prompt is required (or pipe text via stdin)');
+      usage(2);
+    }
+    process.stderr.write('  loading backend: ' + backend + '\n');
+    const be = backend === 'stub'
+      ? makeStubBackend(model)
+      : await loadRealBackend(model, { contextSize, prependBos });
 
-  const t0 = Date.now();
-  const scan = await buildScan(be, prompt, opts);
-  const elapsed = Date.now() - t0;
+    process.stderr.write('  prompt: ' + JSON.stringify(prompt.length > 80 ? prompt.slice(0, 40) + '…' + prompt.slice(-40) : prompt) + '\n');
 
-  buildHtml(out, prompt, be.modelLabel(), scan, colorBy, blockSize);
+    const t0 = Date.now();
+    let buildErr = null;
+    try {
+      scan = await buildScan(be, prompt, opts);
+    } catch (e) {
+      buildErr = e;
+    }
+    const elapsed = Date.now() - t0;
+    scanPrompt = prompt;
+    scanModelLabel = be.modelLabel();
 
-  if (typeof be.dispose === 'function') { try { await be.dispose(); } catch {} }
+    // Save the scan cache *before* writing HTML — and even if buildScan
+    // threw partway through, so a crashed/interrupted build still leaves
+    // a usable artifact for re-rendering. buildScan's SIGINT handler
+    // already returns a partial-but-consistent scan, so the common case
+    // (Ctrl-C during build) lands here with a valid `scan` object.
+    if (scan) {
+      saveScanJson(scanCachePath, scan, {
+        type: 'llm-density',
+        prompt: scanPrompt,
+        modelLabel: scanModelLabel,
+        backend, model, opts,
+        cliCommand: buildCliCommand('gp-visualize-llm-continuation-density'),
+        builtAt: new Date().toISOString(),
+        buildMs: elapsed,
+      });
+      process.stderr.write('  saved scan: ' + scanCachePath +
+        '  (' + (fs.statSync(scanCachePath).size / 1024).toFixed(1) + ' KB gz)\n');
+    }
+
+    if (typeof be.dispose === 'function') { try { await be.dispose(); } catch {} }
+    if (buildErr && !scan) { throw buildErr; }
+  }
+
+  buildHtml(out, scanPrompt, scanModelLabel, scan, colorBy, blockSize);
 
   console.log('');
-  console.log('built tree from ' + be.modelLabel());
-  console.log('  prompt length     ' + prompt.length.toLocaleString() + ' chars');
+  console.log((fromCache ? 'loaded ' : 'built ') + 'tree from ' + scanModelLabel + (fromCache ? ' (cached)' : ''));
   console.log('  nodes             ' + scan.counts.nodes.toLocaleString());
   console.log('  max depth         ' + scan.counts.maxDepth);
   console.log('  leaves            ' + scan.counts.leaves.toLocaleString());
   console.log('  mass explored     ' + (scan.counts.exploredMass * 100).toFixed(4) + '%');
-  console.log('  build took        ' + elapsed + ' ms');
   console.log('');
   console.log('wrote ' + out + '  (' + (fs.statSync(out).size / 1024).toFixed(1) + ' KB)');
 
@@ -203,6 +278,45 @@ async function main() {
     const openCmd = process.platform === 'win32' ? 'start ""' : process.platform === 'darwin' ? 'open' : 'xdg-open';
     try { execSync(openCmd + ' ' + JSON.stringify(out)); } catch { console.log('open it with:  open "' + out + '"'); }
   }
+}
+
+// ---------------------------------------------------------------------------
+// Scan cache (.scan.json.gz) — UI-independent payload that round-trips
+// through buildHtml so you can iterate on rendering without re-running the
+// model. Format intentionally close to scan-core.js's normalized scan
+// shape, plus enough metadata to label the visualization.
+// ---------------------------------------------------------------------------
+
+function deriveScanCachePath(htmlPath) {
+  return htmlPath.replace(/\.html?$/i, '') + '.scan.json.gz';
+}
+
+function saveScanJson(path, scan, meta) {
+  const payload = {
+    v: 1,
+    type: meta.type || 'llm-density',
+    meta,
+    scan: {
+      labels: scan.labels,
+      parentIndices: scan.parentIndices,
+      values: scan.values,
+      attributes: scan.attributes,
+    },
+    counts: scan.counts,
+  };
+  const json = JSON.stringify(payload);
+  const compressed = zlib.gzipSync(json, { level: 6 });
+  fs.writeFileSync(path, compressed);
+}
+
+function loadScanJson(path) {
+  const compressed = fs.readFileSync(path);
+  const json = zlib.gunzipSync(compressed).toString();
+  const payload = JSON.parse(json);
+  if (!payload.v || !payload.scan) {
+    throw new Error('not a recognized scan-cache file (missing v / scan): ' + path);
+  }
+  return payload;
 }
 
 // ---------------------------------------------------------------------------
