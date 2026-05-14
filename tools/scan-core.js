@@ -227,7 +227,7 @@ export function partitionBlocks(scan, targetSize = 50000) {
 // Why this is useful: shallow descendants of the root land in block 0,
 // deeper ones in later blocks — which is what a layer-by-layer renderer
 // wants to paint first.
-export function partitionBlocksBFS(scan, targetSize = 50000) {
+export function partitionBlocksBFS(scan, targetSize = 50000, firstBlockSize = targetSize) {
   const n = scan.labels.length;
   const pi = scan.parentIndices;
 
@@ -239,55 +239,88 @@ export function partitionBlocksBFS(scan, targetSize = 50000) {
     childIds[p].push(i);
   }
 
-  // Aggregate value, reverse pass (used by encodeBlock).
+  // Subtree size and aggregated value, both reverse-pass.
+  const subtreeSize = new Int32Array(n);
   const aggValue = new Float64Array(n);
   for (let i = n - 1; i >= 0; i--) {
+    subtreeSize[i] = 1;
     aggValue[i] = scan.values[i];
-    if (childIds[i]) for (const c of childIds[i]) aggValue[i] += aggValue[c];
+    if (childIds[i]) for (const c of childIds[i]) {
+      subtreeSize[i] += subtreeSize[c];
+      aggValue[i] += aggValue[c];
+    }
   }
 
   const blocks = [];
 
-  function buildBlock(rootGi) {
-    const blockId = blocks.length;
-    const block = { globalRows: [rootGi], stubs: [] };
+  // Block 0 is built BFS-style with the same per-child subtree-fit logic
+  // the DFS partitioner uses: a child whose entire subtree fits in the
+  // remaining capacity gets admitted (and BFS-queued for further
+  // expansion); otherwise it becomes a stub. This avoids the failure
+  // mode where every parent at the block-cap boundary becomes its own
+  // stub, cascading into thousands of size-2/-3 child blocks.
+  //
+  // Child blocks (post-stub) fall back to standard DFS subtree-first
+  // packing — same algorithm as `partitionBlocks` — which produces
+  // O(totalNodes / targetSize) blocks instead of growing with depth.
+  function buildBlock0() {
+    const block = { globalRows: [0], stubs: [] };
     blocks.push(block);
-
-    // Local row of each node in this block, for stub bookkeeping.
-    const localRowOf = new Map([[rootGi, 0]]);
-
-    // BFS frontier of nodes whose children we still need to consider adding
-    // to *this* block. Each child-set is added atomically: if it fits, all
-    // children join the block; otherwise the parent becomes a stub.
-    const q = [rootGi];
+    const localRowOf = new Map([[0, 0]]);
+    const q = [0];
     while (q.length > 0) {
       const parent = q.shift();
       const kids = childIds[parent];
       if (!kids) continue;
-
-      // The block-root's children are always added (even if oversized), so
-      // any node with more than `targetSize` direct children — say a vocab-
-      // sized fan-out at the root — won't loop forever. After that, parent
-      // child-sets only get added if they fit; otherwise the parent becomes
-      // a stub and its child-set goes in a recursively-built child block.
-      const isBlockRoot = parent === rootGi;
-      if (isBlockRoot || block.globalRows.length + kids.length <= targetSize) {
-        for (const c of kids) {
-          localRowOf.set(c, block.globalRows.length);
-          block.globalRows.push(c);
-          if (childIds[c]) q.push(c);
+      for (const c of kids) {
+        const remaining = firstBlockSize - block.globalRows.length;
+        localRowOf.set(c, block.globalRows.length);
+        block.globalRows.push(c);
+        if (!childIds[c]) {
+          // Leaf — already pushed; nothing more to do.
+        } else if (subtreeSize[c] <= remaining) {
+          // Entire subtree of c fits in this block; BFS-queue for layer-
+          // by-layer expansion of its descendants in the rows that follow.
+          q.push(c);
+        } else {
+          // Subtree too big — stub for a recursively-built DFS-style
+          // sub-block.
+          block.stubs.push({ gi: c, localRow: localRowOf.get(c), childBlockId: -1 });
         }
-      } else {
-        block.stubs.push({ gi: parent, localRow: localRowOf.get(parent), childBlockId: -1 });
       }
     }
-
     for (const stub of block.stubs) {
-      stub.childBlockId = buildBlock(stub.gi);
+      stub.childBlockId = buildSubBlock(stub.gi);
+    }
+  }
+
+  function buildSubBlock(rootGi) {
+    const blockId = blocks.length;
+    const block = { globalRows: [], stubs: [] };
+    blocks.push(block);
+    function visit(gi) {
+      block.globalRows.push(gi);
+      if (!childIds[gi]) return;
+      for (const c of childIds[gi]) {
+        if (!childIds[c]) {
+          block.globalRows.push(c);
+        } else if (block.globalRows.length + subtreeSize[c] <= targetSize) {
+          visit(c);
+        } else {
+          const stubLocalRow = block.globalRows.length;
+          block.globalRows.push(c);
+          block.stubs.push({ gi: c, localRow: stubLocalRow, childBlockId: -1 });
+        }
+      }
+    }
+    visit(rootGi);
+    for (const stub of block.stubs) {
+      stub.childBlockId = buildSubBlock(stub.gi);
     }
     return blockId;
   }
-  buildBlock(0);
+
+  buildBlock0();
 
   return { blocks, childIds, aggValue };
 }

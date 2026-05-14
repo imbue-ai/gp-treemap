@@ -107,29 +107,31 @@ test('partitionBlocksBFS: each block is BFS-ordered (parents before children, sh
   expect(blocks[0].globalRows).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 });
 
-test('partitionBlocksBFS: deeper-layer overflow becomes a stub pointing to a child block rooted at the stub', () => {
+test('partitionBlocksBFS: subtree that won\'t fit in block 0 becomes a stub pointing to a child block rooted at the stub', () => {
   // Tree: root → [a, b]; b → [c]; c → 8 leaves.
-  // targetSize=4 means block 0 = [root, a, b] (3 nodes), then trying to add c
-  // would push us to 4; c is added (root's grandchildren still fit — block now
-  // has 4 nodes). c's children would push us to 12, doesn't fit; c becomes a
-  // stub. A child block is built rooted at c, containing c + its 8 leaves.
+  // Total subtree of b is 10 nodes (b, c, 8 leaves), which won't fit in
+  // a targetSize=4 block 0. b becomes a stub at its row in block 0 — the
+  // partitioner is per-child-subtree-size aware so it doesn't BFS-descend
+  // into b's children at all.
   const labels = ['root', 'a', 'b', 'c'];
   const parentIndices = [-1, 0, 0, 2];
   const values = [0, 1, 0, 0];
   for (let i = 0; i < 8; i++) { labels.push('leaf-' + i); parentIndices.push(3); values.push(1); }
   const scan = { labels, parentIndices, values, attributes: {} };
-  const { blocks } = partitionBlocksBFS(scan, 4);
+  // targetSize=20 so b's whole subtree (10 nodes) fits in its child block.
+  // firstBlockSize=4 still forces b to stub at block 0's cap.
+  const { blocks } = partitionBlocksBFS(scan, 20, 4);
   expect(blocks.length).toBe(2);
 
-  // Block 0 holds shallow BFS: [root, a, b, c] with c marked as a stub.
-  expect(blocks[0].globalRows).toEqual([0, 1, 2, 3]);
+  // Block 0: [root, a, b] (root + leaf-a + stub-b).
+  expect(blocks[0].globalRows).toEqual([0, 1, 2]);
   expect(blocks[0].stubs.length).toBe(1);
-  expect(blocks[0].stubs[0].gi).toBe(3);
+  expect(blocks[0].stubs[0].gi).toBe(2);
   expect(blocks[0].stubs[0].childBlockId).toBe(1);
 
-  // Block 1 = c (as block-root) + 8 leaves.
-  expect(blocks[1].globalRows[0]).toBe(3);
-  expect(blocks[1].globalRows.length).toBe(9);
+  // Block 1 starts at b (the stub-parent) and holds b + c + 8 leaves.
+  expect(blocks[1].globalRows[0]).toBe(2);
+  expect(blocks[1].globalRows.length).toBe(10);
 });
 
 test('partitionBlocksBFS: block-root with more children than targetSize still fits (avoids infinite recursion)', () => {

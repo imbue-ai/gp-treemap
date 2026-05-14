@@ -24,7 +24,8 @@ import path from 'node:path';
 import os from 'node:os';
 import zlib from 'node:zlib';
 import { BUNDLE } from '../dist/gp-treemap.bundle.embed.js';
-import { partitionBlocks, encodeBlock, buildEnvelope, writeEnvelopeJson,
+import { partitionBlocks, partitionBlocksBFS, encodeBlock,
+         buildEnvelope, writeEnvelopeJson,
          humanBytes, escapeHtml, LOADER_JS,
          deriveScanCachePath, saveScanJson, loadScanJson } from './scan-core.js';
 import { buildCliCommand, COPY_BTN_HTML, COPY_BTN_CSS, copyButtonScript } from './cli-command.js';
@@ -38,6 +39,10 @@ async function main() {
   const noOpen = argv.includes('--no-open');
   let colorBy = 'extension';
   let blockSize = 500000;
+  let firstBlockSize = 5000;        // block 0 controls first-paint latency;
+                                    // keep it small so a coarse overview
+                                    // can be rendered before any deeper
+                                    // block has streamed in.
   let workers = 16;
   let noCache = false;
   let scanInPath = null;
@@ -47,6 +52,7 @@ async function main() {
     if (argv[i] === '--no-open') continue;
     if (argv[i] === '--no-cache') { noCache = true; continue; }
     if (argv[i].startsWith('--block-size=')) { blockSize = Number(argv[i].split('=')[1]) || 500000; continue; }
+    if (argv[i].startsWith('--first-block-size=')) { firstBlockSize = Math.max(1, Number(argv[i].split('=')[1]) || 5000); continue; }
     if (argv[i].startsWith('--workers=')) { workers = Math.max(1, Number(argv[i].split('=')[1]) || 16); continue; }
     if (argv[i] === '--scan-in' || argv[i].startsWith('--scan-in=')) {
       scanInPath = argv[i].includes('=') ? argv[i].split('=')[1] : argv[++i];
@@ -101,6 +107,11 @@ async function main() {
       : path.join(os.tmpdir(), 'gpdu-scan-' + path.basename(target).replace(/[^a-zA-Z0-9._-]/g, '_') + '-' + Date.now() + '.html');
   }
 
+  // The first block can never sensibly be larger than a regular block — a
+  // user passing --block-size=20 expects every block (including the first)
+  // capped at 20.
+  firstBlockSize = Math.min(firstBlockSize, blockSize);
+
   const scanCachePath = scanOutPath || scanInPath || deriveScanCachePath(out);
   const explicitIn = scanInPath != null;
   // Existence check is wrapped so a sandboxed environment without
@@ -136,7 +147,7 @@ async function main() {
     scanTarget = target;
     counts = { files: scan.files, dirs: scan.dirs, bytes: scan.bytes, unreadable: scan.unreadable };
 
-    envelope = buildScanEnvelope(scan, blockSize);
+    envelope = buildScanEnvelope(scan, blockSize, firstBlockSize);
 
     // Persist the scan cache *before* writing HTML, so a crash during the
     // HTML emit still leaves a usable cache for re-rendering. Wrapped in
@@ -484,7 +495,12 @@ const PAGE_CSS = `
 // Doing this work once (here) means the cache stores already-encoded
 // blocks — re-rendering HTML from the cache is just a base64-string
 // splice, no re-partition / re-encode.
-function buildScanEnvelope(scan, blockSize) {
+//
+// Uses BFS-from-the-root chunking so shallow descendants land in block 0
+// (what a layer-by-layer renderer can paint immediately), with `firstBlockSize`
+// keeping block 0 small enough for fast first paint. Deeper blocks at the
+// regular `blockSize` carry the detail, streamed in lazily.
+function buildScanEnvelope(scan, blockSize, firstBlockSize) {
   const normScan = {
     labels: scan.labels,
     parentIndices: scan.parentIndices,
@@ -499,7 +515,7 @@ function buildScanEnvelope(scan, blockSize) {
     },
     stubFields: {},
   };
-  const partResult = partitionBlocks(normScan, blockSize);
+  const partResult = partitionBlocksBFS(normScan, blockSize, firstBlockSize);
   const { blocks, childIds } = partResult;
 
   // Per-node aggregate file/dir counts for the stats bar's stub fast path.
