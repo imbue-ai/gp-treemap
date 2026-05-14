@@ -148,6 +148,22 @@ export const LOADER_JS = `// Browser-side IIFE shared by all \`gpdu-*\` CLIs. In
     }
   }
 
+  // Progressive-render scheduler. Each block that lands replaces a stub
+  // leaf in the in-memory store with a real subtree; we want the canvas
+  // to repaint as detail accumulates rather than wait for the last block
+  // to land. rAF-coalesced so a flurry of block arrivals in the same
+  // frame turns into one repaint, not N.
+  var pendingProgressiveRender = false;
+  function scheduleProgressiveRender() {
+    if (pendingProgressiveRender) return;
+    pendingProgressiveRender = true;
+    requestAnimationFrame(function () {
+      pendingProgressiveRender = false;
+      if (tm._tree) tm._tree._lazy = true;
+      tm._queueRender();
+    });
+  }
+
   // Inflate one compressed block.
   function inflateBlock(blockId) {
     var b64 = envelope.blocks[blockId];
@@ -160,11 +176,13 @@ export const LOADER_JS = `// Browser-side IIFE shared by all \`gpdu-*\` CLIs. In
     return new Response(ds.readable).text().then(function (text) {
       loadBlock(JSON.parse(text));
       envelope.blocks[blockId] = null;
+      scheduleProgressiveRender();
     });
   }
 
-  // After block-0 renders, inflate all remaining blocks in parallel and
-  // re-render once. Two renders total: skeletal first, complete second.
+  // After block-0 renders, kick off the rest of the blocks in parallel.
+  // Each one queues a progressive repaint as it lands, so the user sees
+  // detail fill in continuously instead of all-or-nothing at the end.
   var allBlocksReady = null;
   function inflateAllBlocks() {
     if (allBlocksReady) return allBlocksReady;
