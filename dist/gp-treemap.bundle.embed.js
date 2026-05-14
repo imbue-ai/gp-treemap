@@ -2556,11 +2556,36 @@ class GpTreemap extends HTMLElement {
     // Double-click any cell to zoom into it. For depth-truncated cells this
     // is the natural "drill deeper" gesture — after zooming, the displayDepth
     // budget re-applies relative to the new visible root.
+    //
+    // Special case: if a focused cell is set (the white selection rectangle,
+    // typically arrived at by scroll-wheel ancestor-walking) and the click
+    // is inside *its* rect, zoom to the focused cell rather than to the
+    // inner leaf under the cursor. The user has already picked the depth
+    // they want to drill into; we shouldn't override that just because they
+    // happened to click on one of its children.
+    if (!this._tree) return;
+    if (this._focusId != null && this._nodeRects) {
+      const rect = this._nodeRects.get(this._focusId);
+      if (rect) {
+        const canvasRect = this._canvas.getBoundingClientRect();
+        const dpr = this._canvas.width / canvasRect.width;
+        const px = (e.clientX - canvasRect.left) * dpr;
+        const py = (e.clientY - canvasRect.top) * dpr;
+        if (px >= rect.x && px < rect.x + rect.w && py >= rect.y && py < rect.y + rect.h) {
+          const focusNode = this._tree.nodes.get(this._focusId);
+          if (focusNode && !(focusNode.childIds && focusNode.childIds.length === 0)) {
+            e.preventDefault();
+            this.stretchZoomIn(this._focusId);
+            return;
+          }
+        }
+      }
+    }
+
     const id = this._hitTest(e);
-    if (id == null || !this._tree) return;
+    if (id == null) return;
     const node = this._tree.nodes.get(id);
     if (!node) return;
-    // If it's a true leaf (no children known), zooming is meaningless.
     if (node.childIds && node.childIds.length === 0) return;
     e.preventDefault();
     this.stretchZoomIn(id);

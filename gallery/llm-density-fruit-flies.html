@@ -142,7 +142,7 @@
   min-cell-area="30"></gp-treemap>
 <div id="bottom-bar">
   <div id="stats-bar"></div>
-  <span id="scanned-note">built 2026-05-13T17:28:20-07:00</span>
+  <span id="scanned-note">built 2026-05-13T21:22:31-07:00</span>
 </div>
 
 <script type="application/json" id="tmdata">
@@ -2068,22 +2068,35 @@ class GpTreemap extends HTMLElement {
       const node = nodes.get(nodeId);
       const atCap = node.depth >= cap;
 
-      // Lazy expansion: only expand nodes whose childIds is still null
-      // (unexpanded stubs or first-visit nodes). Already-expanded nodes
-      // keep their children across renders — no redundant getChildren calls.
-      if (lazy && node._item != null && node.childIds == null) {
+      // Lazy expansion: re-read children from the accessor every render.
+      // This is necessary for progressive loaders (depth-band chunks)
+      // where a node's children arrive in later blocks; the renderer's
+      // cached childIds may be empty or stale from an earlier render
+      // and we want to pick up newly-loaded descendants on the next
+      // paint. For accessors that return stable children, this loop is
+      // cheap (just rebuilds the same array).
+      //
+      // `items == null` from the accessor means "not yet known" (e.g.,
+      // unloaded stub) — we leave childIds untouched and increment
+      // pendingStubs so the loader knows to come back later.
+      if (lazy && node._item != null) {
         const items = _gc(node._item);
         if (items == null) {
-          // Data not yet available (stub block not inflated).
-          // Leave childIds as null — will retry on next render.
-          pendingStubs++;
-        } else if (items.length > 0) {
-          node.childIds = [];
+          if (node.childIds == null) pendingStubs++;
+          // else: keep the previously-resolved childIds (defensive — shouldn't
+          // happen in normal flow, but if an accessor flips back to null we
+          // prefer the last-known-good list to a blank).
+        } else if (items.length === 0) {
+          node.childIds = [];  // confirmed leaf
+        } else {
+          // Rebuild childIds from the current accessor result; add any new
+          // children to the local nodes map.
+          const newChildIds = new Array(items.length);
           for (let ci = 0; ci < items.length; ci++) {
             const cItem = items[ci];
             const cId = _gid(cItem);
-            const cVal = Number(_gv(cItem)) || 0;
             if (!nodes.has(cId)) {
+              const cVal = Number(_gv(cItem)) || 0;
               nodes.set(cId, {
                 id: cId, label: _gl(cItem), value: cVal,
                 colorValue: _gcol ? _gcol(cItem) : cVal,
@@ -2092,10 +2105,9 @@ class GpTreemap extends HTMLElement {
                 _item: cItem, _hasExplicitValue: true,
               });
             }
-            node.childIds.push(cId);
+            newChildIds[ci] = cId;
           }
-        } else {
-          node.childIds = [];  // true leaf — no children
+          node.childIds = newChildIds;
         }
       }
 
@@ -2704,11 +2716,36 @@ class GpTreemap extends HTMLElement {
     // Double-click any cell to zoom into it. For depth-truncated cells this
     // is the natural "drill deeper" gesture — after zooming, the displayDepth
     // budget re-applies relative to the new visible root.
+    //
+    // Special case: if a focused cell is set (the white selection rectangle,
+    // typically arrived at by scroll-wheel ancestor-walking) and the click
+    // is inside *its* rect, zoom to the focused cell rather than to the
+    // inner leaf under the cursor. The user has already picked the depth
+    // they want to drill into; we shouldn't override that just because they
+    // happened to click on one of its children.
+    if (!this._tree) return;
+    if (this._focusId != null && this._nodeRects) {
+      const rect = this._nodeRects.get(this._focusId);
+      if (rect) {
+        const canvasRect = this._canvas.getBoundingClientRect();
+        const dpr = this._canvas.width / canvasRect.width;
+        const px = (e.clientX - canvasRect.left) * dpr;
+        const py = (e.clientY - canvasRect.top) * dpr;
+        if (px >= rect.x && px < rect.x + rect.w && py >= rect.y && py < rect.y + rect.h) {
+          const focusNode = this._tree.nodes.get(this._focusId);
+          if (focusNode && !(focusNode.childIds && focusNode.childIds.length === 0)) {
+            e.preventDefault();
+            this.stretchZoomIn(this._focusId);
+            return;
+          }
+        }
+      }
+    }
+
     const id = this._hitTest(e);
-    if (id == null || !this._tree) return;
+    if (id == null) return;
     const node = this._tree.nodes.get(id);
     if (!node) return;
-    // If it's a true leaf (no children known), zooming is meaningless.
     if (node.childIds && node.childIds.length === 0) return;
     e.preventDefault();
     this.stretchZoomIn(id);
@@ -3177,9 +3214,15 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
   var currentPalette = DEFAULT_PALETTE;
 
   // Decode a block (already-parsed JSON object) and add its nodes to the store.
+  // Supports two wire formats:
+  //   * v=3 (subtree-rooted, blk.piB64): parent refs are local-row offsets,
+  //     -1 for "parent is in another block". Stubs (blk.stubs) tag the
+  //     internal nodes whose real children live elsewhere.
+  //   * v=4 (depth-band, blk.pgB64): parent refs are global ids. Every
+  //     parent is in an earlier block; on load we append each row into
+  //     its parent's childIds via store lookup. No stubs.
   function loadBlock(blk) {
     var m = blk.labels.length;
-    var pi = new Int32Array(_buf(blk.piB64));
     var gr = new Int32Array(_buf(blk.grB64));
 
     // Decode each attribute the encoder produced.
@@ -3193,6 +3236,36 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
         decodedAttrs[name] = decodeNum(a.b64);
       }
     }
+
+    if (blk.pgB64) {
+      // ---- v=4 depth-band path: every parent reference is global; we
+      // link each row into its parent's childIds via the store. ----
+      var pg = new Int32Array(_buf(blk.pgB64));
+      for (var k = 0; k < m; k++) {
+        var gid = gr[k];
+        if (store.has(gid)) continue;  // shouldn't happen with depth-band, but defensive
+        var gp = pg[k];
+        var nd = {
+          label: blk.labels[k],
+          value: blk.values[k],
+          parentId: gp >= 0 ? gp : null,
+          childIds: null,
+        };
+        for (var an in decodedAttrs) nd[an] = decodedAttrs[an][k];
+        store.set(gid, nd);
+        if (gp >= 0) {
+          var parentNd = store.get(gp);
+          if (parentNd) {
+            if (parentNd.childIds == null) parentNd.childIds = [];
+            parentNd.childIds.push(gid);
+          }
+        }
+      }
+      return;
+    }
+
+    // ---- v=3 subtree-rooted path. ----
+    var pi = new Int32Array(_buf(blk.piB64));
 
     // Build childIds per node (local).
     var localChildren = new Array(m);
@@ -3215,37 +3288,52 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
       }
     }
 
-    for (var k = 0; k < m; k++) {
-      var gid = gr[k];
-      if (store.has(gid)) {
+    for (var k2 = 0; k2 < m; k2++) {
+      var gid2 = gr[k2];
+      if (store.has(gid2)) {
         // Node already exists (it's a stub from a parent block) — update it
         // with real children from this block.
-        var existing = store.get(gid);
-        if (localChildren[k]) {
-          existing.childIds = localChildren[k].map(function (li) { return gr[li]; });
+        var existing = store.get(gid2);
+        if (localChildren[k2]) {
+          existing.childIds = localChildren[k2].map(function (li) { return gr[li]; });
         }
         continue;
       }
-      var gp = null;
-      if (pi[k] >= 0) gp = gr[pi[k]];
-      var nd = {
-        label: blk.labels[k],
-        value: blk.values[k],
-        parentId: gp,
-        childIds: localChildren[k] ? localChildren[k].map(function (li) { return gr[li]; }) : null,
+      var gp2 = null;
+      if (pi[k2] >= 0) gp2 = gr[pi[k2]];
+      var nd2 = {
+        label: blk.labels[k2],
+        value: blk.values[k2],
+        parentId: gp2,
+        childIds: localChildren[k2] ? localChildren[k2].map(function (li) { return gr[li]; }) : null,
       };
-      for (var an in decodedAttrs) nd[an] = decodedAttrs[an][k];
-      var stubInfo = stubMap.get(k);
+      for (var an2 in decodedAttrs) nd2[an2] = decodedAttrs[an2][k2];
+      var stubInfo = stubMap.get(k2);
       if (stubInfo) {
-        nd.stubBlockId = stubInfo[1];
-        nd.stubAggregates = {};
+        nd2.stubBlockId = stubInfo[1];
+        nd2.stubAggregates = {};
         for (var sf = 0; sf < stubFieldNames.length; sf++) {
-          // stubInfo layout: [localRow, childBlockId, ...stubFieldValues]
-          nd.stubAggregates[stubFieldNames[sf]] = stubInfo[2 + sf];
+          nd2.stubAggregates[stubFieldNames[sf]] = stubInfo[2 + sf];
         }
       }
-      store.set(gid, nd);
+      store.set(gid2, nd2);
     }
+  }
+
+  // Progressive-render scheduler. Each block that lands replaces a stub
+  // leaf in the in-memory store with a real subtree; we want the canvas
+  // to repaint as detail accumulates rather than wait for the last block
+  // to land. rAF-coalesced so a flurry of block arrivals in the same
+  // frame turns into one repaint, not N.
+  var pendingProgressiveRender = false;
+  function scheduleProgressiveRender() {
+    if (pendingProgressiveRender) return;
+    pendingProgressiveRender = true;
+    requestAnimationFrame(function () {
+      pendingProgressiveRender = false;
+      if (tm._tree) tm._tree._lazy = true;
+      tm._queueRender();
+    });
   }
 
   // Inflate one compressed block.
@@ -3260,11 +3348,13 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
     return new Response(ds.readable).text().then(function (text) {
       loadBlock(JSON.parse(text));
       envelope.blocks[blockId] = null;
+      scheduleProgressiveRender();
     });
   }
 
-  // After block-0 renders, inflate all remaining blocks in parallel and
-  // re-render once. Two renders total: skeletal first, complete second.
+  // After block-0 renders, kick off the rest of the blocks in parallel.
+  // Each one queues a progressive repaint as it lands, so the user sees
+  // detail fill in continuously instead of all-or-nothing at the end.
   var allBlocksReady = null;
   function inflateAllBlocks() {
     if (allBlocksReady) return allBlocksReady;
@@ -3552,7 +3642,7 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
 (function () {
   var btn = document.getElementById('copy-cli-btn');
   if (!btn) return;
-  var cmd = "npx -p @imbue-ai/gp-treemap gp-visualize-llm-continuation-density --no-open --scan-in=samples/data/llm-density/fruit-flies-d4.json.gz '--prompt=Time flies like an arrow. Fruit flies like a' --model=/tmp/llama-3.2-1b-f16.gguf gallery/llm-density-fruit-flies.html";
+  var cmd = "npx -p @imbue-ai/gp-treemap gp-visualize-llm-continuation-density --no-open --scan-in=/Users/thad/.sculptor/workspaces/66edd043bf8747fbb443ed267f7ee294/code/samples/data/llm-density/fruit-flies-d4.json.gz '--prompt=Time flies like an arrow. Fruit flies like a' --model=/tmp/llama-3.2-1b-f16.gguf /Users/thad/.sculptor/workspaces/66edd043bf8747fbb443ed267f7ee294/code/gallery/llm-density-fruit-flies.html";
   var origHtml = btn.innerHTML;
   var resetTimer = null;
   btn.addEventListener('click', function () {
