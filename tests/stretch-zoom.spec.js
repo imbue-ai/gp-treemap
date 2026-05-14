@@ -662,4 +662,79 @@ test.describe('stretch zoom', () => {
     expect(hoverId).not.toBeNull();
   });
 
+  test('double-click inside the focused-ancestor rect zooms to the ancestor, not the inner leaf', async ({ page }) => {
+    // The natural follow-up to "scroll-wheel out to an ancestor, now zoom
+    // here": double-clicking anywhere inside the white selection rectangle
+    // should land at the ancestor, even though the cursor is technically
+    // on one of its leaf children. Both clicks of the dblclick reset focus
+    // to that leaf, so we have to recover the pre-click focus.
+    await page.goto('/samples/interactions.html');
+    await waitForRender(page);
+
+    // Single-click a leaf to set target+focus on it.
+    const box = await page.locator('gp-treemap').boundingBox();
+    const clickX = box.x + box.width * 0.3;
+    const clickY = box.y + box.height * 0.3;
+    await page.mouse.click(clickX, clickY);
+    await waitForRender(page);
+
+    // Walk focus up to an ancestor. We want a focus chain like
+    // target → parent → grandparent → root so dblclick has a non-target
+    // ancestor's rect to land inside.
+    const initial = await page.locator('gp-treemap').evaluate((el) => ({
+      targetId: el._targetId,
+      focusId: el._focusId,
+    }));
+    expect(initial.targetId).not.toBeNull();
+    expect(initial.focusId).toBe(initial.targetId);
+
+    // Wheel up at least once; do it a few times to reach a higher ancestor
+    // (samples/interactions.html is a depth-4ish tree).
+    await page.locator('gp-treemap').evaluate((el) => {
+      el._focusUp(); el._focusUp();
+    });
+    await waitForRender(page);
+
+    const ancestorState = await page.locator('gp-treemap').evaluate((el) => ({
+      targetId: el._targetId,
+      focusId: el._focusId,
+      ancestorRect: el._nodeRects.get(el._focusId),
+      hasChildren: (() => {
+        const n = el._tree.nodes.get(el._focusId);
+        return n && n.childIds && n.childIds.length > 0;
+      })(),
+    }));
+    expect(ancestorState.focusId).not.toBe(ancestorState.targetId);
+    expect(ancestorState.hasChildren).toBe(true);
+    expect(ancestorState.ancestorRect).toBeTruthy();
+    const ancestorBeforeDblClick = ancestorState.focusId;
+
+    // Compute a click point inside the focused ancestor's rect, but NOT
+    // at the same screen pixel as our previous single-click (we want to
+    // demonstrate that dblclicking a *different* inner cell still zooms
+    // to the ancestor). We translate the ancestor rect (canvas pixels)
+    // back to CSS coords, then aim near its centroid.
+    const dblPoint = await page.locator('gp-treemap').evaluate((el) => {
+      const rect = el._nodeRects.get(el._focusId);
+      const canvasRect = el._canvas.getBoundingClientRect();
+      const dpr = el._canvas.width / canvasRect.width;
+      const cssX = canvasRect.left + (rect.x + rect.w * 0.5) / dpr;
+      const cssY = canvasRect.top + (rect.y + rect.h * 0.5) / dpr;
+      return { x: cssX, y: cssY };
+    });
+
+    await page.mouse.dblclick(dblPoint.x, dblPoint.y);
+    await waitForZoomAnimation(page);
+
+    const after = await page.locator('gp-treemap').evaluate((el) => ({
+      stretchZoomId: el._stretchZoomId,
+      focusId: el._focusId,
+      targetId: el._targetId,
+    }));
+    expect(
+      after.stretchZoomId,
+      'dblclick should have stretched into the focused ancestor, not into the inner leaf the cursor was on',
+    ).toBe(ancestorBeforeDblClick);
+  });
+
 });
