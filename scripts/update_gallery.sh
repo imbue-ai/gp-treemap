@@ -22,6 +22,15 @@ fi
 # --- Disk-usage entry: self-scan of the repo.
 node tools/gpdu-scan.js --no-open --color=extension "$ROOT" "$ROOT/gallery/gp-treemap-source-tree-disk-usage.html"
 
+# --- LLM continuation-density entry: regenerate the HTML from the cached
+# scan JSON. Running the LLM from scratch needs the model weights and takes
+# ~30 min; the gzipped scan (~1.3 MB) lets the gallery rebuild in <1 s.
+node tools/gpdu-llm-density.js --no-open \
+  --scan-in="$ROOT/samples/data/llm-density/fruit-flies-d4.json.gz" \
+  --prompt='Time flies like an arrow. Fruit flies like a' \
+  --model=/tmp/llama-3.2-1b-f16.gguf \
+  "$ROOT/gallery/llm-density-fruit-flies.html"
+
 # --- Table-treemap entries. Each line pairs a dataset with the defaults
 # baked into its viewer HTML.
 node tools/table-treemap.js --no-open \
