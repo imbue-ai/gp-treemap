@@ -1927,11 +1927,18 @@ class GpTreemap extends HTMLElement {
           // happen in normal flow, but if an accessor flips back to null we
           // prefer the last-known-good list to a blank).
         } else if (items.length === 0) {
-          node.childIds = [];  // confirmed leaf
+          if (node.childIds == null || node.childIds.length !== 0) {
+            node.childIds = [];  // confirmed leaf
+            node._balRoot = null;
+          }
         } else {
           // Rebuild childIds from the current accessor result; add any new
-          // children to the local nodes map.
-          const newChildIds = new Array(items.length);
+          // children to the local nodes map. If membership is unchanged from
+          // the previous render, preserve the existing childIds array
+          // identity so the per-node balancer cache (_balRoot) stays valid.
+          const existing = node.childIds;
+          let same = existing != null && existing.length === items.length;
+          const newChildIds = same ? null : new Array(items.length);
           for (let ci = 0; ci < items.length; ci++) {
             const cItem = items[ci];
             const cId = _gid(cItem);
@@ -1945,9 +1952,23 @@ class GpTreemap extends HTMLElement {
                 _item: cItem, _hasExplicitValue: true,
               });
             }
-            newChildIds[ci] = cId;
+            if (same) {
+              if (existing[ci] !== cId) {
+                same = false;
+                const rebuilt = new Array(items.length);
+                for (let bi = 0; bi < ci; bi++) rebuilt[bi] = existing[bi];
+                rebuilt[ci] = cId;
+                node.childIds = rebuilt;
+                node._balRoot = null;
+              }
+            } else {
+              newChildIds[ci] = cId;
+            }
           }
-          node.childIds = newChildIds;
+          if (!same && newChildIds) {
+            node.childIds = newChildIds;
+            node._balRoot = null;
+          }
         }
       }
 
@@ -1957,7 +1978,15 @@ class GpTreemap extends HTMLElement {
         return;
       }
       const kids = node.childIds.map((cid) => nodes.get(cid));
-      const balRoot = balanceChildren(kids.map((k) => ({ id: k.id, size: Math.max(0, k.value) })));
+      // Cache the GP-style balanced binary tree on the node. It's a pure
+      // function of (childIds, child values), and child values don't change
+      // once a node enters `nodes`, so a single recompute per childIds
+      // identity is enough. Invalidated above whenever childIds is reassigned.
+      let balRoot = node._balRoot;
+      if (!balRoot) {
+        balRoot = balanceChildren(kids.map((k) => ({ id: k.id, size: Math.max(0, k.value) })));
+        node._balRoot = balRoot;
+      }
       const childRects = new Map();
       if (balRoot) {
         layoutTree(balRoot, rect, (id, r) => childRects.set(id, r), splitBias);

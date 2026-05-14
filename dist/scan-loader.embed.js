@@ -186,14 +186,26 @@ export const LOADER_JS = `// Browser-side IIFE shared by all \`gpdu-*\` CLIs. In
   // Progressive-render scheduler. Each block that lands replaces a stub
   // leaf in the in-memory store with a real subtree; we want the canvas
   // to repaint as detail accumulates rather than wait for the last block
-  // to land. rAF-coalesced so a flurry of block arrivals in the same
-  // frame turns into one repaint, not N.
+  // to land.
+  //
+  // Doubling backoff: paint after 1 new block, then after 2 more, then 4,
+  // then 8, ... So total paint count grows as log2(N), not N — for a
+  // 29-block load that's ~5 paints instead of 29, each of which fully
+  // re-layouts the visible subtree. rAF-coalesced so multiple arrivals
+  // in one frame still collapse to one repaint. The final block always
+  // triggers a paint regardless of the doubling threshold.
   var pendingProgressiveRender = false;
+  var paintedBlocks = 0;     // loadedBlocks count at last scheduled paint
+  var nextPaintDelta = 1;    // doubles after each scheduled paint
   function scheduleProgressiveRender() {
+    var allDone = totalBlocks > 0 && loadedBlocks >= totalBlocks;
+    if (!allDone && (loadedBlocks - paintedBlocks) < nextPaintDelta) return;
     if (pendingProgressiveRender) return;
     pendingProgressiveRender = true;
     requestAnimationFrame(function () {
       pendingProgressiveRender = false;
+      paintedBlocks = loadedBlocks;
+      if (!(totalBlocks > 0 && loadedBlocks >= totalBlocks)) nextPaintDelta *= 2;
       if (tm._tree) tm._tree._lazy = true;
       tm._queueRender();
     });
