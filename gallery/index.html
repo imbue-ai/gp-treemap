@@ -180,40 +180,7 @@
       assigns to continuations of a starter prompt. Each cell is one
       token; cell <i>area</i> is the joint probability of the prefix
       from the root to that token (so sibling areas at any subtree sum
-      to the parent's joint, and the whole tree sums to 1.0). Cell
-      <i>label</i> shows the token's conditional probability given its
-      parent — a verification handle: read off the conditionals along
-      any path and their product matches the visual area of the
-      destination cell. At every internal node, a synthetic
-      <code>(other)</code> leaf carries the residual mass not expanded
-      by <code>--top-k</code> / <code>--top-p</code> /
-      <code>--prune-probability</code>, so the aggregates reconcile
-      exactly at every level. Color: by topmost visible ancestor under
-      the current zoom root (<code>[Level 1]</code> in the dropdown),
-      so every direct child of the current view gets a distinct hue
-      and its descendants inherit it — the palette re-applies as you
-      zoom in. Generated locally with <a
-      href="https://huggingface.co/QuantFactory/Llama-3.2-1B-GGUF">Llama-3.2-1B
-      base (Q4_K_M GGUF, ~770 MB)</a> — the *base* checkpoint, no
-      instruct fine-tuning. The base model has seen the canonical
-      "fruit flies like a banana" joke in its pretraining corpus
-      verbatim, so <code>" banana"</code> sits at the top of the
-      distribution at 21.5%, followed by other natural completions:
-      <code>" rainbow"</code>, <code>" butterfly"</code>,
-      <code>" fruit"</code>, <code>" fly"</code>, <code>" bee"</code>,
-      <code>" honey"</code>, <code>" bird"</code>,
-      <code>" mosquito"</code>, <code>" grape"</code>,
-      <code>" parachute"</code>, <code>" kite"</code> — the kind of
-      shape you'd actually want from a language model that's seen real
-      English text. Note one tokenization subtlety: the prompt ends
-      with <code>"...like a"</code> (no trailing space). That matters,
-      because BPE tokenizers ship content words with their leading
-      space baked in (the token is <code>" banana"</code>, not
-      <code>"banana"</code>). Adding a trailing space to the prompt
-      forces the model to predict a token *without* a leading space,
-      which content words rarely have — and the head of the
-      distribution collapses to digits and punctuation. Same model,
-      same joke, completely different visualization.
+      to the parent's joint, and the whole tree sums to 1.0).
     </p>
     <p style="background: var(--card-bg, #fff); border: 1px solid var(--border, #e2e2e2); border-radius: 6px; padding: 10px 14px; margin: 0 0 1rem; font-size: 13px; color: var(--muted, #555);">
       <b style="color: var(--fg, #1a1a1a);">Aside — two things this

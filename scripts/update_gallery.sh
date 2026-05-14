@@ -34,14 +34,14 @@ node tools/gpdu-llm-density.js --no-open \
 # --- Table-treemap entries. Each line pairs a dataset with the defaults
 # baked into its viewer HTML.
 node tools/table-treemap.js --no-open \
-  --size=Generation_TWh --color=Fuel --path=Fuel,Continent,Country \
+  --size=Generation_TWh --color='[Level 1]' --path=Fuel,Continent,Country \
   --theme=catppuccin \
   --title="Global electricity generation (2023, TWh) — colored by fuel" \
   "$DATA/energy-2023.jsonl" \
   "$ROOT/gallery/table-treemap-energy-fuel.html"
 
 node tools/table-treemap.js --no-open \
-  --size=Gross_Outlays --color=Category --path=Category,Agency,Bureau \
+  --size=Gross_Outlays --color='[Level 1]' --path=Category,Agency,Bureau \
   --palette=viridis \
   --title="US federal outlays FY2024 — Treasury MTS (USD)" \
   "$DATA/us-outlays-fy2024.jsonl" \
@@ -65,7 +65,7 @@ KEEP_COLS=EmployerType,EmployerName,DepartmentOrSubdivision,Position,TotalWages,
 if [ -f "$DATA/ca-raw/2024_UniversityOfCalifornia.zip" ]; then
   unzip -o -q "$DATA/ca-raw/2024_UniversityOfCalifornia.zip" -d "$CA_TMP"
   node tools/table-treemap.js --no-open \
-    --size=TotalWages --color=EmployerName --path=EmployerName,DepartmentOrSubdivision \
+    --size=TotalWages --color='[Level 1]' --path=EmployerName,DepartmentOrSubdivision \
     --palette=turbo --keep-cols="$KEEP_COLS" \
     --title="UC employee wages 2024 (California)" \
     "$CA_TMP/2024_UniversityOfCalifornia.csv" \
@@ -74,7 +74,7 @@ fi
 if [ -f "$DATA/ca-raw/2024_City.zip" ]; then
   unzip -o -q "$DATA/ca-raw/2024_City.zip" -d "$CA_TMP"
   node tools/table-treemap.js --no-open \
-    --size=TotalWages --color=DepartmentOrSubdivision \
+    --size=TotalWages --color='[Level 1]' \
     --path=DepartmentOrSubdivision,EmployerCounty,EmployerName,Position,_row \
     --theme=one-dark --keep-cols="$KEEP_COLS" \
     --title="California city government wages 2024" \
