@@ -577,22 +577,35 @@ export class GpTreemap extends HTMLElement {
       const node = nodes.get(nodeId);
       const atCap = node.depth >= cap;
 
-      // Lazy expansion: only expand nodes whose childIds is still null
-      // (unexpanded stubs or first-visit nodes). Already-expanded nodes
-      // keep their children across renders — no redundant getChildren calls.
-      if (lazy && node._item != null && node.childIds == null) {
+      // Lazy expansion: re-read children from the accessor every render.
+      // This is necessary for progressive loaders (depth-band chunks)
+      // where a node's children arrive in later blocks; the renderer's
+      // cached childIds may be empty or stale from an earlier render
+      // and we want to pick up newly-loaded descendants on the next
+      // paint. For accessors that return stable children, this loop is
+      // cheap (just rebuilds the same array).
+      //
+      // `items == null` from the accessor means "not yet known" (e.g.,
+      // unloaded stub) — we leave childIds untouched and increment
+      // pendingStubs so the loader knows to come back later.
+      if (lazy && node._item != null) {
         const items = _gc(node._item);
         if (items == null) {
-          // Data not yet available (stub block not inflated).
-          // Leave childIds as null — will retry on next render.
-          pendingStubs++;
-        } else if (items.length > 0) {
-          node.childIds = [];
+          if (node.childIds == null) pendingStubs++;
+          // else: keep the previously-resolved childIds (defensive — shouldn't
+          // happen in normal flow, but if an accessor flips back to null we
+          // prefer the last-known-good list to a blank).
+        } else if (items.length === 0) {
+          node.childIds = [];  // confirmed leaf
+        } else {
+          // Rebuild childIds from the current accessor result; add any new
+          // children to the local nodes map.
+          const newChildIds = new Array(items.length);
           for (let ci = 0; ci < items.length; ci++) {
             const cItem = items[ci];
             const cId = _gid(cItem);
-            const cVal = Number(_gv(cItem)) || 0;
             if (!nodes.has(cId)) {
+              const cVal = Number(_gv(cItem)) || 0;
               nodes.set(cId, {
                 id: cId, label: _gl(cItem), value: cVal,
                 colorValue: _gcol ? _gcol(cItem) : cVal,
@@ -601,10 +614,9 @@ export class GpTreemap extends HTMLElement {
                 _item: cItem, _hasExplicitValue: true,
               });
             }
-            node.childIds.push(cId);
+            newChildIds[ci] = cId;
           }
-        } else {
-          node.childIds = [];  // true leaf — no children
+          node.childIds = newChildIds;
         }
       }
 

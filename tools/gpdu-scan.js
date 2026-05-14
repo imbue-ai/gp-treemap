@@ -24,8 +24,8 @@ import path from 'node:path';
 import os from 'node:os';
 import zlib from 'node:zlib';
 import { BUNDLE } from '../dist/gp-treemap.bundle.embed.js';
-import { partitionBlocks, partitionBlocksBFS, encodeBlock,
-         buildEnvelope, writeEnvelopeJson,
+import { partitionBlocks, partitionBlocksBFS, partitionBlocksDepthBand,
+         encodeBlock, buildEnvelope, writeEnvelopeJson,
          humanBytes, escapeHtml, LOADER_JS,
          deriveScanCachePath, saveScanJson, loadScanJson } from './scan-core.js';
 import { buildCliCommand, COPY_BTN_HTML, COPY_BTN_CSS, copyButtonScript } from './cli-command.js';
@@ -496,10 +496,12 @@ const PAGE_CSS = `
 // blocks — re-rendering HTML from the cache is just a base64-string
 // splice, no re-partition / re-encode.
 //
-// Uses BFS-from-the-root chunking so shallow descendants land in block 0
-// (what a layer-by-layer renderer can paint immediately), with `firstBlockSize`
-// keeping block 0 small enough for fast first paint. Deeper blocks at the
-// regular `blockSize` carry the detail, streamed in lazily.
+// Depth-band chunking: block 0 = depth 0..K (shallow), block 1 = next
+// `blockSize` nodes in depth-sorted order, etc. The renderer sees a clean
+// iterative-deepening fill as deeper blocks land — each block is a
+// horizontal slice across the whole tree, not a subtree slice. No stubs
+// are needed since every parent always lives in an earlier block; the
+// loader resolves cross-block parent links via the global store.
 function buildScanEnvelope(scan, blockSize, firstBlockSize) {
   const normScan = {
     labels: scan.labels,
@@ -515,23 +517,9 @@ function buildScanEnvelope(scan, blockSize, firstBlockSize) {
     },
     stubFields: {},
   };
-  const partResult = partitionBlocksBFS(normScan, blockSize, firstBlockSize);
-  const { blocks, childIds } = partResult;
+  const partResult = partitionBlocksDepthBand(normScan, blockSize, firstBlockSize);
 
-  // Per-node aggregate file/dir counts for the stats bar's stub fast path.
-  const n = scan.labels.length;
-  const aggFiles = new Int32Array(n);
-  const aggDirs = new Int32Array(n);
-  for (let i = n - 1; i >= 0; i--) {
-    if (!childIds[i]) { aggFiles[i] = 1; aggDirs[i] = 0; }
-    else {
-      aggFiles[i] = 0; aggDirs[i] = 1;
-      for (const c of childIds[i]) { aggFiles[i] += aggFiles[c]; aggDirs[i] += aggDirs[c]; }
-    }
-  }
-  normScan.stubFields = { aggFiles: Array.from(aggFiles), aggDirs: Array.from(aggDirs) };
-
-  process.stderr.write('  partitioned into ' + blocks.length + ' blocks\n');
+  process.stderr.write('  partitioned into ' + partResult.blocks.length + ' depth-band blocks\n');
 
   return buildEnvelope(normScan, partResult, {
     totalFiles: scan.files,

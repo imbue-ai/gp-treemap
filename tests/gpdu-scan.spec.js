@@ -26,8 +26,26 @@ function parseScanHtml(htmlPath) {
   } else {
     raw = envelope;
   }
-  const piBuf = Buffer.from(raw.piB64, 'base64');
-  const parentIndices = Array.from(new Int32Array(piBuf.buffer, piBuf.byteOffset, piBuf.byteLength / 4));
+  // v=3 blocks use local-row parent indices in `piB64`. v=4 (depth-band)
+  // blocks use global parent ids in `pgB64`; in that case we also need
+  // grB64 to map every row to its global id and reverse it back to the
+  // local-row index the existing tests expect.
+  let parentIndices;
+  if (raw.piB64) {
+    const piBuf = Buffer.from(raw.piB64, 'base64');
+    parentIndices = Array.from(new Int32Array(piBuf.buffer, piBuf.byteOffset, piBuf.byteLength / 4));
+  } else {
+    const pgBuf = Buffer.from(raw.pgB64, 'base64');
+    const pg = new Int32Array(pgBuf.buffer, pgBuf.byteOffset, pgBuf.byteLength / 4);
+    const grBuf = Buffer.from(raw.grB64, 'base64');
+    const gr = new Int32Array(grBuf.buffer, grBuf.byteOffset, grBuf.byteLength / 4);
+    const globalToLocal = new Map();
+    for (let i = 0; i < gr.length; i++) globalToLocal.set(gr[i], i);
+    parentIndices = new Array(pg.length);
+    for (let i = 0; i < pg.length; i++) {
+      parentIndices[i] = globalToLocal.has(pg[i]) ? globalToLocal.get(pg[i]) : -1;
+    }
+  }
   // The 'kind' attribute carries the bucketed file kind (used to be 'extColor').
   const kindAttr = raw.attributes.kind;
   const cBuf = Buffer.from(kindAttr.b64, 'base64');
@@ -373,9 +391,9 @@ test('multi-block scan: stubs expand progressively after async inflate', async (
     path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', '--block-size=20', target, out,
   ], { encoding: 'utf8' });
   expect(res.status, res.stderr).toBe(0);
-  expect(res.stderr).toMatch(/partitioned into \d+ blocks/);
+  expect(res.stderr).toMatch(/partitioned into \d+ (?:depth-band )?blocks/);
   // Should have more than 1 block.
-  const blockCount = Number(res.stderr.match(/partitioned into (\d+) blocks/)[1]);
+  const blockCount = Number(res.stderr.match(/partitioned into (\d+) (?:depth-band )?blocks/)[1]);
   expect(blockCount).toBeGreaterThan(1);
 
   const errs = [];
@@ -559,8 +577,8 @@ test('zoom survives async block inflation in multi-block scan', async ({ page })
     path.join(ROOT, 'tools', 'gpdu-scan.js'), '--no-open', '--block-size=20', target, out,
   ], { encoding: 'utf8' });
   expect(res.status, res.stderr).toBe(0);
-  const blockCount = Number(res.stderr.match(/partitioned into (\d+) blocks/)?.[1] || 0);
-  expect(blockCount, 'must have multiple blocks so stubs exist').toBeGreaterThan(1);
+  const blockCount = Number(res.stderr.match(/partitioned into (\d+) (?:depth-band )?blocks/)?.[1] || 0);
+  expect(blockCount, 'must have multiple blocks so async inflation is exercised').toBeGreaterThan(1);
 
   const errs = [];
   page.on('pageerror', (e) => errs.push(String(e)));

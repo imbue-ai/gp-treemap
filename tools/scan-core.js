@@ -325,6 +325,85 @@ export function partitionBlocksBFS(scan, targetSize = 50000, firstBlockSize = ta
   return { blocks, childIds, aggValue };
 }
 
+// Depth-band partitioner. Re-orders nodes by (depth, original-position),
+// then slices the depth-sorted sequence into fixed-size chunks. Each
+// chunk is a contiguous depth slice across the whole tree, so block 0
+// holds the shallowest layers (root + depth 1 + depth 2 + …) up to
+// `firstBlockSize`, block 1 picks up where block 0 left off, etc.
+//
+// Notable differences from `partitionBlocks` / `partitionBlocksBFS`:
+//
+//   * No stubs. A parent in block K with children in block K+1 simply
+//     has `childIds === null` until block K+1 lands; the loader appends
+//     each new node to its parent's `childIds` and the renderer redraws.
+//   * Parents always live in EARLIER blocks. So every row's parent ref
+//     is cross-block; the encoder writes a `parentGlobalB64` array (Int32
+//     of global parent ids) instead of relying on local-row offsets.
+//   * No fan-out limits — a layer wider than `blockSize` simply spans
+//     multiple blocks, all at full capacity.
+//
+// Output shape:
+//   {
+//     blocks: [{ globalRows: number[], stubs: [] }, ...],
+//     childIds,
+//     aggValue,
+//     reorder,    // new[i] = old-row-of-new-row-i  (= globalRows flat-concat)
+//     newOrder,   // newOrder[oldGi] = newGi  (== inverse of reorder)
+//   }
+//
+// `reorder` / `newOrder` let encodeBlock rewrite parentIndices in the
+// new ordering; this is the only partitioner that touches the row order.
+export function partitionBlocksDepthBand(scan, blockSize = 500000, firstBlockSize = blockSize) {
+  const n = scan.labels.length;
+  const pi = scan.parentIndices;
+
+  const childIds = new Array(n);
+  for (let i = 0; i < n; i++) childIds[i] = null;
+  for (let i = 1; i < n; i++) {
+    const p = pi[i];
+    if (childIds[p] === null) childIds[p] = [];
+    childIds[p].push(i);
+  }
+
+  // aggValue, reverse pass (used by encodeBlock for the values column).
+  const aggValue = new Float64Array(n);
+  for (let i = n - 1; i >= 0; i--) {
+    aggValue[i] = scan.values[i];
+    if (childIds[i]) for (const c of childIds[i]) aggValue[i] += aggValue[c];
+  }
+
+  // Per-node depth. Root (-1 parent) = 0; parents always have a lower id
+  // than children in a well-formed scan, so a forward pass works.
+  const depth = new Int32Array(n);
+  for (let i = 0; i < n; i++) {
+    depth[i] = pi[i] < 0 ? 0 : depth[pi[i]] + 1;
+  }
+
+  // Permutation: sort node indices by (depth ASC, originalId ASC). The
+  // secondary sort by id preserves source-order within a layer, which keeps
+  // adjacent siblings together for nicer locality in compressed blocks.
+  const order = new Int32Array(n);
+  for (let i = 0; i < n; i++) order[i] = i;
+  // V8 sort doesn't apply to typed arrays as objects; do via plain Array.
+  const orderArr = Array.from(order);
+  orderArr.sort((a, b) => (depth[a] - depth[b]) || (a - b));
+
+  // Slice into blocks. First block uses `firstBlockSize`; the rest use
+  // `blockSize`. No layer-boundary alignment — a dense layer simply
+  // continues across blocks.
+  const blocks = [];
+  let i = 0;
+  while (i < n) {
+    const cap = blocks.length === 0 ? firstBlockSize : blockSize;
+    const end = Math.min(i + cap, n);
+    const slice = orderArr.slice(i, end);
+    blocks.push({ globalRows: slice, stubs: [] });
+    i = end;
+  }
+
+  return { blocks, childIds, aggValue, depth };
+}
+
 // Build the full wire-format envelope for a scan. This is the JSON object
 // that ends up inside `<script type="application/json" id="tmdata">` in
 // the HTML output AND inside the scan-cache JSON — same shape in both
@@ -342,13 +421,19 @@ export function partitionBlocksBFS(scan, targetSize = 50000, firstBlockSize = ta
 // `childIds` to compute per-node aggregate counts for stubFields)
 // inspect or patch the scan between partition and encode.
 export function buildEnvelope(scan, partitionResult, extraTopLevel = {}) {
-  const { blocks: blockMetas, aggValue } = partitionResult;
+  const { blocks: blockMetas, aggValue, depth } = partitionResult;
+  // If the partitioner produced a `depth` array, it's the depth-band
+  // variant and every block needs global parent ids (cross-block links).
+  // Bump the envelope version so the loader picks the right code path.
+  const useGlobalParents = depth != null;
+  const v = useGlobalParents ? 4 : 3;
+  const parentEncoding = useGlobalParents ? 'global' : 'local';
   const b64 = new Array(blockMetas.length);
   for (let i = 0; i < blockMetas.length; i++) {
-    const json = JSON.stringify(encodeBlock(scan, blockMetas[i], { aggValue }));
+    const json = JSON.stringify(encodeBlock(scan, blockMetas[i], { aggValue, parentEncoding }));
     b64[i] = zlib.deflateRawSync(json, { level: 6 }).toString('base64');
   }
-  return { v: 3, ...extraTopLevel, blocks: b64 };
+  return { v, ...extraTopLevel, blocks: b64 };
 }
 
 // Write an envelope's JSON form into a file descriptor without ever
@@ -376,25 +461,46 @@ export function writeEnvelopeJson(write, envelope) {
 
 // Encode one block as a JSON-serializable object. The browser-side loader
 // (scan-loader.source.js) decodes the same shape.
+//
+// `ctx.parentEncoding` (optional, default 'local'):
+//   * 'local': writes `piB64` with local-row offsets, -1 for "parent is
+//     elsewhere". This is what partitionBlocks / partitionBlocksBFS need —
+//     each block is subtree-rooted, parents are typically in this block.
+//   * 'global': writes `pgB64` with the global parent id for every row.
+//     This is what partitionBlocksDepthBand needs — blocks are depth
+//     slices, so every parent is in some earlier block; the loader looks
+//     parents up in the store rather than via local-row offsets.
 export function encodeBlock(scan, block, ctx) {
-  const { aggValue } = ctx;
+  const { aggValue, parentEncoding = 'local' } = ctx;
   const stubFields = scan.stubFields || {};
   const stubFieldNames = Object.keys(stubFields);
 
   const gRows = block.globalRows;
   const m = gRows.length;
-  const globalToLocal = new Map();
-  for (let i = 0; i < m; i++) globalToLocal.set(gRows[i], i);
 
   const labels = new Array(m);
   const values = new Array(m);
-  const localPI = new Int32Array(m);
   for (let i = 0; i < m; i++) {
     const gi = gRows[i];
     labels[i] = scan.labels[gi];
     values[i] = aggValue[gi];
-    const gp = scan.parentIndices[gi];
-    localPI[i] = globalToLocal.has(gp) ? globalToLocal.get(gp) : -1;
+  }
+
+  // Parent references: one of two encodings (see ctx.parentEncoding).
+  let parentRefs;
+  if (parentEncoding === 'global') {
+    const pg = new Int32Array(m);
+    for (let i = 0; i < m; i++) pg[i] = scan.parentIndices[gRows[i]];
+    parentRefs = { pgB64: Buffer.from(pg.buffer).toString('base64') };
+  } else {
+    const globalToLocal = new Map();
+    for (let i = 0; i < m; i++) globalToLocal.set(gRows[i], i);
+    const localPI = new Int32Array(m);
+    for (let i = 0; i < m; i++) {
+      const gp = scan.parentIndices[gRows[i]];
+      localPI[i] = globalToLocal.has(gp) ? globalToLocal.get(gp) : -1;
+    }
+    parentRefs = { piB64: Buffer.from(localPI.buffer).toString('base64') };
   }
 
   // Per-attribute encoding. Categorical → enum-indexed Uint16. Numeric → Float64Array.
@@ -428,7 +534,7 @@ export function encodeBlock(scan, block, ctx) {
 
   return {
     labels, values,
-    piB64: Buffer.from(localPI.buffer).toString('base64'),
+    ...parentRefs,
     grB64: Buffer.from(Int32Array.from(gRows).buffer).toString('base64'),
     attributes,
     stubFieldNames,

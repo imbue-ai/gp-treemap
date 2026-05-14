@@ -77,9 +77,15 @@
   var currentPalette = DEFAULT_PALETTE;
 
   // Decode a block (already-parsed JSON object) and add its nodes to the store.
+  // Supports two wire formats:
+  //   * v=3 (subtree-rooted, blk.piB64): parent refs are local-row offsets,
+  //     -1 for "parent is in another block". Stubs (blk.stubs) tag the
+  //     internal nodes whose real children live elsewhere.
+  //   * v=4 (depth-band, blk.pgB64): parent refs are global ids. Every
+  //     parent is in an earlier block; on load we append each row into
+  //     its parent's childIds via store lookup. No stubs.
   function loadBlock(blk) {
     var m = blk.labels.length;
-    var pi = new Int32Array(_buf(blk.piB64));
     var gr = new Int32Array(_buf(blk.grB64));
 
     // Decode each attribute the encoder produced.
@@ -93,6 +99,36 @@
         decodedAttrs[name] = decodeNum(a.b64);
       }
     }
+
+    if (blk.pgB64) {
+      // ---- v=4 depth-band path: every parent reference is global; we
+      // link each row into its parent's childIds via the store. ----
+      var pg = new Int32Array(_buf(blk.pgB64));
+      for (var k = 0; k < m; k++) {
+        var gid = gr[k];
+        if (store.has(gid)) continue;  // shouldn't happen with depth-band, but defensive
+        var gp = pg[k];
+        var nd = {
+          label: blk.labels[k],
+          value: blk.values[k],
+          parentId: gp >= 0 ? gp : null,
+          childIds: null,
+        };
+        for (var an in decodedAttrs) nd[an] = decodedAttrs[an][k];
+        store.set(gid, nd);
+        if (gp >= 0) {
+          var parentNd = store.get(gp);
+          if (parentNd) {
+            if (parentNd.childIds == null) parentNd.childIds = [];
+            parentNd.childIds.push(gid);
+          }
+        }
+      }
+      return;
+    }
+
+    // ---- v=3 subtree-rooted path. ----
+    var pi = new Int32Array(_buf(blk.piB64));
 
     // Build childIds per node (local).
     var localChildren = new Array(m);
@@ -115,36 +151,35 @@
       }
     }
 
-    for (var k = 0; k < m; k++) {
-      var gid = gr[k];
-      if (store.has(gid)) {
+    for (var k2 = 0; k2 < m; k2++) {
+      var gid2 = gr[k2];
+      if (store.has(gid2)) {
         // Node already exists (it's a stub from a parent block) — update it
         // with real children from this block.
-        var existing = store.get(gid);
-        if (localChildren[k]) {
-          existing.childIds = localChildren[k].map(function (li) { return gr[li]; });
+        var existing = store.get(gid2);
+        if (localChildren[k2]) {
+          existing.childIds = localChildren[k2].map(function (li) { return gr[li]; });
         }
         continue;
       }
-      var gp = null;
-      if (pi[k] >= 0) gp = gr[pi[k]];
-      var nd = {
-        label: blk.labels[k],
-        value: blk.values[k],
-        parentId: gp,
-        childIds: localChildren[k] ? localChildren[k].map(function (li) { return gr[li]; }) : null,
+      var gp2 = null;
+      if (pi[k2] >= 0) gp2 = gr[pi[k2]];
+      var nd2 = {
+        label: blk.labels[k2],
+        value: blk.values[k2],
+        parentId: gp2,
+        childIds: localChildren[k2] ? localChildren[k2].map(function (li) { return gr[li]; }) : null,
       };
-      for (var an in decodedAttrs) nd[an] = decodedAttrs[an][k];
-      var stubInfo = stubMap.get(k);
+      for (var an2 in decodedAttrs) nd2[an2] = decodedAttrs[an2][k2];
+      var stubInfo = stubMap.get(k2);
       if (stubInfo) {
-        nd.stubBlockId = stubInfo[1];
-        nd.stubAggregates = {};
+        nd2.stubBlockId = stubInfo[1];
+        nd2.stubAggregates = {};
         for (var sf = 0; sf < stubFieldNames.length; sf++) {
-          // stubInfo layout: [localRow, childBlockId, ...stubFieldValues]
-          nd.stubAggregates[stubFieldNames[sf]] = stubInfo[2 + sf];
+          nd2.stubAggregates[stubFieldNames[sf]] = stubInfo[2 + sf];
         }
       }
-      store.set(gid, nd);
+      store.set(gid2, nd2);
     }
   }
 
