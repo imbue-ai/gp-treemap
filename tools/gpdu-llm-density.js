@@ -63,7 +63,9 @@ import os from 'node:os';
 import zlib from 'node:zlib';
 import crypto from 'node:crypto';
 import { BUNDLE } from '../dist/gp-treemap.bundle.embed.js';
-import { partitionBlocks, partitionBlocksBFS, encodeBlock, escapeHtml, LOADER_JS,
+import { partitionBlocks, partitionBlocksBFS, encodeBlock,
+         buildEnvelope, writeEnvelopeJson,
+         escapeHtml, LOADER_JS,
          deriveScanCachePath, saveScanJson, loadScanJson } from './scan-core.js';
 import { buildCliCommand, COPY_BTN_HTML, COPY_BTN_CSS, copyButtonScript } from './cli-command.js';
 
@@ -201,7 +203,7 @@ async function main() {
 
   const opts = { maxDepth, pruneProbability, topK, topP, temperature, maxNodes };
 
-  let scan, scanPrompt, scanModelLabel, fromCache = false;
+  let envelope, counts, scanPrompt, scanModelLabel, fromCache = false;
   const explicitIn = scanInPath != null;
   // Wrapped so a sandboxed run without read permission for the cache path
   // (Deno per-path sandbox) falls through to a fresh build instead of
@@ -216,7 +218,8 @@ async function main() {
     }
     process.stderr.write('  loading cached scan: ' + scanCachePath + '\n');
     const cached = loadScanJson(scanCachePath);
-    scan = cached.scan;
+    envelope = cached.envelope;
+    counts = cached.meta.counts || {};
     scanPrompt = (prompt !== null && prompt !== '') ? prompt : cached.meta.prompt;
     scanModelLabel = cached.meta.modelLabel;
     fromCache = true;
@@ -235,6 +238,7 @@ async function main() {
 
     const t0 = Date.now();
     let buildErr = null;
+    let scan = null;
     try {
       scan = await buildScan(be, prompt, opts);
     } catch (e) {
@@ -244,17 +248,16 @@ async function main() {
     scanPrompt = prompt;
     scanModelLabel = be.modelLabel();
 
-    // Save the scan cache *before* writing HTML — and even if buildScan
-    // threw partway through, so a crashed/interrupted build still leaves
-    // a usable artifact for re-rendering. buildScan's SIGINT handler
-    // already returns a partial-but-consistent scan, so the common case
-    // (Ctrl-C during build) lands here with a valid `scan` object.
-    // Wrapped in try/catch so a sandboxed run that lacks write
-    // permission for the cache path silently skips caching rather than
-    // failing the whole invocation.
     if (scan) {
+      counts = scan.counts;
+      envelope = buildLlmEnvelope(scan, blockSize);
+
+      // Save the scan cache *before* writing HTML — even if the build was
+      // interrupted partway through (buildScan's SIGINT handler returns a
+      // partial-but-consistent scan), so we always leave a usable cache.
+      // Permission errors are silenced for sandbox compatibility.
       try {
-        await saveScanJson(scanCachePath, scan, {
+        await saveScanJson(scanCachePath, envelope, {
           type: 'llm-density',
           prompt: scanPrompt,
           modelLabel: scanModelLabel,
@@ -262,6 +265,7 @@ async function main() {
           cliCommand: buildCliCommand('gp-visualize-llm-continuation-density'),
           builtAt: new Date().toISOString(),
           buildMs: elapsed,
+          counts,
         });
         process.stderr.write('  saved scan: ' + scanCachePath +
           '  (' + (fs.statSync(scanCachePath).size / 1024).toFixed(1) + ' KB gz)\n');
@@ -275,17 +279,17 @@ async function main() {
     }
 
     if (typeof be.dispose === 'function') { try { await be.dispose(); } catch {} }
-    if (buildErr && !scan) { throw buildErr; }
+    if (buildErr && !envelope) { throw buildErr; }
   }
 
-  buildHtml(out, scanPrompt, scanModelLabel, scan, colorBy, blockSize);
+  buildHtml(out, scanPrompt, scanModelLabel, counts, envelope, colorBy);
 
   console.log('');
   console.log((fromCache ? 'loaded ' : 'built ') + 'tree from ' + scanModelLabel + (fromCache ? ' (cached)' : ''));
-  console.log('  nodes             ' + scan.counts.nodes.toLocaleString());
-  console.log('  max depth         ' + scan.counts.maxDepth);
-  console.log('  leaves            ' + scan.counts.leaves.toLocaleString());
-  console.log('  mass explored     ' + (scan.counts.exploredMass * 100).toFixed(4) + '%');
+  console.log('  nodes             ' + (counts.nodes || 0).toLocaleString());
+  console.log('  max depth         ' + (counts.maxDepth || 0));
+  console.log('  leaves            ' + (counts.leaves || 0).toLocaleString());
+  console.log('  mass explored     ' + ((counts.exploredMass || 0) * 100).toFixed(4) + '%');
   console.log('');
   console.log('wrote ' + out + '  (' + (fs.statSync(out).size / 1024).toFixed(1) + ' KB)');
 
@@ -966,7 +970,17 @@ const PAGE_CSS = `
     border: 1px solid var(--page-border, #ccc); cursor: pointer; }
 `;
 
-function buildHtml(outPath, promptText, modelLabel, scan, colorBy, blockSize) {
+// Build the wire-format envelope (the JSON that goes inside <script id="tmdata">
+// in the HTML output and identically inside the scan cache). Uses
+// BFS-chunking so block 0 holds shallow descendants of the root — what a
+// layer-by-layer renderer wants to paint first.
+function buildLlmEnvelope(scan, blockSize) {
+  const partResult = partitionBlocksBFS(scan, blockSize);
+  process.stderr.write('  partitioned into ' + partResult.blocks.length + ' blocks\n');
+  return buildEnvelope(scan, partResult, { totalProb: 1 });
+}
+
+function buildHtml(outPath, promptText, modelLabel, counts, envelope, colorBy) {
   const fd = fs.openSync(outPath, 'w');
   const w = (s) => fs.writeSync(fd, s);
 
@@ -1007,9 +1021,9 @@ function buildHtml(outPath, promptText, modelLabel, scan, colorBy, blockSize) {
   ${COPY_BTN_HTML}
   <h1 title="${escapeHtml(promptText)}">"${escapeHtml(promptDisplay)}"</h1>
   <span class="stat"><b>${escapeHtml(modelLabel)}</b> model</span>
-  <span class="stat"><b>${scan.counts.nodes.toLocaleString()}</b> nodes</span>
-  <span class="stat"><b>${scan.counts.maxDepth}</b> max depth</span>
-  <span class="stat"><b>${(scan.counts.exploredMass * 100).toFixed(3)}%</b> explored</span>
+  <span class="stat"><b>${(counts.nodes || 0).toLocaleString()}</b> nodes</span>
+  <span class="stat"><b>${counts.maxDepth || 0}</b> max depth</span>
+  <span class="stat"><b>${((counts.exploredMass || 0) * 100).toFixed(3)}%</b> explored</span>
   <span class="spacer" style="flex:1"></span>
   <button id="help-btn" class="help-btn" title="Help">?</button>
 </div>
@@ -1058,21 +1072,10 @@ function buildHtml(outPath, promptText, modelLabel, scan, colorBy, blockSize) {
 <script type="application/json" id="tmdata">
 `);
 
-  // BFS chunking: shallow descendants of root land in block 0, which lets a
-  // layer-by-layer renderer paint the visible top of the tree before any
-  // deeper blocks are demanded. Same envelope shape as DFS chunking so the
-  // existing scan-loader inflates either flavor identically.
-  const { blocks, aggValue } = partitionBlocksBFS(scan, blockSize);
-  process.stderr.write('  partitioned into ' + blocks.length + ' blocks\n');
-
-  w('{"v":3,"totalProb":1,"blocks":[');
-  for (let bi = 0; bi < blocks.length; bi++) {
-    const blockJson = JSON.stringify(encodeBlock(scan, blocks[bi], { aggValue }));
-    const compressed = zlib.deflateRawSync(blockJson, { level: 6 });
-    if (bi > 0) w(',');
-    w('"' + compressed.toString('base64') + '"');
-  }
-  w(']}');
+  // Drop the pre-built envelope into the tmdata script tag. Same wire
+  // format whether it came fresh from buildLlmEnvelope() or got loaded
+  // from a scan cache.
+  writeEnvelopeJson(w, envelope);
 
   const cfg = {
     defaultColorMode: colorBy,

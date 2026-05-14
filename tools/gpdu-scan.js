@@ -24,7 +24,8 @@ import path from 'node:path';
 import os from 'node:os';
 import zlib from 'node:zlib';
 import { BUNDLE } from '../dist/gp-treemap.bundle.embed.js';
-import { partitionBlocks, encodeBlock, humanBytes, escapeHtml, LOADER_JS,
+import { partitionBlocks, encodeBlock, buildEnvelope, writeEnvelopeJson,
+         humanBytes, escapeHtml, LOADER_JS,
          deriveScanCachePath, saveScanJson, loadScanJson } from './scan-core.js';
 import { buildCliCommand, COPY_BTN_HTML, COPY_BTN_CSS, copyButtonScript } from './cli-command.js';
 
@@ -108,7 +109,7 @@ async function main() {
   let cacheExists = false;
   try { cacheExists = fs.existsSync(scanCachePath); } catch (_) {}
 
-  let scan, scanTarget, elapsed, fromCache = false;
+  let envelope, scanTarget, elapsed, counts, fromCache = false;
   if (explicitIn || (cacheExists && !noCache)) {
     if (!cacheExists) {
       console.error('gpdu-scan: --scan-in path does not exist: ' + scanCachePath);
@@ -116,7 +117,8 @@ async function main() {
     }
     process.stderr.write('  loading cached scan: ' + scanCachePath + '\n');
     const cached = loadScanJson(scanCachePath);
-    scan = cached.scan;
+    envelope = cached.envelope;
+    counts = cached.meta.counts || {};
     scanTarget = cached.meta.target || target || '(from cached scan)';
     elapsed = cached.meta.scanMs || 0;
     fromCache = true;
@@ -129,9 +131,12 @@ async function main() {
       process.exit(1);
     }
     const t0 = Date.now();
-    scan = await walk(target, workers);
+    const scan = await walk(target, workers);
     elapsed = Date.now() - t0;
     scanTarget = target;
+    counts = { files: scan.files, dirs: scan.dirs, bytes: scan.bytes, unreadable: scan.unreadable };
+
+    envelope = buildScanEnvelope(scan, blockSize);
 
     // Persist the scan cache *before* writing HTML, so a crash during the
     // HTML emit still leaves a usable cache for re-rendering. Wrapped in
@@ -140,35 +145,33 @@ async function main() {
     // rather than failing the whole invocation — the cache is a cold-
     // start optimization, never a correctness requirement.
     try {
-      await saveScanJson(scanCachePath, scan, {
+      await saveScanJson(scanCachePath, envelope, {
         type: 'directory',
         target,
         cliCommand: buildCliCommand('gpdu'),
         builtAt: new Date().toISOString(),
         scanMs: elapsed,
+        counts,
       });
       process.stderr.write('  saved scan: ' + scanCachePath +
         '  (' + humanBytes(fs.statSync(scanCachePath).size) + ' gz)\n');
     } catch (e) {
-      // Quietly skip on permission errors (Deno per-path sandbox is the
-      // canonical case; the README's documented `deno run` command doesn't
-      // grant write access to the cache path). Other errors get surfaced.
       if (/permission|access|EACCES|EPERM|NotCapable/i.test(String(e && (e.message || e)))) {
-        // silent
+        // silent — sandbox without write permission for the cache path
       } else {
         process.stderr.write('  (scan cache not written: ' + e.message + ')\n');
       }
     }
   }
 
-  buildHtml(out, scanTarget, scan, colorBy, blockSize);
+  buildHtml(out, scanTarget, counts, envelope, colorBy);
 
   console.log('');
   console.log((fromCache ? 'loaded ' : 'scanned ') + scanTarget + (fromCache ? ' (cached)' : ''));
-  console.log('  files        ' + scan.files.toLocaleString());
-  console.log('  directories  ' + scan.dirs.toLocaleString());
-  console.log('  total size   ' + humanBytes(scan.bytes) + '  (' + scan.bytes.toLocaleString() + ' B)');
-  if (scan.unreadable) console.log('  unreadable   ' + scan.unreadable.toLocaleString() + ' entries skipped');
+  console.log('  files        ' + (counts.files || 0).toLocaleString());
+  console.log('  directories  ' + (counts.dirs || 0).toLocaleString());
+  console.log('  total size   ' + humanBytes(counts.bytes || 0) + '  (' + (counts.bytes || 0).toLocaleString() + ' B)');
+  if (counts.unreadable) console.log('  unreadable   ' + counts.unreadable.toLocaleString() + ' entries skipped');
   if (elapsed) console.log('  scan took    ' + elapsed + ' ms');
   console.log('');
   console.log('wrote ' + out + '  (' + humanBytes(fs.statSync(out).size) + ')');
@@ -475,9 +478,57 @@ const PAGE_CSS = `
     border: 1px solid var(--page-border, #ccc); cursor: pointer; }
 `;
 
+// Build the wire-format envelope (the JSON object that goes inside the
+// `<script id="tmdata">` tag and identically inside the scan-cache file).
+// Returns `{ v: 3, totalFiles, totalDirs, totalBytes, blocks: ['b64',…] }`.
+// Doing this work once (here) means the cache stores already-encoded
+// blocks — re-rendering HTML from the cache is just a base64-string
+// splice, no re-partition / re-encode.
+function buildScanEnvelope(scan, blockSize) {
+  const normScan = {
+    labels: scan.labels,
+    parentIndices: scan.parentIndices,
+    values: scan.values,
+    attributes: {
+      extension: { kind: 'categorical', values: scan.rawExtColor },
+      kind:      { kind: 'categorical', values: scan.extColor },
+      folder:    { kind: 'categorical', values: scan.folderColor },
+      ctime:     { kind: 'numeric',     values: scan.ctimes },
+      mtime:     { kind: 'numeric',     values: scan.mtimes },
+      atime:     { kind: 'numeric',     values: scan.atimes },
+    },
+    stubFields: {},
+  };
+  const partResult = partitionBlocks(normScan, blockSize);
+  const { blocks, childIds } = partResult;
+
+  // Per-node aggregate file/dir counts for the stats bar's stub fast path.
+  const n = scan.labels.length;
+  const aggFiles = new Int32Array(n);
+  const aggDirs = new Int32Array(n);
+  for (let i = n - 1; i >= 0; i--) {
+    if (!childIds[i]) { aggFiles[i] = 1; aggDirs[i] = 0; }
+    else {
+      aggFiles[i] = 0; aggDirs[i] = 1;
+      for (const c of childIds[i]) { aggFiles[i] += aggFiles[c]; aggDirs[i] += aggDirs[c]; }
+    }
+  }
+  normScan.stubFields = { aggFiles: Array.from(aggFiles), aggDirs: Array.from(aggDirs) };
+
+  process.stderr.write('  partitioned into ' + blocks.length + ' blocks\n');
+
+  return buildEnvelope(normScan, partResult, {
+    totalFiles: scan.files,
+    totalDirs: scan.dirs,
+    totalBytes: scan.bytes,
+  });
+}
+
 // Streaming HTML builder — writes directly to a file descriptor to avoid
-// hitting V8's ~512 MB string limit on large scans (8M+ files).
-function buildHtml(outPath, target, scan, colorBy, blockSize) {
+// hitting V8's ~512 MB string limit on large scans (8M+ files). Takes a
+// pre-built envelope (see buildScanEnvelope above) so re-rendering from a
+// cached scan can re-use the encoded blocks unchanged.
+function buildHtml(outPath, target, counts, envelope, colorBy) {
   const fd = fs.openSync(outPath, 'w');
   const w = (s) => fs.writeSync(fd, s);
 
@@ -492,7 +543,7 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
     .map(([k, v]) => `<option value="${k}">${escapeHtml(v)}</option>`)
     .join('');
 
-  const humanSize = humanBytes(scan.bytes);
+  const humanSize = humanBytes(counts.bytes || 0);
   const when = (() => {
     const d = new Date();
     const off = -d.getTimezoneOffset();
@@ -516,10 +567,10 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
 <div class="title-row">
   ${COPY_BTN_HTML}
   <h1>${escapeHtml(target)}</h1>
-  <span class="stat"><b>${scan.files.toLocaleString()}</b> files</span>
-  <span class="stat"><b>${scan.dirs.toLocaleString()}</b> directories</span>
+  <span class="stat"><b>${(counts.files || 0).toLocaleString()}</b> files</span>
+  <span class="stat"><b>${(counts.dirs || 0).toLocaleString()}</b> directories</span>
   <span class="stat"><b>${humanSize}</b> total</span>
-  ${scan.unreadable ? `<span class="stat">(${scan.unreadable.toLocaleString()} unreadable)</span>` : ''}
+  ${counts.unreadable ? `<span class="stat">(${counts.unreadable.toLocaleString()} unreadable)</span>` : ''}
   <span class="spacer" style="flex:1"></span>
   <button id="help-btn" class="help-btn" title="Keyboard &amp; mouse cheatsheet">?</button>
 </div>
@@ -569,51 +620,10 @@ function buildHtml(outPath, target, scan, colorBy, blockSize) {
 <script type="application/json" id="tmdata">
 `);
 
-  // ---- Block-partition + envelope ----
-  const normScan = {
-    labels: scan.labels,
-    parentIndices: scan.parentIndices,
-    values: scan.values,
-    attributes: {
-      extension: { kind: 'categorical', values: scan.rawExtColor },
-      kind:      { kind: 'categorical', values: scan.extColor },
-      folder:    { kind: 'categorical', values: scan.folderColor },
-      ctime:     { kind: 'numeric',     values: scan.ctimes },
-      mtime:     { kind: 'numeric',     values: scan.mtimes },
-      atime:     { kind: 'numeric',     values: scan.atimes },
-    },
-    stubFields: {
-      // Per-node leaf and dir counts for the stats bar's stub fast path.
-      // Computed below from childIds.
-    },
-  };
-
-  const { blocks, childIds, aggValue } = partitionBlocks(normScan, blockSize);
-
-  // Compute aggFiles / aggDirs (file-leaves vs. directory-internals) for stub records.
-  const n = scan.labels.length;
-  const aggFiles = new Int32Array(n);
-  const aggDirs = new Int32Array(n);
-  for (let i = n - 1; i >= 0; i--) {
-    if (!childIds[i]) { aggFiles[i] = 1; aggDirs[i] = 0; }
-    else {
-      aggFiles[i] = 0; aggDirs[i] = 1;
-      for (const c of childIds[i]) { aggFiles[i] += aggFiles[c]; aggDirs[i] += aggDirs[c]; }
-    }
-  }
-  normScan.stubFields = { aggFiles: Array.from(aggFiles), aggDirs: Array.from(aggDirs) };
-
-  process.stderr.write('  partitioned into ' + blocks.length + ' blocks\n');
-
-  w('{"v":3,"totalFiles":' + scan.files + ',"totalDirs":' + scan.dirs +
-    ',"totalBytes":' + scan.bytes + ',"blocks":[');
-  for (let bi = 0; bi < blocks.length; bi++) {
-    const blockJson = JSON.stringify(encodeBlock(normScan, blocks[bi], { aggValue }));
-    const compressed = zlib.deflateRawSync(blockJson, { level: 6 });
-    if (bi > 0) w(',');
-    w('"' + compressed.toString('base64') + '"');
-  }
-  w(']}');
+  // Drop the pre-built envelope into the tmdata script tag. Same wire
+  // format whether it came fresh from buildScanEnvelope() or got loaded
+  // verbatim from a scan cache.
+  writeEnvelopeJson(w, envelope);
 
   // ---- Loader config + bundle + loader IIFE + tool-specific stats bar ----
   const cfg = {
@@ -653,7 +663,7 @@ window._bootReady.then(function () {
   var tm = document.getElementById('tm');
   var bar = document.getElementById('stats-bar');
   var store = window._store;
-  var envTotalFiles = ${scan.files}, envTotalDirs = ${scan.dirs}, envTotalBytes = ${scan.bytes};
+  var envTotalFiles = ${counts.files || 0}, envTotalDirs = ${counts.dirs || 0}, envTotalBytes = ${counts.bytes || 0};
   function fmtBytes(v) {
     var units = ['B','KB','MB','GB','TB','PB']; var i = 0, n = v || 0;
     while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }

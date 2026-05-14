@@ -31,50 +31,60 @@ import { LOADER_JS } from '../dist/scan-loader.embed.js';
 
 export { LOADER_JS };
 
-// Scan-cache JSON (gzipped). Each gpdu-* tool writes its raw scan to disk
-// alongside the HTML output so subsequent runs can re-emit HTML without
-// re-doing the slow build step (directory walk, LLM forward passes,
-// parquet read, …). Format is deliberately minimal: `{ v, type, meta,
-// scan }`. `scan` is whatever shape the tool produced — labels +
-// parentIndices + values + the tool's attribute arrays. `meta` carries
-// build metadata (target, cliCommand, builtAt, etc.) and `type` is the
-// tool's short identifier ('directory', 'llm-density', 'json', …).
+// Scan-cache JSON (gzipped). Each gpdu-* tool writes its pre-encoded
+// wire-format envelope to disk alongside the HTML output, so subsequent
+// runs can re-emit HTML without re-doing the slow build step (directory
+// walk, LLM forward passes, parquet read, …) AND without re-doing the
+// partition/encode pipeline.
+//
+// Format (v=2):
+//   { v: 2,
+//     type: 'directory' | 'llm-density' | …,   // tool short id
+//     meta: { target, cliCommand, builtAt, scanMs, counts: {…}, … },
+//     envelope: {                              // wire format (v=3 internal)
+//       v: 3,
+//       totalBytes | totalProb | totalFiles…,  // tool-specific scalars
+//       blocks: ['b64...', 'b64...', …]        // independently
+//                                              // base64+deflate-compressed
+//     }
+//   }
+//
+// Each block string is small (~target-blocksize bytes worth of nodes,
+// compressed), so the array can be many GB cumulatively without any
+// single value tripping V8's ~512 MB string-length ceiling — that's why
+// the cache survives even at the 11 M-node home-directory scale.
 export function deriveScanCachePath(htmlPath) {
   return htmlPath.replace(/\.html?$/i, '') + '.scan.json.gz';
 }
 
-// Streaming JSON+gzip writer. The whole stringified payload for a
-// many-million-node scan can exceed V8's ~512 MB single-string limit
-// ("Invalid string length"), so we emit the JSON in chunks via an async
-// generator → gzip → file pipeline. Big arrays are walked in fixed-size
-// slices and emitted as raw `,`-joined fragments inside their `[ ]`
-// brackets. Returns a promise; callers should `await`.
-export async function saveScanJson(filePath, scan, meta) {
+// Streaming JSON+gzip writer for the scan cache. Big `blocks` arrays are
+// emitted one element at a time so no single JSON.stringify call sees a
+// payload bigger than one block (~1–15 MB for typical block sizes),
+// keeping us comfortably under V8's ~512 MB per-string ceiling regardless
+// of scan size. The wrapper object (v / type / meta) is small enough to
+// stringify whole; the `envelope` object is special-cased so its
+// `blocks` array streams element-by-element while its scalar fields
+// (totalBytes / totalProb / totalFiles / …) get included normally.
+export async function saveScanJson(filePath, envelope, meta) {
   const { pipeline } = await import('node:stream/promises');
   const { Readable } = await import('node:stream');
 
-  const ARRAY_CHUNK = 100_000;   // ~100 K items per JSON.stringify call
-
   async function* gen() {
-    yield '{"v":1,"type":';
+    yield '{"v":2,"type":';
     yield JSON.stringify(meta.type || 'unknown');
     yield ',"meta":';
     yield JSON.stringify(meta);
-    yield ',"scan":';
-    yield* genValue(scan);
+    yield ',"envelope":';
+    yield* genValue(envelope);
     yield '}';
   }
   function* genValue(v) {
     if (Array.isArray(v)) {
       if (v.length === 0) { yield '[]'; return; }
       yield '[';
-      for (let i = 0; i < v.length; i += ARRAY_CHUNK) {
+      for (let i = 0; i < v.length; i++) {
         if (i > 0) yield ',';
-        // Slice + stringify each chunk separately to keep each intermediate
-        // string well under the V8 limit. Strip the outer [ ] so we can
-        // splice fragments together inside one logical array.
-        const part = JSON.stringify(v.slice(i, i + ARRAY_CHUNK));
-        yield part.slice(1, -1);
+        yield* genValue(v[i]);
       }
       yield ']';
     } else if (v && typeof v === 'object') {
@@ -103,8 +113,8 @@ export function loadScanJson(filePath) {
   const compressed = fs.readFileSync(filePath);
   const json = zlib.gunzipSync(compressed).toString();
   const payload = JSON.parse(json);
-  if (!payload.v || !payload.scan) {
-    throw new Error('not a recognized scan-cache file (missing v / scan): ' + filePath);
+  if (!payload.v || !payload.envelope) {
+    throw new Error('not a recognized scan-cache file (missing v / envelope): ' + filePath);
   }
   return payload;
 }
@@ -280,6 +290,55 @@ export function partitionBlocksBFS(scan, targetSize = 50000) {
   buildBlock(0);
 
   return { blocks, childIds, aggValue };
+}
+
+// Build the full wire-format envelope for a scan. This is the JSON object
+// that ends up inside `<script type="application/json" id="tmdata">` in
+// the HTML output AND inside the scan-cache JSON — same shape in both
+// places, so cache→HTML re-rendering is just "splice these base64 strings
+// into the new HTML's tmdata" with no re-partition / re-encode work.
+//
+// Returns `{ v: 3, ...extraTopLevel, blocks: ['b64...', ...] }`. Each
+// block is independently base64+deflate compressed; the array can be
+// many GB cumulatively without any single string ever exceeding V8's
+// per-string limit. `extraTopLevel` is for tool-specific scalars the
+// existing loader knows about (`totalBytes`, `totalProb`, etc.).
+//
+// Caller is responsible for running the partitioner first. This lets
+// tools that depend on the partition result (e.g. gpdu-scan needs
+// `childIds` to compute per-node aggregate counts for stubFields)
+// inspect or patch the scan between partition and encode.
+export function buildEnvelope(scan, partitionResult, extraTopLevel = {}) {
+  const { blocks: blockMetas, aggValue } = partitionResult;
+  const b64 = new Array(blockMetas.length);
+  for (let i = 0; i < blockMetas.length; i++) {
+    const json = JSON.stringify(encodeBlock(scan, blockMetas[i], { aggValue }));
+    b64[i] = zlib.deflateRawSync(json, { level: 6 }).toString('base64');
+  }
+  return { v: 3, ...extraTopLevel, blocks: b64 };
+}
+
+// Write an envelope's JSON form into a file descriptor without ever
+// stringifying the whole `blocks` array at once. Used both by the HTML
+// emitter (writing into the `<script id="tmdata">` body) and tests that
+// want to inspect the wire format. `write(s)` is any callback that
+// accepts a string chunk (e.g. `(s) => fs.writeSync(fd, s)`).
+export function writeEnvelopeJson(write, envelope) {
+  write('{');
+  let first = true;
+  for (const k of Object.keys(envelope)) {
+    if (k === 'blocks') continue;
+    if (!first) write(',');
+    first = false;
+    write(JSON.stringify(k) + ':' + JSON.stringify(envelope[k]));
+  }
+  if (!first) write(',');
+  write('"blocks":[');
+  for (let i = 0; i < envelope.blocks.length; i++) {
+    if (i > 0) write(',');
+    write('"' + envelope.blocks[i] + '"');
+  }
+  write(']}');
 }
 
 // Encode one block as a JSON-serializable object. The browser-side loader
