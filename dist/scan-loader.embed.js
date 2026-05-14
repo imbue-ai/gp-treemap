@@ -199,6 +199,56 @@ export const LOADER_JS = `// Browser-side IIFE shared by all \`gpdu-*\` CLIs. In
     });
   }
 
+  // Loading-progress indicator: a small "loading N / M blocks" message
+  // with a CSS spinner that lives in the page's #bottom-bar (every gpdu-*
+  // tool ships one). Auto-inserted the first time we touch it so tools
+  // don't have to declare it; removed once all blocks have inflated.
+  var totalBlocks = envelope.blocks ? envelope.blocks.length : 0;
+  var loadedBlocks = 0;
+  var progressEl = null;
+  function ensureProgressEl() {
+    if (progressEl) return progressEl;
+    var bar = document.getElementById('bottom-bar');
+    if (!bar) return null;
+    progressEl = document.createElement('span');
+    progressEl.id = 'loader-progress';
+    progressEl.style.cssText = 'flex-shrink:0; color: var(--page-fg-muted, #888); ' +
+      'display:inline-flex; align-items:center; gap:6px; margin-right:8px; font-variant-numeric: tabular-nums;';
+    progressEl.innerHTML =
+      '<span class="loader-spinner" style="display:inline-block; width:11px; height:11px; ' +
+        'border:2px solid currentColor; border-right-color:transparent; border-radius:50%; ' +
+        'animation: gp-spin 0.8s linear infinite; opacity:0.7;"></span>' +
+      '<span class="loader-text"></span>';
+    // Insert before #scanned-note if present, else append.
+    var scannedNote = document.getElementById('scanned-note');
+    if (scannedNote && scannedNote.parentNode === bar) {
+      bar.insertBefore(progressEl, scannedNote);
+    } else {
+      bar.appendChild(progressEl);
+    }
+    if (!document.getElementById('loader-progress-keyframes')) {
+      var style = document.createElement('style');
+      style.id = 'loader-progress-keyframes';
+      style.textContent = '@keyframes gp-spin { to { transform: rotate(360deg); } }';
+      document.head.appendChild(style);
+    }
+    return progressEl;
+  }
+  function updateLoaderProgress() {
+    var el = ensureProgressEl();
+    if (!el) return;
+    var textEl = el.querySelector('.loader-text');
+    if (loadedBlocks < totalBlocks) {
+      if (textEl) textEl.textContent = 'loading ' + loadedBlocks.toLocaleString() + ' / ' + totalBlocks.toLocaleString() + ' blocks';
+      el.style.display = '';
+    } else {
+      // Done — fade out and remove.
+      el.style.transition = 'opacity 0.4s ease-out';
+      el.style.opacity = '0';
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 500);
+    }
+  }
+
   // Inflate one compressed block.
   function inflateBlock(blockId) {
     var b64 = envelope.blocks[blockId];
@@ -211,6 +261,8 @@ export const LOADER_JS = `// Browser-side IIFE shared by all \`gpdu-*\` CLIs. In
     return new Response(ds.readable).text().then(function (text) {
       loadBlock(JSON.parse(text));
       envelope.blocks[blockId] = null;
+      loadedBlocks++;
+      updateLoaderProgress();
       scheduleProgressiveRender();
     });
   }
@@ -267,6 +319,8 @@ export const LOADER_JS = `// Browser-side IIFE shared by all \`gpdu-*\` CLIs. In
   var bootReady = block0Promise.then(function (block0) {
     loadBlock(block0);
     envelope.blocks[0] = null;
+    loadedBlocks++;
+    updateLoaderProgress();
     var rootId = new Int32Array(_buf(block0.grB64))[0];
     tm.root = rootId;
     window._rootId = rootId;

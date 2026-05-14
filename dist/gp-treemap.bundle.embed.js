@@ -1424,7 +1424,7 @@ const STYLE = \`
   color:#fff; padding:1px 5px; border-radius:3px;
   background: rgba(0,0,0,0.32);
   -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap;
   z-index: 2; }
 .overlay .lbl { position:absolute; font-size:10px; font-weight:500; line-height:1.15; padding:1px 3px;
   color: var(--gp-fg, #111);
@@ -2184,8 +2184,10 @@ class GpTreemap extends HTMLElement {
       lbl.style.visibility = 'hidden';
       lbl.style.left = (x + padX) + 'px';
       lbl.style.top = (y + padY) + 'px';
-      // Cap width to the cell so long labels ellipsize rather than spill.
-      lbl.style.maxWidth = Math.max(0, w - 2 * padX) + 'px';
+      // No \`maxWidth\` cap — long labels are allowed to flow past the cell's
+      // right edge into the rest of the canvas instead of being truncated
+      // with an ellipsis. The vertical collision-push below keeps outer
+      // ancestors' labels from being overwritten by inner ones.
       this._overlay.appendChild(lbl);
       const lw = lbl.offsetWidth;
       const lh = lbl.offsetHeight;

@@ -142,7 +142,7 @@
   min-cell-area="30"></gp-treemap>
 <div id="bottom-bar">
   <div id="stats-bar"></div>
-  <span id="scanned-note">built 2026-05-13T21:22:31-07:00</span>
+  <span id="scanned-note">built 2026-05-13T21:26:58-07:00</span>
 </div>
 
 <script type="application/json" id="tmdata">
@@ -1584,7 +1584,7 @@ const STYLE = `
   color:#fff; padding:1px 5px; border-radius:3px;
   background: rgba(0,0,0,0.32);
   -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap;
   z-index: 2; }
 .overlay .lbl { position:absolute; font-size:10px; font-weight:500; line-height:1.15; padding:1px 3px;
   color: var(--gp-fg, #111);
@@ -2344,8 +2344,10 @@ class GpTreemap extends HTMLElement {
       lbl.style.visibility = 'hidden';
       lbl.style.left = (x + padX) + 'px';
       lbl.style.top = (y + padY) + 'px';
-      // Cap width to the cell so long labels ellipsize rather than spill.
-      lbl.style.maxWidth = Math.max(0, w - 2 * padX) + 'px';
+      // No `maxWidth` cap — long labels are allowed to flow past the cell's
+      // right edge into the rest of the canvas instead of being truncated
+      // with an ellipsis. The vertical collision-push below keeps outer
+      // ancestors' labels from being overwritten by inner ones.
       this._overlay.appendChild(lbl);
       const lw = lbl.offsetWidth;
       const lh = lbl.offsetHeight;
@@ -3336,6 +3338,56 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
     });
   }
 
+  // Loading-progress indicator: a small "loading N / M blocks" message
+  // with a CSS spinner that lives in the page's #bottom-bar (every gpdu-*
+  // tool ships one). Auto-inserted the first time we touch it so tools
+  // don't have to declare it; removed once all blocks have inflated.
+  var totalBlocks = envelope.blocks ? envelope.blocks.length : 0;
+  var loadedBlocks = 0;
+  var progressEl = null;
+  function ensureProgressEl() {
+    if (progressEl) return progressEl;
+    var bar = document.getElementById('bottom-bar');
+    if (!bar) return null;
+    progressEl = document.createElement('span');
+    progressEl.id = 'loader-progress';
+    progressEl.style.cssText = 'flex-shrink:0; color: var(--page-fg-muted, #888); ' +
+      'display:inline-flex; align-items:center; gap:6px; margin-right:8px; font-variant-numeric: tabular-nums;';
+    progressEl.innerHTML =
+      '<span class="loader-spinner" style="display:inline-block; width:11px; height:11px; ' +
+        'border:2px solid currentColor; border-right-color:transparent; border-radius:50%; ' +
+        'animation: gp-spin 0.8s linear infinite; opacity:0.7;"></span>' +
+      '<span class="loader-text"></span>';
+    // Insert before #scanned-note if present, else append.
+    var scannedNote = document.getElementById('scanned-note');
+    if (scannedNote && scannedNote.parentNode === bar) {
+      bar.insertBefore(progressEl, scannedNote);
+    } else {
+      bar.appendChild(progressEl);
+    }
+    if (!document.getElementById('loader-progress-keyframes')) {
+      var style = document.createElement('style');
+      style.id = 'loader-progress-keyframes';
+      style.textContent = '@keyframes gp-spin { to { transform: rotate(360deg); } }';
+      document.head.appendChild(style);
+    }
+    return progressEl;
+  }
+  function updateLoaderProgress() {
+    var el = ensureProgressEl();
+    if (!el) return;
+    var textEl = el.querySelector('.loader-text');
+    if (loadedBlocks < totalBlocks) {
+      if (textEl) textEl.textContent = 'loading ' + loadedBlocks.toLocaleString() + ' / ' + totalBlocks.toLocaleString() + ' blocks';
+      el.style.display = '';
+    } else {
+      // Done — fade out and remove.
+      el.style.transition = 'opacity 0.4s ease-out';
+      el.style.opacity = '0';
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 500);
+    }
+  }
+
   // Inflate one compressed block.
   function inflateBlock(blockId) {
     var b64 = envelope.blocks[blockId];
@@ -3348,6 +3400,8 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
     return new Response(ds.readable).text().then(function (text) {
       loadBlock(JSON.parse(text));
       envelope.blocks[blockId] = null;
+      loadedBlocks++;
+      updateLoaderProgress();
       scheduleProgressiveRender();
     });
   }
@@ -3404,6 +3458,8 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
   var bootReady = block0Promise.then(function (block0) {
     loadBlock(block0);
     envelope.blocks[0] = null;
+    loadedBlocks++;
+    updateLoaderProgress();
     var rootId = new Int32Array(_buf(block0.grB64))[0];
     tm.root = rootId;
     window._rootId = rootId;
