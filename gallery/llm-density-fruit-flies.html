@@ -142,7 +142,7 @@
   min-cell-area="30"></gp-treemap>
 <div id="bottom-bar">
   <div id="stats-bar"></div>
-  <span id="scanned-note">built 2026-05-13T21:26:58-07:00</span>
+  <span id="scanned-note">built 2026-05-13T21:44:52-07:00</span>
 </div>
 
 <script type="application/json" id="tmdata">
@@ -2702,6 +2702,12 @@ class GpTreemap extends HTMLElement {
   _onClick(e) {
     const id = this._hitTest(e);
     if (id == null) return;
+    // First click of a (possible) double-click sequence (e.detail === 1):
+    // snapshot the current focus so the dblclick handler can recover the
+    // "user wheel-walked to an ancestor before clicking" case. Without
+    // this, both clicks of a dblclick reset focus to the inner leaf and
+    // the original ancestor info is gone by the time dblclick fires.
+    if (e.detail === 1) this._preClickFocus = this._focusId;
     this._targetId = id;
     this._focusId = id;
     this._selectionLocked = true;
@@ -2726,18 +2732,27 @@ class GpTreemap extends HTMLElement {
     // they want to drill into; we shouldn't override that just because they
     // happened to click on one of its children.
     if (!this._tree) return;
-    if (this._focusId != null && this._nodeRects) {
-      const rect = this._nodeRects.get(this._focusId);
+    // The two clicks of a dblclick already fired _onClick twice, each
+    // resetting _focusId to the inner leaf under the cursor. _preClickFocus
+    // (captured in _onClick on detail===1) is what focus was BEFORE the
+    // first click of this sequence — that's the ancestor we want to zoom to.
+    const preFocus = this._preClickFocus;
+    if (preFocus != null && this._nodeRects) {
+      const rect = this._nodeRects.get(preFocus);
       if (rect) {
         const canvasRect = this._canvas.getBoundingClientRect();
         const dpr = this._canvas.width / canvasRect.width;
         const px = (e.clientX - canvasRect.left) * dpr;
         const py = (e.clientY - canvasRect.top) * dpr;
         if (px >= rect.x && px < rect.x + rect.w && py >= rect.y && py < rect.y + rect.h) {
-          const focusNode = this._tree.nodes.get(this._focusId);
+          const focusNode = this._tree.nodes.get(preFocus);
           if (focusNode && !(focusNode.childIds && focusNode.childIds.length === 0)) {
             e.preventDefault();
-            this.stretchZoomIn(this._focusId);
+            // Restore the focus to the ancestor too so the visual selection
+            // matches what we just zoomed into.
+            this._focusId = preFocus;
+            this._targetId = preFocus;
+            this.stretchZoomIn(preFocus);
             return;
           }
         }
