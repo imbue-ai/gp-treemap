@@ -63,7 +63,7 @@ import os from 'node:os';
 import zlib from 'node:zlib';
 import crypto from 'node:crypto';
 import { BUNDLE } from '../dist/gp-treemap.bundle.embed.js';
-import { partitionBlocks, partitionBlocksBFS, encodeBlock,
+import { partitionBlocksDepthBand, encodeBlock,
          buildEnvelope, writeEnvelopeJson,
          escapeHtml, LOADER_JS,
          deriveScanCachePath, saveScanJson, loadScanJson } from './scan-core.js';
@@ -971,11 +971,16 @@ const PAGE_CSS = `
 `;
 
 // Build the wire-format envelope (the JSON that goes inside <script id="tmdata">
-// in the HTML output and identically inside the scan cache). Uses
-// BFS-chunking so block 0 holds shallow descendants of the root — what a
-// layer-by-layer renderer wants to paint first.
+// in the HTML output and identically inside the scan cache). Uses the
+// depth-band partitioner: block 0 holds the shallowest layers (root +
+// depth-1 + depth-2 + …) up to blockSize nodes, with the rest of the tree
+// spilling into a handful more blocks in depth order. Block count is
+// ceil(totalNodes / blockSize) regardless of fan-out, so wide trees (LLM
+// continuations with top-p≈0.98 fan out 50+ ways per level) don't get
+// fragmented into hundreds of thousands of tiny blocks the way the
+// stub-based BFS partitioner did.
 function buildLlmEnvelope(scan, blockSize) {
-  const partResult = partitionBlocksBFS(scan, blockSize);
+  const partResult = partitionBlocksDepthBand(scan, blockSize);
   process.stderr.write('  partitioned into ' + partResult.blocks.length + ' blocks\n');
   return buildEnvelope(scan, partResult, { totalProb: 1 });
 }

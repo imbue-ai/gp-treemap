@@ -404,6 +404,104 @@ export function partitionBlocksDepthBand(scan, blockSize = 500000, firstBlockSiz
   return { blocks, childIds, aggValue, depth };
 }
 
+// Reverse of `buildEnvelope` — inflate every block and stitch the rows back
+// into a flat `scan` object suitable for handing to any partitioner. Used
+// when we want to re-pack a previously-built scan with a different
+// partition strategy (e.g. when the original strategy produced too many
+// blocks for the loader to inflate concurrently). Returns the same shape
+// `partition*` expects: `{ labels, parentIndices, values, attributes }`.
+//
+// `scan.values` is reconstructed from the block-encoded `aggValue` array
+// by subtracting each node's children's aggregates back out — the inverse
+// of the reverse-pass every partitioner applies. So for any tree where
+// parent.aggValue = parent.value + Σ child.aggValue (the only invariant
+// the partitioners assume), this round-trips losslessly.
+export function decodeEnvelope(envelope) {
+  const blockB64 = envelope.blocks;
+  // Pass 1: inflate + parse each block; track the max global id seen so we
+  // can size the flat arrays. Summing block lengths over-counts because
+  // v=3 stubs appear twice (in the parent block as a leaf-placeholder
+  // *and* in the child block as the block root).
+  const decoded = new Array(blockB64.length);
+  let maxGi = -1;
+  const attrSpecByName = {};
+  for (let i = 0; i < blockB64.length; i++) {
+    const buf = Buffer.from(blockB64[i], 'base64');
+    const json = zlib.inflateRawSync(buf).toString();
+    decoded[i] = JSON.parse(json);
+    const grBuf = Buffer.from(decoded[i].grB64, 'base64');
+    const gr = new Int32Array(grBuf.buffer, grBuf.byteOffset, decoded[i].labels.length);
+    for (let k = 0; k < gr.length; k++) if (gr[k] > maxGi) maxGi = gr[k];
+    for (const name of Object.keys(decoded[i].attributes || {})) {
+      if (!attrSpecByName[name]) attrSpecByName[name] = decoded[i].attributes[name].kind;
+    }
+  }
+  const total = maxGi + 1;
+  const labels = new Array(total);
+  const aggValueGlobal = new Float64Array(total);
+  const parentIndices = new Int32Array(total).fill(-1);
+  const attributes = {};
+  for (const name of Object.keys(attrSpecByName)) {
+    attributes[name] = { kind: attrSpecByName[name], values: new Array(total) };
+  }
+  // Pass 2: scatter each block's rows into the global flat arrays.
+  for (let bi = 0; bi < decoded.length; bi++) {
+    const blk = decoded[bi];
+    const m = blk.labels.length;
+    const grBuf = Buffer.from(blk.grB64, 'base64');
+    const gr = new Int32Array(grBuf.buffer, grBuf.byteOffset, m);
+    for (let k = 0; k < m; k++) {
+      labels[gr[k]] = blk.labels[k];
+      aggValueGlobal[gr[k]] = blk.values[k];
+    }
+    if (blk.pgB64) {
+      const pgBuf = Buffer.from(blk.pgB64, 'base64');
+      const pg = new Int32Array(pgBuf.buffer, pgBuf.byteOffset, m);
+      for (let k = 0; k < m; k++) parentIndices[gr[k]] = pg[k];
+    } else {
+      // v=3 local parent refs. Only write when pi[k] >= 0 — the row's
+      // global parent is in *some* block; -1 just means "not this block".
+      // The parent block will overwrite with the real value.
+      const piBuf = Buffer.from(blk.piB64, 'base64');
+      const pi = new Int32Array(piBuf.buffer, piBuf.byteOffset, m);
+      for (let k = 0; k < m; k++) {
+        if (pi[k] >= 0) parentIndices[gr[k]] = gr[pi[k]];
+      }
+    }
+    for (const name of Object.keys(attributes)) {
+      const a = blk.attributes[name];
+      if (a.kind === 'categorical') {
+        const u16Buf = Buffer.from(a.b64, 'base64');
+        const u16 = new Uint16Array(u16Buf.buffer, u16Buf.byteOffset, m);
+        const names = a.names;
+        for (let k = 0; k < m; k++) attributes[name].values[gr[k]] = names[u16[k]];
+      } else {
+        const f64Buf = Buffer.from(a.b64, 'base64');
+        const f64 = new Float64Array(f64Buf.buffer, f64Buf.byteOffset, m);
+        for (let k = 0; k < m; k++) attributes[name].values[gr[k]] = f64[k];
+      }
+    }
+  }
+  // Recover `scan.values` from `aggValueGlobal` by stripping out each node's
+  // children's aggregates. Same identity every partitioner relies on.
+  const childIds = new Array(total);
+  for (let i = 0; i < total; i++) childIds[i] = null;
+  for (let i = 0; i < total; i++) {
+    const p = parentIndices[i];
+    if (p >= 0) {
+      if (!childIds[p]) childIds[p] = [];
+      childIds[p].push(i);
+    }
+  }
+  const values = new Float64Array(total);
+  for (let i = 0; i < total; i++) {
+    let v = aggValueGlobal[i];
+    if (childIds[i]) for (const c of childIds[i]) v -= aggValueGlobal[c];
+    values[i] = v;
+  }
+  return { labels, parentIndices, values, attributes };
+}
+
 // Build the full wire-format envelope for a scan. This is the JSON object
 // that ends up inside `<script type="application/json" id="tmdata">` in
 // the HTML output AND inside the scan-cache JSON — same shape in both
