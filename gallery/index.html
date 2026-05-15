@@ -211,9 +211,17 @@
       disables it for direct comparison.
     </p>
     <pre style="background: var(--border, #f0f0f0); padding: 8px 12px; border-radius: 4px; font-size: 12px; overflow-x: auto; margin: 0 0 1rem;"><code>npx -p @imbue-ai/gp-treemap gp-visualize-llm-continuation-density \
+  --backend=real --model hf:QuantFactory/Llama-3.2-1B-GGUF:Q4_K_M \
   --prompt "Time flies like an arrow. Fruit flies like a" \
-  --model hf:QuantFactory/Llama-3.2-1B-GGUF:Q4_K_M \
-  --continuation-max-depth=10 --prune-probability=1e-4</code></pre>
+  --continuation-max-depth=6 --prune-probability=1e-7 --top-p=0.98</code></pre>
+    <p style="font-size: 0.875rem; font-style: italic; color: var(--muted);">
+      The scan below took ~24 hours of CPU forward passes on a Llama 3.2 1B
+      model — 3.66 M token paths kept after pruning. The gzipped scan cache
+      lives in <code>samples/data/llm-density/fruit-flies-d6.json.gz</code>
+      (~87 MB); the rendered HTML (~120 MB) is too large to commit but
+      <code>scripts/update_gallery.sh</code> regenerates it locally in
+      seconds from the cached scan.
+    </p>
     <div class="frame-wrap">
       <iframe
         src="llm-density-fruit-flies.html"

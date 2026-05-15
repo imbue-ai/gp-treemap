@@ -23,10 +23,12 @@ fi
 node tools/gpdu-scan.js --no-open --color=extension "$ROOT" "$ROOT/gallery/gp-treemap-source-tree-disk-usage.html"
 
 # --- LLM continuation-density entry: regenerate the HTML from the cached
-# scan JSON. Running the LLM from scratch needs the model weights and takes
-# ~30 min; the gzipped scan (~1.3 MB) lets the gallery rebuild in <1 s.
-node tools/gpdu-llm-density.js --no-open \
-  --scan-in="$ROOT/samples/data/llm-density/fruit-flies-d4.json.gz" \
+# scan JSON. The original scan took ~24 hours of forward passes
+# (continuation-max-depth=6, top-p=0.98, prune-probability=1e-7 — ~3.66 M
+# token-paths), so we ship the gzipped scan in samples/ and rebuild the
+# HTML from it in seconds.
+node --max-old-space-size=8192 tools/gpdu-llm-density.js --no-open \
+  --scan-in="$ROOT/samples/data/llm-density/fruit-flies-d6.json.gz" \
   --prompt='Time flies like an arrow. Fruit flies like a' \
   --model=/tmp/llama-3.2-1b-f16.gguf \
   "$ROOT/gallery/llm-density-fruit-flies.html"
