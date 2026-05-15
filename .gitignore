@@ -11,10 +11,6 @@ test-results/
 # Scan-tool outputs that sometimes land in the working tree
 /gp-treemap-*.html
 
-# Generated locally from samples/data/llm-density/fruit-flies-d6.json.gz.
-# The rendered HTML is too big (~120 MB) to commit, but the gzipped scan
-# cache is in samples/. Run `bash scripts/update_gallery.sh` to produce it.
-gallery/llm-density-fruit-flies.html
 
 # gpdu-s3 test runner writes per-test launcher .mjs files here
 tests/_tmp_s3_launchers/

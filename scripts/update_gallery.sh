@@ -26,12 +26,21 @@ node tools/gpdu-scan.js --no-open --color=extension "$ROOT" "$ROOT/gallery/gp-tr
 # scan JSON. The original scan took ~24 hours of forward passes
 # (continuation-max-depth=6, top-p=0.98, prune-probability=1e-7 — ~3.66 M
 # token-paths), so we ship the gzipped scan in samples/ and rebuild the
-# HTML from it in seconds.
+# HTML from it in seconds. We strip the deepest layer first because the
+# full depth-6 HTML is ~120 MB (past GitHub's 100 MB per-file push limit);
+# at depth-5 the rendered HTML is ~86 MB and still shows the visually
+# interesting structure the longer run produced.
+LLM_TMP=$(mktemp -t gp-treemap-llm-XXXXXX).scan.json.gz
+node --max-old-space-size=8192 tools/repack-scan.js \
+  "$ROOT/samples/data/llm-density/fruit-flies-d6.json.gz" \
+  "$LLM_TMP" \
+  --max-depth=5
 node --max-old-space-size=8192 tools/gpdu-llm-density.js --no-open \
-  --scan-in="$ROOT/samples/data/llm-density/fruit-flies-d6.json.gz" \
+  --scan-in="$LLM_TMP" \
   --prompt='Time flies like an arrow. Fruit flies like a' \
   --model=/tmp/llama-3.2-1b-f16.gguf \
   "$ROOT/gallery/llm-density-fruit-flies.html"
+rm -f "$LLM_TMP"
 
 # --- Table-treemap entries. Each line pairs a dataset with the defaults
 # baked into its viewer HTML.
