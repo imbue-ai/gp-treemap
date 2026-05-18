@@ -1,0 +1,566 @@
+// Browser-side IIFE shared by all `gpdu-*` CLIs. Inlined into each tool's
+// generated HTML via `dist/scan-loader.embed.js` (built by tools/build.js).
+//
+// Each tool sets `window._gpduConfig` *before* this script runs:
+//
+//   window._gpduConfig = {
+//     defaultColorMode: 'extension',          // initial mode
+//     categoricalModes: ['extension', ...],   // which modes are categorical
+//     quantitativeModes: ['ctime', ...],      // which modes are quantitative
+//     catColorMaps: { kind: {imageM: '#...'}, ... },  // optional per-mode color overrides
+//     defaultTheme: 'tokyo-night',
+//     themes: { 'tokyo-night': { label, dark, bg, surface, border, fg, fgMuted, accent }, ... },
+//     palettePicks: { viridis: 'Viridis', ... },
+//     catPaletteDefault: 'tokyo-night',
+//     qPaletteDefault:   'viridis',
+//   };
+//
+// Then includes #color-sel / #theme-sel / #palette-sel selects, a #help-btn
+// + #help-modal, an empty #stats-bar (the tool's own page-script populates
+// the stats bar in a window._bootReady.then handler), and the <gp-treemap>
+// element with id="tm".
+//
+// The loader exposes:
+//   window._store          — Map<globalId, { label, value, parentId, childIds,
+//                                            <attribute keys>, stubBlockId?, stubAggregates? }>
+//   window._rootId         — global id of the tree root
+//   window._bootReady      — Promise resolved once block 0 is loaded
+//   window._allBlocksReady — Promise resolved once every block is inflated
+//   window._currentColorMode
+//   window._currentPalette
+//   window._applyColorBy(mode)  — switch color mode (cat-vs-quant inferred from config)
+//
+// Per-tool stats-bar logic, help modal contents, and any extra page chrome
+// live in the tool's own emitted HTML, not here.
+
+(function () {
+  var cfg = window._gpduConfig || {};
+  var categoricalModes = cfg.categoricalModes || [];
+  var quantitativeModes = cfg.quantitativeModes || [];
+  var catColorMaps = cfg.catColorMaps || {};
+  var themes = cfg.themes || {};
+  var DEFAULT_THEME = cfg.defaultTheme || '';
+  var DEFAULT_COLOR = cfg.defaultColorMode || (categoricalModes[0] || quantitativeModes[0] || '');
+  var DEFAULT_PALETTE = '';
+  var CAT_PALETTE_DEFAULT = cfg.catPaletteDefault || 'tokyo-night';
+  var Q_PALETTE_DEFAULT = cfg.qPaletteDefault || 'viridis';
+
+  var raw = JSON.parse(document.getElementById('tmdata').textContent);
+  var envelope = raw;
+  var tm = document.getElementById('tm');
+
+  // --- Decode helpers ---
+  function _buf(b64) {
+    var s = atob(b64), b = new Uint8Array(s.length);
+    for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i);
+    return b.buffer;
+  }
+  function decodeCat(names, b64) {
+    var ci = new Uint16Array(_buf(b64));
+    var a = new Array(ci.length);
+    for (var i = 0; i < ci.length; i++) a[i] = names[ci[i]];
+    return a;
+  }
+  function decodeNum(b64) {
+    return new Float64Array(_buf(b64));
+  }
+
+  // --- Node store ---
+  // id -> {
+  //   label, value, parentId, childIds,
+  //   <one entry per attribute>,
+  //   stubBlockId?, stubAggregates? (object keyed by stubField name)
+  // }
+  var store = new Map();
+  var currentColorMode = DEFAULT_COLOR;
+  var currentTheme = DEFAULT_THEME;
+  var currentPalette = DEFAULT_PALETTE;
+
+  // Decode a block (already-parsed JSON object) and add its nodes to the store.
+  // Supports two wire formats:
+  //   * v=3 (subtree-rooted, blk.piB64): parent refs are local-row offsets,
+  //     -1 for "parent is in another block". Stubs (blk.stubs) tag the
+  //     internal nodes whose real children live elsewhere.
+  //   * v=4 (depth-band, blk.pgB64): parent refs are global ids. Every
+  //     parent is in an earlier block; on load we append each row into
+  //     its parent's childIds via store lookup. No stubs.
+  function loadBlock(blk) {
+    var m = blk.labels.length;
+    var gr = new Int32Array(_buf(blk.grB64));
+
+    // Decode each attribute the encoder produced.
+    var attrs = blk.attributes || {};
+    var decodedAttrs = {};
+    for (var name in attrs) {
+      var a = attrs[name];
+      if (a.kind === 'categorical') {
+        decodedAttrs[name] = decodeCat(a.names, a.b64);
+      } else {
+        decodedAttrs[name] = decodeNum(a.b64);
+      }
+    }
+
+    if (blk.pgB64) {
+      // ---- v=4 depth-band path: every parent reference is global; we
+      // link each row into its parent's childIds via the store. ----
+      var pg = new Int32Array(_buf(blk.pgB64));
+      for (var k = 0; k < m; k++) {
+        var gid = gr[k];
+        if (store.has(gid)) continue;  // shouldn't happen with depth-band, but defensive
+        var gp = pg[k];
+        var nd = {
+          label: blk.labels[k],
+          value: blk.values[k],
+          parentId: gp >= 0 ? gp : null,
+          childIds: null,
+        };
+        for (var an in decodedAttrs) nd[an] = decodedAttrs[an][k];
+        store.set(gid, nd);
+        if (gp >= 0) {
+          var parentNd = store.get(gp);
+          if (parentNd) {
+            if (parentNd.childIds == null) parentNd.childIds = [];
+            parentNd.childIds.push(gid);
+          }
+        }
+      }
+      return;
+    }
+
+    // ---- v=3 subtree-rooted path. ----
+    var pi = new Int32Array(_buf(blk.piB64));
+
+    // Build childIds per node (local).
+    var localChildren = new Array(m);
+    for (var i = 0; i < m; i++) localChildren[i] = null;
+    for (var j = 1; j < m; j++) {
+      var p = pi[j];
+      if (p >= 0) {
+        if (!localChildren[p]) localChildren[p] = [];
+        localChildren[p].push(j);
+      }
+    }
+
+    // Stubs: array of [localRow, childBlockId, ...stubFieldValues].
+    var stubFieldNames = blk.stubFieldNames || [];
+    var stubMap = new Map();
+    if (blk.stubs) {
+      for (var si = 0; si < blk.stubs.length; si++) {
+        var s = blk.stubs[si];
+        stubMap.set(s[0], s);
+      }
+    }
+
+    for (var k2 = 0; k2 < m; k2++) {
+      var gid2 = gr[k2];
+      if (store.has(gid2)) {
+        // Node already exists (it's a stub from a parent block) — update it
+        // with real children from this block.
+        var existing = store.get(gid2);
+        if (localChildren[k2]) {
+          existing.childIds = localChildren[k2].map(function (li) { return gr[li]; });
+        }
+        continue;
+      }
+      var gp2 = null;
+      if (pi[k2] >= 0) gp2 = gr[pi[k2]];
+      var nd2 = {
+        label: blk.labels[k2],
+        value: blk.values[k2],
+        parentId: gp2,
+        childIds: localChildren[k2] ? localChildren[k2].map(function (li) { return gr[li]; }) : null,
+      };
+      for (var an2 in decodedAttrs) nd2[an2] = decodedAttrs[an2][k2];
+      var stubInfo = stubMap.get(k2);
+      if (stubInfo) {
+        nd2.stubBlockId = stubInfo[1];
+        nd2.stubAggregates = {};
+        for (var sf = 0; sf < stubFieldNames.length; sf++) {
+          nd2.stubAggregates[stubFieldNames[sf]] = stubInfo[2 + sf];
+        }
+      }
+      store.set(gid2, nd2);
+    }
+  }
+
+  // Progressive-render scheduler. Each block that lands replaces a stub
+  // leaf in the in-memory store with a real subtree; we want the canvas
+  // to repaint as detail accumulates rather than wait for the last block
+  // to land.
+  //
+  // Doubling backoff: paint after 1 new block, then after 2 more, then 4,
+  // then 8, ... So total paint count grows as log2(N), not N — for a
+  // 29-block load that's ~5 paints instead of 29, each of which fully
+  // re-layouts the visible subtree. rAF-coalesced so multiple arrivals
+  // in one frame still collapse to one repaint. The final block always
+  // triggers a paint regardless of the doubling threshold.
+  var pendingProgressiveRender = false;
+  var paintedBlocks = 0;     // loadedBlocks count at last scheduled paint
+  var nextPaintDelta = 1;    // doubles after each scheduled paint
+  function scheduleProgressiveRender() {
+    var allDone = totalBlocks > 0 && loadedBlocks >= totalBlocks;
+    if (!allDone && (loadedBlocks - paintedBlocks) < nextPaintDelta) return;
+    if (pendingProgressiveRender) return;
+    pendingProgressiveRender = true;
+    requestAnimationFrame(function () {
+      pendingProgressiveRender = false;
+      paintedBlocks = loadedBlocks;
+      if (!(totalBlocks > 0 && loadedBlocks >= totalBlocks)) nextPaintDelta *= 2;
+      if (tm._tree) tm._tree._lazy = true;
+      tm._queueRender();
+    });
+  }
+
+  // Loading-progress indicator: a small "loading N / M blocks" message
+  // with a CSS spinner that lives in the page's #bottom-bar (every gpdu-*
+  // tool ships one). Auto-inserted the first time we touch it so tools
+  // don't have to declare it; removed once all blocks have inflated.
+  var totalBlocks = envelope.blocks ? envelope.blocks.length : 0;
+  var loadedBlocks = 0;
+  var progressEl = null;
+  function ensureProgressEl() {
+    if (progressEl) return progressEl;
+    var bar = document.getElementById('bottom-bar');
+    if (!bar) return null;
+    progressEl = document.createElement('span');
+    progressEl.id = 'loader-progress';
+    progressEl.style.cssText = 'flex-shrink:0; color: var(--page-fg-muted, #888); ' +
+      'display:inline-flex; align-items:center; gap:6px; margin-right:8px; font-variant-numeric: tabular-nums;';
+    progressEl.innerHTML =
+      '<span class="loader-spinner" style="display:inline-block; width:11px; height:11px; ' +
+        'border:2px solid currentColor; border-right-color:transparent; border-radius:50%; ' +
+        'animation: gp-spin 0.8s linear infinite; opacity:0.7;"></span>' +
+      '<span class="loader-text"></span>';
+    // Insert before #scanned-note if present, else append.
+    var scannedNote = document.getElementById('scanned-note');
+    if (scannedNote && scannedNote.parentNode === bar) {
+      bar.insertBefore(progressEl, scannedNote);
+    } else {
+      bar.appendChild(progressEl);
+    }
+    if (!document.getElementById('loader-progress-keyframes')) {
+      var style = document.createElement('style');
+      style.id = 'loader-progress-keyframes';
+      style.textContent = '@keyframes gp-spin { to { transform: rotate(360deg); } }';
+      document.head.appendChild(style);
+    }
+    return progressEl;
+  }
+  function updateLoaderProgress() {
+    var el = ensureProgressEl();
+    if (!el) return;
+    var textEl = el.querySelector('.loader-text');
+    if (loadedBlocks < totalBlocks) {
+      if (textEl) textEl.textContent = 'loading ' + loadedBlocks.toLocaleString() + ' / ' + totalBlocks.toLocaleString() + ' blocks';
+      el.style.display = '';
+    } else {
+      // Done — fade out and remove.
+      el.style.transition = 'opacity 0.4s ease-out';
+      el.style.opacity = '0';
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 500);
+    }
+  }
+
+  // Inflate one compressed block.
+  function inflateBlock(blockId) {
+    var b64 = envelope.blocks[blockId];
+    if (!b64) return Promise.resolve();
+    var bytes = new Uint8Array(atob(b64).split('').map(function (c) { return c.charCodeAt(0); }));
+    var ds = new DecompressionStream('deflate-raw');
+    var writer = ds.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    return new Response(ds.readable).text().then(function (text) {
+      loadBlock(JSON.parse(text));
+      envelope.blocks[blockId] = null;
+      loadedBlocks++;
+      updateLoaderProgress();
+      scheduleProgressiveRender();
+    });
+  }
+
+  // After block-0 renders, kick off the rest of the blocks in parallel.
+  // Each one queues a progressive repaint as it lands, so the user sees
+  // detail fill in continuously instead of all-or-nothing at the end.
+  var allBlocksReady = null;
+  function inflateAllBlocks() {
+    if (allBlocksReady) return allBlocksReady;
+    var promises = [];
+    for (var i = 1; i < envelope.blocks.length; i++) {
+      if (envelope.blocks[i]) promises.push(inflateBlock(i));
+    }
+    allBlocksReady = Promise.all(promises).then(function () {
+      if (tm._tree) tm._tree._lazy = true;
+      tm._queueRender();
+    });
+    return allBlocksReady;
+  }
+
+  // --- <gp-treemap> accessor functions ---
+  function getChildren(id) {
+    var nd = store.get(id);
+    if (!nd) return null;
+    if (nd.stubBlockId != null && nd.childIds === null) return null;
+    if (!nd.childIds) return [];
+    return nd.childIds;
+  }
+  function getValue(id) { var nd = store.get(id); return nd ? nd.value : 0; }
+  function getLabel(id) { var nd = store.get(id); return nd ? nd.label : ''; }
+  function getId(id) { return id; }
+  function getColor(id) {
+    var nd = store.get(id);
+    if (!nd) return '';
+    return nd[currentColorMode];
+  }
+
+  // --- Boot: inflate block 0, wire accessors, kick a render ---
+  function inflateBlock0(b64) {
+    var bytes = new Uint8Array(atob(b64).split('').map(function (c) { return c.charCodeAt(0); }));
+    var ds = new DecompressionStream('deflate-raw');
+    var writer = ds.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    return new Response(ds.readable).text().then(function (text) {
+      return JSON.parse(text);
+    });
+  }
+  var block0Promise = envelope.block0
+    ? Promise.resolve(envelope.block0)
+    : inflateBlock0(envelope.blocks[0]);
+
+  var bootReady = block0Promise.then(function (block0) {
+    loadBlock(block0);
+    envelope.blocks[0] = null;
+    loadedBlocks++;
+    updateLoaderProgress();
+    var rootId = new Int32Array(_buf(block0.grB64))[0];
+    tm.root = rootId;
+    window._rootId = rootId;
+    tm.getId = getId;
+    tm.getChildren = getChildren;
+    tm.getValue = getValue;
+    tm.getLabel = getLabel;
+    tm.getColor = getColor;
+
+    var isLevel1 = currentColorMode === '[Level 1]';
+    var isCat = isLevel1 || categoricalModes.indexOf(currentColorMode) >= 0;
+    tm.setAttribute('color-mode', isLevel1 ? 'level1' : (isCat ? 'categorical' : 'quantitative'));
+
+    window._store = store;
+    window._currentColorMode = currentColorMode;
+
+    window._applyColorBy = function (mode) {
+      currentColorMode = mode;
+      window._currentColorMode = mode;
+      var isLevel1 = mode === '[Level 1]';
+      var cat = isLevel1 || categoricalModes.indexOf(mode) >= 0;
+      var newMap = (cat && !isLevel1) ? (catColorMaps[mode] || {}) : {};
+      tm._props._userColorMap = newMap;
+      tm.colorMap = tm.getAttribute('theme') ? {} : newMap;
+      var paletteOverride = window._currentPalette || '';
+      if (isLevel1) {
+        tm.setAttribute('color-mode', 'level1');
+        var l1Pal = paletteOverride || CAT_PALETTE_DEFAULT;
+        tm._props._userPalette = l1Pal;
+        if (!tm.getAttribute('theme')) tm.setAttribute('palette', l1Pal);
+        tm.colorDomain = undefined;
+      } else if (cat) {
+        tm.setAttribute('color-mode', 'categorical');
+        var catPal = paletteOverride || CAT_PALETTE_DEFAULT;
+        tm._props._userPalette = catPal;
+        if (!tm.getAttribute('theme')) tm.setAttribute('palette', catPal);
+        tm.colorDomain = undefined;
+      } else {
+        tm.setAttribute('color-mode', 'quantitative');
+        var qPal = paletteOverride || Q_PALETTE_DEFAULT;
+        tm._props._userPalette = qPal;
+        tm.setAttribute('palette', qPal);
+        var lo = Infinity, hi = -Infinity;
+        store.forEach(function (nd) {
+          var v = nd[mode];
+          if (typeof v === 'number' && v > 0) { if (v < lo) lo = v; if (v > hi) hi = v; }
+        });
+        tm.colorDomain = lo !== Infinity ? [lo, hi] : undefined;
+      }
+      tm._queueRender();
+    };
+
+    if (cfg.valueFormatter) tm.valueFormatter = cfg.valueFormatter;
+
+    // After block-0's render is queued, inflate everything else.
+    requestAnimationFrame(function () { inflateAllBlocks(); });
+  });
+
+  window._bootReady = bootReady;
+  window._allBlocksReady = bootReady.then(function () { return inflateAllBlocks(); });
+
+  // --- Theme / palette / color-by switcher + URL hash sync ---
+  bootReady.then(function () {
+    var themeSel = document.getElementById('theme-sel');
+    var paletteSel = document.getElementById('palette-sel');
+    var colorSel = document.getElementById('color-sel');
+    var htmlRoot = document.documentElement;
+
+    function applyPageTheme(name) {
+      currentTheme = name || '';
+      var t = name ? themes[name] : null;
+      if (t) {
+        htmlRoot.style.setProperty('--page-bg', t.bg);
+        htmlRoot.style.setProperty('--page-surface', t.surface);
+        htmlRoot.style.setProperty('--page-border', t.border);
+        htmlRoot.style.setProperty('--page-fg', t.fg);
+        htmlRoot.style.setProperty('--page-fg-muted', t.fgMuted);
+        htmlRoot.style.setProperty('--page-accent', t.accent);
+      } else {
+        ['--page-bg', '--page-surface', '--page-border', '--page-fg', '--page-fg-muted', '--page-accent']
+          .forEach(function (v) { htmlRoot.style.removeProperty(v); });
+      }
+      tm.setAttribute('theme', name || '');
+      applyPalette(currentPalette);
+      if (themeSel) themeSel.value = currentTheme;
+    }
+    function applyPalette(name) {
+      currentPalette = name || '';
+      window._currentPalette = currentPalette;
+      var effective = name || currentTheme || 'gp-default';
+      tm._props._userPalette = effective;
+      tm.setAttribute('palette', effective);
+      tm._props.palette = effective;
+      tm._queueRender();
+      if (paletteSel) paletteSel.value = currentPalette;
+    }
+    function applyColor(mode) {
+      var m = mode || DEFAULT_COLOR;
+      window._applyColorBy(m);
+      if (colorSel) colorSel.value = m;
+      if (currentPalette) applyPalette(currentPalette);
+    }
+    if (themeSel) themeSel.addEventListener('change', function () { applyPageTheme(themeSel.value); writeHash(); });
+    if (paletteSel) paletteSel.addEventListener('change', function () { applyPalette(paletteSel.value); writeHash(); });
+    if (colorSel) colorSel.addEventListener('change', function () { applyColor(colorSel.value); writeHash(); });
+
+    // Help modal: open on ?-button, close on backdrop click / ESC / × button.
+    var helpBtn = document.getElementById('help-btn');
+    var helpModal = document.getElementById('help-modal');
+    if (helpBtn && helpModal) {
+      helpBtn.addEventListener('click', function () { helpModal.classList.add('open'); });
+      helpModal.addEventListener('click', function (e) {
+        if (e.target === helpModal || e.target.classList.contains('close')) helpModal.classList.remove('open');
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') helpModal.classList.remove('open');
+      });
+    }
+
+    // Convert integer node IDs to/from human-readable label paths for the URL hash.
+    function idToPath(id) {
+      if (id == null) return undefined;
+      var rootId = window._rootId;
+      var nd = store.get(id);
+      if (!nd) return undefined;
+      if (id === rootId) return [];
+      var parts = [];
+      var cur = nd;
+      while (cur && cur.parentId != null) {
+        parts.unshift(cur.label);
+        cur = store.get(cur.parentId);
+      }
+      return parts;
+    }
+    function pathToId(path) {
+      if (path == null || !Array.isArray(path)) return undefined;
+      var rootId = window._rootId;
+      if (path.length === 0) return rootId;
+      var cur = rootId;
+      for (var i = 0; i < path.length; i++) {
+        var nd = store.get(cur);
+        if (!nd || !nd.childIds) return undefined;
+        var found = null;
+        for (var j = 0; j < nd.childIds.length; j++) {
+          var child = store.get(nd.childIds[j]);
+          if (child && child.label === path[i]) { found = nd.childIds[j]; break; }
+        }
+        if (found == null) return undefined;
+        cur = found;
+      }
+      return cur;
+    }
+    function readHash() {
+      try {
+        if (location.hash.length <= 1) return;
+        var raw = location.hash.slice(1);
+        if (!(raw.charAt(0) === 's' && raw.charAt(1) === '=')) return;
+        var obj = JSON.parse(decodeURIComponent(raw.slice(2)));
+        applyPageTheme('theme' in obj ? (obj.theme || '') : DEFAULT_THEME);
+        applyPalette('palette' in obj ? (obj.palette || '') : '');
+        applyColor(obj.color || DEFAULT_COLOR);
+        var v = obj.viewer || {};
+        applyViewer(v);
+        if (window._allBlocksReady) {
+          window._allBlocksReady.then(function () { applyViewer(v); });
+        }
+      } catch (_) {}
+    }
+    function applyViewer(v) {
+      // Build a viewerState object with only the keys that are actually
+      // present in the hash. The component setter uses `key in obj` to
+      // decide whether to act on a field, so including a key with
+      // value=undefined would coerce that field to `false`/null — wrong
+      // when the URL is silent about it (we want to keep the current /
+      // default value).
+      var s = {};
+      if ('zoom' in v) s.zoom = pathToId(v.zoom);
+      if (Array.isArray(v.zoomPath)) {
+        s.zoomPath = v.zoomPath.map(function (p) { return pathToId(p); }).filter(function (id) { return id != null; });
+      }
+      if ('depth' in v) s.depth = v.depth === 'Infinity' ? Infinity : (v.depth != null ? Number(v.depth) : undefined);
+      if ('target' in v) s.target = pathToId(v.target);
+      if ('focus' in v) s.focus = pathToId(v.focus);
+      if ('showLabels' in v) s.showLabels = !!v.showLabels;
+      if ('showAncestors' in v) s.showAncestors = !!v.showAncestors;
+      tm.viewerState = s;
+    }
+    function writeHash() {
+      try {
+        var v = tm.viewerState || {};
+        var vOut = {};
+        if (v.zoom != null) vOut.zoom = idToPath(v.zoom);
+        if (v.zoomPath) vOut.zoomPath = v.zoomPath.map(idToPath).filter(function (p) { return p != null; });
+        if (v.target != null) vOut.target = idToPath(v.target);
+        if (v.focus != null) vOut.focus = idToPath(v.focus);
+        if (v.depth != null) vOut.depth = v.depth === Infinity ? 'Infinity' : v.depth;
+        if ('showLabels' in v) vOut.showLabels = v.showLabels;
+        if ('showAncestors' in v) vOut.showAncestors = v.showAncestors;
+
+        var out = {};
+        if (currentColor() !== DEFAULT_COLOR) out.color = currentColor();
+        if (currentTheme !== DEFAULT_THEME) out.theme = currentTheme;
+        if (currentPalette !== DEFAULT_PALETTE) out.palette = currentPalette;
+        if (Object.keys(vOut).length) out.viewer = vOut;
+        var s = Object.keys(out).length ? 's=' + encodeURIComponent(JSON.stringify(out)) : '';
+        history.replaceState(null, '', s ? '#' + s : location.pathname + location.search);
+      } catch (_) {}
+    }
+    function currentColor() { return window._currentColorMode || DEFAULT_COLOR; }
+
+    if (colorSel) colorSel.value = DEFAULT_COLOR;
+    readHash();
+    if (location.hash.length <= 1) {
+      applyPageTheme(DEFAULT_THEME);
+      applyColor(DEFAULT_COLOR);
+    }
+    if (location.hash.length > 1) tm._queueRender();
+    tm.addEventListener('gp-zoom-change', writeHash);
+    tm.addEventListener('gp-depth-change', writeHash);
+    tm.addEventListener('gp-target', writeHash);
+    tm.addEventListener('gp-focus', writeHash);
+    tm.addEventListener('gp-labels-change', writeHash);
+    tm.addEventListener('gp-ancestors-change', writeHash);
+
+    // Expose for tool-side hooks.
+    window._applyPageTheme = applyPageTheme;
+    window._applyPalette = applyPalette;
+    window._applyColor = applyColor;
+    window._writeHash = writeHash;
+  });
+})();

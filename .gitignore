@@ -14,3 +14,11 @@ test-results/
 
 # gpdu-s3 test runner writes per-test launcher .mjs files here
 tests/_tmp_s3_launchers/
+
+# Python wrapper local dev state
+python/.venv/
+python/.pytest_cache/
+python/dist/
+python/build/
+python/**/*.egg-info/
+python/**/__pycache__/
