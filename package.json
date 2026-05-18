@@ -64,7 +64,8 @@
     "test:install": "playwright install chromium",
     "test:update": "playwright test --update-snapshots",
     "bench": "node tools/bench.js",
-    "prepublishOnly": "node tools/build.js"
+    "prepublishOnly": "node tools/build.js",
+    "version": "node scripts/sync_python_version.mjs"
   },
   "optionalDependencies": {
     "@aws-sdk/client-s3": "^3.1039.0",

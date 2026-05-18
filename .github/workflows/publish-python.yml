@@ -1,0 +1,71 @@
+# Publishes gp_treemap to PyPI when a v* tag is pushed — same tag that
+# also triggers the npm publish workflow. Versions stay locked because
+# `npm version` mirrors the bump into python/pyproject.toml +
+# python/src/gp_treemap/__init__.py via scripts/sync_python_version.mjs.
+#
+# To cut a release (from the repo root, clean working tree):
+#   npm version patch -m "release: %s"   # or minor / major
+#   git push --follow-tags
+#
+# The tag push fires this workflow, which:
+#   1. Verifies the tag matches python/pyproject.toml's version.
+#   2. Rebuilds the JS bundle and refreshes the Python package data so
+#      the wheel ships the same bundle the npm release publishes.
+#   3. Builds the wheel + sdist with `uv build`.
+#   4. Publishes to PyPI via Trusted Publishing (OIDC) — no token.
+#
+# Trusted Publishing config lives on pypi.org under the project's
+# Settings → Publishing. It's bound to this repo + this exact workflow
+# filename + the "pypi" environment below; rename either and publishes
+# 404 until the config is updated.
+
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write    # required for OIDC token exchange with PyPI
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node (for the JS bundle build)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+
+      - name: Verify tag matches python/pyproject.toml version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          PKG=$(awk -F'"' '/^version = / {print $2; exit}' python/pyproject.toml)
+          if [ "$TAG" != "$PKG" ]; then
+            echo "Tag v$TAG does not match python/pyproject.toml version $PKG" >&2
+            exit 1
+          fi
+
+      - name: Build the JS bundle
+        run: |
+          npm ci --ignore-scripts
+          node tools/build.js
+
+      - name: Refresh Python package data with the freshly-built bundle
+        run: bash python/scripts/refresh_bundle.sh
+
+      - name: Build wheel + sdist
+        working-directory: python
+        run: uv build
+
+      - name: Publish to PyPI (Trusted Publishing)
+        working-directory: python
+        run: uv publish --trusted-publishing always dist/*
