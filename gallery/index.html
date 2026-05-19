@@ -213,14 +213,14 @@
     <pre style="background: var(--border, #f0f0f0); padding: 8px 12px; border-radius: 4px; font-size: 12px; overflow-x: auto; margin: 0 0 1rem;"><code>npx -p @imbue-ai/gp-treemap gp-visualize-llm-continuation-density \
   --backend=real --model hf:QuantFactory/Llama-3.2-1B-GGUF:Q4_K_M \
   --prompt "Time flies like an arrow. Fruit flies like a" \
-  --continuation-max-depth=6 --prune-probability=1e-7 --top-p=0.98</code></pre>
+  --continuation-max-depth=4 --top-p=0.80</code></pre>
     <p style="font-size: 0.875rem; font-style: italic; color: var(--muted);">
-      The scan below took ~24 hours of CPU forward passes on a Llama 3.2 1B
-      model — 3.66 M token paths kept after pruning. We ship the full depth-6
-      gzipped scan in <code>samples/data/llm-density/fruit-flies-d6.json.gz</code>;
-      <code>update_gallery.sh</code> strips the deepest layer in-memory so
-      the rendered HTML stays under GitHub's per-file size limit, leaving
-      ~2.6 M visible nodes across 5 levels.
+      Down-sampled from a much larger ~24-hour Llama 3.2 1B depth-6 run
+      (3.66 M token paths). The sample below is depth-4 + top-p=0.80
+      — ~64 k visible nodes, plenty to see the structure without
+      bloating the repo. The full original tree lives outside git;
+      <code>tools/repack-scan.js</code> derives this slim view from
+      it in a few seconds.
     </p>
     <div class="frame-wrap">
       <iframe

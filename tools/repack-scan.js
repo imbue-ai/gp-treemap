@@ -31,6 +31,7 @@ function parseArgs(argv) {
   let blockSize = 500000, firstBlockSize = null;
   let strategy = 'depth-band';
   let maxDepth = null;
+  let topP = null;
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '-h' || a === '--help') { usage(0); }
@@ -38,6 +39,7 @@ function parseArgs(argv) {
     else if (a.startsWith('--first-block-size=')) firstBlockSize = parseInt(a.split('=')[1], 10);
     else if (a.startsWith('--strategy=')) strategy = a.split('=')[1];
     else if (a.startsWith('--max-depth=')) maxDepth = parseInt(a.split('=')[1], 10);
+    else if (a.startsWith('--top-p=')) topP = parseFloat(a.split('=')[1]);
     else if (a.startsWith('-')) { console.error('unknown flag: ' + a); usage(2); }
     else if (inputPath === null) inputPath = a;
     else if (outputPath === null) outputPath = a;
@@ -46,7 +48,7 @@ function parseArgs(argv) {
   if (!inputPath) usage(2);
   if (!outputPath) outputPath = inputPath.replace(/\.scan\.json\.gz$/i, '') + '.repacked.scan.json.gz';
   if (firstBlockSize === null) firstBlockSize = blockSize;
-  return { inputPath, outputPath, blockSize, firstBlockSize, strategy, maxDepth };
+  return { inputPath, outputPath, blockSize, firstBlockSize, strategy, maxDepth, topP };
 }
 
 function usage(code = 0) {
@@ -56,9 +58,130 @@ function usage(code = 0) {
     '         [--strategy=depth-band|bfs|dfs]\n' +
     '         [--max-depth=N]   drop every node whose depth (root=0) exceeds N;\n' +
     '                           parents that lose all their children become leaves\n' +
-    '                           carrying their pre-prune aggregate value.\n'
+    '                           carrying their pre-prune aggregate value.\n' +
+    '         [--top-p=P]       at each parent, keep only the most-probable\n' +
+    '                           children whose cumulative `probability` attribute\n' +
+    '                           reaches P (a number in (0, 1]); roll the dropped\n' +
+    '                           subtrees into a synthetic "(other)" sibling.\n' +
+    '                           Requires the scan to carry a `probability` attr.\n'
   );
   process.exit(code);
+}
+
+// At each parent, keep the most-probable children whose cumulative
+// `probability` attribute reaches `topP`; roll the dropped subtrees into
+// a synthetic "(other)" sibling carrying the dropped subtree-mass and the
+// dropped conditional-probability total. Requires the scan to carry a
+// `probability` numeric attribute (the conditional p|parent that the
+// gpdu-llm-density tool emits). Operates on the post-decoded flat scan.
+function pruneTopP(scan, topP) {
+  if (!(topP > 0 && topP <= 1)) {
+    throw new Error('--top-p must be in (0, 1]');
+  }
+  const probAttr = scan.attributes && scan.attributes.probability;
+  if (!probAttr || probAttr.kind !== 'numeric') {
+    throw new Error('--top-p requires the scan to carry a numeric `probability` attribute');
+  }
+  const probability = probAttr.values;
+  const n = scan.labels.length;
+  const pi = scan.parentIndices;
+  // childIds
+  const childIds = new Array(n);
+  for (let i = 0; i < n; i++) childIds[i] = null;
+  for (let i = 1; i < n; i++) {
+    const p = pi[i];
+    if (!childIds[p]) childIds[p] = [];
+    childIds[p].push(i);
+  }
+  // aggValue, reverse pass.
+  const aggValue = new Float64Array(n);
+  for (let i = n - 1; i >= 0; i--) {
+    aggValue[i] = scan.values[i];
+    if (childIds[i]) for (const c of childIds[i]) aggValue[i] += aggValue[c];
+  }
+  // Walk top-down, marking nodes kept/dropped. A node is kept if its
+  // parent kept it AND its own walk-up to root went through only kept
+  // ancestors. For each kept parent: sort kids by probability desc,
+  // keep until cumulative probability ≥ topP, drop the rest.
+  const keep = new Uint8Array(n);
+  keep[0] = 1; // root always kept
+  const otherMass = new Float64Array(n);
+  const otherProb = new Float64Array(n);
+  const stack = [0];
+  while (stack.length) {
+    const p = stack.pop();
+    if (!keep[p]) continue;
+    const kids = childIds[p];
+    if (!kids || kids.length === 0) continue;
+    const sorted = kids.slice().sort((a, b) => (probability[b] || 0) - (probability[a] || 0));
+    let cum = 0;
+    let dropped = 0;
+    for (const c of sorted) {
+      if (cum < topP) {
+        keep[c] = 1;
+        cum += Math.max(0, probability[c] || 0);
+        stack.push(c);
+      } else {
+        // Drop this child and its entire subtree (the BFS below
+        // never enqueues it, so its descendants stay keep[i]=0).
+        otherMass[p] += aggValue[c];
+        otherProb[p] += Math.max(0, probability[c] || 0);
+        dropped++;
+      }
+    }
+    void dropped;
+  }
+  // Compact + add an "(other)" leaf under any parent with dropped mass.
+  // The new leaf gets `value` = otherMass (so the partitioner's reverse
+  // pass restores parent aggValue), `probability` = otherProb, and a
+  // leafReason of 'pruned' to match the original tool's convention.
+  const newNodes = [];
+  const newIdx = new Int32Array(n).fill(-1);
+  for (let i = 0; i < n; i++) {
+    if (!keep[i]) continue;
+    newIdx[i] = newNodes.length;
+    newNodes.push(i);
+  }
+  const kept = newNodes.length;
+  // Plan room for (other) leaves so we can size arrays once.
+  let nOther = 0;
+  for (let i = 0; i < n; i++) if (keep[i] && otherMass[i] > 0) nOther++;
+  const total = kept + nOther;
+  const labels = new Array(total);
+  const parentIndices = new Int32Array(total);
+  const values = new Float64Array(total);
+  // Copy kept nodes.
+  for (let ni = 0; ni < kept; ni++) {
+    const i = newNodes[ni];
+    labels[ni] = scan.labels[i];
+    parentIndices[ni] = pi[i] < 0 ? -1 : newIdx[pi[i]];
+    values[ni] = scan.values[i];
+  }
+  // Attributes: copy on kept indices; allocate room for the new leaves.
+  const attributes = {};
+  for (const name of Object.keys(scan.attributes || {})) {
+    const a = scan.attributes[name];
+    const out = new Array(total);
+    for (let ni = 0; ni < kept; ni++) out[ni] = a.values[newNodes[ni]];
+    attributes[name] = { kind: a.kind, values: out };
+  }
+  // Append the (other) leaves.
+  let next = kept;
+  for (let i = 0; i < n; i++) {
+    if (!keep[i] || otherMass[i] <= 0) continue;
+    const parentNew = newIdx[i];
+    labels[next] = '(other)';
+    parentIndices[next] = parentNew;
+    values[next] = otherMass[i];
+    for (const name of Object.keys(attributes)) {
+      if (name === 'probability') attributes[name].values[next] = otherProb[i];
+      else if (name === 'leafReason') attributes[name].values[next] = 'pruned';
+      else if (attributes[name].kind === 'numeric') attributes[name].values[next] = NaN;
+      else attributes[name].values[next] = '(other)';
+    }
+    next++;
+  }
+  return { labels, parentIndices, values, attributes };
 }
 
 // Drop every node whose depth (root=0) exceeds `maxDepth`. Parents whose
@@ -130,7 +253,7 @@ function pruneToDepth(scan, maxDepth) {
 }
 
 async function main() {
-  const { inputPath, outputPath, blockSize, firstBlockSize, strategy, maxDepth } = parseArgs(process.argv.slice(2));
+  const { inputPath, outputPath, blockSize, firstBlockSize, strategy, maxDepth, topP } = parseArgs(process.argv.slice(2));
 
   process.stderr.write('reading ' + inputPath + ' (' + (fs.statSync(inputPath).size / 1024 / 1024).toFixed(1) + ' MB gz)\n');
   const cached = loadScanJson(inputPath);
@@ -142,6 +265,13 @@ async function main() {
   let scan = decodeEnvelope(cached.envelope);
   process.stderr.write('  decoded ' + scan.labels.length.toLocaleString() + ' nodes in ' + ((Date.now() - t0) / 1000).toFixed(1) + 's\n');
 
+  if (topP != null) {
+    process.stderr.write('pruning to top-p=' + topP + '...\n');
+    const before = scan.labels.length;
+    const tp = Date.now();
+    scan = pruneTopP(scan, topP);
+    process.stderr.write('  ' + before.toLocaleString() + ' → ' + scan.labels.length.toLocaleString() + ' nodes in ' + ((Date.now() - tp) / 1000).toFixed(1) + 's\n');
+  }
   if (maxDepth != null) {
     process.stderr.write('pruning to max-depth=' + maxDepth + '...\n');
     const before = scan.labels.length;
@@ -176,7 +306,7 @@ async function main() {
   // Recompute counts after a prune so the rendered HTML / stats-bar
   // doesn't report stale pre-prune numbers.
   let counts = cached.meta.counts;
-  if (maxDepth != null) {
+  if (maxDepth != null || topP != null) {
     let leaves = 0, deepest = 0;
     const n = scan.labels.length;
     const pi = scan.parentIndices;
@@ -198,6 +328,7 @@ async function main() {
     repackedStrategy: strategy,
     repackedBlockSize: blockSize,
     ...(maxDepth != null ? { repackedMaxDepth: maxDepth } : {}),
+    ...(topP != null ? { repackedTopP: topP } : {}),
   });
   const newSize = fs.statSync(outputPath).size;
   process.stderr.write('  wrote ' + (newSize / 1024 / 1024).toFixed(1) + ' MB gz (' + oldBlocks.toLocaleString() + ' → ' + partResult.blocks.length.toLocaleString() + ' blocks)\n');
