@@ -142,7 +142,7 @@
   min-cell-area="30"></gp-treemap>
 <div id="bottom-bar">
   <div id="stats-bar"></div>
-  <span id="scanned-note">scanned 2026-05-13T21:52:30-07:00</span>
+  <span id="scanned-note">scanned 2026-05-19T15:44:40-07:00</span>
 </div>
 
 <script type="application/json" id="tmdata">
@@ -1580,11 +1580,13 @@ const STYLE = `
 .overlay .anc { border:2px solid var(--gp-ancestor, #555); }
 .overlay .anc-lbl { position:absolute; pointer-events:none;
   font-size:11px; font-weight:600; line-height:1.2;
-  color:#fff; padding:1px 5px; border-radius:3px;
+  color: var(--gp-ancestor, #555);
+  padding:1px 5px; border-radius:3px;
   background: rgba(0,0,0,0.32);
   -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
   white-space:nowrap;
   z-index: 2; }
+.overlay .anc-lbl.focused { color: var(--gp-selected, #fff); }
 .overlay .lbl { position:absolute; font-size:10px; font-weight:500; line-height:1.15; padding:1px 3px;
   color: var(--gp-fg, #111);
   text-shadow: 0 0 2px var(--gp-bg, #ffffffcc), 0 0 2px var(--gp-bg, #ffffffcc);
@@ -2086,11 +2088,18 @@ class GpTreemap extends HTMLElement {
           // happen in normal flow, but if an accessor flips back to null we
           // prefer the last-known-good list to a blank).
         } else if (items.length === 0) {
-          node.childIds = [];  // confirmed leaf
+          if (node.childIds == null || node.childIds.length !== 0) {
+            node.childIds = [];  // confirmed leaf
+            node._balRoot = null;
+          }
         } else {
           // Rebuild childIds from the current accessor result; add any new
-          // children to the local nodes map.
-          const newChildIds = new Array(items.length);
+          // children to the local nodes map. If membership is unchanged from
+          // the previous render, preserve the existing childIds array
+          // identity so the per-node balancer cache (_balRoot) stays valid.
+          const existing = node.childIds;
+          let same = existing != null && existing.length === items.length;
+          const newChildIds = same ? null : new Array(items.length);
           for (let ci = 0; ci < items.length; ci++) {
             const cItem = items[ci];
             const cId = _gid(cItem);
@@ -2104,9 +2113,23 @@ class GpTreemap extends HTMLElement {
                 _item: cItem, _hasExplicitValue: true,
               });
             }
-            newChildIds[ci] = cId;
+            if (same) {
+              if (existing[ci] !== cId) {
+                same = false;
+                const rebuilt = new Array(items.length);
+                for (let bi = 0; bi < ci; bi++) rebuilt[bi] = existing[bi];
+                rebuilt[ci] = cId;
+                node.childIds = rebuilt;
+                node._balRoot = null;
+              }
+            } else {
+              newChildIds[ci] = cId;
+            }
           }
-          node.childIds = newChildIds;
+          if (!same && newChildIds) {
+            node.childIds = newChildIds;
+            node._balRoot = null;
+          }
         }
       }
 
@@ -2116,7 +2139,15 @@ class GpTreemap extends HTMLElement {
         return;
       }
       const kids = node.childIds.map((cid) => nodes.get(cid));
-      const balRoot = balanceChildren(kids.map((k) => ({ id: k.id, size: Math.max(0, k.value) })));
+      // Cache the GP-style balanced binary tree on the node. It's a pure
+      // function of (childIds, child values), and child values don't change
+      // once a node enters `nodes`, so a single recompute per childIds
+      // identity is enough. Invalidated above whenever childIds is reassigned.
+      let balRoot = node._balRoot;
+      if (!balRoot) {
+        balRoot = balanceChildren(kids.map((k) => ({ id: k.id, size: Math.max(0, k.value) })));
+        node._balRoot = balRoot;
+      }
       const childRects = new Map();
       if (balRoot) {
         layoutTree(balRoot, rect, (id, r) => childRects.set(id, r), splitBias);
@@ -2311,7 +2342,6 @@ class GpTreemap extends HTMLElement {
       if (!rect) continue;
       const x = rect.x / dpr, y = rect.y / dpr;
       const w = rect.w / dpr, h = rect.h / dpr;
-      if (w < 6 || h < 6) continue;
 
       // Outline. Skip if this cell is the currently focused one — its bright
       // `.sel` border will be drawn on top by the caller. We still draw its
@@ -2337,7 +2367,7 @@ class GpTreemap extends HTMLElement {
       if (!node) continue;
       const padX = 3, padY = 3;
       const lbl = document.createElement('div');
-      lbl.className = 'anc-lbl';
+      lbl.className = id === focusId ? 'anc-lbl focused' : 'anc-lbl';
       lbl.textContent = node.label != null ? String(node.label) : String(id);
       // Hidden until positioned so we don't flash an unplaced label at (0,0).
       lbl.style.visibility = 'hidden';
@@ -2370,8 +2400,10 @@ class GpTreemap extends HTMLElement {
         }
         if (!bumped) break;
       }
-      // Drop the label entirely if it no longer fits inside its cell.
-      if (top + lh > y + h - 1) { lbl.remove(); continue; }
+      // Let the label overflow its cell — it's better to cover a small box
+      // than to drop the label entirely when the user can't otherwise tell
+      // what they're hovering. The collision-push above already keeps it
+      // from overwriting outer-ancestor labels.
       lbl.style.top = top + 'px';
       lbl.style.visibility = '';
       placedLabels.push({ left, top, right, bottom: top + lh });
@@ -3339,14 +3371,26 @@ try { if (typeof window !== "undefined") window.GpTreemap = { GpTreemap, fnv1a, 
   // Progressive-render scheduler. Each block that lands replaces a stub
   // leaf in the in-memory store with a real subtree; we want the canvas
   // to repaint as detail accumulates rather than wait for the last block
-  // to land. rAF-coalesced so a flurry of block arrivals in the same
-  // frame turns into one repaint, not N.
+  // to land.
+  //
+  // Doubling backoff: paint after 1 new block, then after 2 more, then 4,
+  // then 8, ... So total paint count grows as log2(N), not N — for a
+  // 29-block load that's ~5 paints instead of 29, each of which fully
+  // re-layouts the visible subtree. rAF-coalesced so multiple arrivals
+  // in one frame still collapse to one repaint. The final block always
+  // triggers a paint regardless of the doubling threshold.
   var pendingProgressiveRender = false;
+  var paintedBlocks = 0;     // loadedBlocks count at last scheduled paint
+  var nextPaintDelta = 1;    // doubles after each scheduled paint
   function scheduleProgressiveRender() {
+    var allDone = totalBlocks > 0 && loadedBlocks >= totalBlocks;
+    if (!allDone && (loadedBlocks - paintedBlocks) < nextPaintDelta) return;
     if (pendingProgressiveRender) return;
     pendingProgressiveRender = true;
     requestAnimationFrame(function () {
       pendingProgressiveRender = false;
+      paintedBlocks = loadedBlocks;
+      if (!(totalBlocks > 0 && loadedBlocks >= totalBlocks)) nextPaintDelta *= 2;
       if (tm._tree) tm._tree._lazy = true;
       tm._queueRender();
     });

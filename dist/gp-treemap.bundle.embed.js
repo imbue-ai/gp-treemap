@@ -1421,11 +1421,13 @@ const STYLE = \`
 .overlay .anc { border:2px solid var(--gp-ancestor, #555); }
 .overlay .anc-lbl { position:absolute; pointer-events:none;
   font-size:11px; font-weight:600; line-height:1.2;
-  color:#fff; padding:1px 5px; border-radius:3px;
+  color: var(--gp-ancestor, #555);
+  padding:1px 5px; border-radius:3px;
   background: rgba(0,0,0,0.32);
   -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
   white-space:nowrap;
   z-index: 2; }
+.overlay .anc-lbl.focused { color: var(--gp-selected, #fff); }
 .overlay .lbl { position:absolute; font-size:10px; font-weight:500; line-height:1.15; padding:1px 3px;
   color: var(--gp-fg, #111);
   text-shadow: 0 0 2px var(--gp-bg, #ffffffcc), 0 0 2px var(--gp-bg, #ffffffcc);
@@ -2181,7 +2183,6 @@ class GpTreemap extends HTMLElement {
       if (!rect) continue;
       const x = rect.x / dpr, y = rect.y / dpr;
       const w = rect.w / dpr, h = rect.h / dpr;
-      if (w < 6 || h < 6) continue;
 
       // Outline. Skip if this cell is the currently focused one — its bright
       // \`.sel\` border will be drawn on top by the caller. We still draw its
@@ -2207,7 +2208,7 @@ class GpTreemap extends HTMLElement {
       if (!node) continue;
       const padX = 3, padY = 3;
       const lbl = document.createElement('div');
-      lbl.className = 'anc-lbl';
+      lbl.className = id === focusId ? 'anc-lbl focused' : 'anc-lbl';
       lbl.textContent = node.label != null ? String(node.label) : String(id);
       // Hidden until positioned so we don't flash an unplaced label at (0,0).
       lbl.style.visibility = 'hidden';
@@ -2240,8 +2241,10 @@ class GpTreemap extends HTMLElement {
         }
         if (!bumped) break;
       }
-      // Drop the label entirely if it no longer fits inside its cell.
-      if (top + lh > y + h - 1) { lbl.remove(); continue; }
+      // Let the label overflow its cell — it's better to cover a small box
+      // than to drop the label entirely when the user can't otherwise tell
+      // what they're hovering. The collision-push above already keeps it
+      // from overwriting outer-ancestor labels.
       lbl.style.top = top + 'px';
       lbl.style.visibility = '';
       placedLabels.push({ left, top, right, bottom: top + lh });
