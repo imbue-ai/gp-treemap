@@ -221,6 +221,60 @@ export class GpTreemap extends HTMLElement {
 
     this._stage.addEventListener('wheel', this._onWheel, { passive: true });
     this._stage.addEventListener('keydown', this._onKeyDown);
+
+    // Spin up a render worker if the host environment supports it AND the
+    // build embedded a worker source string. The worker is currently idle
+    // — Phase A.0 wires the plumbing; subsequent phases move paint, then
+    // layout, then tree-build into it. ``this._worker`` stays null on
+    // environments without Worker / Blob URL support, and rendering falls
+    // back to the synchronous main-thread path.
+    this._worker = null;
+    this._workerPending = new Map();   // id → {resolve, reject}
+    this._workerNextId = 1;
+    this._initWorker();
+  }
+
+  _initWorker() {
+    try {
+      const src = (typeof window !== 'undefined') && window.__gpTreemapWorkerSrc;
+      if (!src) return;
+      if (typeof Worker === 'undefined' || typeof Blob === 'undefined' ||
+          typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') {
+        return;
+      }
+      const blob = new Blob([src], { type: 'application/javascript' });
+      this._worker = new Worker(URL.createObjectURL(blob));
+      this._worker.onmessage = (e) => this._onWorkerMessage(e.data);
+      this._worker.onerror = (e) => {
+        // Worker crashed — log and continue with the synchronous path.
+        // eslint-disable-next-line no-console
+        console.warn('gp-treemap render worker error:', e && (e.message || e));
+        try { this._worker.terminate(); } catch (_) {}
+        this._worker = null;
+      };
+    } catch (_) {
+      this._worker = null;
+    }
+  }
+
+  _onWorkerMessage(msg) {
+    if (!msg || typeof msg !== 'object') return;
+    const pending = msg.id != null ? this._workerPending.get(msg.id) : null;
+    if (pending) {
+      this._workerPending.delete(msg.id);
+      if (msg.type === 'error') pending.reject(new Error(msg.error || 'worker error'));
+      else pending.resolve(msg);
+    }
+  }
+
+  _workerRequest(msg, transfer) {
+    if (!this._worker) return Promise.reject(new Error('worker not available'));
+    const id = this._workerNextId++;
+    const payload = { ...msg, id };
+    return new Promise((resolve, reject) => {
+      this._workerPending.set(id, { resolve, reject });
+      this._worker.postMessage(payload, transfer || []);
+    });
   }
 
   connectedCallback() {
@@ -229,7 +283,13 @@ export class GpTreemap extends HTMLElement {
     if (!this.hasAttribute('theme')) this._applyTheme('tokyo-night');
     requestAnimationFrame(() => this._queueRender());
   }
-  disconnectedCallback() { this._resizeObserver.disconnect(); }
+  disconnectedCallback() {
+    this._resizeObserver.disconnect();
+    if (this._worker) {
+      try { this._worker.terminate(); } catch (_) {}
+      this._worker = null;
+    }
+  }
 
   attributeChangedCallback(name, _old, val) {
     switch (name) {

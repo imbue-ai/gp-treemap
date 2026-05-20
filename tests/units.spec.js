@@ -461,6 +461,23 @@ test('hit-test: every pixel inside the canvas resolves to a cell (dense tree)', 
   expect(result.misses).toBe(0);
 });
 
+// Phase A.0: the render-worker is instantiated by the component on mount.
+// Pinging it confirms the worker bundle is wired up and all the pure-
+// computation modules made it into the worker source.
+test('worker: ping/pong round-trip + all computation modules present', async ({ page }) => {
+  await page.goto('/tests/unit-fixture.html');
+  const result = await page.evaluate(async () => {
+    const tm = document.createElement('gp-treemap');
+    document.body.appendChild(tm);
+    if (!tm._worker) return { worker: false };
+    const reply = await tm._workerRequest({ type: 'ping' });
+    return { worker: true, reply };
+  });
+  expect(result.worker).toBe(true);
+  expect(result.reply.type).toBe('pong');
+  expect(result.reply.symbolsAvailable).toBe(true);
+});
+
 test('_coerceTreeId: prefers the type the tree actually uses', async ({ page }) => {
   await mountGptmStrings(page);
   const stringCase = await page.locator('gp-treemap').evaluate((tm) => ({
