@@ -36,7 +36,13 @@ function parseScanHtml(htmlPath) {
   const envelope = JSON.parse(m[1]);
   const compressed = Buffer.from(envelope.blocks[0], 'base64');
   const raw = JSON.parse(zlib.inflateRawSync(compressed).toString());
-  const piBuf = Buffer.from(raw.piB64, 'base64');
+  // The wire format has two parent encodings — v=3 (subtree-with-stubs)
+  // writes `piB64` as local row offsets, v=4 (depth-band) writes `pgB64`
+  // as direct global ids. For these tests every input fits in a single
+  // block so local row IS global id, and either field gives the same
+  // [row → parent-row] interpretation.
+  const parentB64 = raw.pgB64 || raw.piB64;
+  const piBuf = Buffer.from(parentB64, 'base64');
   const parentIndices = Array.from(new Int32Array(piBuf.buffer, piBuf.byteOffset, piBuf.byteLength / 4));
   function decodeCat(attr) {
     const buf = Buffer.from(attr.b64, 'base64');

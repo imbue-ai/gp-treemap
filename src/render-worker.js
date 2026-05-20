@@ -30,6 +30,26 @@ self.onmessage = (e) => {
       });
       return;
     }
+    case 'paint': {
+      // Inputs:
+      //   width, height: canvas pixels.
+      //   cells:        Array<{x, y, w, h, lutIndex}> — already-laid-out leaves.
+      //   luts:         Array<Uint8ClampedArray> — one 256×4 ramp per LUT slot.
+      //   background:   {r, g, b} (0..255) — fill colour for uncovered pixels.
+      // Output:
+      //   imageData: ImageData (transferable via its data.buffer).
+      try {
+        const image = new ImageData(msg.width, msg.height);
+        paintAll(image, msg.cells, msg.luts, msg.background);
+        self.postMessage(
+          { type: 'painted', id: msg.id, imageData: image },
+          [image.data.buffer],
+        );
+      } catch (err) {
+        self.postMessage({ type: 'error', id: msg.id, error: String(err && err.message || err) });
+      }
+      return;
+    }
     default:
       self.postMessage({ type: 'error', id: msg.id, error: 'unknown message type: ' + msg.type });
   }

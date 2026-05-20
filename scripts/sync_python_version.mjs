@@ -41,10 +41,15 @@ patchFile('python/pyproject.toml',
 patchFile('python/src/gp_treemap/__init__.py',
   /^__version__ = "[^"]+"$/m,
   `__version__ = "${version}"`);
+// Also bump the README's pinned-version Deno example so the
+// readme-deno-command spec stays green.
+patchFile('README.md',
+  /npm:@imbue-ai\/gp-treemap@[\w.-]+\//,
+  `npm:@imbue-ai/gp-treemap@${version}/`);
 
 // Stage the edits so npm's auto-commit picks them up alongside package.json.
 try {
-  execSync('git add python/pyproject.toml python/src/gp_treemap/__init__.py',
+  execSync('git add python/pyproject.toml python/src/gp_treemap/__init__.py README.md',
     { cwd: repoRoot, stdio: 'ignore' });
 } catch (_) {
   // Outside a git context (e.g. inside an sdist build) — fine to ignore.

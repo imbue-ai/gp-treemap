@@ -193,7 +193,7 @@ deno run \
   --allow-read="$SCAN","$OUT" \
   --allow-write="$OUT" \
   --deny-env \
-  npm:@imbue-ai/gp-treemap@0.5.0/gpdu --no-open "$SCAN" "$OUT" \
+  npm:@imbue-ai/gp-treemap@0.6.2/gpdu --no-open "$SCAN" "$OUT" \
   && open "$OUT"
 ```
 

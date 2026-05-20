@@ -1366,6 +1366,26 @@ self.onmessage = (e) => {
       });
       return;
     }
+    case 'paint': {
+      // Inputs:
+      //   width, height: canvas pixels.
+      //   cells:        Array<{x, y, w, h, lutIndex}> — already-laid-out leaves.
+      //   luts:         Array<Uint8ClampedArray> — one 256×4 ramp per LUT slot.
+      //   background:   {r, g, b} (0..255) — fill colour for uncovered pixels.
+      // Output:
+      //   imageData: ImageData (transferable via its data.buffer).
+      try {
+        const image = new ImageData(msg.width, msg.height);
+        paintAll(image, msg.cells, msg.luts, msg.background);
+        self.postMessage(
+          { type: 'painted', id: msg.id, imageData: image },
+          [image.data.buffer],
+        );
+      } catch (err) {
+        self.postMessage({ type: 'error', id: msg.id, error: String(err && err.message || err) });
+      }
+      return;
+    }
     default:
       self.postMessage({ type: 'error', id: msg.id, error: 'unknown message type: ' + msg.type });
   }
@@ -2935,6 +2955,7 @@ class GpTreemap extends HTMLElement {
     this._worker = null;
     this._workerPending = new Map();   // id → {resolve, reject}
     this._workerNextId = 1;
+    this._paintSeq = 0;                // monotonically increasing per paint
     this._initWorker();
   }
 
@@ -3518,11 +3539,34 @@ class GpTreemap extends HTMLElement {
     }
     this._leaves = renderLeaves;
 
-    // Paint into the canvas in one ImageData allocation.
+    // Paint into the canvas. Off the main thread via the render worker
+    // when available; falls back to a synchronous paint otherwise. We
+    // increment _paintSeq before posting and check it on receipt so a
+    // newer paint always supersedes an in-flight one (e.g. when the
+    // user is wheel-scrolling or blocks are arriving in quick succession).
     const ctx = this._canvas.getContext('2d', { alpha: false });
-    const image = ctx.createImageData(w, h);
-    paintAll(image, renderLeaves, luts, parseBgColor(p.background));
-    ctx.putImageData(image, 0, 0);
+    const seq = ++this._paintSeq;
+    if (this._worker) {
+      const bg = parseBgColor(p.background);
+      this._workerRequest(
+        { type: 'paint', width: w, height: h, cells: renderLeaves, luts, background: bg },
+      ).then((reply) => {
+        if (seq !== this._paintSeq) return;  // stale; a newer paint won.
+        ctx.putImageData(reply.imageData, 0, 0);
+      }, (err) => {
+        // Worker paint failed — fall back synchronously so the user
+        // still sees a treemap.
+        // eslint-disable-next-line no-console
+        console.warn('render worker paint failed; falling back to sync paint:', err);
+        const image = ctx.createImageData(w, h);
+        paintAll(image, renderLeaves, luts, parseBgColor(p.background));
+        ctx.putImageData(image, 0, 0);
+      });
+    } else {
+      const image = ctx.createImageData(w, h);
+      paintAll(image, renderLeaves, luts, parseBgColor(p.background));
+      ctx.putImageData(image, 0, 0);
+    }
 
     this._renderOverlay(cssW, cssH, dpr);
     this._updateToolbarInfo();
