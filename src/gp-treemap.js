@@ -18,9 +18,9 @@ import { buildFromTabular, buildFromTree } from './builder.js';
 import { balanceChildren } from './balancer.js';
 import { layoutTree } from './layout.js';
 import { resolveColors } from './color-resolver.js';
-import { resolvePalette, THEMES } from './palettes.js';
+import { resolvePalette, THEMES, interpolatePalette } from './palettes.js';
 import { buildLUTs, buildLUTForCssColor } from './lut.js';
-import { paintAll } from './painter.js';
+import { paintAll, paintIdGrid } from './painter.js';
 import { applyFormat } from './format.js';
 
 const DEFAULT_PROPS = {
@@ -232,6 +232,9 @@ export class GpTreemap extends HTMLElement {
     this._workerPending = new Map();   // id → {resolve, reject}
     this._workerNextId = 1;
     this._paintSeq = 0;                // monotonically increasing per paint
+    this._idGrid = null;               // Uint32Array(w*h); cellIndex+1 per pixel
+    this._idGridSize = { w: 0, h: 0 };
+    this._workerHasTree = false;       // set-tree posted, ready for render
     this._initWorker();
   }
 
@@ -494,6 +497,33 @@ export class GpTreemap extends HTMLElement {
     }
     this._renderToolbar();
     this._paint();
+  }
+
+  // Serialise this._tree.nodes into a structured-cloneable array and ship
+  // it to the worker. The worker rebuilds its own Map so it can mutate
+  // per-node caches (`_balRoot`, `colorValue` during [Level 1]) without
+  // touching the main-thread tree.
+  _postTreeToWorker() {
+    if (!this._worker || !this._tree) return;
+    const out = [];
+    for (const [, n] of this._tree.nodes) {
+      out.push({
+        id: n.id, label: n.label, value: n.value, depth: n.depth,
+        parentId: n.parentId,
+        childIds: n.childIds ? n.childIds.slice() : null,
+        colorValue: n.colorValue,
+        isOther: !!n.isOther,
+        colorIndex: n.colorIndex | 0,
+      });
+    }
+    const roots = this._tree.roots.slice();
+    this._workerHasTree = false;
+    this._workerRequest({ type: 'set-tree', nodes: out, roots }).then(() => {
+      this._workerHasTree = true;
+      // If a paint queued before the tree landed, the eager path was
+      // skipped — kick a fresh render now that the worker is ready.
+      this._queueRender();
+    }, () => { /* worker error; fall back forever via sync path */ });
   }
 
   _buildTree() {
@@ -829,6 +859,8 @@ export class GpTreemap extends HTMLElement {
       ).then((reply) => {
         if (seq !== this._paintSeq) return;  // stale; a newer paint won.
         ctx.putImageData(reply.imageData, 0, 0);
+        this._idGrid = reply.idGrid;
+        this._idGridSize = { w, h };
       }, (err) => {
         // Worker paint failed — fall back synchronously so the user
         // still sees a treemap.
@@ -837,11 +869,19 @@ export class GpTreemap extends HTMLElement {
         const image = ctx.createImageData(w, h);
         paintAll(image, renderLeaves, luts, parseBgColor(p.background));
         ctx.putImageData(image, 0, 0);
+        const idGrid = new Uint32Array(w * h);
+        paintIdGrid(idGrid, w, h, renderLeaves);
+        this._idGrid = idGrid;
+        this._idGridSize = { w, h };
       });
     } else {
       const image = ctx.createImageData(w, h);
       paintAll(image, renderLeaves, luts, parseBgColor(p.background));
       ctx.putImageData(image, 0, 0);
+      const idGrid = new Uint32Array(w * h);
+      paintIdGrid(idGrid, w, h, renderLeaves);
+      this._idGrid = idGrid;
+      this._idGridSize = { w, h };
     }
 
     this._renderOverlay(cssW, cssH, dpr);
@@ -1004,6 +1044,62 @@ export class GpTreemap extends HTMLElement {
     }
   }
 
+  // Eager render path: shippeverything to the worker, blit the result.
+  // Mirrors _paint's post-rebuild work but stays off the main thread.
+  _paintEagerViaWorker(cssW, cssH, dpr, w, h) {
+    const p = this._props;
+    const ctx = this._canvas.getContext('2d', { alpha: false });
+    // Stretch-zoom: bias the worker's split decisions to match the
+    // pre-zoom aspect ratio. Same logic as the sync path.
+    let splitBias = 1;
+    if (this._stretchZoomId && this._stretchZoomAspect > 0) {
+      const narrowW = Math.max(1, Math.round(h * this._stretchZoomAspect));
+      const rawBias = w / narrowW;
+      splitBias = rawBias > 1 ? Math.min(rawBias, 4) : Math.max(rawBias, 0.25);
+    }
+    const params = {
+      width: w, height: h,
+      visibleRootId: this._activeVisibleRootId(),
+      displayDepth: p.displayDepth === Infinity ? 'Infinity' : p.displayDepth,
+      groupPaddingPx: Math.max(0, (p.groupPadding || 0) * dpr),
+      splitBias,
+      palette: this._resolvedPalette(),
+      gradientIntensity: p.gradientIntensity,
+      background: parseBgColor(p.background),
+      colorMode: p.colorMode,
+      colorScale: p.colorScale,
+      colorDomain: p.colorDomain,
+      colorMap: p.colorMap || {},
+      locatedNodeIds: p.locatedNodeIds || [],
+    };
+    const seq = ++this._paintSeq;
+    this._workerRequest({ type: 'render', params }).then((reply) => {
+      if (seq !== this._paintSeq) return;
+      ctx.putImageData(reply.imageData, 0, 0);
+      this._idGrid = reply.idGrid;
+      this._idGridSize = { w, h };
+      this._leaves = reply.leaves;
+      this._leafById = new Map();
+      for (const l of this._leaves) this._leafById.set(l.id, l);
+      // Reconstruct nodeRects from the flat [id, x, y, w, h, ...] array.
+      this._nodeRects = new Map();
+      const flat = reply.nodeRects;
+      for (let i = 0; i < flat.length; i += 5) {
+        this._nodeRects.set(flat[i], { x: flat[i + 1], y: flat[i + 2], w: flat[i + 3], h: flat[i + 4] });
+      }
+      this._renderOverlay(cssW, cssH, dpr);
+      this._updateToolbarInfo();
+      if (this._spinner) this._spinner.hidden = true;
+    }, (err) => {
+      // Worker render failed — disable the eager path and fall back to
+      // the sync code by clearing the worker flag and re-queueing.
+      // eslint-disable-next-line no-console
+      console.warn('render worker eager-render failed; falling back to sync:', err);
+      this._workerHasTree = false;
+      this._queueRender();
+    });
+  }
+
   _clearCanvas() {
     const ctx = this._canvas.getContext('2d', { alpha: false });
     ctx.fillStyle = this._props.background;
@@ -1011,6 +1107,8 @@ export class GpTreemap extends HTMLElement {
     this._overlay.innerHTML = '';
     this._leaves = [];
     this._leafById = new Map();
+    this._idGrid = null;
+    this._idGridSize = { w: 0, h: 0 };
   }
 
   // ----- toolbar -----
@@ -1274,22 +1372,28 @@ export class GpTreemap extends HTMLElement {
     const dpr = this._canvas.width / canvasRect.width;
     let px = cssX * dpr;
     let py = cssY * dpr;
-    // Clamp to canvas bounds so the 4px stage margin around the canvas and
-    // the right/bottom edge (where `px < l.x + l.w` flips at integer pixels)
-    // still resolve to a leaf.
+    // Clamp to canvas bounds so the 4px stage margin still resolves to a
+    // cell at the edges.
     const W = this._canvas.width;
     const H = this._canvas.height;
     if (px < 0) px = 0; else if (px > W - 1) px = W - 1;
     if (py < 0) py = 0; else if (py > H - 1) py = H - 1;
-    // First pass: exact containment. Cells don't overlap so first hit wins.
-    for (const l of this._leaves) {
-      if (px >= l.x && px < l.x + l.w && py >= l.y && py < l.y + l.h) return l.id;
+    // Fast path: the idGrid maps every canvas pixel to its leaf index + 1
+    // (0 = background). Single memory read, no scan, no float-seam gaps.
+    const grid = this._idGrid;
+    if (grid && this._idGridSize.w === W && this._idGridSize.h === H) {
+      const ix = px | 0;
+      const iy = py | 0;
+      const cell = grid[iy * W + ix];
+      if (cell > 0 && cell - 1 < this._leaves.length) return this._leaves[cell - 1].id;
+      // Fall through to the linear-scan fallback if the pixel is background
+      // (rare — usually only happens at canvas edges or during the brief
+      // window between a layout and its paint landing).
     }
-    // Fallback: nearest leaf by squared rect distance. With thousands of
-    // tightly-packed sub-pixel cells, float-rounded seams between adjacent
-    // leaves can leave the cursor in a hairline gap that the exact pass
-    // misses; falling back to "closest cell" means the user never has to
-    // wiggle the mouse to register a hover.
+    // Fallback: nearest leaf by squared rect distance. Used when the worker
+    // hasn't responded yet OR (extremely rarely) when the cursor is in a
+    // background pixel — keeps hover working from the moment the layout is
+    // known, even before paint completes.
     let bestId = null, bestDist = Infinity;
     for (const l of this._leaves) {
       const right = l.x + l.w, bottom = l.y + l.h;
@@ -1736,26 +1840,6 @@ function parseBgColor(css) {
 
 // Interpolate a small palette (e.g. 7 HSL stops) into `count` evenly spaced
 // entries by linear interpolation in HSL space.
-function interpolatePalette(palette, count) {
-  if (palette.length >= count) return palette;
-  const stops = palette.map((c) => {
-    const m = /hsl\(\s*([\d.]+)\s*,\s*([\d.]+)%?\s*,\s*([\d.]+)%?\s*\)/.exec(c);
-    return m ? [+m[1], +m[2], +m[3]] : [0, 0, 50];
-  });
-  const out = [];
-  for (let i = 0; i < count; i++) {
-    const t = i / (count - 1) * (stops.length - 1);
-    const idx = Math.min(stops.length - 2, Math.floor(t));
-    const frac = t - idx;
-    const a = stops[idx], b = stops[idx + 1];
-    const h = a[0] + (b[0] - a[0]) * frac;
-    const s = a[1] + (b[1] - a[1]) * frac;
-    const l = a[2] + (b[2] - a[2]) * frac;
-    out.push(`hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l.toFixed(1)}%)`);
-  }
-  return out;
-}
-
 // Properties that define the data source — changing these invalidates the
 // cached lazy tree so it gets rebuilt from scratch on the next render.
 const DATA_PROPS = new Set(['root', 'labels', 'parents', 'parentIndices', 'values', 'ids', 'getChildren', 'getValue', 'getLabel', 'getId', 'getColor']);

@@ -352,6 +352,30 @@ function toHsl({ h, s, l }) {
   return \`hsl(\${h}, \${clampPct(s)}%, \${clampPct(l)}%)\`;
 }
 
+// Interpolate a small categorical palette up to \`count\` HSL stops so a
+// quantitative color scale gets fine-grained gradient bins instead of a
+// few coarse ones. Used by the renderer when the active palette has
+// fewer entries than the scale resolution wants.
+function interpolatePalette(palette, count) {
+  if (palette.length >= count) return palette;
+  const stops = palette.map((c) => {
+    const m = /hsl\\(\\s*([\\d.]+)\\s*,\\s*([\\d.]+)%?\\s*,\\s*([\\d.]+)%?\\s*\\)/.exec(c);
+    return m ? [+m[1], +m[2], +m[3]] : [0, 0, 50];
+  });
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1) * (stops.length - 1);
+    const idx = Math.min(stops.length - 2, Math.floor(t));
+    const frac = t - idx;
+    const a = stops[idx], b = stops[idx + 1];
+    const h = a[0] + (b[0] - a[0]) * frac;
+    const s = a[1] + (b[1] - a[1]) * frac;
+    const l = a[2] + (b[2] - a[2]) * frac;
+    out.push(\`hsl(\${h.toFixed(1)}, \${s.toFixed(1)}%, \${l.toFixed(1)}%)\`);
+  }
+  return out;
+}
+
 /* ---- src/color-scale.js ---- */
 // Scale builders. Each returns (value) => integer palette index.
 function buildLinearScale(domain, paletteLen) {
@@ -1293,6 +1317,42 @@ function paintAll(image, cells, luts, background) {
   }
 }
 
+/**
+ * Build a canvas-pixel-sized Uint32Array where each entry is \`cellIndex + 1\`
+ * (0 = background). Hit-test becomes a single memory read on the main
+ * thread: \`idGrid[y * width + x] - 1\` → index into the cells array.
+ *
+ * Uses the same rounding as paintAll so the id-grid is pixel-exact aligned
+ * with what the user actually sees.
+ *
+ * @param {Uint32Array} idGrid  length width*height
+ * @param {number}      width
+ * @param {number}      height
+ * @param {Array<{x,y,w,h}>} cells
+ */
+function paintIdGrid(idGrid, width, height, cells) {
+  // Background = 0. The grid is initialised to zero by the caller (Uint32Array
+  // default), so we only write inside cells. Pixel ordering matches the row-
+  // major data layout of ImageData so a single (y * width + x) lookup works.
+  for (let k = 0; k < cells.length; k++) {
+    const c = cells[k];
+    const x0 = Math.round(c.x);
+    const y0 = Math.round(c.y);
+    const x1 = Math.round(c.x + c.w);
+    const y1 = Math.round(c.y + c.h);
+    const rx = x0 < 0 ? 0 : x0;
+    const ry = y0 < 0 ? 0 : y0;
+    const rxEnd = x1 > width  ? width  : x1;
+    const ryEnd = y1 > height ? height : y1;
+    if (rxEnd <= rx || ryEnd <= ry) continue;
+    const stamp = (k + 1) >>> 0;  // reserve 0 for background
+    for (let y = ry; y < ryEnd; y++) {
+      const rowStart = y * width;
+      idGrid.fill(stamp, rowStart + rx, rowStart + rxEnd);
+    }
+  }
+}
+
 /* ---- src/format.js ---- */
 // Small d3-format-ish subset sufficient for valueFormat: we handle \`,d\`,
 // SI suffixes (\`.2s\`), percent (\`.1%\`), fixed (\`.2f\`) and bytes (\`b\`).
@@ -1339,10 +1399,144 @@ function siPrefix(v, p) {
 // its own bundle (no DOM, no <gp-treemap> element) — just the pure
 // computation modules (balancer, layout, builder, color-resolver,
 // color-scale, lut, painter, hash, palettes, format).
-//
-// Phase A.0: scaffolding only. Responds to a \`ping\` message so the
-// main thread can confirm the worker boots. Subsequent phases move
-// paint → layout → tree-build → block-inflation in here.
+
+let workerTree = null;  // { nodes: Map<id, node>, roots: id[] } — set by 'set-tree'
+
+// Layout body — non-lazy version of the closure inside gp-treemap.js's
+// _paint. Walks the visible subtree from \`rootId\`, balancing each
+// non-leaf's children into a binary split tree and tiling its rect.
+// Returns the per-node rect map + the leaves the painter will draw.
+function layoutSubtreeWorker(nodes, rootId, baseDepth, cap, pad, splitBias, w, h) {
+  const leavesCollect = [];
+  const inSubtree = new Set();
+  const nodeRects = new Map();
+  function walk(nodeId, rect) {
+    inSubtree.add(nodeId);
+    nodeRects.set(nodeId, rect);
+    const node = nodes.get(nodeId);
+    if (!node) return;
+    const atCap = node.depth >= cap;
+    if (atCap || !node.childIds || node.childIds.length === 0) {
+      leavesCollect.push({ node, rect });
+      return;
+    }
+    const kids = node.childIds.map((cid) => nodes.get(cid)).filter(Boolean);
+    let balRoot = node._balRoot;
+    if (!balRoot) {
+      balRoot = balanceChildren(kids.map((k) => ({ id: k.id, size: Math.max(0, k.value) })));
+      node._balRoot = balRoot;
+    }
+    const childRects = new Map();
+    if (balRoot) layoutTree(balRoot, rect, (id, r) => childRects.set(id, r), splitBias);
+    for (const kid of kids) {
+      const r = childRects.get(kid.id);
+      if (!r) continue;
+      let sub = r;
+      if (pad > 0 && kid.childIds && kid.childIds.length > 0) {
+        const px = Math.min(pad, r.w / 2 - 1);
+        const py = Math.min(pad, r.h / 2 - 1);
+        if (px > 0 && py > 0) sub = { x: r.x + px, y: r.y + py, w: r.w - 2 * px, h: r.h - 2 * py };
+      }
+      walk(kid.id, sub);
+    }
+  }
+  walk(rootId, { x: 0, y: 0, w, h });
+  return { leavesCollect, inSubtree, nodeRects };
+}
+
+// Run the full eager render: layout → colors → LUTs → paint → idGrid.
+// Returns the response payload the main thread expects (plus the typed-
+// array buffers that should be transferred zero-copy).
+function eagerRender(params) {
+  if (!workerTree) throw new Error('no tree posted to worker (call set-tree first)');
+  const { nodes, roots } = workerTree;
+  const {
+    width, height, visibleRootId, displayDepth,
+    groupPaddingPx, splitBias, palette, gradientIntensity,
+    background, colorMode, colorScale, colorDomain, colorMap, level1, locatedNodeIds,
+  } = params;
+  const rootId = visibleRootId != null && nodes.has(visibleRootId) ? visibleRootId : roots[0];
+  if (rootId == null) {
+    const empty = new ImageData(width, height);
+    return { imageData: empty, idGrid: new Uint32Array(width * height), leaves: [], nodeRects: [] };
+  }
+  const rootNode = nodes.get(rootId);
+  const baseDepth = rootNode.depth | 0;
+  const cap = baseDepth + (displayDepth === 'Infinity' || displayDepth == null ? 99 : Math.max(0, displayDepth | 0));
+  const { leavesCollect, inSubtree, nodeRects } =
+    layoutSubtreeWorker(nodes, rootId, baseDepth, cap, groupPaddingPx, splitBias || 1, width, height);
+
+  let activePalette = palette;
+  if (colorMode === 'quantitative' && activePalette.length < 64) {
+    activePalette = interpolatePalette(activePalette, 64);
+  }
+  const subtree = Array.from(inSubtree).map((id) => nodes.get(id));
+  let effectiveColorMode = colorMode;
+  // [Level 1] overrides colorValue with the ancestor's id. Save originals
+  // so a subsequent render under a different colorMode sees the real
+  // colorValues — the worker tree persists across renders.
+  let level1Originals = null;
+  if (colorMode === 'level1') {
+    level1Originals = new Map();
+    for (const nd of subtree) {
+      level1Originals.set(nd.id, nd.colorValue);
+      let cur = nd;
+      while (cur && cur.id !== rootId && cur.parentId != null && cur.parentId !== rootId) {
+        cur = nodes.get(cur.parentId);
+        if (!cur) break;
+      }
+      nd.colorValue = cur ? cur.id : nd.id;
+    }
+    effectiveColorMode = 'categorical';
+  }
+  resolveColors(subtree, effectiveColorMode, {
+    palette: activePalette, colorScale, colorDomain, colorMap: colorMap || {},
+  });
+  if (level1Originals) {
+    for (const nd of subtree) nd.colorValue = level1Originals.get(nd.id);
+  }
+
+  const assigned = new Map();
+  for (const { node, rect } of leavesCollect) assigned.set(node.id, rect);
+  const luts = buildLUTs(activePalette, gradientIntensity);
+  const overrideIndex = new Map();
+  const located = new Set(locatedNodeIds || []);
+  const renderLeaves = [];
+  for (const { node: n } of leavesCollect) {
+    if (!assigned.has(n.id)) continue;
+    const r = assigned.get(n.id);
+    let lutIndex;
+    if (n.colorOverride) {
+      let idx = overrideIndex.get(n.colorOverride);
+      if (idx === undefined) {
+        idx = luts.length;
+        luts.push(buildLUTForCssColor(n.colorOverride, gradientIntensity));
+        overrideIndex.set(n.colorOverride, idx);
+      }
+      lutIndex = idx;
+    } else {
+      lutIndex = n.colorIndex;
+    }
+    renderLeaves.push({
+      id: n.id, label: n.label, value: n.value, depth: n.depth,
+      parentId: n.parentId, isOther: n.isOther,
+      isLocated: located.has(n.id),
+      x: r.x, y: r.y, w: r.w, h: r.h, lutIndex,
+    });
+  }
+
+  const image = new ImageData(width, height);
+  paintAll(image, renderLeaves, luts, background);
+  const idGrid = new Uint32Array(width * height);
+  paintIdGrid(idGrid, width, height, renderLeaves);
+
+  // Serialize nodeRects as a flat array — worker→main structured clone of
+  // a Map of small objects is slower than a single array of [id, x, y, w, h].
+  const nodeRectsFlat = [];
+  for (const [id, r] of nodeRects) nodeRectsFlat.push(id, r.x, r.y, r.w, r.h);
+
+  return { imageData: image, idGrid, leaves: renderLeaves, nodeRects: nodeRectsFlat };
+}
 
 self.onmessage = (e) => {
   const msg = e.data;
@@ -1366,6 +1560,37 @@ self.onmessage = (e) => {
       });
       return;
     }
+    case 'set-tree': {
+      // Receives the eager-built tree from the main thread once after
+      // buildFromTabular runs. We rebuild a fresh Map here so the worker
+      // owns mutable per-node fields (\`_balRoot\` cache, \`colorValue\` etc.)
+      // independent of the main-thread copy.
+      const nodes = new Map();
+      for (const n of msg.nodes) nodes.set(n.id, { ...n });
+      workerTree = { nodes, roots: msg.roots };
+      self.postMessage({ type: 'tree-set', id: msg.id, nodeCount: nodes.size });
+      return;
+    }
+    case 'render': {
+      // Full eager pipeline: layout → colors → LUTs → paintAll → idGrid.
+      // Uses the cached worker tree (set via 'set-tree'). Returns ImageData
+      // + idGrid as transferables plus the rendered-leaves array and a
+      // flat nodeRects list for the main thread's overlay/breadcrumb.
+      try {
+        const out = eagerRender(msg.params);
+        self.postMessage(
+          {
+            type: 'rendered', id: msg.id,
+            imageData: out.imageData, idGrid: out.idGrid,
+            leaves: out.leaves, nodeRects: out.nodeRects,
+          },
+          [out.imageData.data.buffer, out.idGrid.buffer],
+        );
+      } catch (err) {
+        self.postMessage({ type: 'error', id: msg.id, error: String(err && err.message || err) });
+      }
+      return;
+    }
     case 'paint': {
       // Inputs:
       //   width, height: canvas pixels.
@@ -1374,12 +1599,17 @@ self.onmessage = (e) => {
       //   background:   {r, g, b} (0..255) — fill colour for uncovered pixels.
       // Output:
       //   imageData: ImageData (transferable via its data.buffer).
+      //   idGrid:    Uint32Array (width*height) — \`cellIndex + 1\` per pixel,
+      //              0 = background. Lets the main thread do O(1) hit-test
+      //              with a single memory read.
       try {
         const image = new ImageData(msg.width, msg.height);
         paintAll(image, msg.cells, msg.luts, msg.background);
+        const idGrid = new Uint32Array(msg.width * msg.height);
+        paintIdGrid(idGrid, msg.width, msg.height, msg.cells);
         self.postMessage(
-          { type: 'painted', id: msg.id, imageData: image },
-          [image.data.buffer],
+          { type: 'painted', id: msg.id, imageData: image, idGrid },
+          [image.data.buffer, idGrid.buffer],
         );
       } catch (err) {
         self.postMessage({ type: 'error', id: msg.id, error: String(err && err.message || err) });
@@ -1741,6 +1971,30 @@ function parseHsl(str) {
 function toHsl({ h, s, l }) {
   const clampPct = (v) => Math.max(0, Math.min(100, v));
   return `hsl(${h}, ${clampPct(s)}%, ${clampPct(l)}%)`;
+}
+
+// Interpolate a small categorical palette up to `count` HSL stops so a
+// quantitative color scale gets fine-grained gradient bins instead of a
+// few coarse ones. Used by the renderer when the active palette has
+// fewer entries than the scale resolution wants.
+function interpolatePalette(palette, count) {
+  if (palette.length >= count) return palette;
+  const stops = palette.map((c) => {
+    const m = /hsl\(\s*([\d.]+)\s*,\s*([\d.]+)%?\s*,\s*([\d.]+)%?\s*\)/.exec(c);
+    return m ? [+m[1], +m[2], +m[3]] : [0, 0, 50];
+  });
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1) * (stops.length - 1);
+    const idx = Math.min(stops.length - 2, Math.floor(t));
+    const frac = t - idx;
+    const a = stops[idx], b = stops[idx + 1];
+    const h = a[0] + (b[0] - a[0]) * frac;
+    const s = a[1] + (b[1] - a[1]) * frac;
+    const l = a[2] + (b[2] - a[2]) * frac;
+    out.push(`hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l.toFixed(1)}%)`);
+  }
+  return out;
 }
 
 /* ---- src/color-scale.js ---- */
@@ -2684,6 +2938,42 @@ function paintAll(image, cells, luts, background) {
   }
 }
 
+/**
+ * Build a canvas-pixel-sized Uint32Array where each entry is `cellIndex + 1`
+ * (0 = background). Hit-test becomes a single memory read on the main
+ * thread: `idGrid[y * width + x] - 1` → index into the cells array.
+ *
+ * Uses the same rounding as paintAll so the id-grid is pixel-exact aligned
+ * with what the user actually sees.
+ *
+ * @param {Uint32Array} idGrid  length width*height
+ * @param {number}      width
+ * @param {number}      height
+ * @param {Array<{x,y,w,h}>} cells
+ */
+function paintIdGrid(idGrid, width, height, cells) {
+  // Background = 0. The grid is initialised to zero by the caller (Uint32Array
+  // default), so we only write inside cells. Pixel ordering matches the row-
+  // major data layout of ImageData so a single (y * width + x) lookup works.
+  for (let k = 0; k < cells.length; k++) {
+    const c = cells[k];
+    const x0 = Math.round(c.x);
+    const y0 = Math.round(c.y);
+    const x1 = Math.round(c.x + c.w);
+    const y1 = Math.round(c.y + c.h);
+    const rx = x0 < 0 ? 0 : x0;
+    const ry = y0 < 0 ? 0 : y0;
+    const rxEnd = x1 > width  ? width  : x1;
+    const ryEnd = y1 > height ? height : y1;
+    if (rxEnd <= rx || ryEnd <= ry) continue;
+    const stamp = (k + 1) >>> 0;  // reserve 0 for background
+    for (let y = ry; y < ryEnd; y++) {
+      const rowStart = y * width;
+      idGrid.fill(stamp, rowStart + rx, rowStart + rxEnd);
+    }
+  }
+}
+
 /* ---- src/format.js ---- */
 // Small d3-format-ish subset sufficient for valueFormat: we handle `,d`,
 // SI suffixes (`.2s`), percent (`.1%`), fixed (`.2f`) and bytes (`b`).
@@ -2956,6 +3246,9 @@ class GpTreemap extends HTMLElement {
     this._workerPending = new Map();   // id → {resolve, reject}
     this._workerNextId = 1;
     this._paintSeq = 0;                // monotonically increasing per paint
+    this._idGrid = null;               // Uint32Array(w*h); cellIndex+1 per pixel
+    this._idGridSize = { w: 0, h: 0 };
+    this._workerHasTree = false;       // set-tree posted, ready for render
     this._initWorker();
   }
 
@@ -3218,6 +3511,33 @@ class GpTreemap extends HTMLElement {
     }
     this._renderToolbar();
     this._paint();
+  }
+
+  // Serialise this._tree.nodes into a structured-cloneable array and ship
+  // it to the worker. The worker rebuilds its own Map so it can mutate
+  // per-node caches (`_balRoot`, `colorValue` during [Level 1]) without
+  // touching the main-thread tree.
+  _postTreeToWorker() {
+    if (!this._worker || !this._tree) return;
+    const out = [];
+    for (const [, n] of this._tree.nodes) {
+      out.push({
+        id: n.id, label: n.label, value: n.value, depth: n.depth,
+        parentId: n.parentId,
+        childIds: n.childIds ? n.childIds.slice() : null,
+        colorValue: n.colorValue,
+        isOther: !!n.isOther,
+        colorIndex: n.colorIndex | 0,
+      });
+    }
+    const roots = this._tree.roots.slice();
+    this._workerHasTree = false;
+    this._workerRequest({ type: 'set-tree', nodes: out, roots }).then(() => {
+      this._workerHasTree = true;
+      // If a paint queued before the tree landed, the eager path was
+      // skipped — kick a fresh render now that the worker is ready.
+      this._queueRender();
+    }, () => { /* worker error; fall back forever via sync path */ });
   }
 
   _buildTree() {
@@ -3553,6 +3873,8 @@ class GpTreemap extends HTMLElement {
       ).then((reply) => {
         if (seq !== this._paintSeq) return;  // stale; a newer paint won.
         ctx.putImageData(reply.imageData, 0, 0);
+        this._idGrid = reply.idGrid;
+        this._idGridSize = { w, h };
       }, (err) => {
         // Worker paint failed — fall back synchronously so the user
         // still sees a treemap.
@@ -3561,11 +3883,19 @@ class GpTreemap extends HTMLElement {
         const image = ctx.createImageData(w, h);
         paintAll(image, renderLeaves, luts, parseBgColor(p.background));
         ctx.putImageData(image, 0, 0);
+        const idGrid = new Uint32Array(w * h);
+        paintIdGrid(idGrid, w, h, renderLeaves);
+        this._idGrid = idGrid;
+        this._idGridSize = { w, h };
       });
     } else {
       const image = ctx.createImageData(w, h);
       paintAll(image, renderLeaves, luts, parseBgColor(p.background));
       ctx.putImageData(image, 0, 0);
+      const idGrid = new Uint32Array(w * h);
+      paintIdGrid(idGrid, w, h, renderLeaves);
+      this._idGrid = idGrid;
+      this._idGridSize = { w, h };
     }
 
     this._renderOverlay(cssW, cssH, dpr);
@@ -3728,6 +4058,62 @@ class GpTreemap extends HTMLElement {
     }
   }
 
+  // Eager render path: shippeverything to the worker, blit the result.
+  // Mirrors _paint's post-rebuild work but stays off the main thread.
+  _paintEagerViaWorker(cssW, cssH, dpr, w, h) {
+    const p = this._props;
+    const ctx = this._canvas.getContext('2d', { alpha: false });
+    // Stretch-zoom: bias the worker's split decisions to match the
+    // pre-zoom aspect ratio. Same logic as the sync path.
+    let splitBias = 1;
+    if (this._stretchZoomId && this._stretchZoomAspect > 0) {
+      const narrowW = Math.max(1, Math.round(h * this._stretchZoomAspect));
+      const rawBias = w / narrowW;
+      splitBias = rawBias > 1 ? Math.min(rawBias, 4) : Math.max(rawBias, 0.25);
+    }
+    const params = {
+      width: w, height: h,
+      visibleRootId: this._activeVisibleRootId(),
+      displayDepth: p.displayDepth === Infinity ? 'Infinity' : p.displayDepth,
+      groupPaddingPx: Math.max(0, (p.groupPadding || 0) * dpr),
+      splitBias,
+      palette: this._resolvedPalette(),
+      gradientIntensity: p.gradientIntensity,
+      background: parseBgColor(p.background),
+      colorMode: p.colorMode,
+      colorScale: p.colorScale,
+      colorDomain: p.colorDomain,
+      colorMap: p.colorMap || {},
+      locatedNodeIds: p.locatedNodeIds || [],
+    };
+    const seq = ++this._paintSeq;
+    this._workerRequest({ type: 'render', params }).then((reply) => {
+      if (seq !== this._paintSeq) return;
+      ctx.putImageData(reply.imageData, 0, 0);
+      this._idGrid = reply.idGrid;
+      this._idGridSize = { w, h };
+      this._leaves = reply.leaves;
+      this._leafById = new Map();
+      for (const l of this._leaves) this._leafById.set(l.id, l);
+      // Reconstruct nodeRects from the flat [id, x, y, w, h, ...] array.
+      this._nodeRects = new Map();
+      const flat = reply.nodeRects;
+      for (let i = 0; i < flat.length; i += 5) {
+        this._nodeRects.set(flat[i], { x: flat[i + 1], y: flat[i + 2], w: flat[i + 3], h: flat[i + 4] });
+      }
+      this._renderOverlay(cssW, cssH, dpr);
+      this._updateToolbarInfo();
+      if (this._spinner) this._spinner.hidden = true;
+    }, (err) => {
+      // Worker render failed — disable the eager path and fall back to
+      // the sync code by clearing the worker flag and re-queueing.
+      // eslint-disable-next-line no-console
+      console.warn('render worker eager-render failed; falling back to sync:', err);
+      this._workerHasTree = false;
+      this._queueRender();
+    });
+  }
+
   _clearCanvas() {
     const ctx = this._canvas.getContext('2d', { alpha: false });
     ctx.fillStyle = this._props.background;
@@ -3735,6 +4121,8 @@ class GpTreemap extends HTMLElement {
     this._overlay.innerHTML = '';
     this._leaves = [];
     this._leafById = new Map();
+    this._idGrid = null;
+    this._idGridSize = { w: 0, h: 0 };
   }
 
   // ----- toolbar -----
@@ -3998,22 +4386,28 @@ class GpTreemap extends HTMLElement {
     const dpr = this._canvas.width / canvasRect.width;
     let px = cssX * dpr;
     let py = cssY * dpr;
-    // Clamp to canvas bounds so the 4px stage margin around the canvas and
-    // the right/bottom edge (where `px < l.x + l.w` flips at integer pixels)
-    // still resolve to a leaf.
+    // Clamp to canvas bounds so the 4px stage margin still resolves to a
+    // cell at the edges.
     const W = this._canvas.width;
     const H = this._canvas.height;
     if (px < 0) px = 0; else if (px > W - 1) px = W - 1;
     if (py < 0) py = 0; else if (py > H - 1) py = H - 1;
-    // First pass: exact containment. Cells don't overlap so first hit wins.
-    for (const l of this._leaves) {
-      if (px >= l.x && px < l.x + l.w && py >= l.y && py < l.y + l.h) return l.id;
+    // Fast path: the idGrid maps every canvas pixel to its leaf index + 1
+    // (0 = background). Single memory read, no scan, no float-seam gaps.
+    const grid = this._idGrid;
+    if (grid && this._idGridSize.w === W && this._idGridSize.h === H) {
+      const ix = px | 0;
+      const iy = py | 0;
+      const cell = grid[iy * W + ix];
+      if (cell > 0 && cell - 1 < this._leaves.length) return this._leaves[cell - 1].id;
+      // Fall through to the linear-scan fallback if the pixel is background
+      // (rare — usually only happens at canvas edges or during the brief
+      // window between a layout and its paint landing).
     }
-    // Fallback: nearest leaf by squared rect distance. With thousands of
-    // tightly-packed sub-pixel cells, float-rounded seams between adjacent
-    // leaves can leave the cursor in a hairline gap that the exact pass
-    // misses; falling back to "closest cell" means the user never has to
-    // wiggle the mouse to register a hover.
+    // Fallback: nearest leaf by squared rect distance. Used when the worker
+    // hasn't responded yet OR (extremely rarely) when the cursor is in a
+    // background pixel — keeps hover working from the moment the layout is
+    // known, even before paint completes.
     let bestId = null, bestDist = Infinity;
     for (const l of this._leaves) {
       const right = l.x + l.w, bottom = l.y + l.h;
@@ -4460,26 +4854,6 @@ function parseBgColor(css) {
 
 // Interpolate a small palette (e.g. 7 HSL stops) into `count` evenly spaced
 // entries by linear interpolation in HSL space.
-function interpolatePalette(palette, count) {
-  if (palette.length >= count) return palette;
-  const stops = palette.map((c) => {
-    const m = /hsl\(\s*([\d.]+)\s*,\s*([\d.]+)%?\s*,\s*([\d.]+)%?\s*\)/.exec(c);
-    return m ? [+m[1], +m[2], +m[3]] : [0, 0, 50];
-  });
-  const out = [];
-  for (let i = 0; i < count; i++) {
-    const t = i / (count - 1) * (stops.length - 1);
-    const idx = Math.min(stops.length - 2, Math.floor(t));
-    const frac = t - idx;
-    const a = stops[idx], b = stops[idx + 1];
-    const h = a[0] + (b[0] - a[0]) * frac;
-    const s = a[1] + (b[1] - a[1]) * frac;
-    const l = a[2] + (b[2] - a[2]) * frac;
-    out.push(`hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l.toFixed(1)}%)`);
-  }
-  return out;
-}
-
 // Properties that define the data source — changing these invalidates the
 // cached lazy tree so it gets rebuilt from scratch on the next render.
 const DATA_PROPS = new Set(['root', 'labels', 'parents', 'parentIndices', 'values', 'ids', 'getChildren', 'getValue', 'getLabel', 'getId', 'getColor']);

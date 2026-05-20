@@ -338,3 +338,27 @@ export function toHsl({ h, s, l }) {
   const clampPct = (v) => Math.max(0, Math.min(100, v));
   return `hsl(${h}, ${clampPct(s)}%, ${clampPct(l)}%)`;
 }
+
+// Interpolate a small categorical palette up to `count` HSL stops so a
+// quantitative color scale gets fine-grained gradient bins instead of a
+// few coarse ones. Used by the renderer when the active palette has
+// fewer entries than the scale resolution wants.
+export function interpolatePalette(palette, count) {
+  if (palette.length >= count) return palette;
+  const stops = palette.map((c) => {
+    const m = /hsl\(\s*([\d.]+)\s*,\s*([\d.]+)%?\s*,\s*([\d.]+)%?\s*\)/.exec(c);
+    return m ? [+m[1], +m[2], +m[3]] : [0, 0, 50];
+  });
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1) * (stops.length - 1);
+    const idx = Math.min(stops.length - 2, Math.floor(t));
+    const frac = t - idx;
+    const a = stops[idx], b = stops[idx + 1];
+    const h = a[0] + (b[0] - a[0]) * frac;
+    const s = a[1] + (b[1] - a[1]) * frac;
+    const l = a[2] + (b[2] - a[2]) * frac;
+    out.push(`hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l.toFixed(1)}%)`);
+  }
+  return out;
+}

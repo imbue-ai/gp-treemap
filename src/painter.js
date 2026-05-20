@@ -131,3 +131,39 @@ export function paintAll(image, cells, luts, background) {
     paintCell(data, width, rx, ry, rw, rh, luts[c.lutIndex]);
   }
 }
+
+/**
+ * Build a canvas-pixel-sized Uint32Array where each entry is `cellIndex + 1`
+ * (0 = background). Hit-test becomes a single memory read on the main
+ * thread: `idGrid[y * width + x] - 1` → index into the cells array.
+ *
+ * Uses the same rounding as paintAll so the id-grid is pixel-exact aligned
+ * with what the user actually sees.
+ *
+ * @param {Uint32Array} idGrid  length width*height
+ * @param {number}      width
+ * @param {number}      height
+ * @param {Array<{x,y,w,h}>} cells
+ */
+export function paintIdGrid(idGrid, width, height, cells) {
+  // Background = 0. The grid is initialised to zero by the caller (Uint32Array
+  // default), so we only write inside cells. Pixel ordering matches the row-
+  // major data layout of ImageData so a single (y * width + x) lookup works.
+  for (let k = 0; k < cells.length; k++) {
+    const c = cells[k];
+    const x0 = Math.round(c.x);
+    const y0 = Math.round(c.y);
+    const x1 = Math.round(c.x + c.w);
+    const y1 = Math.round(c.y + c.h);
+    const rx = x0 < 0 ? 0 : x0;
+    const ry = y0 < 0 ? 0 : y0;
+    const rxEnd = x1 > width  ? width  : x1;
+    const ryEnd = y1 > height ? height : y1;
+    if (rxEnd <= rx || ryEnd <= ry) continue;
+    const stamp = (k + 1) >>> 0;  // reserve 0 for background
+    for (let y = ry; y < ryEnd; y++) {
+      const rowStart = y * width;
+      idGrid.fill(stamp, rowStart + rx, rowStart + rxEnd);
+    }
+  }
+}
